@@ -250,8 +250,8 @@ pub async fn set_key_attributes(srv: &TestServer, user_id: i64) {
     sqlx::query(
         "INSERT INTO key_attributes(user_id, kek_salt, encrypted_key, key_decryption_nonce, public_key, encrypted_secret_key, \
          secret_key_decryption_nonce, mem_limit, ops_limit, master_key_encrypted_with_recovery_key, master_key_decryption_nonce, \
-         recovery_key_encrypted_with_master_key, recovery_key_decryption_nonce) \
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+         recovery_key_encrypted_with_master_key, recovery_key_decryption_nonce, creation_time) \
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 1)",
     )
     .bind(user_id)
     .bind(b(16))

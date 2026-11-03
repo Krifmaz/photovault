@@ -85,6 +85,8 @@ async fn main() -> anyhow::Result<()> {
             let listener = tokio::net::TcpListener::bind(&listen).await?;
             tracing::info!(%listen, storage = state.store.name(), "photovault listening");
             photovault_server::storage::spawn_maintenance(&state);
+            photovault_server::library::spawn_background(state.clone());
+            photovault_server::legacy::spawn_background(state.clone());
             axum::serve(listener, photovault_server::app(state))
                 .with_graceful_shutdown(shutdown_signal())
                 .await?;

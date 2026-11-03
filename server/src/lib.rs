@@ -15,6 +15,7 @@ pub mod entities;
 pub mod error;
 pub mod jwt;
 pub mod legacy;
+pub mod library;
 pub mod mail;
 pub mod metrics;
 pub mod public;
@@ -23,6 +24,7 @@ pub mod social;
 pub mod state;
 pub mod storage;
 pub mod testing;
+pub mod users;
 
 use axum::Router;
 use axum::extract::{MatchedPath, Request};
