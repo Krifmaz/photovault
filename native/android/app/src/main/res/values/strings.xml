@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Photovault Native</string>
+    <string name="app_name_short">Photovault</string>
+    <string name="beta">BETA</string>
+    <string name="back">Back</string>
+    <string name="password_show">Show password</string>
+    <string name="password_hide">Hide password</string>
+
+    <!-- Connect -->
+    <string name="connect_title">Connect to your server</string>
+    <string name="connect_subtitle">Enter the address of your Photovault server, pick one found on this network, or scan the QR code from its settings page.</string>
+    <string name="connect_address">Server address</string>
+    <string name="connect_address_hint">photos.example.com or 10.0.1.7:8095</string>
+    <string name="connect_scan_qr">Scan QR code</string>
+    <string name="connect_check">Check address</string>
+    <string name="connect_continue">Continue</string>
+    <string name="connect_version">Version %1$s</string>
+    <string name="connect_compatible">Compatible server</string>
+    <string name="connect_compatible_detail">This server works with the app but does not report a name or version.</string>
+    <string name="connect_unreachable">Can\'t reach %1$s. Are you on your home Wi-Fi?</string>
+    <string name="connect_not_photovault">%1$s answered, but it isn\'t a Photovault server.</string>
+    <string name="connect_empty">Enter your server\'s address first.</string>
+    <string name="connect_bad_qr">That QR code isn\'t a Photovault server code.</string>
+    <string name="connect_other">Couldn\'t connect: %1$s</string>
+    <string name="connect_on_network">On this network</string>
+    <string name="connect_on_network_none">Looking for servers on this Wi-Fi…</string>
+    <string name="connect_saved">Saved servers</string>
+    <string name="connect_saved_active">%1$s · current</string>
+    <string name="connect_saved_remove">Remove %1$s</string>
+
+    <!-- QR -->
+    <string name="qr_permission">The camera is needed to scan your server\'s QR code.</string>
+    <string name="qr_permission_denied">Camera access was refused. Allow it to scan the code, or type the address instead.</string>
+    <string name="qr_allow_camera">Allow camera</string>
+    <string name="qr_hint">Point the camera at the QR code on your server\'s settings page.</string>
+
+    <!-- Sign in -->
+    <string name="signin_title">Sign in</string>
+    <string name="signin_subtitle">to %1$s</string>
+    <string name="signin_email">Email</string>
+    <string name="signin_password">Password</string>
+    <string name="signin_action">Sign in</string>
+    <string name="signin_use_recovery">Use recovery key</string>
+    <string name="signin_create_account">Create account</string>
+    <string name="signin_create_account_note">Creating an account in this app is coming soon. Create it on your server\'s web page, then sign in here.</string>
+    <string name="signin_change_server">Change server</string>
+    <string name="signin_missing">Fill in every field.</string>
+    <string name="signin_incorrect_password">Incorrect email or password.</string>
+    <string name="signin_incorrect_code">That code is not right. Check it and try again.</string>
+
+    <string name="code_email_title">Check your email</string>
+    <string name="code_email_subtitle">We sent a 6-digit code to %1$s.</string>
+    <string name="code_totp_title">Two-factor authentication</string>
+    <string name="code_totp_subtitle">Enter the 6-digit code from your authenticator app.</string>
+    <string name="code_label">Code</string>
+    <string name="code_verify">Verify</string>
+    <string name="code_resend">Send a new code</string>
+
+    <string name="passkey_title">Passkey required</string>
+    <string name="passkey_subtitle">This account signs in with a passkey. Finish in your browser, then come back to the app.</string>
+    <string name="passkey_open">Open browser</string>
+    <string name="passkey_no_browser">No browser is installed to finish the passkey sign-in.</string>
+
+    <string name="recovery_title">Use recovery key</string>
+    <string name="recovery_subtitle">Enter the 24-word recovery key you saved when you created your account, then choose a new password.</string>
+    <string name="recovery_key">Recovery key</string>
+    <string name="recovery_key_hint">24 words separated by spaces</string>
+    <string name="recovery_new_password">New password</string>
+    <string name="recovery_confirm_password">Confirm new password</string>
+    <string name="recovery_action">Recover account</string>
+    <string name="recovery_mismatch">The passwords don\'t match.</string>
+    <string name="recovery_too_short">Use at least %1$d characters.</string>
+
+    <!-- Timeline -->
+    <string name="timeline_title">Photos</string>
+    <string name="timeline_today">Today</string>
+    <string name="timeline_yesterday">Yesterday</string>
+    <string name="timeline_syncing">Syncing…</string>
+    <string name="timeline_demo">Demo library (built without photovault-core)</string>
+    <string name="timeline_account">Account</string>
+    <string name="timeline_sync_now">Sync now</string>
+    <string name="timeline_switch_server">Switch server</string>
+    <string name="timeline_sign_out">Sign out</string>
+    <string name="timeline_empty_title">No photos yet</string>
+    <string name="timeline_empty_body">Photos you back up to this server will show up here.</string>
+
+    <!-- Viewer -->
+    <string name="viewer_video_error">Can\'t play this video. %1$s</string>
+</resources>

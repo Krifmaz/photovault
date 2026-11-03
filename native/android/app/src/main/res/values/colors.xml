@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- encore-tokens.json light.bg; values-night has dark.bg -->
+    <color name="encore_bg">#F6F6FB</color>
+    <!-- launcher tile: branding/icon.svg background -->
+    <color name="ic_launcher_background">#1C1C1E</color>
+</resources>
