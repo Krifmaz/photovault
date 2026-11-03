@@ -7,19 +7,14 @@ import "package:dio/dio.dart";
 import "package:ente_pure_utils/ente_pure_utils.dart";
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:photos/core/error-reporting/tunneled_transport.dart';
-import "package:photos/core/exceptions.dart";
 import 'package:photos/models/typedefs.dart';
 import "package:photos/utils/device_info.dart";
 import "package:photos/utils/ram_check_util.dart";
-import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 extension SuperString on String {
   Iterable<String> chunked(int chunkSize) sync* {
@@ -82,15 +77,10 @@ extension SuperLogRecord on LogRecord {
   }
 }
 
+// PHOTOVAULT: telemetry removed. Sentry crash reporting (DSN, tunnel,
+// uploader, user ID, "Crash reporting" preference) is gone; logs only go to
+// local files, which the user can still export/share manually.
 class LogConfig {
-  String? sentryDsn;
-
-  String? tunnel;
-
-  Duration? sentryInitTimeout;
-
-  Duration sentryRetryDelay;
-
   // Null disables file logging; empty uses the default directory.
   String? logDirPath;
 
@@ -105,10 +95,6 @@ class LogConfig {
   String prefix;
 
   LogConfig({
-    this.sentryDsn,
-    this.tunnel,
-    this.sentryInitTimeout,
-    this.sentryRetryDelay = const Duration(seconds: 30),
     this.logDirPath,
     this.maxLogFiles = 10,
     this.enableInDebugMode = false,
@@ -129,39 +115,22 @@ class SuperLogging {
 
   static late LogConfig config;
 
-  static late SharedPreferences _preferences;
-
   static bool _isRootLogListenerRegistered = false;
-
-  static const keyShouldReportCrashes = "should_report_crashes";
 
   static Future<void> main([LogConfig? appConfig]) async {
     appConfig ??= LogConfig();
     SuperLogging.config = appConfig;
 
     WidgetsFlutterBinding.ensureInitialized();
-    _preferences = await SharedPreferences.getInstance();
 
     appVersion ??= await getAppVersion();
-    final isFDroidClient = await isFDroidBuild();
-    if (isFDroidClient) {
-      appConfig.sentryDsn = null;
-      appConfig.tunnel = null;
-    }
 
+    // PHOTOVAULT: telemetry removed (no Sentry setup).
     final enable = appConfig.enableInDebugMode || kReleaseMode;
-    sentryIsEnabled =
-        enable &&
-        appConfig.sentryDsn != null &&
-        !isFDroidClient &&
-        shouldReportCrashes();
     fileIsEnabled = enable && appConfig.logDirPath != null;
 
     if (fileIsEnabled) {
       await setupLogDir();
-    }
-    if (sentryIsEnabled) {
-      setupSentry().ignore();
     }
 
     Logger.root.level = rootLoggerLevel;
@@ -171,22 +140,11 @@ class SuperLogging {
       _isRootLogListenerRegistered = true;
     }
 
-    if (isFDroidClient) {
-      assert(
-        sentryIsEnabled == false,
-        "sentry dsn should be disabled for "
-        "f-droid config  ${appConfig.sentryDsn} & ${appConfig.tunnel}",
-      );
-    }
-
     if (!enable) {
-      $.info("detected debug mode; sentry & file logging disabled.");
+      $.info("detected debug mode; file logging disabled.");
     }
     if (fileIsEnabled) {
       $.info("log file for today: $logFile with prefix ${appConfig.prefix}");
-    }
-    if (sentryIsEnabled) {
-      $.info("sentry uploader started");
     }
 
     unawaited(
@@ -203,58 +161,13 @@ class SuperLogging {
 
     if (appConfig.body == null) return;
 
-    if (enable && sentryIsEnabled) {
-      final sentryInitTimeout = appConfig.sentryInitTimeout;
-      if (sentryInitTimeout == null) {
-        await SentryFlutter.init(
-          _configureSentryOptions,
-          appRunner: () => kDebugMode
-              ? _runWithUnhandledErrorLogging(appConfig!.body!)
-              : appConfig!.body!(),
-        );
-      } else {
-        try {
-          await SentryFlutter.init(
-            _configureSentryOptions,
-          ).timeout(sentryInitTimeout);
-        } catch (e) {
-          sentryIsEnabled = false;
-          $.warning(
-            "Sentry init did not complete, running body without it: $e",
-          );
-        }
-        if (kDebugMode) {
-          await _runWithUnhandledErrorLogging(appConfig.body!);
-        } else {
-          await appConfig.body!();
-        }
-      }
+    // PHOTOVAULT: telemetry removed (the body always runs without Sentry).
+    if (kDebugMode) {
+      // Keep debug-only until we're sure this doesn't cause regressions.
+      await _runWithUnhandledErrorLogging(appConfig.body!);
     } else {
-      if (kDebugMode) {
-        // Keep debug-only until we're sure this doesn't cause regressions.
-        await _runWithUnhandledErrorLogging(appConfig.body!);
-      } else {
-        await appConfig.body!();
-      }
+      await appConfig.body!();
     }
-  }
-
-  static void _configureSentryOptions(SentryFlutterOptions options) {
-    options.dsn = config.sentryDsn;
-    options.anrEnabled = true;
-    options.anrTimeoutInterval = const Duration(seconds: 5);
-    options.httpClient = http.Client();
-    final tunnel = config.tunnel;
-    if (tunnel != null) {
-      options.transport = TunneledTransport(Uri.parse(tunnel), options);
-    }
-    options.beforeSend = (SentryEvent event, Hint hint) async {
-      final dynamic error = event.throwable;
-      if (error != null && _shouldSkipSentry(error)) {
-        return null;
-      }
-      return event;
-    };
   }
 
   static Future<void> _runWithUnhandledErrorLogging(
@@ -276,76 +189,6 @@ class SuperLogging {
     });
   }
 
-  static Future<void> setUserID(String userID) async {
-    if (config.sentryDsn != null) {
-      $.finest("setting sentry user ID to: $userID");
-      Sentry.configureScope(
-        (scope) => scope
-            .setUser(SentryUser(id: userID))
-            .onError(
-              (e, s) => $.warning("failed to configure scope user", e, s),
-            ),
-      );
-    }
-  }
-
-  static bool _shouldSkipSentry(Object error) {
-    if (error is DioException) {
-      return true;
-    }
-    final bool result =
-        error is LocallyHandledError ||
-        error is TaskQueueTimeoutException ||
-        error is TaskQueueOverflowException ||
-        error is TaskQueueCancelledException;
-    if (kDebugMode && result) {
-      $.info('Not sending error to sentry: $error');
-    }
-    return result;
-  }
-
-  static Future<void> _sendErrorToSentry(
-    Object error,
-    StackTrace? stack, {
-    LogRecord? rec,
-  }) async {
-    try {
-      if (kDebugMode && error is StackTrace) {
-        _reportInvalidLoggerUsageInDebug(rec, error);
-      }
-
-      if (_shouldSkipSentry(error)) {
-        return;
-      }
-
-      final executionContext = _getExecutionContext();
-
-      if (rec != null) {
-        await Sentry.captureException(
-          error,
-          stackTrace: stack,
-          withScope: (scope) {
-            scope.setContexts('log_details', {'message': rec.message});
-            scope.setTag('logger', rec.loggerName);
-            scope.setTag('level', rec.level.name);
-            scope.setTag('execution_context', executionContext);
-          },
-        );
-      } else {
-        await Sentry.captureException(
-          error,
-          stackTrace: stack,
-          withScope: (scope) {
-            scope.setTag('execution_context', executionContext);
-          },
-        );
-      }
-    } catch (e) {
-      $.info('Sending report to sentry failed: $e');
-      $.info('Original error: $error');
-    }
-  }
-
   static void _reportInvalidLoggerUsageInDebug(
     LogRecord? rec,
     StackTrace stack,
@@ -365,14 +208,6 @@ class SuperLogging {
       );
       return true;
     }());
-  }
-
-  static String _getExecutionContext() {
-    final prefix = config.prefix.trim();
-    if (prefix.isEmpty) return 'foreground';
-    if (prefix.contains('[bg]')) return 'background';
-    if (prefix.contains('[fbg]')) return 'firebase_background';
-    return 'unknown';
   }
 
   static String _lastExtraLines = '';
@@ -431,12 +266,9 @@ class SuperLogging {
       }
     }
 
-    if (sentryIsEnabled && error != null) {
-      _sendErrorToSentry(
-        error,
-        rec?.stackTrace ?? stackTrace,
-        rec: rec,
-      ).ignore();
+    // PHOTOVAULT: telemetry removed (errors are no longer sent to Sentry).
+    if (kDebugMode && error is StackTrace) {
+      _reportInvalidLoggerUsageInDebug(rec, error);
     }
   }
 
@@ -465,43 +297,6 @@ class SuperLogging {
       // ignore: avoid_print
       text.chunked(logChunkSize).forEach(print);
     }
-  }
-
-  static final sentryQueueControl = StreamController<Error>();
-
-  static bool sentryIsEnabled = false;
-
-  static Future<void> setupSentry() async {
-    await for (final error in sentryQueueControl.stream.asBroadcastStream()) {
-      try {
-        if (_shouldSkipSentry(error)) {
-          continue;
-        }
-        await Sentry.captureException(error);
-      } catch (e) {
-        $.fine(
-          "sentry upload failed; will retry after ${config.sentryRetryDelay}",
-        );
-        doSentryRetry(error);
-      }
-    }
-  }
-
-  static void doSentryRetry(Error error) async {
-    await Future.delayed(config.sentryRetryDelay);
-    sentryQueueControl.add(error);
-  }
-
-  static bool shouldReportCrashes() {
-    if (_preferences.containsKey(keyShouldReportCrashes)) {
-      return _preferences.getBool(keyShouldReportCrashes)!;
-    } else {
-      return true;
-    }
-  }
-
-  static Future<void> setShouldReportCrashes(bool value) {
-    return _preferences.setBool(keyShouldReportCrashes, value);
   }
 
   static File? logFile;
@@ -555,14 +350,5 @@ class SuperLogging {
   static Future<String> getAppVersion() async {
     final pkgInfo = await PackageInfo.fromPlatform();
     return "${pkgInfo.version}+${pkgInfo.buildNumber}";
-  }
-
-  // disable sentry on f-droid. We need to make it opt-in preference
-  static Future<bool> isFDroidBuild() async {
-    if (!Platform.isAndroid) {
-      return false;
-    }
-    final pkgName = (await PackageInfo.fromPlatform()).packageName;
-    return pkgName.startsWith("io.ente.photos.fdroid");
   }
 }

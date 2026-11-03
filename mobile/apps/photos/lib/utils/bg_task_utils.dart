@@ -108,8 +108,7 @@ void callbackDispatcher() {
           }
         }
       },
-      prefix: "[bg]",
-      sentryInitTimeout: const Duration(seconds: 5),
+      prefix: "[bg]", // PHOTOVAULT: telemetry removed (Sentry init timeout)
     ).onError((_, _) {
       failure = "Didn't finished correctly!";
       return;

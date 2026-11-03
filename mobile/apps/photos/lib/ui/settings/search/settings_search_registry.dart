@@ -229,15 +229,7 @@ class SettingsSearchRegistry {
           isSubPage: true,
           keywords: ["passkey", "webauthn", "biometric"],
         ),
-      SettingsSearchItem(
-        title: l10n.crashReporting,
-        subtitle: l10n.security,
-        sectionPath: l10n.security,
-        icon: HugeIcons.strokeRoundedBug02,
-        routeBuilder: (_) => const SecuritySettingsPage(),
-        isSubPage: true,
-        keywords: ["crash", "reporting", "diagnostics"],
-      ),
+      // PHOTOVAULT: telemetry removed (the "Crash reporting" entry).
       SettingsSearchItem(
         title: l10n.appLock,
         subtitle: l10n.security,

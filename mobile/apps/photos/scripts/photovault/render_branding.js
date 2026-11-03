@@ -83,11 +83,6 @@ for (const [d, m] of Object.entries(dens)) {
     job(`${res}/drawable-${d}/${n}.png`, art(GLYPH, { scale: 0.82 }), 108 * m);
   }
   job(
-    `${res}/drawable-${d}/ic_ducky_hugging_e_launcher_foreground.png`,
-    art(GLYPH, { scale: 0.82 }),
-    256 * m,
-  );
-  job(
     `${res}/drawable-${d}/ic_monochrome_launcher_foreground.png`,
     art(glyphMono("#ffffff"), { scale: 0.82 }),
     108 * m,
@@ -108,7 +103,7 @@ job(`${app}/android/app/src/main/play/listings/en-US/graphics/icon/icon.png`, ar
 });
 
 // ---------- iOS ----------
-for (const set of ["IconGreen", "IconLight", "IconDark", "IconOG", "IconDuckyHuggingE"]) {
+for (const set of ["IconGreen", "IconLight", "IconDark", "IconOG"]) {
   const dir = `${iosAssets}/${set}.appiconset`;
   job(`${dir}/${set}Any.png`, art(ICON_SQUARE), 1024, 1024, { opaque: true });
   job(`${dir}/${set}Dark.png`, art(GLYPH), 1024);
@@ -126,11 +121,11 @@ const sizeOf = (p) => {
   const b = fs.readFileSync(p);
   return [b.readUInt32BE(16), b.readUInt32BE(20)];
 };
-for (const n of ["icon-green", "icon-light", "icon-dark", "icon-og", "icon-dev", "icon-ducky-hugging-e"]) {
+for (const n of ["icon-green", "icon-light", "icon-dark", "icon-og", "icon-dev"]) {
   const [w, h] = sizeOf(`${li}/${n}.png`);
   job(`${li}/${n}.png`, art(ICON), w, h);
 }
-for (const n of ["icon-foreground", "icon-og-foreground", "icon-ducky-hugging-e-foreground"]) {
+for (const n of ["icon-foreground", "icon-og-foreground"]) {
   const [w, h] = sizeOf(`${li}/${n}.png`);
   job(`${li}/${n}.png`, art(GLYPH, { scale: 0.82 }), w, h);
 }

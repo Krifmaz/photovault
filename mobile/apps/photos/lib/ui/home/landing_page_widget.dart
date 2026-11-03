@@ -8,6 +8,8 @@ import "package:flutter/foundation.dart";
 import 'package:flutter/material.dart';
 import "package:photos/app.dart";
 import 'package:photos/core/configuration.dart';
+import 'package:photos/core/event_bus.dart'; // PHOTOVAULT: payments removed
+import 'package:photos/events/subscription_purchased_event.dart'; // PHOTOVAULT: payments removed
 import "package:photos/locale.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/theme/ente_theme.dart";
@@ -18,7 +20,6 @@ import 'package:photos/ui/account/password_reentry_page.dart';
 import 'package:photos/ui/components/buttons/button_widget.dart';
 import 'package:photos/ui/components/dialog_widget.dart';
 import 'package:photos/ui/components/models/button_type.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import "package:photos/ui/settings/developer_settings_tap_area.dart";
 import "package:photos/ui/settings/developer_settings_widget.dart";
 import "package:rive/rive.dart" as rive;
@@ -268,7 +269,9 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
       } else if (Configuration.instance.getKey() == null) {
         page = const PasswordReentryPage();
       } else {
-        page = getSubscriptionPage(isOnBoarding: true);
+        // PHOTOVAULT: payments removed (was the onboarding plan picker).
+        Bus.instance.fire(SubscriptionPurchasedEvent());
+        return;
       }
     }
     unawaited(
@@ -293,7 +296,9 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
       } else if (Configuration.instance.getKey() == null) {
         page = const PasswordReentryPage();
       } else {
-        page = getSubscriptionPage(isOnBoarding: true);
+        // PHOTOVAULT: payments removed (was the onboarding plan picker).
+        Bus.instance.fire(SubscriptionPurchasedEvent());
+        return;
       }
     }
     Navigator.of(context).push(

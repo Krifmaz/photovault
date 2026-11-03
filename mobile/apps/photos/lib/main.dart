@@ -40,7 +40,6 @@ import "package:photos/locale.dart";
 import 'package:photos/module/upload/service/file_uploader.dart';
 import 'package:photos/module/upload/service/local_file_update_service.dart';
 import "package:photos/service_locator.dart";
-import "package:photos/services/account/purchase_update_listener.dart";
 import "package:photos/services/account/user_service.dart";
 import 'package:photos/services/app_lifecycle_service.dart';
 import 'package:photos/services/collections_service.dart';
@@ -108,7 +107,7 @@ Future<void> wallpaperMain() => runWallpaperApp();
 void main() async {
   debugRepaintRainbowEnabled = false;
   WidgetsFlutterBinding.ensureInitialized();
-  await configureStoreKit();
+  // PHOTOVAULT: payments removed (no StoreKit purchase listener).
   ente_ui.AppThemeConfig.initialize(ente_ui.EnteApp.photos);
   await initIsIPad();
   if (isIPad) {
@@ -699,16 +698,13 @@ Future<void> _sync(String caller) async {
 Future runWithLogs(
   Function() function, {
   String prefix = "",
-  Duration? sentryInitTimeout,
 }) async {
+  // PHOTOVAULT: telemetry removed (no Sentry DSN, tunnel or init timeout).
   await SuperLogging.main(
     LogConfig(
       body: function,
       logDirPath: (await getApplicationSupportDirectory()).path + "/logs",
       maxLogFiles: 5,
-      sentryDsn: kDebugMode ? sentryDebugDSN : sentryDSN,
-      tunnel: sentryTunnel,
-      sentryInitTimeout: sentryInitTimeout,
       enableInDebugMode: true,
       prefix: prefix,
     ),

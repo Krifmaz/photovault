@@ -17,7 +17,6 @@ import 'package:photos/core/cache/image_cache.dart';
 import 'package:photos/core/cache/thumbnail_in_memory_cache.dart';
 import 'package:photos/core/cache/video_cache_manager.dart';
 import 'package:photos/core/constants.dart';
-import 'package:photos/core/error-reporting/super_logging.dart';
 import 'package:photos/core/event_bus.dart';
 import 'package:photos/db/collections_db.dart';
 import 'package:photos/db/files_db.dart';
@@ -54,7 +53,6 @@ import 'package:photos/services/video_preview_service.dart';
 import 'package:photos/src/rust/third_party/ente_frb_lib/account_deletion.dart'
     as account_deletion;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 class Configuration implements LockScreenHost, AccountDeletionHost {
   Configuration._privateConstructor();
@@ -158,7 +156,7 @@ class Configuration implements LockScreenHost, AccountDeletionHost {
         }
         await _migrateSecurityStorageToFirstUnlock();
       }
-      SuperLogging.setUserID(await _getOrCreateAnonymousUserID()).ignore();
+      // PHOTOVAULT: telemetry removed (no anonymous Sentry user ID).
       _logger.info('User ID: ${getUserID()}');
     } catch (e, s) {
       _logger.severe("Configuration init failed", e, s);
@@ -548,13 +546,5 @@ class Configuration implements LockScreenHost, AccountDeletionHost {
       await _preferences.setBool(hasMigratedSecureStorageKey, true);
     }
     _logger.info("(for debugging) Migration check complete");
-  }
-
-  Future<String> _getOrCreateAnonymousUserID() async {
-    if (!_preferences.containsKey(anonymousUserIDKey)) {
-      //ignore: prefer_const_constructors
-      await _preferences.setString(anonymousUserIDKey, Uuid().v4());
-    }
-    return _preferences.getString(anonymousUserIDKey)!;
   }
 }

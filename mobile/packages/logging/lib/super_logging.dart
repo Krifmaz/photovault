@@ -4,18 +4,14 @@ import 'dart:core';
 import 'dart:io';
 
 import "package:dio/dio.dart";
-import 'package:ente_logging/tunneled_transport.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart' as log;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 typedef FutureOrVoidCallback = dynamic Function();
 
@@ -70,6 +66,10 @@ extension SuperLogRecord on log.LogRecord {
   }
 }
 
+// PHOTOVAULT: telemetry removed. Sentry is gone from this shared package
+// (Photos, Auth and Locker). `sentryDsn`, `tunnel`, `sentryRetryDelay`,
+// `setUserID` and the "report errors" preference are kept as no-ops so the
+// other apps still compile; nothing is ever sent anywhere.
 class LogConfig {
   String? sentryDsn;
 
@@ -126,68 +126,31 @@ class SuperLogging {
     appVersion ??= await getAppVersion();
 
     final enable = appConfig.enableInDebugMode || kReleaseMode;
-    sentryIsEnabled =
-        enable && appConfig.sentryDsn != null && shouldReportErrors();
+    sentryIsEnabled = false; // PHOTOVAULT: telemetry removed
     fileIsEnabled = enable && appConfig.logDirPath != null;
 
     if (fileIsEnabled) {
       await setupLogDir();
-    }
-    if (sentryIsEnabled) {
-      setupSentry().ignore();
     }
 
     log.Logger.root.level = kDebugMode ? log.Level.ALL : log.Level.INFO;
     log.Logger.root.onRecord.listen(onLogRecord);
 
     if (!enable) {
-      $.info("detected debug mode; sentry & file logging disabled.");
+      $.info("detected debug mode; file logging disabled.");
     }
     if (fileIsEnabled) {
       $.info("log file for today: $logFile with prefix ${appConfig.prefix}");
     }
-    if (sentryIsEnabled) {
-      $.info("sentry uploader started");
-    }
 
     if (appConfig.body == null) return;
 
-    if (enable && sentryIsEnabled) {
-      await SentryFlutter.init((options) {
-        options.anrEnabled = true;
-        options.anrTimeoutInterval = const Duration(seconds: 5);
-        options.dsn = appConfig!.sentryDsn;
-        options.httpClient = http.Client();
-        if (appConfig.tunnel != null) {
-          options.transport = TunneledTransport(
-            Uri.parse(appConfig.tunnel!),
-            options,
-          );
-        }
-      }, appRunner: () => appConfig!.body!());
-    } else {
-      await appConfig.body!();
-    }
+    // PHOTOVAULT: telemetry removed (no SentryFlutter.init).
+    await appConfig.body!();
   }
 
-  static void setUserID(String userID) async {
-    if (config.sentryDsn != null) {
-      Sentry.configureScope((scope) => scope.setUser(SentryUser(id: userID)));
-      $.info("setting sentry user ID to: $userID");
-    }
-  }
-
-  static Future<void> _sendErrorToSentry(
-    Object error,
-    StackTrace? stack,
-  ) async {
-    try {
-      await Sentry.captureException(error, stackTrace: stack);
-    } catch (e) {
-      $.info('Sending report to sentry.io failed: $e');
-      $.info('Original error: $error');
-    }
-  }
+  // PHOTOVAULT: telemetry removed; kept as a no-op for API compatibility.
+  static void setUserID(String userID) {}
 
   static String _lastExtraLines = '';
 
@@ -208,10 +171,6 @@ class SuperLogging {
       if (fileQueueEntries.length == 1) {
         flushQueue();
       }
-    }
-
-    if (sentryIsEnabled && rec.error != null) {
-      _sendErrorToSentry(rec.error!, null).ignore();
     }
   }
 
@@ -239,29 +198,8 @@ class SuperLogging {
     text.chunked(logChunkSize).forEach(debugPrint);
   }
 
-  static final sentryQueueControl = StreamController<Error>();
-
+  // PHOTOVAULT: telemetry removed; always false.
   static bool sentryIsEnabled = false;
-
-  static Future<void> setupSentry() async {
-    $.info("Setting up sentry");
-    SuperLogging.setUserID(await _getOrCreateAnonymousUserID());
-    await for (final error in sentryQueueControl.stream.asBroadcastStream()) {
-      try {
-        await Sentry.captureException(error);
-      } catch (e) {
-        $.fine(
-          "sentry upload failed; will retry after ${config.sentryRetryDelay}",
-        );
-        doSentryRetry(error);
-      }
-    }
-  }
-
-  static void doSentryRetry(Error error) async {
-    await Future.delayed(config.sentryRetryDelay);
-    sentryQueueControl.add(error);
-  }
 
   static bool shouldReportErrors() {
     if (_preferences.containsKey(keyShouldReportErrors)) {
@@ -273,14 +211,6 @@ class SuperLogging {
 
   static Future<void> setShouldReportErrors(bool value) {
     return _preferences.setBool(keyShouldReportErrors, value);
-  }
-
-  static Future<String> _getOrCreateAnonymousUserID() async {
-    if (!_preferences.containsKey(keyAnonymousUserID)) {
-      //ignore: prefer_const_constructors
-      await _preferences.setString(keyAnonymousUserID, Uuid().v4());
-    }
-    return _preferences.getString(keyAnonymousUserID)!;
   }
 
   static File? logFile;

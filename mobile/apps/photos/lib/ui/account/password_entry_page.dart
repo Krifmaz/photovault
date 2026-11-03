@@ -18,7 +18,6 @@ import 'package:photos/ui/common/web_page.dart';
 import "package:photos/ui/components/alert_bottom_sheet.dart";
 import "package:photos/ui/components/models/button_type.dart";
 import 'package:photos/ui/notification/toast.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/utils/dialog_util.dart';
 import "package:styled_text/styled_text.dart";
 
@@ -393,15 +392,11 @@ class _PasswordEntryPageState extends State<PasswordEntryPage> {
           await UserService.instance.setAttributes(result);
           await dialog.hide();
           Configuration.instance.resetVolatilePassword();
+          // PHOTOVAULT: payments removed. Ente opened the plan picker here;
+          // we go straight to the app, as its "continue with free" did.
           if (mounted) {
-            await Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (BuildContext context) {
-                  return getSubscriptionPage(isOnBoarding: true);
-                },
-              ),
-              (route) => route.isFirst,
-            );
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Bus.instance.fire(SubscriptionPurchasedEvent());
           }
           Bus.instance.fire(AccountConfiguredEvent());
         } catch (e, s) {

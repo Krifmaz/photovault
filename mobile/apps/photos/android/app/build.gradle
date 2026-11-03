@@ -1,13 +1,9 @@
 plugins {
-    id "com.google.gms.google-services" version "4.4.4" apply false
+    // PHOTOVAULT: de-Google. The Google services plugin (Firebase) is removed.
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.20'
-}
-
-if (file("google-services.json").exists()) {
-    apply plugin: "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -71,7 +67,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.ente.photos"
+        // PHOTOVAULT: package id. Namespace and Kotlin packages stay io.ente.photos.
+        applicationId = "app.photovault"
         minSdk = 26
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -94,17 +91,16 @@ android {
     }
 
     flavorDimensions "default"
+    // PHOTOVAULT: de-Google. `independent` is the flavor we build and has no
+    // suffix, so release is exactly app.photovault (debug: app.photovault.debug).
+    // The Play Store flavor is removed.
     productFlavors {
         independent {
             dimension "default"
-            applicationIdSuffix ".independent"
         }
         dev {
             dimension "default"
             applicationIdSuffix ".dev"
-        }
-        playstore {
-            dimension "default"
         }
         fdroid {
             dimension "default"

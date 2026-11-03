@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="724" height="724" viewBox="150 150 724 724">
+  <!-- PHOTOVAULT: in-app glyph (branding/glyph.svg as a single-colour shape without masks; the app tints it with the theme colour). Replaces Ente's duck mascot illustrations. -->
+  <defs><clipPath id="lens"><circle cx="512" cy="512" r="200"/></clipPath></defs>
+  <path fill="#000000" fill-rule="evenodd" d="M166.0 512.0a346 346 0 1 0 692 0a346 346 0 1 0 -692 0ZM218.0 512.0a294 294 0 1 0 588 0a294 294 0 1 0 -588 0ZM795.6 634.5a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM622.5 807.6a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM377.5 807.6a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM204.4 634.5a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM204.4 389.5a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM377.5 216.4a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM622.5 216.4a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM795.6 389.5a12 12 0 1 0 24 0a12 12 0 1 0 -24 0Z"/>
+  <circle cx="512" cy="512" r="200" fill="none" stroke="#000000" stroke-width="30"/>
+  <path clip-path="url(#lens)" fill="none" stroke="#000000" stroke-width="26" d="M592.0 465.8 L592.0 812.0 M592.0 558.2 L292.2 731.3 M512.0 604.4 L212.2 431.3 M432.0 558.2 L432.0 212.0 M432.0 465.8 L731.8 292.7 M512.0 419.6 L811.8 592.7"/>
+</svg>

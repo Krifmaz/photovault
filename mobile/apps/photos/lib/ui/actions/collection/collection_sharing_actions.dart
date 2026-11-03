@@ -23,7 +23,6 @@ import 'package:photos/ui/components/action_sheet_widget.dart';
 import 'package:photos/ui/components/buttons/button_widget.dart';
 import 'package:photos/ui/components/models/button_type.dart';
 import 'package:photos/ui/notification/toast.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/ui/sharing/widgets/sharing_role.dart';
 import 'package:photos/utils/dialog_util.dart';
 import 'package:photos/utils/email_util.dart';
@@ -759,25 +758,7 @@ class CollectionActions {
       title: Text(context.strings.sorry),
       content: Text(context.strings.subscribeToEnableSharing),
       actions: [
-        ButtonWidget(
-          buttonType: ButtonType.primary,
-          isInAlert: true,
-          shouldStickToDarkTheme: false,
-          buttonAction: ButtonAction.first,
-          shouldSurfaceExecutionStates: true,
-          labelText: context.strings.subscribe,
-          onTap: () async {
-            Navigator.of(context)
-                .push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) {
-                      return getSubscriptionPage();
-                    },
-                  ),
-                )
-                .ignore();
-          },
-        ),
+        // PHOTOVAULT: payments removed (the "Subscribe" button).
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: ButtonWidget(
