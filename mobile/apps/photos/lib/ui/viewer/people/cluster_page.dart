@@ -1,0 +1,267 @@
+import "dart:async";
+
+import "package:ente_pure_utils/ente_pure_utils.dart";
+import "package:ente_strings/ente_strings.dart";
+import "package:flutter/material.dart";
+import "package:photos/core/configuration.dart";
+import "package:photos/core/event_bus.dart";
+import "package:photos/events/app_mode_changed_event.dart";
+import "package:photos/events/files_updated_event.dart";
+import "package:photos/events/local_photos_updated_event.dart";
+import "package:photos/events/people_changed_event.dart";
+import "package:photos/models/file/file.dart";
+import "package:photos/models/file_load_result.dart";
+import "package:photos/models/gallery_type.dart";
+import "package:photos/models/ml/face/person.dart";
+import "package:photos/models/selected_files.dart";
+import "package:photos/service_locator.dart" show isLocalGalleryMode;
+import "package:photos/services/machine_learning/face_ml/feedback/cluster_feedback.dart";
+import "package:photos/services/machine_learning/ml_result.dart";
+import "package:photos/services/memory_lane/memory_lane_service.dart";
+import "package:photos/ui/components/banners/name_face_banner.dart";
+import "package:photos/ui/notification/toast.dart";
+import "package:photos/ui/viewer/actions/file_selection_overlay_bar.dart";
+import "package:photos/ui/viewer/gallery/gallery.dart";
+import "package:photos/ui/viewer/gallery/state/gallery_boundaries_provider.dart";
+import "package:photos/ui/viewer/gallery/state/gallery_files_inherited_widget.dart";
+import "package:photos/ui/viewer/gallery/state/selection_state.dart";
+import "package:photos/ui/viewer/people/add_person_action_sheet.dart";
+import "package:photos/ui/viewer/people/cluster_app_bar.dart";
+import "package:photos/ui/viewer/people/memory_lane_page_v2.dart";
+import "package:photos/ui/viewer/people/people_page.dart";
+import "package:photos/ui/viewer/people/person_face_widget.dart";
+import "package:photos/ui/viewer/people/save_person_banner.dart";
+
+class ClusterPage extends StatefulWidget {
+  final List<EnteFile> searchResult;
+  final bool enableGrouping;
+  final String tagPrefix;
+  final String? coverHeroTag;
+  final String clusterID;
+  final PersonEntity? personID;
+  final bool showNamingBanner;
+  final VoidCallback? onFilesChanged;
+
+  static const GalleryType appBarType = GalleryType.cluster;
+  static const GalleryType overlayType = GalleryType.cluster;
+
+  const ClusterPage(
+    this.searchResult, {
+    this.enableGrouping = true,
+    this.tagPrefix = "",
+    this.coverHeroTag,
+    required this.clusterID,
+    this.personID,
+    this.showNamingBanner = true,
+    this.onFilesChanged,
+    super.key,
+  });
+
+  @override
+  State<ClusterPage> createState() => _ClusterPageState();
+}
+
+enum ClusterPageResult { ignoredPerson }
+
+class _ClusterPageState extends State<ClusterPage> {
+  final _selectedFiles = SelectedFiles();
+  final _coverAppBarKey = GlobalKey();
+  late final List<EnteFile> files;
+  late final StreamSubscription<LocalPhotosUpdatedEvent> _filesUpdatedEvent;
+  late final StreamSubscription<PeopleChangedEvent> _peopleChangedEvent;
+  late final StreamSubscription<AppModeChangedEvent> _appModeChangedEvent;
+  late final ValueNotifier<Set<String>> _timelineNotifier;
+  late final VoidCallback _timelineListener;
+  bool get _localGalleryUiMode =>
+      isLocalGalleryMode && !Configuration.instance.hasConfiguredAccount();
+
+  @override
+  void initState() {
+    super.initState();
+    ClusterFeedbackService.setLastViewedClusterID(widget.clusterID);
+    files = List<EnteFile>.from(widget.searchResult)
+      ..sort((a, b) => (b.creationTime ?? 0).compareTo(a.creationTime ?? 0));
+    _filesUpdatedEvent = Bus.instance.on<LocalPhotosUpdatedEvent>().listen((
+      event,
+    ) {
+      if (event.type == EventType.deletedFromEverywhere ||
+          event.type == EventType.deletedFromRemote ||
+          event.type == EventType.hide) {
+        for (var updatedFile in event.updatedFiles) {
+          files.remove(updatedFile);
+        }
+        widget.onFilesChanged?.call();
+        setState(() {});
+      }
+    });
+    _peopleChangedEvent = Bus.instance.on<PeopleChangedEvent>().listen((event) {
+      if (event.source == widget.clusterID.toString()) {
+        if (event.type == PeopleEventType.removedFilesFromCluster) {
+          for (var updatedFile in event.relevantFiles!) {
+            files.remove(updatedFile);
+          }
+          widget.onFilesChanged?.call();
+          setState(() {});
+        }
+        if (event.type == PeopleEventType.removedFaceFromCluster) {
+          for (final String removedFaceID in event.relevantFaceIDs!) {
+            final int fileID = getFileIdFromFaceId<int>(removedFaceID);
+            files.removeWhere((file) => file.uploadedFileID == fileID);
+          }
+          widget.onFilesChanged?.call();
+          setState(() {});
+        }
+      }
+    });
+    _appModeChangedEvent = Bus.instance.on<AppModeChangedEvent>().listen((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    _timelineNotifier = MemoryLaneService.instance.readyPersonIds;
+    _timelineListener = () {
+      if (mounted) setState(() {});
+    };
+    _timelineNotifier.addListener(_timelineListener);
+    if (widget.personID == null) {
+      unawaited(
+        MemoryLaneService.instance.ensureTimelineReachability(
+          widget.clusterID,
+          isCluster: true,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _filesUpdatedEvent.cancel();
+    _peopleChangedEvent.cancel();
+    _appModeChangedEvent.cancel();
+    _timelineNotifier.removeListener(_timelineListener);
+    if (ClusterFeedbackService.lastViewedClusterID == widget.clusterID) {
+      ClusterFeedbackService.resetLastViewedClusterID();
+    }
+    super.dispose();
+  }
+
+  Future<void> _handleSavePerson() async {
+    if (_localGalleryUiMode) {
+      return;
+    }
+    if (widget.personID == null) {
+      final result = await showAssignPersonAction(
+        context,
+        clusterID: widget.clusterID,
+        file: files.isEmpty ? null : files.first,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (result != null) {
+        Navigator.pop(context);
+        final person = result is (PersonEntity, EnteFile) ? result.$1 : result;
+        routeToPage(
+          context,
+          PeoplePage(person: person, searchResult: null),
+        ).ignore();
+      }
+    } else {
+      showShortToast(context, "No personID or clusterID");
+    }
+  }
+
+  Future<void> _openMemoryLanePage() async {
+    if (widget.personID == null &&
+        MemoryLaneService.instance.hasReadyTimelineSync(
+          widget.clusterID,
+          isCluster: true,
+        )) {
+      await openMemoryLanePage(
+        context,
+        personId: widget.clusterID,
+        person: null,
+        isCluster: true,
+      );
+    }
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appBar = ClusterAppBar.sliverConfig(
+      ClusterPage.appBarType,
+      "${files.length} memories",
+      _selectedFiles,
+      widget.clusterID,
+      coverAppBarKey: _coverAppBarKey,
+      coverHeroTag: widget.coverHeroTag,
+      files: files,
+      memoryLaneReady: widget.personID == null
+          ? MemoryLaneService.instance.hasReadyTimelineSync(
+              widget.clusterID,
+              isCluster: true,
+            )
+          : false,
+      onMemoryLaneTap: _openMemoryLanePage,
+    );
+    final gallery = Gallery(
+      appBar: appBar,
+      asyncLoader: (creationStartTime, creationEndTime, {limit, asc}) {
+        final result = files
+            .where(
+              (file) =>
+                  file.creationTime! >= creationStartTime &&
+                  file.creationTime! <= creationEndTime,
+            )
+            .toList();
+        return Future.value(
+          FileLoadResult(result, result.length < files.length),
+        );
+      },
+      reloadEvent: Bus.instance.on<LocalPhotosUpdatedEvent>(),
+      forceReloadEvents: [Bus.instance.on<PeopleChangedEvent>()],
+      removalEventTypes: const {
+        EventType.deletedFromRemote,
+        EventType.deletedFromEverywhere,
+        EventType.hide,
+        EventType.peopleClusterChanged,
+      },
+      tagPrefix: widget.tagPrefix + widget.tagPrefix,
+      selectedFiles: _selectedFiles,
+      enableFileGrouping: widget.enableGrouping,
+      initialFiles: files,
+      header:
+          (_localGalleryUiMode || widget.showNamingBanner) && files.isNotEmpty
+          ? _localGalleryUiMode
+                ? const NameFaceBanner()
+                : SavePersonBanner(
+                    faceWidget: PersonFaceWidget(clusterID: widget.clusterID),
+                    text: context.strings.savePerson,
+                    subText: context.strings.findThemQuickly,
+                    onTap: _handleSavePerson,
+                  )
+          : null,
+    );
+    return GalleryBoundariesProvider(
+      child: GalleryFilesState(
+        child: Scaffold(
+          body: SelectionState(
+            selectedFiles: _selectedFiles,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                gallery,
+                FileSelectionOverlayBar(
+                  ClusterPage.overlayType,
+                  _selectedFiles,
+                  clusterID: widget.clusterID,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

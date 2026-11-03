@@ -1,0 +1,1 @@
+{ "extends": "ente-build-config/tsconfig-next.json", "include": ["."] }

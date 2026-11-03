@@ -1,0 +1,13 @@
+.env*.local
+
+*.tsbuildinfo
+
+dist
+
+.next/
+.next-dev/
+.next-desktop/
+out/
+next-env.d.ts
+
+packages/wasm/*/pkg/

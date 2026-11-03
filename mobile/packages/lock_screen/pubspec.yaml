@@ -1,0 +1,49 @@
+name: ente_lock_screen
+description: A Flutter package containing lock screen UI components and services for Ente apps
+
+resolution: workspace
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  ente_accounts:
+    path: ../accounts
+  ente_components:
+    path: ../ente_components
+  ente_configuration:
+    path: ../configuration
+  ente_crypto_api:
+    path: ../ente_crypto_api
+  ente_pure_utils:
+    path: ../ente_pure_utils
+  ente_screen_cover:
+    path: ../screen_cover
+  ente_strings:
+    path: ../strings
+  ente_ui:
+    path: ../ui
+  ente_utils:
+    path: ../utils
+  flutter:
+    sdk: flutter
+  flutter_animate: 4.5.2
+  # Version 9.2.4 leaves lock-screen keys behind after an app reinstall.
+  # Upgrade only after this is fixed or with a migration.
+  # https://github.com/juliansteenbakker/flutter_secure_storage/issues/870#issuecomment-2777447937
+  flutter_secure_storage: 9.0.0
+  flutter_svg: 2.3.0
+  local_auth: 3.0.1
+  local_auth_android: 2.0.8
+  local_auth_darwin: 2.0.3
+  local_auth_linux:
+    path: ../local_auth_linux
+  logging: 1.3.0
+  shared_preferences: 2.5.4
+
+dev_dependencies:
+  flutter_lints: 6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:

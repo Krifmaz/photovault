@@ -1,0 +1,2 @@
+-dontwarn com.google.errorprone.annotations.**
+-dontnote com.google.errorprone.annotations.**

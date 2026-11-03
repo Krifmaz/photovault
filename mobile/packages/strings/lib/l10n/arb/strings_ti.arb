@@ -1,0 +1,104 @@
+{
+  "account": "ጸብጻብ",
+  "all": "ኩሉ",
+  "blog": "ብሎግ",
+  "bothIssuerAndAccountCanNotBeEmpty": "እቲ ኣወሃሃዲ ዀነ እቲ ሕሳብ ባዶ ኪኸውን ኣይክእልን እዩ",
+  "changePassword": "ቃለ-ምስጢር ቀያይር",
+  "codeIssuerHint": "ኣዋጂ",
+  "contactSupport": "ደገፍ ኣድራሻ",
+  "@contactSupport": {
+    "description": "Contact support button label"
+  },
+  "crashAndErrorReporting": "ጸብጻብ ውድቀትን ጌጋን",
+  "data": "ሓበሬታ",
+  "deleteCodeMessage": "ነዚ ኮድ ክትድምስሶ ከም እትደሊ ርግጸኛ ዲኻ፧ እዚ ተግባር ንድሕሪት ዘይምለስ ኣይኮነን።",
+  "deleteCodeTitle": "ኮድ ይደምሰሰ፧",
+  "doNotSignOut": "ኣውጽኡኒ።",
+  "@doNotSignOut": {
+    "description": "Do not sign out button label"
+  },
+  "emailUsMessage": "በጃኹም ኢ-መይል ጽሓፉልና {email}",
+  "@emailUsMessage": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "faq": "FAQ",
+  "@faq": {
+    "description": "FAQ link label"
+  },
+  "generatingEncryptionKeysTitle": "ናይ ምስጢራዊ ቁልፊ ዪፍጠር...",
+  "@generatingEncryptionKeysTitle": {
+    "description": "Generating encryption keys title"
+  },
+  "getStarted": "ጀምር",
+  "importAccountPageTitle": "ዝርዝር ሕሳብ ኣእትዉ",
+  "importCodes": "ኮድ ኣእቱ",
+  "importEnterSetupKey": "ምድላው መፍትሕ ኣእቱ",
+  "incorrectDetails": "ጌጋ ዝርዝር-ሓበሬታ",
+  "incorrectPasswordTitle": "ግጉይ ቃለ-ምስጢር",
+  "@incorrectPasswordTitle": {
+    "description": "Title for incorrect password error"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "Generic OK button label"
+  },
+  "language": "ቋንቋ",
+  "loggingOut": "ወጸ...",
+  "@loggingOut": {
+    "description": "Message shown while logging out"
+  },
+  "merchandise": "ሸቐጥ",
+  "nextTotpTitle": "ቀጽሊ",
+  "notes": "መዘኻኸሪታት",
+  "oops": "ዉዉኡ",
+  "@oops": {
+    "description": "Oops error title"
+  },
+  "pleaseLoginAgain": "በጃኹም እንደገና እቶ",
+  "pleaseVerifyDetails": "በጃኹም ዝርዝር-ሓበሬታ ኣረጋግጹ እሞ እንደገና ፈትኑ",
+  "pleaseWait": "በጃኻ ተጸበ...",
+  "@pleaseWait": {
+    "description": "Please wait message"
+  },
+  "rateUsOnStore": "ብዛዕባና ርእይቶ ኣብ {storeName} ኣካፍሎ",
+  "@rateUsOnStore": {
+    "placeholders": {
+      "storeName": {}
+    }
+  },
+  "recoveryKey": "ምሕዋይ መፍትሕ",
+  "@recoveryKey": {
+    "description": "Recovery key label"
+  },
+  "reportABug": "ጌጋ ጸብጻብ ልኣኸ",
+  "@reportABug": {
+    "description": "Label for reporting a bug"
+  },
+  "save": "ዓቅብ",
+  "@save": {
+    "description": "Label for save button"
+  },
+  "secretCanNotBeEmpty": "ምስጢር ባዶ ኪኸውን ኣይክእልን እዩ",
+  "security": "ድሕንነት",
+  "sessionExpired": "ክፍለ ግዜኡ ኣኺሉ።",
+  "@sessionExpired": {
+    "description": "Error message when session has expired"
+  },
+  "signOutOtherDevices": "ካብ ካልኦት መሳርሒታት ኣውጽኡኒ።",
+  "@signOutOtherDevices": {
+    "description": "Sign out other devices button label"
+  },
+  "useRecoveryKey": "ምሕዋይ መፍትሕ ተጠቐም",
+  "@useRecoveryKey": {
+    "description": "Use recovery key button label"
+  },
+  "verifyPassword": "ቃለ-ምስጢር ኣረጋግጽ",
+  "@verifyPassword": {
+    "description": "Verify password button label"
+  },
+  "viewLogsAction": "ምዝገባታት ርአ"
+}

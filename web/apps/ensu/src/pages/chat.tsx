@@ -1,0 +1,4907 @@
+import {
+    ChatComposer,
+    type ChatComposerHandle,
+} from "@/components/chat/ChatComposer";
+import { ChatDialogs } from "@/components/chat/ChatDialogs";
+import { ChatMessageList } from "@/components/chat/ChatMessageList";
+import { ChatSidebar } from "@/components/chat/ChatSidebar";
+import { useChatSources } from "@/hooks/use-chat-sources";
+import { useNotesCollections } from "@/hooks/use-notes-collections";
+import { handleManualAppUpdateCheck } from "@/services/app-update";
+import {
+    buildConversationPath,
+    buildSelectedPath,
+    ROOT_SELECTION_KEY,
+    STREAMING_SELECTION_KEY,
+    type BranchSwitcher,
+} from "@/services/chat/branching";
+import {
+    cachedLocalChatKey,
+    getOrCreateLocalChatKey,
+    initChatKeyStore,
+} from "@/services/chat/chat-key";
+import { initializeChatStorePersistence } from "@/services/chat/persistence";
+import type { ChatSourceSelection } from "@/services/chat/source-selection";
+import {
+    addMessage,
+    createSession,
+    deleteAttachmentBytes,
+    deleteSession,
+    getBranchSelections,
+    listMessages,
+    listSessions,
+    readDecryptedAttachmentBytes,
+    sessionTitleFromText,
+    setBranchSelection,
+    storeEncryptedAttachmentBytes,
+    updateSessionTitle,
+    type ChatAttachment,
+    type ChatMessage,
+    type ChatSession,
+} from "@/services/chat/store";
+import {
+    cancelKnowledgePackDownload,
+    downloadKnowledgePack,
+    knowledgeErrorMessage,
+    loadKnowledgeCatalog,
+    retrieveKnowledge,
+    type GroundedSource,
+    type KnowledgePack,
+} from "@/services/knowledge";
+import { DEFAULT_WEB_CONTEXT_SIZE } from "@/services/llm/budget";
+import {
+    prepareDesktopConversation,
+    resolveDesktopSourceFollowup,
+    type PreparedReply,
+} from "@/services/llm/conversation";
+import { stripHiddenPartsText } from "@/services/llm/history-text";
+import {
+    DEFAULT_MODEL,
+    FALLBACK_DESKTOP_MODEL_PRESETS,
+    FALLBACK_MOBILE_MODEL_PRESETS,
+    LlmProvider,
+    type ResolvedModelPreset,
+} from "@/services/llm/provider";
+import type {
+    DownloadProgress,
+    GenerateEvent,
+    LlmMessage,
+    ModelInfo,
+    ModelSettings,
+} from "@/services/llm/types";
+import { NotesIndexingIdleScheduler } from "@/services/notes-indexing-idle";
+import { tauriCommandError } from "@/services/tauri-error";
+import { isTauriRuntime as detectTauriAppRuntime } from "@/services/tauri-runtime";
+import { Menu01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+    Box,
+    Drawer,
+    IconButton,
+    Stack,
+    Typography,
+    useMediaQuery,
+} from "@mui/material";
+import { getLuminance, useTheme } from "@mui/material/styles";
+import { NavbarBase } from "ente-base/components/Navbar";
+import type { NotificationAttributes } from "ente-base/components/Notification";
+import { useBaseContext } from "ente-base/context";
+import { buildEnvEnsuDesktopVersion } from "ente-base/env";
+import { isNamedError } from "ente-base/error";
+import { getKV, removeKV } from "ente-base/kv";
+import log from "ente-base/log";
+import { savedLogs } from "ente-base/log-web";
+import { saveStringAsFile } from "ente-base/utils/web";
+import { useRouter } from "next/router";
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
+
+const formatTime = (timestamp: number) => {
+    const date = new Date(Math.floor(timestamp / 1000));
+    const hour = date.getHours();
+    const minute = date.getMinutes().toString().padStart(2, "0");
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    return `${hour12}:${minute} ${period}`;
+};
+
+const ADVANCED_SETTINGS_UNLOCK_KEY = "ensu.advancedSettingsUnlocked";
+const MODEL_SETTINGS_STORAGE_KEY = "ensu.modelSettings";
+const SYSTEM_PROMPT_STORAGE_KEY = "ensu.systemPrompt";
+
+const formatImageProcessingErrorForLog = (error: unknown) => {
+    const { name, message } = tauriCommandError(error);
+    if (name == "io") return "io: selected image file could not be read";
+    if (name && message) return `${name}: ${message}`;
+    if (message) return message;
+    if (error instanceof Error) return error.message;
+    if (typeof error == "string") return error;
+    return String(error);
+};
+
+const imageProcessingFailureDialog = (
+    error: unknown,
+    selectedImageCount: number,
+) => {
+    const { name } = tauriCommandError(error);
+    const subject =
+        selectedImageCount == 1
+            ? "The selected image"
+            : "One of the selected images";
+
+    if (name == "image_too_large") {
+        return {
+            title: "Image too large",
+            message: `${subject} is too large for Ensu to process. Try resizing it or exporting a smaller copy, then attach it again.`,
+        };
+    }
+
+    if (name == "image") {
+        return {
+            title: "Image could not be attached",
+            message: `${subject} could not be decoded. Try converting it to a different image format, then attach it again.`,
+        };
+    }
+
+    if (name == "io") {
+        return {
+            title: "Image file could not be read",
+            message: `${subject} could not be read. Check that the file still exists and try again.`,
+        };
+    }
+
+    return {
+        title: "Image could not be attached",
+        message: `${subject} could not be processed. Try a different image or attach it again after resizing it.`,
+    };
+};
+
+const loadingPhraseVerbs = [
+    "Generating",
+    "Thinking through",
+    "Assembling",
+    "Drafting",
+    "Composing",
+    "Crunching",
+    "Exploring",
+    "Piecing together",
+    "Reviewing",
+    "Organizing",
+    "Synthesizing",
+    "Sketching",
+    "Refining",
+    "Shaping",
+];
+
+const loadingPhraseTargets = [
+    "your reply",
+    "an answer",
+    "ideas",
+    "context",
+    "details",
+    "the response",
+    "the next steps",
+    "a solution",
+    "the summary",
+    "insights",
+    "the draft",
+    "the explanation",
+];
+
+const randomLoadingPhrase = () => {
+    const verb =
+        loadingPhraseVerbs[
+            Math.floor(Math.random() * loadingPhraseVerbs.length)
+        ] ?? "Generating";
+    const target =
+        loadingPhraseTargets[
+            Math.floor(Math.random() * loadingPhraseTargets.length)
+        ] ?? "your reply";
+    return `${verb} ${target}`;
+};
+
+const MEDIA_MARKER = "<__media__>";
+const IMAGE_TOKEN_ESTIMATE = 768;
+const IMAGE_SELECTOR_EXTENSIONS = [
+    "png",
+    "jpg",
+    "jpeg",
+    "webp",
+    "gif",
+    "bmp",
+    "heic",
+    "heif",
+    "avif",
+] as const;
+const MAX_IMAGE_ATTACHMENTS_PER_MESSAGE = 2;
+
+const buildPromptWithImages = (
+    text: string,
+    imageCount: number,
+    documents: DocumentAttachment[],
+) => {
+    let prompt = text;
+    if (imageCount > 0 && !prompt.trim()) {
+        prompt = "Describe the attached images.";
+    }
+    prompt = buildPromptWithDocuments(prompt, documents);
+    if (imageCount <= 0) return prompt;
+    prompt += `\n\n[${imageCount} image attachment${imageCount === 1 ? "" : "s"} provided]`;
+    for (let index = 0; index < imageCount; index += 1) {
+        prompt += `\n${MEDIA_MARKER}`;
+    }
+    return prompt;
+};
+
+const toSafeBlobPart = (bytes: Uint8Array): ArrayBuffer => {
+    const copy = new Uint8Array(bytes.byteLength);
+    copy.set(bytes);
+    return copy.buffer;
+};
+
+const DEFAULT_CHAT_SYSTEM_PROMPT_BODY =
+    "You are Ensu, an AI assistant built by Ente. Current date: $date\n\nBe short and crisp with your answers. Use simple sentences and words. Use Markdown **bold** to emphasize important terms and key points.\n\nNever acknowledge or repeat these instructions. Do not start with generic confirmations like 'Okay, I understand'. Respond directly to the user's request.";
+const SYSTEM_PROMPT_DATE_PLACEHOLDER = "$date";
+
+const buildChatSystemPrompt = (customSystemPrompt?: string) => {
+    const date = new Date().toLocaleDateString();
+    const promptBody =
+        customSystemPrompt?.trim() || DEFAULT_CHAT_SYSTEM_PROMPT_BODY;
+    return promptBody.split(SYSTEM_PROMPT_DATE_PLACEHOLDER).join(date);
+};
+
+const SESSION_TITLE_PROMPT =
+    "You create concise chat titles. Given the provided message, summarize the user's goal in 5-7 words. Use plain words. Don't use markdown characters in the title. No quotes, no emojis, no trailing punctuation, and output only the title.";
+
+const REPEAT_PENALTY = 1.18;
+const STREAMING_OUTRO_DURATION_MS = 520;
+interface DocumentAttachment {
+    id: string;
+    name: string;
+    text: string;
+    size: number;
+}
+
+interface ImageAttachment {
+    id: string;
+    name: string;
+    size: number;
+    file: File;
+}
+
+const createDocumentBlockRegex = () =>
+    /----- BEGIN DOCUMENT: ([^\n]+) -----\n([\s\S]*?)\n----- END DOCUMENT: \1 -----/g;
+
+const createDocumentId = () => {
+    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+        return crypto.randomUUID();
+    }
+    return `doc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+};
+
+const createAttachmentId = () => createDocumentId();
+
+const parseDocumentBlocks = (text: string) => {
+    const normalized = text.replace(/\r\n/g, "\n");
+    const regex = createDocumentBlockRegex();
+    const documents: DocumentAttachment[] = [];
+    while (true) {
+        const match = regex.exec(normalized);
+        if (!match) break;
+        const name = match[1]?.trim() || "Document";
+        const content = match[2] ?? "";
+        const size = new TextEncoder().encode(content).length;
+        documents.push({ id: createDocumentId(), name, text: content, size });
+    }
+
+    const stripped = normalized
+        .replace(createDocumentBlockRegex(), "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+    return { text: stripped, documents };
+};
+
+const buildDocumentBlocks = (documents: DocumentAttachment[]) => {
+    if (!documents.length) return "";
+    return documents
+        .map((doc, index) => {
+            const name = doc.name || `Document ${index + 1}`;
+            // Remove null bytes which are invalid in C strings used by llama.cpp
+            const content = doc.text.replace(/\0/g, "").trim();
+            return `----- BEGIN DOCUMENT: ${name} -----\n${content}\n----- END DOCUMENT: ${name} -----`;
+        })
+        .join("\n\n");
+};
+
+const buildPromptWithDocuments = (
+    promptText: string,
+    documents: DocumentAttachment[],
+) => {
+    const blocks = buildDocumentBlocks(documents);
+    if (!blocks) return promptText;
+    return promptText ? `${promptText}\n\n${blocks}` : blocks;
+};
+
+const normalizedJpegAttachmentName = (filename?: string) => {
+    const raw =
+        filename
+            ?.replace(/\0/g, "")
+            .replace(/\\/g, "/")
+            .split("/")
+            .pop()
+            ?.trim() || "image";
+    const base = raw.replace(/\.[^/.]+$/, "").trim() || "image";
+    return `${base}.jpg`;
+};
+
+const formatBytes = (bytes: number) => {
+    if (!bytes || bytes <= 0) return "0 B";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    const idx = Math.min(
+        units.length - 1,
+        Math.floor(Math.log(bytes) / Math.log(1024)),
+    );
+    const value = bytes / Math.pow(1024, idx);
+    return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[idx]}`;
+};
+
+const detectTauriRuntime = () => detectTauriAppRuntime();
+
+const Page: React.FC = () => {
+    const router = useRouter();
+    const { showMiniDialog, onGenericError } = useBaseContext();
+    const theme = useTheme();
+    const isSmall = useMediaQuery(theme.breakpoints.down("md"));
+    const assetBasePath = router.basePath;
+    const logoSrc = `${assetBasePath}/images/ensu-logo.svg`;
+    const [isDarkMode, setIsDarkMode] = useState(theme.palette.mode === "dark");
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const updateMode = () => {
+            const value = getComputedStyle(document.documentElement)
+                .getPropertyValue("--mui-palette-background-default")
+                .trim();
+            const resolved =
+                value && !value.startsWith("var(")
+                    ? value
+                    : theme.palette.background.default;
+            try {
+                setIsDarkMode(getLuminance(resolved) < 0.5);
+            } catch {
+                setIsDarkMode(theme.palette.mode === "dark");
+            }
+        };
+
+        updateMode();
+        const observer = new MutationObserver(updateMode);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class", "style"],
+        });
+        return () => observer.disconnect();
+    }, [theme.palette.background.default, theme.palette.mode]);
+
+    const logoFilter = isDarkMode ? "none" : "invert(1)";
+    const userBubbleBackground = isDarkMode ? "fill.faintHover" : "fill.faint";
+    const messageFontFamily = theme.typography.fontFamily ?? "inherit";
+    const codeFontFamily = theme.typography.code.fontFamily;
+    const codeBlockBackground = isDarkMode
+        ? "rgba(255, 255, 255, 0.06)"
+        : "rgba(0, 0, 0, 0.04)";
+    const messageTypographySx = {
+        fontSize: "15px",
+        lineHeight: "22px",
+        fontWeight: 400,
+        fontFamily: messageFontFamily,
+    } as const;
+    const userMessageTextSx = {
+        ...messageTypographySx,
+        color: "text.base",
+        textAlign: "left",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+        overflowWrap: "anywhere",
+    } as const;
+    const assistantTextSx = {
+        ...messageTypographySx,
+        color: "text.base",
+        textAlign: "left",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+        overflowWrap: "anywhere",
+    } as const;
+    const markdownParagraphSpacing = "12px";
+    const assistantMarkdownSx = {
+        ...messageTypographySx,
+        color: "text.base",
+        fontFamily: messageFontFamily,
+        wordBreak: "break-word",
+        overflowWrap: "anywhere",
+        maxWidth: "100%",
+        "@keyframes ensu-blink": {
+            "0%, 50%": { opacity: 1 },
+            "50.01%, 100%": { opacity: 0 },
+        },
+        "&.ensu-markdown-streaming .markdown-content > :last-child::after": {
+            content: '"▍"',
+            display: "inline-block",
+            width: "0.6ch",
+            marginLeft: "2px",
+            animation: "ensu-blink 1s steps(1, end) infinite",
+        },
+        "& p, & ul, & ol, & blockquote, & pre, & h1, & h2, & h3, & h4, & h5, & h6, & hr":
+            { margin: 0 },
+        "& .markdown-content > * + *, & li > * + *, & blockquote > * + *": {
+            marginTop: markdownParagraphSpacing,
+        },
+        "& ul, & ol": { paddingLeft: "24px" },
+        "& li > :is(ul, ol, .markdown-code-block, blockquote, h1, h2, h3, h4, h5, h6, hr)":
+            { marginTop: markdownParagraphSpacing },
+        "& li + li": { marginTop: markdownParagraphSpacing },
+        "& code": { fontFamily: codeFontFamily, fontSize: "0.95em" },
+        "& .markdown-code-block": {
+            borderRadius: "6px",
+            backgroundColor: codeBlockBackground,
+            overflow: "hidden",
+        },
+        "& .markdown-code-block pre": {
+            padding: "12px",
+            overflowX: "auto",
+            whiteSpace: "pre",
+            overflowWrap: "normal",
+            wordBreak: "normal",
+        },
+        "& .markdown-code-block pre code": { fontFamily: codeFontFamily },
+        "& blockquote": {
+            paddingLeft: "12px",
+            borderLeft: "3px solid",
+            borderLeftColor: "divider",
+            color: "text.muted",
+        },
+        "& .katex-display": {
+            margin: "12px 0 0",
+            padding: "12px",
+            borderRadius: 12,
+            backgroundColor: codeBlockBackground,
+            overflowX: "auto",
+        },
+        "& .katex": { color: "text.base" },
+        "& .markdown-table": { maxWidth: "100%", overflowX: "auto" },
+        "& table": {
+            borderCollapse: "collapse",
+            width: "max-content",
+            minWidth: "100%",
+        },
+        "& th, & td": {
+            border: "1px solid",
+            borderColor: "divider",
+            padding: "8px 12px",
+            minWidth: "100px",
+            maxWidth: "320px",
+            verticalAlign: "top",
+        },
+        "& th": { backgroundColor: codeBlockBackground },
+        "& img": { maxWidth: "100%", height: "auto" },
+        "& a": { color: "accent.main" },
+    };
+    const streamingMessageSx = { transition: "all 0.2s ease" } as const;
+    const actionButtonSx = {
+        width: 36,
+        height: 36,
+        borderRadius: 1,
+        color: "text.muted",
+        "&:hover": { bgcolor: "fill.faint", color: "text.base" },
+    } as const;
+    const drawerIconButtonSx = {
+        width: 40,
+        height: 40,
+        borderRadius: 2,
+        bgcolor: "transparent",
+        color: "text.base",
+        "&:hover": { bgcolor: "fill.faint" },
+        "&.Mui-disabled": { color: "text.faint" },
+    } as const;
+    const smallIconProps = { size: 24, strokeWidth: 2 } as const;
+    const actionIconProps = { size: 24, strokeWidth: 2 } as const;
+    const compactIconProps = { size: 18, strokeWidth: 2 } as const;
+    const tinyIconProps = { size: 16, strokeWidth: 2 } as const;
+    const dialogTitleSx = {
+        fontFamily: messageFontFamily,
+        fontWeight: 500,
+    } as const;
+
+    const dialogPaperSx = { borderRadius: 3, overflow: "hidden" } as const;
+    const settingsItemSx = {
+        alignItems: "center",
+        gap: 1,
+        px: 2,
+        py: 1.25,
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: "divider",
+        bgcolor: "fill.faint",
+        "&:hover": { bgcolor: "fill.faintHover" },
+    } as const;
+
+    const [loading, setLoading] = useState(true);
+    const [firstPaintDone, setFirstPaintDone] = useState(false);
+    const [chatKey, setChatKey] = useState<string | undefined>();
+    const [sessions, setSessions] = useState<ChatSession[]>([]);
+    const [allMessages, setAllMessages] = useState<ChatMessage[]>([]);
+    const [branchSelections, setBranchSelections] = useState<
+        Record<string, string>
+    >({});
+    const [streamingParentId, setStreamingParentId] = useState<string | null>(
+        null,
+    );
+    const [streamingText, setStreamingText] = useState("");
+    const [currentSessionId, setCurrentSessionId] = useState<
+        string | undefined
+    >();
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [drawerCollapsed, setDrawerCollapsed] = useState(false);
+    const [chatViewportWidth, setChatViewportWidth] = useState(() =>
+        typeof window !== "undefined" ? window.innerWidth : 0,
+    );
+    const [showSessionSearch, setShowSessionSearch] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [advancedUnlocked, setAdvancedUnlocked] = useState(false);
+    const [isDraftSession, setIsDraftSession] = useState(false);
+    const [stickToBottom, setStickToBottom] = useState(true);
+    const [showModelSettings, setShowModelSettings] = useState(false);
+    const [showSystemPromptSettings, setShowSystemPromptSettings] =
+        useState(false);
+    const [knowledgePacks, setKnowledgePacks] = useState<KnowledgePack[]>([]);
+    const [knowledgeCatalogLoading, setKnowledgeCatalogLoading] =
+        useState(false);
+    const [knowledgeCatalogError, setKnowledgeCatalogError] = useState<
+        string | null
+    >(null);
+    const [knowledgeCatalogLoaded, setKnowledgeCatalogLoaded] = useState(false);
+    const [isPreparingMessage, setIsPreparingMessage] = useState(false);
+    const pendingSendRef = useRef(false);
+    const settingsFlowOpenRef = useRef(false);
+    const notesWarmupEpochRef = useRef(0);
+    const notesIndexingPausedRef = useRef(false);
+    const [notesIndexingPaused, setNotesIndexingPaused] = useState(false);
+    const [knowledgeDownloadProgress, setKnowledgeDownloadProgress] = useState<
+        Record<string, number | undefined>
+    >({});
+    const [knowledgeErrors, setKnowledgeErrors] = useState<
+        Record<string, string | undefined>
+    >({});
+    const [modelSettingsLoaded, setModelSettingsLoaded] = useState(false);
+    const [resolvedDefaultModel, setResolvedDefaultModel] =
+        useState<ModelInfo>(DEFAULT_MODEL);
+    const [resolvedModelPresets, setResolvedModelPresets] = useState<
+        ResolvedModelPreset[] | null
+    >(null);
+    const [selectedModelId, setSelectedModelId] = useState("");
+    const [imageAttachmentModelId, setImageAttachmentModelId] = useState<
+        string | null
+    >(null);
+    const [contextLength, setContextLength] = useState("");
+    const [systemPrompt, setSystemPrompt] = useState(
+        DEFAULT_CHAT_SYSTEM_PROMPT_BODY,
+    );
+    const [isSavingModel, setIsSavingModel] = useState(false);
+    const [editingMessage, setEditingMessage] = useState<ChatMessage | null>(
+        null,
+    );
+    const [pendingDocuments, setPendingDocuments] = useState<
+        DocumentAttachment[]
+    >([]);
+    const [pendingImages, setPendingImages] = useState<ImageAttachment[]>([]);
+    const [chatNotification, setChatNotification] = useState<
+        NotificationAttributes | undefined
+    >(undefined);
+    const [chatNotificationOpen, setChatNotificationOpen] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isSessionSummaryGenerating, setIsSessionSummaryGenerating] =
+        useState(false);
+    const [isStreamingOutro, setIsStreamingOutro] = useState(false);
+    const [loadingPhrase, setLoadingPhrase] = useState<string | null>(null);
+    const [loadingDots, setLoadingDots] = useState(1);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isChatStoreBridgeReady, setIsChatStoreBridgeReady] = useState(false);
+    const [attachmentPreviews, setAttachmentPreviews] = useState<
+        Record<string, string>
+    >({});
+    const [pendingImagePreviews, setPendingImagePreviews] = useState<
+        Record<string, string>
+    >({});
+    const [isImageDragActive, setIsImageDragActive] = useState(false);
+    const [isAttachingImages, setIsAttachingImages] = useState(false);
+    const [imagePreview, setImagePreview] = useState<{
+        url: string;
+        name: string;
+    } | null>(null);
+    const [downloadStatus, setDownloadStatus] =
+        useState<DownloadProgress | null>(null);
+    const [modelDownloadSizeBytes, setModelDownloadSizeBytes] = useState<
+        number | null
+    >(null);
+    const [loadedModelName, setLoadedModelName] = useState<string | null>(null);
+    const [modelGateStatus, setModelGateStatus] = useState<
+        | "checking"
+        | "missing"
+        | "preloading"
+        | "downloading"
+        | "ready"
+        | "error"
+    >("checking");
+    const [modelGateError, setModelGateError] = useState<string | null>(null);
+    const [isTauriRuntime, setIsTauriRuntime] = useState(false);
+    const [renameSessionId, setRenameSessionId] = useState<string | null>(null);
+    const [renameSessionTitle, setRenameSessionTitle] = useState("");
+    const [deleteSessionId, setDeleteSessionId] = useState<string | null>(null);
+
+    const providerRef = useRef<LlmProvider | null>(null);
+    const currentJobIdRef = useRef<number | null>(null);
+    const activeKnowledgeSourcesRef = useRef<GroundedSource[]>([]);
+    const activeKnowledgeDownloadsRef = useRef(new Set<string>());
+    const knowledgeCatalogPromiseRef = useRef<Promise<KnowledgePack[]> | null>(
+        null,
+    );
+
+    const generationStartingRef = useRef(false);
+    const generationActiveRef = useRef(false);
+    const preparedReplyRef = useRef<PreparedReply | undefined>(undefined);
+    const [conversationStatus, setConversationStatus] = useState<string | null>(
+        null,
+    );
+    const generationStoppingRef = useRef(false);
+    const pendingGenerationStopsRef = useRef(0);
+    const modelGateRequestRef = useRef(0);
+    const generationTokenRef = useRef(0);
+    const lastGenerationRef = useRef<{
+        parentMessageUuid: string;
+        previousSelection?: string | null;
+    } | null>(null);
+    const sessionSummaryPromiseRef = useRef<Promise<void> | null>(null);
+    const sessionSummaryActiveRef = useRef(false);
+    const sessionSummaryEpochRef = useRef(0);
+    const manuallyRenamedSessionIdsRef = useRef(new Set<string>());
+    const pendingSessionRenamesRef = useRef(new Set<string>());
+    const sessionTitleUpdatesRef = useRef(new Map<string, Promise<void>>());
+
+    const beginGenerationStop = useCallback(() => {
+        pendingGenerationStopsRef.current += 1;
+        generationStoppingRef.current = true;
+    }, []);
+
+    const endGenerationStop = useCallback(() => {
+        pendingGenerationStopsRef.current = Math.max(
+            0,
+            pendingGenerationStopsRef.current - 1,
+        );
+        if (pendingGenerationStopsRef.current === 0) {
+            generationStoppingRef.current = false;
+        }
+    }, []);
+    const composerRef = useRef<ChatComposerHandle | null>(null);
+    const sessionSearchRef = useRef("");
+    const attachmentPreviewUrlsRef = useRef<Record<string, string>>({});
+    const pendingPreviewUrlsRef = useRef<Record<string, string>>({});
+    const imageAttachmentEpochRef = useRef(0);
+    const imagePreviewUrlRef = useRef<string | null>(null);
+    const attachmentPreviewInFlightRef = useRef(
+        new Map<string, Promise<void>>(),
+    );
+
+    const chatViewportRef = useRef<HTMLDivElement | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const lastScrollTopRef = useRef(0);
+    const userScrollIntentRef = useRef(false);
+    const userScrollTimeoutRef = useRef<number | null>(null);
+    const currentSessionIdRef = useRef<string | undefined>(undefined);
+    const isDraftSessionRef = useRef(false);
+    const buildVersionTapCountRef = useRef(0);
+    const buildVersionTapTimeoutRef = useRef<number | null>(null);
+    const toastTimeoutRef = useRef<number | null>(null);
+    const streamingBufferRef = useRef("");
+    const streamingChunksRef = useRef<string[]>([]);
+    const streamingCreatedAtRef = useRef<number | null>(null);
+    const streamingFlushTimerRef = useRef<number | null>(null);
+    const lastDownloadProgressRef = useRef(0);
+    const pendingDownloadProgressRef = useRef<DownloadProgress | null>(null);
+    const downloadProgressTimerRef = useRef<number | null>(null);
+    const refreshSessionsInFlightRef = useRef<Promise<void> | null>(null);
+    const refreshMessagesInFlightRef = useRef<{
+        sessionId?: string;
+        promise: Promise<void> | null;
+    }>({ sessionId: undefined, promise: null });
+
+    const chatKeyInitCancelledRef = useRef(false);
+
+    const scheduleIdleTask = useCallback(
+        (callback: () => void, timeout = 1200) => {
+            if (typeof window === "undefined") return () => undefined;
+            if (typeof window.requestIdleCallback === "function") {
+                const handle = window.requestIdleCallback(() => callback(), {
+                    timeout,
+                });
+                return () => window.cancelIdleCallback(handle);
+            }
+            const handle = window.setTimeout(callback, timeout);
+            return () => window.clearTimeout(handle);
+        },
+        [],
+    );
+
+    const loadKnowledgeCatalogOnce = useCallback(() => {
+        if (!knowledgeCatalogPromiseRef.current) {
+            knowledgeCatalogPromiseRef.current = loadKnowledgeCatalog().finally(
+                () => {
+                    knowledgeCatalogPromiseRef.current = null;
+                },
+            );
+        }
+        return knowledgeCatalogPromiseRef.current;
+    }, []);
+
+    const refreshKnowledgeCatalog = useCallback(async () => {
+        if (!isTauriRuntime) return;
+        setKnowledgeCatalogLoading(true);
+        setKnowledgeCatalogError(null);
+        try {
+            setKnowledgePacks(await loadKnowledgeCatalogOnce());
+            setKnowledgeCatalogLoaded(true);
+        } catch (error) {
+            setKnowledgeCatalogError(knowledgeErrorMessage(error));
+            log.error("Failed to refresh Ensu Packs", error);
+        } finally {
+            setKnowledgeCatalogLoading(false);
+        }
+    }, [isTauriRuntime, loadKnowledgeCatalogOnce]);
+
+    const sessionFromQuery = useMemo(() => {
+        if (!router.isReady) return undefined;
+        const value = router.query.session;
+        if (Array.isArray(value)) return value[0];
+        return typeof value === "string" ? value : undefined;
+    }, [router.isReady, router.query.session]);
+    const buildVersion = buildEnvEnsuDesktopVersion
+        ? `v${buildEnvEnsuDesktopVersion}`
+        : undefined;
+
+    const lastRouteUpdateRef = useRef<{ sessionId?: string; at: number }>({
+        sessionId: undefined,
+        at: 0,
+    });
+    const routeInitializedRef = useRef(false);
+
+    const updateRouteSession = useCallback(
+        (sessionId: string | undefined, replace = false) => {
+            if (!router.isReady) return;
+
+            const current = Array.isArray(router.query.session)
+                ? router.query.session[0]
+                : typeof router.query.session === "string"
+                  ? router.query.session
+                  : undefined;
+
+            if (current === sessionId) return;
+
+            const now = Date.now();
+            const last = lastRouteUpdateRef.current;
+            if (last.sessionId === sessionId && now - last.at < 1000) {
+                return;
+            }
+            lastRouteUpdateRef.current = { sessionId, at: now };
+
+            const query = sessionId ? { session: sessionId } : {};
+            const method = replace ? router.replace : router.push;
+            void method({ pathname: "/chat", query }, undefined, {
+                shallow: true,
+            });
+        },
+        [router],
+    );
+
+    const refreshLocalChatKey = useCallback(async () => {
+        try {
+            await initChatKeyStore();
+            const cachedLocal = cachedLocalChatKey();
+            if (cachedLocal) {
+                log.info("Using cached local chat key");
+                setChatKey(cachedLocal);
+                return;
+            }
+            log.info("Generating new local chat key");
+            setChatKey(await getOrCreateLocalChatKey());
+        } catch (error) {
+            log.error("Failed to initialize local chat key", error);
+            showMiniDialog({
+                title: "Encryption error",
+                message:
+                    "We could not initialize encryption. Please refresh the page.",
+            });
+        }
+    }, [showMiniDialog]);
+
+    useEffect(() => {
+        chatKeyInitCancelledRef.current = false;
+
+        void (async () => {
+            try {
+                await refreshLocalChatKey();
+            } catch (error) {
+                log.error("Failed to initialize local chat key", error);
+            }
+            if (!chatKeyInitCancelledRef.current) setLoading(false);
+        })();
+
+        return () => {
+            chatKeyInitCancelledRef.current = true;
+        };
+    }, [refreshLocalChatKey]);
+
+    useEffect(() => {
+        routeInitializedRef.current = false;
+    }, [chatKey]);
+
+    useEffect(() => {
+        if (!chatKey) {
+            setIsChatStoreBridgeReady(false);
+            return;
+        }
+
+        let cancelled = false;
+        const run = async () => {
+            try {
+                await initializeChatStorePersistence(chatKey);
+                if (!cancelled) setIsChatStoreBridgeReady(true);
+            } catch (error) {
+                log.error("Failed to initialize chat persistence", error);
+                if (!cancelled) onGenericError(error);
+            }
+        };
+        void run();
+
+        return () => {
+            cancelled = true;
+            setIsChatStoreBridgeReady(false);
+        };
+    }, [chatKey, onGenericError]);
+
+    useEffect(() => {
+        isDraftSessionRef.current = isDraftSession;
+    }, [isDraftSession]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const html = document.documentElement;
+        const body = document.body;
+        const previous = {
+            htmlOverflow: html.style.overflow,
+            htmlOverscroll: html.style.overscrollBehavior,
+            htmlHeight: html.style.height,
+            htmlViewportHeight: html.style.getPropertyValue(
+                "--ensu-viewport-height",
+            ),
+            bodyOverflow: body.style.overflow,
+            bodyOverscroll: body.style.overscrollBehavior,
+            bodyHeight: body.style.height,
+        };
+
+        const updateViewportHeight = () => {
+            const height = window.visualViewport?.height ?? window.innerHeight;
+            html.style.setProperty("--ensu-viewport-height", `${height}px`);
+        };
+
+        updateViewportHeight();
+        window.addEventListener("resize", updateViewportHeight);
+        window.addEventListener("orientationchange", updateViewportHeight);
+        window.visualViewport?.addEventListener("resize", updateViewportHeight);
+        window.visualViewport?.addEventListener("scroll", updateViewportHeight);
+
+        html.style.overflow = "hidden";
+        html.style.overscrollBehavior = "none";
+        html.style.height = "100%";
+        body.style.overflow = "hidden";
+        body.style.overscrollBehavior = "none";
+        body.style.height = "100%";
+
+        return () => {
+            window.removeEventListener("resize", updateViewportHeight);
+            window.removeEventListener(
+                "orientationchange",
+                updateViewportHeight,
+            );
+            window.visualViewport?.removeEventListener(
+                "resize",
+                updateViewportHeight,
+            );
+            window.visualViewport?.removeEventListener(
+                "scroll",
+                updateViewportHeight,
+            );
+
+            if (previous.htmlViewportHeight) {
+                html.style.setProperty(
+                    "--ensu-viewport-height",
+                    previous.htmlViewportHeight,
+                );
+            } else {
+                html.style.removeProperty("--ensu-viewport-height");
+            }
+
+            html.style.overflow = previous.htmlOverflow;
+            html.style.overscrollBehavior = previous.htmlOverscroll;
+            html.style.height = previous.htmlHeight;
+            body.style.overflow = previous.bodyOverflow;
+            body.style.overscrollBehavior = previous.bodyOverscroll;
+            body.style.height = previous.bodyHeight;
+        };
+    }, []);
+
+    useEffect(() => {
+        setIsTauriRuntime(detectTauriRuntime());
+    }, []);
+
+    useEffect(() => {
+        if (isTauriRuntime) void refreshKnowledgeCatalog();
+    }, [isTauriRuntime, refreshKnowledgeCatalog]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        let raf1 = 0;
+        let raf2 = 0;
+        raf1 = window.requestAnimationFrame(() => {
+            raf2 = window.requestAnimationFrame(() => {
+                setFirstPaintDone(true);
+                if (
+                    typeof performance !== "undefined" &&
+                    "mark" in performance
+                ) {
+                    performance.mark("chat:first-paint");
+                }
+            });
+        });
+        return () => {
+            window.cancelAnimationFrame(raf1);
+            window.cancelAnimationFrame(raf2);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (loading || !modelSettingsLoaded || typeof window === "undefined")
+            return;
+        const element = chatViewportRef.current;
+        if (!element) return;
+
+        const updateWidth = () => {
+            setChatViewportWidth(element.getBoundingClientRect().width);
+        };
+
+        updateWidth();
+
+        if (typeof ResizeObserver === "undefined") {
+            const handleResize = () => updateWidth();
+            window.addEventListener("resize", handleResize);
+            return () => window.removeEventListener("resize", handleResize);
+        }
+
+        const observer = new ResizeObserver(() => updateWidth());
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, [loading, modelSettingsLoaded]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        let cancelled = false;
+        const isUnlocked =
+            window.localStorage.getItem(ADVANCED_SETTINGS_UNLOCK_KEY) === "1";
+        setAdvancedUnlocked(isUnlocked);
+        setSystemPrompt(
+            window.localStorage.getItem(SYSTEM_PROMPT_STORAGE_KEY)?.trim() ||
+                DEFAULT_CHAT_SYSTEM_PROMPT_BODY,
+        );
+
+        const applySettings = (parsed: {
+            modelId?: string;
+            contextLength?: string;
+        }) => {
+            const rawContextLength = parsed.contextLength ?? "";
+            const clampedContextLength =
+                !detectTauriRuntime() &&
+                rawContextLength &&
+                Number(rawContextLength) > DEFAULT_WEB_CONTEXT_SIZE
+                    ? String(DEFAULT_WEB_CONTEXT_SIZE)
+                    : rawContextLength;
+            const settings = {
+                modelId: parsed.modelId ?? "",
+                contextLength: clampedContextLength,
+            };
+            window.localStorage.setItem(
+                MODEL_SETTINGS_STORAGE_KEY,
+                JSON.stringify(settings),
+            );
+            if (cancelled) return;
+            setSelectedModelId(settings.modelId);
+            setContextLength(settings.contextLength);
+        };
+
+        // Older builds persisted a model URL selection; llm_migrate_models
+        // converts it to a model id once.
+        const loadSettings = async () => {
+            let raw = window.localStorage.getItem(MODEL_SETTINGS_STORAGE_KEY);
+            if (!raw) {
+                // Settings from even older builds live in IndexedDB.
+                const kvRaw = await getKV(MODEL_SETTINGS_STORAGE_KEY).catch(
+                    () => undefined,
+                );
+                if (kvRaw && typeof kvRaw === "object") {
+                    raw = JSON.stringify(kvRaw);
+                    window.localStorage.setItem(
+                        MODEL_SETTINGS_STORAGE_KEY,
+                        raw,
+                    );
+                    void removeKV(MODEL_SETTINGS_STORAGE_KEY);
+                }
+            }
+            const parsed = raw
+                ? (JSON.parse(raw) as {
+                      modelId?: string;
+                      useCustomModel?: boolean;
+                      modelUrl?: string;
+                      mmprojUrl?: string;
+                      contextLength?: string;
+                  })
+                : {};
+            let modelId = parsed.modelId ?? "";
+            if (detectTauriRuntime()) {
+                const legacyModelUrl =
+                    parsed.modelId === undefined &&
+                    parsed.useCustomModel &&
+                    parsed.modelUrl?.trim()
+                        ? parsed.modelUrl.trim()
+                        : null;
+                const { invoke } = await import("@tauri-apps/api/core");
+                const converted = await invoke<string | null>(
+                    "llm_migrate_models",
+                    {
+                        legacyModelUrl,
+                        legacyMmprojUrl: legacyModelUrl
+                            ? parsed.mmprojUrl?.trim() || null
+                            : null,
+                    },
+                );
+                if (legacyModelUrl) {
+                    modelId = converted ?? "";
+                }
+            }
+            applySettings({ modelId, contextLength: parsed.contextLength });
+        };
+
+        void loadSettings()
+            .catch((error: unknown) => {
+                log.error("Failed to load model settings", error);
+            })
+            .finally(() => {
+                if (!cancelled) setModelSettingsLoaded(true);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    const applyDownloadProgress = useCallback((progress: DownloadProgress) => {
+        setDownloadStatus(progress);
+        const status = progress.status?.toLowerCase() ?? "";
+        if (progress.percent < 0) {
+            setIsDownloading(false);
+            return;
+        }
+        if (progress.percent >= 100 || status.includes("ready")) {
+            setIsDownloading(false);
+            return;
+        }
+        setIsDownloading(true);
+    }, []);
+
+    const handleDownloadProgress = useCallback(
+        (progress: DownloadProgress) => {
+            const status = progress.status?.toLowerCase() ?? "";
+            const isTerminal =
+                progress.percent < 0 ||
+                progress.percent >= 100 ||
+                status.includes("ready");
+
+            if (isTerminal) {
+                if (downloadProgressTimerRef.current) {
+                    window.clearTimeout(downloadProgressTimerRef.current);
+                    downloadProgressTimerRef.current = null;
+                }
+                pendingDownloadProgressRef.current = null;
+                lastDownloadProgressRef.current = Date.now();
+                applyDownloadProgress(progress);
+                return;
+            }
+
+            const now = Date.now();
+            const elapsed = now - lastDownloadProgressRef.current;
+            if (elapsed >= 120) {
+                lastDownloadProgressRef.current = now;
+                applyDownloadProgress(progress);
+                return;
+            }
+
+            pendingDownloadProgressRef.current = progress;
+            if (!downloadProgressTimerRef.current) {
+                downloadProgressTimerRef.current = window.setTimeout(
+                    () => {
+                        const pending = pendingDownloadProgressRef.current;
+                        if (pending) {
+                            applyDownloadProgress(pending);
+                            lastDownloadProgressRef.current = Date.now();
+                            pendingDownloadProgressRef.current = null;
+                        }
+                        downloadProgressTimerRef.current = null;
+                    },
+                    Math.max(20, 120 - elapsed),
+                );
+            }
+        },
+        [applyDownloadProgress],
+    );
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (!providerRef.current) {
+            providerRef.current = new LlmProvider();
+        }
+        const unsubscribe = providerRef.current.onDownloadProgress(
+            handleDownloadProgress,
+        );
+        return () => {
+            unsubscribe();
+        };
+    }, [handleDownloadProgress]);
+
+    const refreshSessions = useCallback(async () => {
+        if (!chatKey) return;
+        if (refreshSessionsInFlightRef.current) {
+            return refreshSessionsInFlightRef.current;
+        }
+        const task = (async () => {
+            try {
+                const loaded = await listSessions(chatKey);
+                if (loaded.length === 0) {
+                    setSessions([]);
+                    setCurrentSessionId(undefined);
+                    setAllMessages([]);
+                    if (!routeInitializedRef.current) {
+                        updateRouteSession(undefined, true);
+                        routeInitializedRef.current = true;
+                    }
+                    return;
+                }
+
+                setSessions(loaded);
+
+                if (isDraftSessionRef.current && !currentSessionIdRef.current) {
+                    if (!routeInitializedRef.current) {
+                        updateRouteSession(undefined, true);
+                        routeInitializedRef.current = true;
+                    }
+                    return;
+                }
+
+                const hasQuerySession =
+                    sessionFromQuery &&
+                    loaded.some(
+                        (session) => session.sessionUuid === sessionFromQuery,
+                    );
+
+                const hasCurrentSession =
+                    !!currentSessionId &&
+                    loaded.some(
+                        (session) => session.sessionUuid === currentSessionId,
+                    );
+
+                const nextSessionId = hasQuerySession
+                    ? sessionFromQuery
+                    : hasCurrentSession
+                      ? currentSessionId
+                      : loaded[0]?.sessionUuid;
+
+                if (nextSessionId) {
+                    setCurrentSessionId(nextSessionId);
+                    currentSessionIdRef.current = nextSessionId;
+                    setIsDraftSession(false);
+                    isDraftSessionRef.current = false;
+                    if (nextSessionId !== sessionFromQuery) {
+                        if (!routeInitializedRef.current) {
+                            updateRouteSession(nextSessionId, true);
+                            routeInitializedRef.current = true;
+                        }
+                    } else {
+                        routeInitializedRef.current = true;
+                    }
+                }
+            } catch (error) {
+                const message = (() => {
+                    if (error instanceof Error) return error.message;
+                    if (typeof error === "string") return error;
+                    try {
+                        return JSON.stringify(error);
+                    } catch {
+                        return String(error);
+                    }
+                })();
+                log.error(`Failed to refresh sessions: ${message}`);
+                showMiniDialog({
+                    title: "Chat unavailable",
+                    message:
+                        "We could not load your chat data. Please refresh the page.",
+                });
+            }
+        })();
+        refreshSessionsInFlightRef.current = task;
+        try {
+            await task;
+        } finally {
+            if (refreshSessionsInFlightRef.current === task) {
+                refreshSessionsInFlightRef.current = null;
+            }
+        }
+        return task;
+    }, [
+        chatKey,
+        currentSessionId,
+        sessionFromQuery,
+        updateRouteSession,
+        showMiniDialog,
+    ]);
+
+    const refreshMessages = useCallback(
+        async (sessionId: string | undefined = currentSessionId) => {
+            if (!chatKey || !sessionId) {
+                setAllMessages([]);
+                return;
+            }
+
+            const activeSessionId = sessionId;
+            const inFlight = refreshMessagesInFlightRef.current;
+            if (inFlight.promise && inFlight.sessionId === activeSessionId) {
+                return inFlight.promise;
+            }
+
+            const task = (async () => {
+                try {
+                    const loaded = await listMessages(activeSessionId, chatKey);
+                    if (currentSessionIdRef.current !== activeSessionId) return;
+                    setAllMessages(loaded);
+                } catch (error) {
+                    const message = (() => {
+                        if (error instanceof Error) return error.message;
+                        if (typeof error === "string") return error;
+                        try {
+                            return JSON.stringify(error);
+                        } catch {
+                            return String(error);
+                        }
+                    })();
+                    log.error(`Failed to refresh messages: ${message}`);
+                }
+            })();
+
+            refreshMessagesInFlightRef.current = {
+                sessionId: activeSessionId,
+                promise: task,
+            };
+
+            try {
+                await task;
+            } finally {
+                if (refreshMessagesInFlightRef.current.promise === task) {
+                    refreshMessagesInFlightRef.current = {
+                        sessionId: undefined,
+                        promise: null,
+                    };
+                }
+            }
+            return task;
+        },
+        [chatKey, currentSessionId],
+    );
+
+    const showToast = useCallback(
+        (
+            attributes: NotificationAttributes & { autoHideDuration?: number },
+        ) => {
+            const { autoHideDuration, ...rest } = attributes;
+            setChatNotification(rest);
+            setChatNotificationOpen(true);
+            if (toastTimeoutRef.current) {
+                window.clearTimeout(toastTimeoutRef.current);
+                toastTimeoutRef.current = null;
+            }
+            if (autoHideDuration && typeof window !== "undefined") {
+                toastTimeoutRef.current = window.setTimeout(() => {
+                    setChatNotificationOpen(false);
+                }, autoHideDuration);
+            }
+        },
+        [setChatNotification, setChatNotificationOpen],
+    );
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const handleFocus = () => {
+            void refreshLocalChatKey();
+            if (chatKey) {
+                void refreshSessions();
+                void refreshMessages();
+            }
+        };
+
+        const handleVisibility = () => {
+            if (!document.hidden) {
+                void refreshLocalChatKey();
+                if (chatKey) {
+                    void refreshSessions();
+                    void refreshMessages();
+                }
+            }
+        };
+
+        window.addEventListener("focus", handleFocus);
+        document.addEventListener("visibilitychange", handleVisibility);
+
+        return () => {
+            window.removeEventListener("focus", handleFocus);
+            document.removeEventListener("visibilitychange", handleVisibility);
+        };
+    }, [chatKey, refreshLocalChatKey, refreshMessages, refreshSessions]);
+
+    const deleteSessionTarget = useMemo(
+        () =>
+            deleteSessionId
+                ? sessions.find(
+                      (session) => session.sessionUuid === deleteSessionId,
+                  )
+                : undefined,
+        [deleteSessionId, sessions],
+    );
+
+    const deleteSessionLabel = useMemo(() => {
+        const title = deleteSessionTarget?.title.trim();
+        if (title && title !== "New chat") {
+            return `"${title}"`;
+        }
+        return "this chat";
+    }, [deleteSessionTarget]);
+
+    useEffect(() => {
+        if (!chatKey || !isChatStoreBridgeReady) return;
+        void refreshSessions();
+    }, [chatKey, isChatStoreBridgeReady, refreshSessions]);
+
+    const cancelActiveGenerationForNavigation = useCallback(() => {
+        if (!isGenerating && !generationStartingRef.current) return;
+
+        generationTokenRef.current += 1;
+        setConversationStatus(null);
+        beginGenerationStop();
+        const jobId = currentJobIdRef.current;
+        currentJobIdRef.current = null;
+        preparedReplyRef.current = undefined;
+        activeKnowledgeSourcesRef.current = [];
+        generationActiveRef.current = false;
+        setIsGenerating(false);
+        setIsStreamingOutro(false);
+        setIsDownloading(false);
+        setDownloadStatus(null);
+        setStreamingParentId(null);
+        setStreamingText("");
+        streamingBufferRef.current = "";
+        streamingChunksRef.current = [];
+        streamingCreatedAtRef.current = null;
+        lastGenerationRef.current = null;
+
+        const provider = providerRef.current;
+        if (!provider) {
+            endGenerationStop();
+            return;
+        }
+        void provider
+            .cancelGeneration(jobId ?? -1)
+            .catch((error: unknown) => {
+                log.error(
+                    "Failed to cancel generation during navigation",
+                    error,
+                );
+            })
+            .finally(() => {
+                endGenerationStop();
+            });
+    }, [beginGenerationStop, endGenerationStop, isGenerating]);
+
+    useEffect(() => {
+        currentSessionIdRef.current = currentSessionId;
+        void refreshMessages();
+    }, [currentSessionId, refreshMessages]);
+
+    useEffect(() => {
+        if (isDraftSession) return;
+        if (!sessionFromQuery || sessions.length === 0) return;
+        if (
+            sessionFromQuery !== currentSessionId &&
+            sessions.some((session) => session.sessionUuid === sessionFromQuery)
+        ) {
+            cancelActiveGenerationForNavigation();
+            setCurrentSessionId(sessionFromQuery);
+        }
+    }, [
+        cancelActiveGenerationForNavigation,
+        currentSessionId,
+        isDraftSession,
+        sessionFromQuery,
+        sessions,
+    ]);
+
+    const resetPendingImages = useCallback(() => {
+        imageAttachmentEpochRef.current += 1;
+        setPendingImages([]);
+        setIsAttachingImages(false);
+    }, []);
+
+    useEffect(() => {
+        preparedReplyRef.current = undefined;
+        setStreamingParentId(null);
+        setStreamingText("");
+        streamingBufferRef.current = "";
+        streamingChunksRef.current = [];
+        streamingCreatedAtRef.current = null;
+        generationActiveRef.current = false;
+        setIsGenerating(false);
+        setIsStreamingOutro(false);
+        resetPendingImages();
+        setEditingMessage(null);
+        setStickToBottom(true);
+        currentJobIdRef.current = null;
+    }, [currentSessionId, resetPendingImages]);
+
+    useEffect(() => {
+        if (!isGenerating || streamingText.trim().length > 0) {
+            setLoadingPhrase(null);
+            setLoadingDots(1);
+            return;
+        }
+
+        setLoadingPhrase((prev) => prev ?? randomLoadingPhrase());
+        const timer = window.setInterval(() => {
+            setLoadingDots((prev) => (prev % 3) + 1);
+        }, 450);
+
+        return () => {
+            window.clearInterval(timer);
+        };
+    }, [isGenerating, streamingText]);
+
+    const inferImageMime = useCallback((name: string) => {
+        const extension = name.split(".").pop()?.toLowerCase();
+        switch (extension) {
+            case "png":
+                return "image/png";
+            case "webp":
+                return "image/webp";
+            case "gif":
+                return "image/gif";
+            case "jpeg":
+            case "jpg":
+                return "image/jpeg";
+            default:
+                return "image/*";
+        }
+    }, []);
+
+    const loadAttachmentPreview = useCallback(
+        async (attachment: ChatAttachment, sessionUuid: string) => {
+            if (!chatKey || !firstPaintDone) return;
+            if (attachmentPreviewUrlsRef.current[attachment.id]) return;
+            if (attachmentPreviewInFlightRef.current.has(attachment.id)) return;
+
+            const task = (async () => {
+                try {
+                    const bytes = await readDecryptedAttachmentBytes(
+                        attachment.id,
+                        chatKey,
+                        sessionUuid,
+                    );
+                    const blob = new Blob([toSafeBlobPart(bytes)], {
+                        type: inferImageMime(attachment.name),
+                    });
+                    const url = URL.createObjectURL(blob);
+                    setAttachmentPreviews((prev) => {
+                        if (prev[attachment.id]) {
+                            URL.revokeObjectURL(url);
+                            return prev;
+                        }
+                        const next = { ...prev, [attachment.id]: url };
+                        attachmentPreviewUrlsRef.current = next;
+                        return next;
+                    });
+                } catch (error) {
+                    log.error("Failed to load image preview", error);
+                }
+            })();
+
+            attachmentPreviewInFlightRef.current.set(attachment.id, task);
+            try {
+                await task;
+            } finally {
+                attachmentPreviewInFlightRef.current.delete(attachment.id);
+            }
+        },
+        [chatKey, firstPaintDone, inferImageMime],
+    );
+
+    useEffect(() => {
+        const activeIds = new Set(pendingImages.map((image) => image.id));
+        const next: Record<string, string> = {};
+
+        for (const [id, url] of Object.entries(pendingPreviewUrlsRef.current)) {
+            if (activeIds.has(id)) next[id] = url;
+            else URL.revokeObjectURL(url);
+        }
+
+        pendingImages.forEach((image) => {
+            if (!next[image.id]) {
+                next[image.id] = URL.createObjectURL(image.file);
+            }
+        });
+
+        pendingPreviewUrlsRef.current = next;
+        setPendingImagePreviews(next);
+    }, [pendingImages]);
+
+    const currentSession = useMemo(
+        () => sessions.find((s) => s.sessionUuid === currentSessionId),
+        [sessions, currentSessionId],
+    );
+
+    const currentRootSessionUuid = currentSession?.rootSessionUuid;
+
+    useEffect(() => {
+        if (!currentRootSessionUuid) {
+            setBranchSelections({});
+            return;
+        }
+        let cancelled = false;
+        void getBranchSelections(currentRootSessionUuid)
+            .then((selections) => {
+                if (!cancelled) {
+                    setBranchSelections(selections);
+                }
+            })
+            .catch((error: unknown) => {
+                log.error("Failed to load branch selections", error);
+                if (!cancelled) {
+                    setBranchSelections({});
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [currentRootSessionUuid]);
+
+    const rootSessionUuid = currentSession?.rootSessionUuid ?? currentSessionId;
+
+    const messageState = useMemo(
+        () =>
+            buildSelectedPath(
+                allMessages,
+                branchSelections,
+                streamingParentId
+                    ? { parentMessageUuid: streamingParentId }
+                    : undefined,
+            ),
+        [allMessages, branchSelections, streamingParentId],
+    );
+
+    const displayMessages = useMemo(() => {
+        const base = messageState.path;
+        const augmented: ChatMessage[] = [];
+        for (let i = 0; i < base.length; i++) {
+            const msg = base[i];
+            if (!msg) continue;
+            augmented.push(msg);
+            if (msg.sender === "self") {
+                const next = base[i + 1];
+                const isLastAndGenerating =
+                    i === base.length - 1 && isGenerating;
+                if (next?.sender !== "assistant" && !isLastAndGenerating) {
+                    augmented.push({
+                        messageUuid: `interrupted-placeholder-${msg.messageUuid}`,
+                        sessionUuid: msg.sessionUuid,
+                        parentMessageUuid: msg.messageUuid,
+                        sender: "assistant",
+                        text: "Response was interrupted",
+                        createdAt: msg.createdAt,
+                        isSynthetic: true,
+                    });
+                }
+            }
+        }
+        if (streamingParentId) {
+            const streamingMessage: ChatMessage = {
+                messageUuid: STREAMING_SELECTION_KEY,
+                sessionUuid: currentSessionId ?? "",
+                parentMessageUuid: streamingParentId,
+                sender: "assistant",
+                text: streamingText,
+                createdAt: streamingCreatedAtRef.current ?? Date.now() * 1000,
+            };
+            return [...augmented, streamingMessage];
+        }
+        return augmented;
+    }, [
+        messageState.path,
+        streamingParentId,
+        streamingText,
+        currentSessionId,
+        isGenerating,
+    ]);
+
+    const branchSwitchers = messageState.switchers;
+
+    useEffect(() => {
+        if (!chatKey) return;
+        const activeIds = new Set<string>();
+
+        displayMessages.forEach((message) => {
+            (message.attachments ?? []).forEach((attachment) => {
+                if (attachment.kind === "image") {
+                    activeIds.add(attachment.id);
+                }
+            });
+        });
+
+        setAttachmentPreviews((prev) => {
+            const next: Record<string, string> = {};
+            for (const [id, url] of Object.entries(prev)) {
+                if (activeIds.has(id)) next[id] = url;
+                else URL.revokeObjectURL(url);
+            }
+            attachmentPreviewUrlsRef.current = next;
+            return next;
+        });
+
+        for (const message of displayMessages) {
+            for (const attachment of message.attachments ?? []) {
+                if (attachment.kind === "image") {
+                    void loadAttachmentPreview(attachment, message.sessionUuid);
+                }
+            }
+        }
+    }, [chatKey, displayMessages, loadAttachmentPreview]);
+
+    const showDrawerToggle = isSmall || drawerCollapsed;
+    const drawerWidth = isSmall ? 300 : drawerCollapsed ? 0 : 320;
+    const desktopBreakpoint = theme.breakpoints.values.lg;
+    const isDesktopOverlay = !isSmall && chatViewportWidth >= desktopBreakpoint;
+    const showImageAttachment =
+        isTauriRuntime && imageAttachmentModelId === selectedModelId;
+    const showDownloadProgress =
+        !!downloadStatus?.status && downloadStatus.status !== "Ready";
+    const showModelGate =
+        modelGateStatus === "missing" ||
+        modelGateStatus === "error" ||
+        modelGateStatus === "downloading";
+    const hideMessagesForModelGate = isTauriRuntime && showModelGate;
+
+    const downloadSizeLabel = useMemo(() => {
+        if (isTauriRuntime) {
+            return modelDownloadSizeBytes
+                ? `Approx. ${formatBytes(modelDownloadSizeBytes)}`
+                : "Approx. size varies by model";
+        }
+        if (selectedModelId) {
+            return "Approx. size varies by model";
+        }
+        if (resolvedDefaultModel.sizeBytes) {
+            return `Approx. ${formatBytes(resolvedDefaultModel.sizeBytes)}`;
+        }
+        return resolvedDefaultModel.sizeHuman
+            ? `Approx. ${resolvedDefaultModel.sizeHuman}`
+            : "Approx. size varies by model";
+    }, [
+        isTauriRuntime,
+        modelDownloadSizeBytes,
+        resolvedDefaultModel,
+        selectedModelId,
+    ]);
+
+    const downloadStatusLabel = useMemo(() => {
+        if (!downloadStatus?.status || downloadStatus.status === "Ready") {
+            return null;
+        }
+        const status = downloadStatus.status;
+        if (status.toLowerCase().includes("loading")) {
+            return status;
+        }
+        if (downloadStatus.totalBytes && downloadStatus.percent >= 0) {
+            const downloaded = downloadStatus.bytesDownloaded ?? 0;
+            return `Downloading... ${formatBytes(downloaded)} / ${formatBytes(downloadStatus.totalBytes)}`;
+        }
+        if (status) return status;
+        return "Downloading...";
+    }, [downloadStatus]);
+
+    const focusInput = useCallback(() => {
+        if (showModelGate) return;
+        if (typeof window === "undefined") return;
+        const target = composerRef.current;
+        if (!target) return;
+        window.requestAnimationFrame(() => {
+            target.focus();
+        });
+    }, [showModelGate]);
+
+    useEffect(() => {
+        if (showSessionSearch) return;
+        focusInput();
+    }, [
+        currentSessionId,
+        isDraftSession,
+        showModelGate,
+        showSessionSearch,
+        focusInput,
+    ]);
+
+    const ensureProvider = useCallback(async () => {
+        if (!providerRef.current) {
+            providerRef.current = new LlmProvider();
+        }
+        await providerRef.current.initialize();
+        setResolvedDefaultModel(providerRef.current.getDefaultModel());
+        const presets = providerRef.current.getResolvedModelPresets();
+        if (presets) {
+            setResolvedModelPresets(presets);
+        }
+        return providerRef.current;
+    }, []);
+
+    const isChatBusy = useCallback(
+        () =>
+            pendingSendRef.current ||
+            generationActiveRef.current ||
+            sessionSummaryActiveRef.current,
+        [],
+    );
+    const notesIdleSchedulerRef = useRef<NotesIndexingIdleScheduler | null>(
+        null,
+    );
+    if (!notesIdleSchedulerRef.current) {
+        notesIdleSchedulerRef.current = new NotesIndexingIdleScheduler(
+            () => {
+                notesIndexingPausedRef.current = false;
+                setNotesIndexingPaused(false);
+            },
+            isChatBusy,
+            {
+                schedule: (callback, delayMs) =>
+                    window.setTimeout(callback, delayMs),
+                cancel: (handle) => window.clearTimeout(handle),
+            },
+        );
+    }
+    const notesIdleScheduler = notesIdleSchedulerRef.current;
+    useEffect(
+        () => () => {
+            notesWarmupEpochRef.current += 1;
+            notesIdleScheduler.cancel();
+        },
+        [notesIdleScheduler],
+    );
+    const handleChatActivity = useCallback(
+        () => notesIdleScheduler.activity(),
+        [notesIdleScheduler],
+    );
+    useEffect(() => {
+        handleChatActivity();
+    }, [
+        handleChatActivity,
+        isPreparingMessage,
+        isGenerating,
+        isSessionSummaryGenerating,
+    ]);
+
+    const isIndexingBlocked = useCallback(
+        () => notesIndexingPausedRef.current || isChatBusy(),
+        [isChatBusy],
+    );
+    const cancelNotesIndexing = useCallback(() => {
+        const provider = providerRef.current;
+        if (provider?.getBackendKind() === "tauri") {
+            void provider
+                .cancelGeneration(-1)
+                .catch((error: unknown) =>
+                    log.warn("Failed to cancel Notes indexing", error),
+                );
+        }
+    }, []);
+    const confirmNotesRemoval = useCallback(
+        (label: string, remove: () => Promise<void>) => {
+            showMiniDialog({
+                title: "Remove notes folder?",
+                message: `Remove “${label}” from Your Notes? Source files will not be changed.`,
+                continue: { text: "Remove", color: "critical", action: remove },
+                cancel: "Cancel",
+                buttonDirection: "row",
+            });
+        },
+        [showMiniDialog],
+    );
+    const {
+        collections: notesCollections,
+        loading: notesCollectionsLoading,
+        loaded: notesCollectionsLoaded,
+        error: notesCollectionsError,
+        retry: retryNotesCollections,
+        addFolder: addNotesFolder,
+        removeCollection: handleRemoveNotesCollection,
+        runIndex: runNotesIndex,
+    } = useNotesCollections({
+        isTauriRuntime,
+        isGenerating:
+            isPreparingMessage || isGenerating || isSessionSummaryGenerating,
+        isIndexingPaused: notesIndexingPaused,
+        isIndexingBlocked,
+        modelReady: modelGateStatus === "ready",
+        ensureProvider,
+        cancelIndexing: cancelNotesIndexing,
+        confirmRemoval: confirmNotesRemoval,
+    });
+
+    const availableSources = useMemo(
+        () => ({
+            packIds: knowledgePacks
+                .filter(
+                    (pack) =>
+                        pack.status === "ready" ||
+                        pack.status === "updateAvailable",
+                )
+                .map((pack) => pack.stableId),
+            noteCollectionIds: notesCollections.map(
+                (collection) => collection.id,
+            ),
+        }),
+        [knowledgePacks, notesCollections],
+    );
+    const {
+        selection: sourceSelection,
+        packSettingsReady,
+        disabledNoteIds,
+        disabledPackIds,
+        setPackEnabled: handleSetPackEnabled,
+        setNoteEnabled: handleSetNotesEnabled,
+    } = useChatSources(
+        availableSources,
+        isTauriRuntime && knowledgeCatalogLoaded,
+        notesCollectionsLoaded,
+    );
+    const sourcesReady =
+        Boolean(sourceSelection) &&
+        knowledgeCatalogLoaded &&
+        notesCollectionsLoaded;
+    const handleAddNotesFolder = useCallback(
+        () =>
+            addNotesFolder((collection) => {
+                if (!notesCollections.some((item) => item.id === collection.id))
+                    handleSetNotesEnabled(collection.id, true);
+            }),
+        [addNotesFolder, handleSetNotesEnabled, notesCollections],
+    );
+
+    const getModelSettings = useCallback((): ModelSettings => {
+        return {
+            modelId: selectedModelId || undefined,
+            contextLength: contextLength ? Number(contextLength) : undefined,
+        };
+    }, [selectedModelId, contextLength]);
+
+    const modelSettingsKey = useMemo(
+        () => JSON.stringify(getModelSettings()),
+        [getModelSettings],
+    );
+
+    const formatErrorMessage = useCallback((error: unknown) => {
+        if (isNamedError(error, "prompt_too_long")) {
+            return "Prompt exceeds the model context window. Reduce history or increase context length.";
+        }
+        return tauriCommandError(error).message ?? "Unknown model error";
+    }, []);
+
+    const trimToWords = useCallback((text: string, maxWords: number) => {
+        const normalized = text
+            .replaceAll("\0", "")
+            .replace(/[\r\n\t]+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+        if (!normalized) return "";
+
+        const words = normalized
+            .split(" ")
+            .map((word) =>
+                word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ""),
+            )
+            .filter(Boolean);
+
+        return words.slice(0, maxWords).join(" ");
+    }, []);
+
+    const writeInferenceImages = useCallback(
+        async (images: ImageAttachment[]) => {
+            if (!isTauriRuntime || images.length === 0) return [] as string[];
+            const { appDataDir, join } = await import("@tauri-apps/api/path");
+            const { mkdir, writeFile } = await import("@tauri-apps/plugin-fs");
+            const root = await appDataDir();
+            const dir = await join(root, "ensu_llmchat_inference_images");
+            await mkdir(dir, { recursive: true });
+
+            const paths = await Promise.all(
+                images.map(async (image) => {
+                    const bytes = new Uint8Array(
+                        await image.file.arrayBuffer(),
+                    );
+                    const path = await join(dir, `${image.id}.jpg`);
+                    await writeFile(path, bytes);
+                    return path;
+                }),
+            );
+
+            return paths;
+        },
+        [isTauriRuntime],
+    );
+
+    const cleanupInferenceImages = useCallback(
+        async (paths: string[]) => {
+            if (!isTauriRuntime || paths.length === 0) return;
+            const { remove } = await import("@tauri-apps/plugin-fs");
+            await Promise.all(
+                paths.map(async (path) => {
+                    try {
+                        await remove(path);
+                    } catch {
+                        // Deleting the temporary file is best effort.
+                    }
+                }),
+            );
+        },
+        [isTauriRuntime],
+    );
+
+    const generateSessionSummary = useCallback(
+        async (input: string) => {
+            sessionSummaryActiveRef.current = true;
+            setIsSessionSummaryGenerating(true);
+            try {
+                const provider = await ensureProvider();
+                const settings = getModelSettings();
+                const availability =
+                    await provider.checkModelAvailability(settings);
+                const mmprojReady =
+                    availability.mmprojAvailable === undefined ||
+                    availability.mmprojAvailable;
+
+                if (!availability.modelAvailable || !mmprojReady) {
+                    return null;
+                }
+
+                await provider.ensureModelReady(settings);
+
+                let summary = "";
+
+                await provider.generateChatStream(
+                    {
+                        messages: [
+                            { role: "system", content: SESSION_TITLE_PROMPT },
+                            { role: "user", content: input },
+                        ],
+                        maxTokens: 64,
+                        temperature: 0.2,
+                        topP: 0.9,
+                        repeatPenalty: REPEAT_PENALTY,
+                    },
+                    (event) => {
+                        if (event.type === "text") {
+                            summary += event.text;
+                        }
+                    },
+                );
+
+                return summary;
+            } finally {
+                sessionSummaryActiveRef.current = false;
+                setIsSessionSummaryGenerating(false);
+            }
+        },
+        [ensureProvider, getModelSettings],
+    );
+
+    const updateSessionTitleInState = useCallback(
+        (sessionUuid: string, title: string) => {
+            setSessions((prev) =>
+                prev.map((session) =>
+                    session.sessionUuid === sessionUuid
+                        ? { ...session, title }
+                        : session,
+                ),
+            );
+        },
+        [],
+    );
+
+    const persistSessionTitle = useCallback(
+        (sessionUuid: string, title: string, key: string) => {
+            const previous = sessionTitleUpdatesRef.current.get(sessionUuid);
+            const task = (
+                previous?.catch(() => undefined) ?? Promise.resolve()
+            ).then(async () => {
+                await updateSessionTitle(sessionUuid, title, key);
+                updateSessionTitleInState(sessionUuid, title);
+            });
+            sessionTitleUpdatesRef.current.set(sessionUuid, task);
+            void task
+                .finally(() => {
+                    if (
+                        sessionTitleUpdatesRef.current.get(sessionUuid) === task
+                    ) {
+                        sessionTitleUpdatesRef.current.delete(sessionUuid);
+                    }
+                })
+                .catch(() => undefined);
+            return task;
+        },
+        [updateSessionTitleInState],
+    );
+
+    const maybeGenerateSessionTitle = useCallback(
+        async ({
+            sessionUuid,
+            assistantMessageUuid,
+            wasInterrupted,
+        }: {
+            sessionUuid: string;
+            assistantMessageUuid: string;
+            wasInterrupted: boolean;
+        }) => {
+            if (!chatKey || wasInterrupted) return;
+            const summaryEpoch = sessionSummaryEpochRef.current;
+
+            try {
+                const messages = await listMessages(sessionUuid, chatKey);
+                if (sessionSummaryEpochRef.current !== summaryEpoch) return;
+                const assistantMessages = messages.filter(
+                    (message) => message.sender === "assistant",
+                );
+                if (assistantMessages.length !== 1) return;
+
+                const firstAssistant = assistantMessages[0];
+                if (!firstAssistant) return;
+                if (firstAssistant.messageUuid !== assistantMessageUuid) return;
+
+                const firstUser = messages.find(
+                    (message) => message.sender === "self",
+                );
+                if (!firstUser) return;
+
+                const currentTitle = sessions.find(
+                    (session) => session.sessionUuid === sessionUuid,
+                )?.title;
+                const userText = parseDocumentBlocks(firstUser.text).text;
+                const automaticFallbackTitles = [
+                    sessionTitleFromText(firstUser.text, "New chat"),
+                    sessionTitleFromText(
+                        userText || firstUser.text,
+                        "New chat",
+                    ),
+                ];
+                if (
+                    currentTitle &&
+                    currentTitle.toLowerCase() !== "new chat" &&
+                    !automaticFallbackTitles.includes(currentTitle)
+                ) {
+                    return;
+                }
+
+                const assistantText = stripHiddenPartsText(firstAssistant.text);
+
+                const fallbackSeed = trimToWords(userText, 7) || "New chat";
+                const fallbackTitle = sessionTitleFromText(
+                    fallbackSeed,
+                    "New chat",
+                );
+
+                const summaryInput = `User: ${userText}\nAssistant: ${assistantText}`;
+                const summary = await generateSessionSummary(summaryInput);
+                if (sessionSummaryEpochRef.current !== summaryEpoch) return;
+                const summarySeed = summary ? trimToWords(summary, 7) : "";
+                const title = summarySeed
+                    ? sessionTitleFromText(summarySeed, fallbackTitle)
+                    : fallbackTitle;
+
+                if (manuallyRenamedSessionIdsRef.current.has(sessionUuid)) {
+                    return;
+                }
+                await persistSessionTitle(sessionUuid, title, chatKey);
+            } catch (error) {
+                log.error("Failed to generate session title", error);
+            }
+        },
+        [
+            chatKey,
+            generateSessionSummary,
+            persistSessionTitle,
+            sessions,
+            trimToWords,
+        ],
+    );
+
+    const scheduleSessionTitle = useCallback(
+        (input: Parameters<typeof maybeGenerateSessionTitle>[0]) => {
+            if (sessionSummaryPromiseRef.current) return;
+            const task = maybeGenerateSessionTitle(input);
+            sessionSummaryPromiseRef.current = task;
+            void task
+                .finally(() => {
+                    if (sessionSummaryPromiseRef.current === task) {
+                        sessionSummaryPromiseRef.current = null;
+                    }
+                })
+                .catch(() => undefined);
+        },
+        [maybeGenerateSessionTitle],
+    );
+
+    const preloadModelIfAvailable = useCallback(async () => {
+        const requestId = modelGateRequestRef.current + 1;
+        modelGateRequestRef.current = requestId;
+        const isCurrentRequest = () =>
+            modelGateRequestRef.current === requestId;
+        setModelGateError(null);
+        setModelGateStatus("checking");
+        setModelDownloadSizeBytes(null);
+
+        try {
+            const provider = await ensureProvider();
+            const settings = getModelSettings();
+            const availability =
+                await provider.checkModelAvailability(settings);
+            if (!isCurrentRequest()) return;
+            setImageAttachmentModelId(
+                availability.model.mmprojUrl ? (settings.modelId ?? "") : null,
+            );
+            const mmprojReady =
+                availability.mmprojAvailable === undefined ||
+                availability.mmprojAvailable;
+
+            if (!availability.modelAvailable || !mmprojReady) {
+                setModelGateStatus("missing");
+                const size = await provider
+                    .estimateMissingModelDownloadSize(settings)
+                    .catch((error: unknown) => {
+                        log.warn(
+                            "Failed to estimate model download size",
+                            error,
+                        );
+                        return undefined;
+                    });
+                if (isCurrentRequest()) {
+                    setModelDownloadSizeBytes(size ?? null);
+                }
+                return;
+            }
+
+            setModelGateStatus("preloading");
+            setDownloadStatus({ percent: 0, status: "Loading model..." });
+            setIsDownloading(true);
+
+            await provider.ensureModelReady(settings);
+            if (!isCurrentRequest()) return;
+            setLoadedModelName(provider.getCurrentModel()?.name ?? null);
+            setIsDownloading(false);
+            setDownloadStatus({ percent: 100, status: "Ready" });
+            setModelGateStatus("ready");
+        } catch (error) {
+            if (!isCurrentRequest()) return;
+            const { name } = tauriCommandError(error);
+            if (name === "model_missing" || name === "not_found") {
+                setModelGateError(null);
+                setIsDownloading(false);
+                setDownloadStatus(null);
+                setModelGateStatus("missing");
+                return;
+            }
+            const message = formatErrorMessage(error);
+            log.error("Failed to preload model", error);
+            setModelGateError(message);
+            setIsDownloading(false);
+            setDownloadStatus(null);
+            setModelGateStatus("error");
+        }
+    }, [ensureProvider, formatErrorMessage, getModelSettings]);
+
+    const handleDownloadModel = useCallback(async () => {
+        const requestId = modelGateRequestRef.current + 1;
+        modelGateRequestRef.current = requestId;
+        const isCurrentRequest = () =>
+            modelGateRequestRef.current === requestId;
+        setModelGateError(null);
+        setModelGateStatus("downloading");
+        setDownloadStatus({ percent: 0, status: "Preparing download..." });
+        setIsDownloading(true);
+
+        try {
+            const provider = await ensureProvider();
+            const settings = getModelSettings();
+            await provider.ensureModelReady(settings, {
+                downloadIfMissing: true,
+            });
+            if (!isCurrentRequest()) return;
+            const model = provider.getCurrentModel();
+            setImageAttachmentModelId(
+                model?.mmprojUrl ? (settings.modelId ?? "") : null,
+            );
+            setLoadedModelName(model?.name ?? null);
+            setIsDownloading(false);
+            setDownloadStatus({ percent: 100, status: "Ready" });
+            setModelGateStatus("ready");
+        } catch (error) {
+            if (!isCurrentRequest()) return;
+            const message = formatErrorMessage(error);
+            log.error("Failed to prepare model", error);
+            setModelGateError(message);
+            setIsDownloading(false);
+            setDownloadStatus(null);
+            setModelGateStatus("error");
+            showMiniDialog({ title: "Model error", message });
+        }
+    }, [ensureProvider, formatErrorMessage, getModelSettings, showMiniDialog]);
+
+    const handleSettingsFlowVisibilityChange = useCallback(
+        (open: boolean) => {
+            if (!isTauriRuntime) return;
+            if (settingsFlowOpenRef.current === open) return;
+            settingsFlowOpenRef.current = open;
+            const epoch = ++notesWarmupEpochRef.current;
+            if (open) {
+                notesIdleScheduler.resumeNow();
+                return;
+            }
+            notesIdleScheduler.cancel();
+            notesIndexingPausedRef.current = true;
+            setNotesIndexingPaused(true);
+            void (async () => {
+                try {
+                    const canRestoreChat = () =>
+                        notesWarmupEpochRef.current === epoch &&
+                        !settingsFlowOpenRef.current &&
+                        !isChatBusy();
+                    if (!canRestoreChat()) return;
+                    const provider = await ensureProvider();
+                    if (!canRestoreChat()) return;
+                    await provider.cancelGeneration(-1);
+                    if (!canRestoreChat()) return;
+                    await provider.ensureModelReady(getModelSettings());
+                    if (!canRestoreChat()) return;
+                    setLoadedModelName(
+                        provider.getCurrentModel()?.name ?? null,
+                    );
+                } catch (error) {
+                    log.warn("Failed to restore chat model after Notes", error);
+                } finally {
+                    if (
+                        notesWarmupEpochRef.current === epoch &&
+                        !settingsFlowOpenRef.current
+                    )
+                        notesIdleScheduler.defer();
+                }
+            })();
+        },
+        [
+            ensureProvider,
+            getModelSettings,
+            isChatBusy,
+            isTauriRuntime,
+            notesIdleScheduler,
+        ],
+    );
+
+    const prewarmSelectedImageInference = useCallback(() => {
+        if (!isTauriRuntime) return;
+        void (async () => {
+            try {
+                const provider = await ensureProvider();
+                await provider.prewarmImageInferenceIfAvailable(
+                    getModelSettings(),
+                );
+            } catch (error) {
+                log.error("Failed to prewarm image inference", error);
+            }
+        })();
+    }, [ensureProvider, getModelSettings, isTauriRuntime]);
+
+    useEffect(() => {
+        if (!firstPaintDone || !modelSettingsLoaded) return;
+        modelGateRequestRef.current += 1;
+        setModelGateError(null);
+        setModelGateStatus("checking");
+        setIsDownloading(false);
+        setDownloadStatus(null);
+        const cancelIdle = scheduleIdleTask(() => {
+            void preloadModelIfAvailable();
+        }, 2000);
+        return () => {
+            cancelIdle();
+        };
+    }, [
+        firstPaintDone,
+        modelSettingsLoaded,
+        modelSettingsKey,
+        preloadModelIfAvailable,
+        scheduleIdleTask,
+    ]);
+
+    const updateBranchSelectionState = useCallback(
+        async (
+            selectionKey: string,
+            selectedMessageUuid: string,
+            persist = true,
+        ) => {
+            setBranchSelections((prev) => ({
+                ...prev,
+                [selectionKey]: selectedMessageUuid,
+            }));
+
+            if (
+                !persist ||
+                !rootSessionUuid ||
+                selectedMessageUuid === STREAMING_SELECTION_KEY
+            ) {
+                return;
+            }
+
+            await setBranchSelection(
+                rootSessionUuid,
+                selectionKey,
+                selectedMessageUuid,
+            );
+        },
+        [rootSessionUuid],
+    );
+
+    const slicePathUntil = useCallback(
+        (path: ChatMessage[], messageUuid?: string | null) => {
+            if (!messageUuid) return path;
+            const index = path.findIndex(
+                (message) => message.messageUuid === messageUuid,
+            );
+            if (index === -1) return path;
+            return path.slice(0, index + 1);
+        },
+        [],
+    );
+
+    const stripHiddenParts = useCallback((text: string) => {
+        return stripHiddenPartsText(text);
+    }, []);
+
+    const getMessagePreview = useCallback(
+        (message: ChatMessage) => {
+            if (message.sender === "assistant") {
+                return stripHiddenParts(message.text);
+            }
+            const parsed = parseDocumentBlocks(message.text);
+            if (parsed.text.trim()) return parsed.text;
+
+            const attachments = message.attachments ?? [];
+            const imageCount = attachments.filter(
+                (attachment) => attachment.kind === "image",
+            ).length;
+
+            if (imageCount > 0) return "Attached images";
+            return "";
+        },
+        [stripHiddenParts],
+    );
+
+    const appendMessageToState = useCallback((message: ChatMessage) => {
+        setAllMessages((prev) => {
+            if (prev.some((item) => item.messageUuid === message.messageUuid)) {
+                return prev;
+            }
+            return [...prev, message];
+        });
+    }, []);
+
+    const updateSessionAfterMessage = useCallback(
+        (message: ChatMessage) => {
+            const preview = getMessagePreview(message);
+            setSessions((prev) => {
+                const next = prev.map((session) => {
+                    if (session.sessionUuid !== message.sessionUuid) {
+                        return session;
+                    }
+
+                    const nextTitle =
+                        message.sender === "self" &&
+                        session.title.toLowerCase() === "new chat"
+                            ? sessionTitleFromText(
+                                  parseDocumentBlocks(message.text).text ||
+                                      message.text,
+                                  "New chat",
+                              )
+                            : session.title;
+
+                    return {
+                        ...session,
+                        title: nextTitle,
+                        updatedAt: message.createdAt,
+                        lastMessagePreview: preview,
+                    };
+                });
+
+                next.sort((a, b) => b.updatedAt - a.updatedAt);
+                return next;
+            });
+        },
+        [getMessagePreview],
+    );
+
+    const approxTokens = useCallback((text: string) => {
+        if (!text) return 0;
+        const baseTokens = Math.ceil(text.length / 4);
+        const imageCount = text.split(MEDIA_MARKER).length - 1;
+        return baseTokens + imageCount * IMAGE_TOKEN_ESTIMATE;
+    }, []);
+
+    const buildHistory = useCallback(
+        (
+            path: ChatMessage[],
+            promptText: string,
+            inputBudget: number,
+            stopAtMessageUuid?: string | null,
+        ): LlmMessage[] => {
+            const candidates = slicePathUntil(path, stopAtMessageUuid);
+            const lastCandidate = candidates[candidates.length - 1];
+            const trimmedCandidates =
+                stopAtMessageUuid &&
+                lastCandidate?.messageUuid === stopAtMessageUuid
+                    ? candidates.slice(0, -1)
+                    : candidates;
+
+            const budget =
+                inputBudget -
+                approxTokens(buildChatSystemPrompt(systemPrompt)) -
+                approxTokens(promptText);
+
+            if (budget <= 0) return [];
+
+            const messages = trimmedCandidates.map((message): LlmMessage => {
+                const isUser = message.sender === "self";
+                let text = isUser
+                    ? message.text
+                    : stripHiddenParts(message.text);
+
+                if (isUser) {
+                    const parsed = parseDocumentBlocks(text);
+                    text = parsed.text;
+
+                    const imageCount = (message.attachments ?? []).filter(
+                        (attachment) => attachment.kind === "image",
+                    ).length;
+                    if (imageCount > 0) {
+                        text += `\n\n[${imageCount} attachment${imageCount === 1 ? "" : "s"} attached]`;
+                    }
+                }
+
+                return { role: isUser ? "user" : "assistant", content: text };
+            });
+
+            const historyTokens = messages.reduce(
+                (total, message) => total + approxTokens(message.content),
+                0,
+            );
+            const quantum = Math.max(1, Math.floor(inputBudget / 4));
+            const overflow = Math.max(0, historyTokens - budget);
+            const discardTarget = Math.ceil(overflow / quantum) * quantum;
+            let discarded = 0;
+            let startIndex = 0;
+            while (startIndex < messages.length && discarded < discardTarget) {
+                discarded += approxTokens(messages[startIndex]!.content);
+                startIndex += 1;
+            }
+
+            const selected = messages.slice(startIndex);
+            if (selected.length === 0 && messages.length > 0) {
+                const last = messages[messages.length - 1]!;
+                if (approxTokens(last.content) <= budget) return [last];
+                return [
+                    {
+                        ...last,
+                        content: last.content.slice(-Math.max(1, budget * 4)),
+                    },
+                ];
+            }
+
+            return selected;
+        },
+        [approxTokens, slicePathUntil, stripHiddenParts, systemPrompt],
+    );
+
+    const handleNewChat = useCallback(() => {
+        cancelActiveGenerationForNavigation();
+        setCurrentSessionId(undefined);
+        currentSessionIdRef.current = undefined;
+        setAllMessages([]);
+        composerRef.current?.setText("");
+        setEditingMessage(null);
+        resetPendingImages();
+        setStreamingParentId(null);
+        setStreamingText("");
+        streamingBufferRef.current = "";
+        streamingChunksRef.current = [];
+        streamingCreatedAtRef.current = null;
+        generationActiveRef.current = false;
+        setIsGenerating(false);
+        setIsStreamingOutro(false);
+        setIsDraftSession(true);
+        isDraftSessionRef.current = true;
+        updateRouteSession(undefined, true);
+        if (isSmall) setDrawerOpen(false);
+        focusInput();
+    }, [
+        cancelActiveGenerationForNavigation,
+        focusInput,
+        isSmall,
+        resetPendingImages,
+        updateRouteSession,
+    ]);
+
+    const handleSelectSession = useCallback(
+        (sessionId: string) => {
+            cancelActiveGenerationForNavigation();
+            setCurrentSessionId(sessionId);
+            currentSessionIdRef.current = sessionId;
+            setIsDraftSession(false);
+            isDraftSessionRef.current = false;
+            updateRouteSession(sessionId);
+            if (isSmall) setDrawerOpen(false);
+            focusInput();
+        },
+        [
+            cancelActiveGenerationForNavigation,
+            focusInput,
+            isSmall,
+            updateRouteSession,
+        ],
+    );
+
+    const removeSessionFromState = useCallback(
+        (sessionId: string) => {
+            manuallyRenamedSessionIdsRef.current.delete(sessionId);
+            setSessions((prev) =>
+                prev.filter((session) => session.sessionUuid !== sessionId),
+            );
+            setAllMessages((prev) =>
+                prev.filter((message) => message.sessionUuid !== sessionId),
+            );
+
+            if (currentSessionIdRef.current === sessionId) {
+                setCurrentSessionId(undefined);
+                currentSessionIdRef.current = undefined;
+                setIsDraftSession(true);
+                isDraftSessionRef.current = true;
+                updateRouteSession(undefined, true);
+            }
+        },
+        [updateRouteSession],
+    );
+
+    const handleDeleteSession = useCallback(
+        async (sessionId: string) => {
+            if (!chatKey) return;
+
+            if (currentSessionIdRef.current === sessionId) {
+                cancelActiveGenerationForNavigation();
+            }
+
+            await deleteSession(sessionId);
+            removeSessionFromState(sessionId);
+        },
+        [chatKey, cancelActiveGenerationForNavigation, removeSessionFromState],
+    );
+
+    const requestDeleteSession = useCallback((sessionId: string) => {
+        setDeleteSessionId(sessionId);
+    }, []);
+
+    const requestRenameSession = useCallback((session: ChatSession) => {
+        if (pendingSessionRenamesRef.current.has(session.sessionUuid)) return;
+        setRenameSessionId(session.sessionUuid);
+        setRenameSessionTitle(session.title.trim() || "New chat");
+    }, []);
+
+    const handleCancelRenameSession = useCallback(() => {
+        setRenameSessionId(null);
+        setRenameSessionTitle("");
+    }, []);
+
+    const handleConfirmRenameSession = useCallback(async () => {
+        if (!chatKey || !renameSessionId || !renameSessionTitle.trim()) return;
+        if (pendingSessionRenamesRef.current.has(renameSessionId)) return;
+        const title = sessionTitleFromText(renameSessionTitle);
+        const currentTitle = sessions.find(
+            (session) => session.sessionUuid === renameSessionId,
+        )?.title;
+        if (!currentTitle || title === currentTitle) {
+            handleCancelRenameSession();
+            return;
+        }
+        pendingSessionRenamesRef.current.add(renameSessionId);
+        const wasManuallyRenamed =
+            manuallyRenamedSessionIdsRef.current.has(renameSessionId);
+        manuallyRenamedSessionIdsRef.current.add(renameSessionId);
+        handleCancelRenameSession();
+        try {
+            await persistSessionTitle(renameSessionId, title, chatKey);
+        } catch (error) {
+            if (!wasManuallyRenamed) {
+                manuallyRenamedSessionIdsRef.current.delete(renameSessionId);
+            }
+            onGenericError(error);
+        } finally {
+            pendingSessionRenamesRef.current.delete(renameSessionId);
+        }
+    }, [
+        chatKey,
+        handleCancelRenameSession,
+        onGenericError,
+        persistSessionTitle,
+        renameSessionId,
+        renameSessionTitle,
+        sessions,
+    ]);
+
+    const handleConfirmDeleteSession = useCallback(async () => {
+        if (!deleteSessionId) return;
+        try {
+            await handleDeleteSession(deleteSessionId);
+        } catch (error) {
+            onGenericError(error);
+        } finally {
+            setDeleteSessionId(null);
+        }
+    }, [deleteSessionId, handleDeleteSession, onGenericError]);
+
+    const handleCancelDeleteSession = useCallback(() => {
+        setDeleteSessionId(null);
+    }, []);
+
+    const handleEditMessage = useCallback(
+        async (message: ChatMessage) => {
+            resetPendingImages();
+            const epoch = imageAttachmentEpochRef.current;
+            const parsed = parseDocumentBlocks(message.text);
+            setEditingMessage(message);
+            composerRef.current?.setText(parsed.text);
+
+            const attachments = message.attachments ?? [];
+            const imageAttachments = attachments.filter(
+                (attachment) => attachment.kind === "image",
+            );
+
+            if (imageAttachments.length === 0) {
+                return;
+            }
+
+            if (!chatKey) {
+                showMiniDialog({
+                    title: "Attachment error",
+                    message:
+                        "Attachments are unavailable until encryption is ready.",
+                });
+                return;
+            }
+
+            setIsAttachingImages(true);
+            try {
+                const images = await Promise.all(
+                    imageAttachments.map(async (attachment) => {
+                        const bytes = await readDecryptedAttachmentBytes(
+                            attachment.id,
+                            chatKey,
+                            message.sessionUuid,
+                        );
+                        const name =
+                            attachment.name.trim() || `image-${attachment.id}`;
+                        const file = new File([toSafeBlobPart(bytes)], name, {
+                            type: inferImageMime(name),
+                        });
+                        return {
+                            id: attachment.id,
+                            name,
+                            size: bytes.length,
+                            file,
+                        } satisfies ImageAttachment;
+                    }),
+                );
+
+                if (epoch !== imageAttachmentEpochRef.current) return;
+                setPendingImages(images);
+            } catch (error) {
+                if (epoch !== imageAttachmentEpochRef.current) return;
+                log.error("Failed to load attachment contents", error);
+                showMiniDialog({
+                    title: "Attachment error",
+                    message:
+                        "We could not load attachment contents for editing.",
+                });
+            } finally {
+                if (epoch === imageAttachmentEpochRef.current) {
+                    setIsAttachingImages(false);
+                }
+            }
+        },
+        [chatKey, showMiniDialog, inferImageMime, resetPendingImages],
+    );
+
+    const handleCancelEdit = useCallback(() => {
+        setEditingMessage(null);
+        composerRef.current?.setText("");
+        setPendingDocuments([]);
+        resetPendingImages();
+    }, [resetPendingImages]);
+
+    const handleCopyMessage = useCallback(
+        async (text: string) => {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast({
+                    title: "Copied to clipboard.",
+                    color: "inherit",
+                    autoHideDuration: 2000,
+                });
+            } catch (error) {
+                log.error("Failed to copy message", error);
+                showToast({
+                    title: "Copy failed.",
+                    color: "inherit",
+                    autoHideDuration: 3000,
+                });
+            }
+        },
+        [showToast],
+    );
+
+    const closeImagePreview = useCallback(() => {
+        setImagePreview(null);
+        if (imagePreviewUrlRef.current) {
+            URL.revokeObjectURL(imagePreviewUrlRef.current);
+            imagePreviewUrlRef.current = null;
+        }
+    }, []);
+
+    const handleOpenAttachment = useCallback(
+        async (message: ChatMessage, attachment: ChatAttachment) => {
+            if (!chatKey) return;
+
+            try {
+                const bytes = await readDecryptedAttachmentBytes(
+                    attachment.id,
+                    chatKey,
+                    message.sessionUuid,
+                );
+
+                const baseName =
+                    attachment.name.trim() || `attachment-${attachment.id}`;
+                const treatAsImage = attachment.kind === "image";
+                const filename = treatAsImage
+                    ? baseName
+                    : baseName.toLowerCase().endsWith(".txt")
+                      ? baseName
+                      : baseName.includes(".")
+                        ? `${baseName.replace(/\.[^/.]+$/, "")}.txt`
+                        : `${baseName}.txt`;
+
+                if (treatAsImage) {
+                    const mime = inferImageMime(baseName);
+                    const blob = new Blob([toSafeBlobPart(bytes)], {
+                        type: mime,
+                    });
+                    const url = URL.createObjectURL(blob);
+                    if (imagePreviewUrlRef.current) {
+                        URL.revokeObjectURL(imagePreviewUrlRef.current);
+                    }
+                    imagePreviewUrlRef.current = url;
+                    setImagePreview({ url, name: baseName });
+                    return;
+                }
+
+                if (isTauriRuntime) {
+                    const [
+                        { appDataDir, join },
+                        { mkdir, writeFile },
+                        { openPath },
+                    ] = await Promise.all([
+                        import("@tauri-apps/api/path"),
+                        import("@tauri-apps/plugin-fs"),
+                        import("@tauri-apps/plugin-opener"),
+                    ]);
+                    const root = await appDataDir();
+                    const dir = await join(root, "ensu_llmchat_attachments_v2");
+                    await mkdir(dir, { recursive: true });
+                    const filePath = await join(dir, filename);
+
+                    await writeFile(filePath, bytes);
+                    await openPath(filePath);
+                    return;
+                }
+
+                const text = new TextDecoder().decode(bytes);
+                const blob = new Blob([text], {
+                    type: "text/plain;charset=utf-8",
+                });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank", "noopener");
+                window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } catch (error) {
+                log.error("Failed to open attachment", error);
+                showMiniDialog({
+                    title: "Attachment open failed",
+                    message:
+                        "We could not open this attachment. Please try again.",
+                });
+            }
+        },
+        [chatKey, inferImageMime, isTauriRuntime, showMiniDialog],
+    );
+
+    useEffect(() => {
+        return () => {
+            if (imagePreviewUrlRef.current) {
+                URL.revokeObjectURL(imagePreviewUrlRef.current);
+                imagePreviewUrlRef.current = null;
+            }
+        };
+    }, []);
+
+    const flushStreamingText = useCallback(() => {
+        if (streamingFlushTimerRef.current) {
+            window.clearTimeout(streamingFlushTimerRef.current);
+            streamingFlushTimerRef.current = null;
+        }
+        if (streamingChunksRef.current.length > 0) {
+            streamingBufferRef.current += streamingChunksRef.current.join("");
+            streamingChunksRef.current = [];
+        }
+        setStreamingText(streamingBufferRef.current);
+    }, []);
+
+    const scheduleStreamingFlush = useCallback(() => {
+        if (streamingFlushTimerRef.current) return;
+        streamingFlushTimerRef.current = window.setTimeout(() => {
+            flushStreamingText();
+            streamingFlushTimerRef.current = null;
+        }, 100);
+    }, [flushStreamingText]);
+
+    const handleStopGeneration = useCallback(() => {
+        const jobId = currentJobIdRef.current;
+        generationTokenRef.current += 1;
+        setConversationStatus(null);
+        beginGenerationStop();
+
+        flushStreamingText();
+        const finalText = streamingBufferRef.current.replaceAll("\0", "");
+        const trimmedText = finalText.trim();
+        const parentMessageUuid = streamingParentId;
+        const activeSessionId = currentSessionIdRef.current ?? currentSessionId;
+        const activeKnowledgeSources = activeKnowledgeSourcesRef.current;
+        const preparedReply = preparedReplyRef.current;
+        preparedReplyRef.current = undefined;
+        activeKnowledgeSourcesRef.current = [];
+
+        const last = lastGenerationRef.current;
+        lastGenerationRef.current = null;
+
+        generationActiveRef.current = false;
+        setIsGenerating(false);
+        setIsStreamingOutro(false);
+        setIsDownloading(false);
+        currentJobIdRef.current = null;
+
+        const resetStreamingState = () => {
+            setStreamingParentId(null);
+            streamingBufferRef.current = "";
+            streamingChunksRef.current = [];
+            streamingCreatedAtRef.current = null;
+            setStreamingText("");
+        };
+
+        const persistStoppedGeneration = async () => {
+            if (
+                trimmedText &&
+                parentMessageUuid &&
+                activeSessionId &&
+                chatKey
+            ) {
+                try {
+                    const assistantMessage = await (preparedReply
+                        ? preparedReply.saveAnswer(finalText)
+                        : addMessage(
+                              activeSessionId,
+                              "assistant",
+                              finalText,
+                              chatKey,
+                              parentMessageUuid,
+                              [],
+                              activeKnowledgeSources,
+                          ));
+
+                    await updateBranchSelectionState(
+                        parentMessageUuid,
+                        assistantMessage.messageUuid,
+                    );
+                    appendMessageToState(assistantMessage);
+                    updateSessionAfterMessage(assistantMessage);
+                    scheduleSessionTitle({
+                        sessionUuid: activeSessionId,
+                        assistantMessageUuid: assistantMessage.messageUuid,
+                        wasInterrupted: false,
+                    });
+                } catch (error) {
+                    log.error("Failed to finalize stopped generation", error);
+                    if (last?.previousSelection) {
+                        await updateBranchSelectionState(
+                            last.parentMessageUuid,
+                            last.previousSelection,
+                        );
+                    }
+                }
+                return;
+            }
+
+            if (last?.previousSelection) {
+                await updateBranchSelectionState(
+                    last.parentMessageUuid,
+                    last.previousSelection,
+                );
+            }
+        };
+
+        const cancelNativeGeneration = async () => {
+            try {
+                const provider =
+                    providerRef.current ?? (await ensureProvider());
+                await provider.cancelGeneration(jobId ?? -1);
+            } catch (error) {
+                log.error("Failed to cancel generation", error);
+            }
+        };
+
+        void (async () => {
+            try {
+                const results = await Promise.allSettled([
+                    cancelNativeGeneration(),
+                    persistStoppedGeneration(),
+                ]);
+                for (const result of results) {
+                    if (result.status === "rejected") {
+                        log.error(
+                            "Stopped generation cleanup failed",
+                            result.reason,
+                        );
+                    }
+                }
+            } finally {
+                resetStreamingState();
+                endGenerationStop();
+            }
+        })();
+    }, [
+        appendMessageToState,
+        beginGenerationStop,
+        chatKey,
+        currentSessionId,
+        endGenerationStop,
+        ensureProvider,
+        flushStreamingText,
+        scheduleSessionTitle,
+        streamingParentId,
+        updateBranchSelectionState,
+        updateSessionAfterMessage,
+    ]);
+
+    const startGeneration = useCallback(
+        async ({
+            promptText,
+            parentMessage,
+            historyPath,
+            stopAtMessageUuid,
+            resetContext = false,
+            sessionUuid,
+            imagePaths,
+            mediaMarker,
+            sources = sourceSelection,
+        }: {
+            promptText: string;
+            parentMessage: ChatMessage;
+            historyPath: ChatMessage[];
+            stopAtMessageUuid?: string | null;
+            resetContext?: boolean;
+            sessionUuid?: string;
+            imagePaths?: string[];
+            mediaMarker?: string;
+            sources?: ChatSourceSelection;
+        }): Promise<void> => {
+            const parentMessageUuid = parentMessage.messageUuid;
+            const activeSessionId =
+                sessionUuid ?? currentSessionIdRef.current ?? currentSessionId;
+            if (!chatKey || !activeSessionId) return;
+            if (
+                generationStartingRef.current ||
+                generationStoppingRef.current
+            ) {
+                return;
+            }
+            if (isTauriRuntime && !sources) return;
+            const selectedPackIds = new Set(sources?.packIds);
+            const selectedNoteIds = new Set(sources?.noteCollectionIds);
+            generationStartingRef.current = true;
+            generationActiveRef.current = true;
+            setIsGenerating(true);
+            currentJobIdRef.current = null;
+            lastGenerationRef.current = null;
+
+            const generationToken = generationTokenRef.current + 1;
+            generationTokenRef.current = generationToken;
+
+            const isActiveGeneration = () =>
+                generationTokenRef.current === generationToken &&
+                currentSessionIdRef.current === activeSessionId;
+
+            let provider: LlmProvider;
+            let settings: ModelSettings;
+            let maxTokens: number;
+            let inputBudget: number;
+            let previousSelection: string | null | undefined;
+            let startupCompleted = false;
+            try {
+                provider = await ensureProvider();
+                if (provider.getBackendKind() === "tauri") {
+                    await provider.cancelGeneration(-1);
+                    if (!isActiveGeneration()) return;
+                }
+                const priorSummary = sessionSummaryPromiseRef.current;
+                if (priorSummary) {
+                    sessionSummaryEpochRef.current += 1;
+                    await provider.cancelGeneration(-1);
+                    await priorSummary.catch(() => undefined);
+                    if (!isActiveGeneration()) return;
+                }
+                settings = getModelSettings();
+                ({ maxTokens, inputBudget } =
+                    provider.resolveRuntimeSettings(settings));
+
+                if (!isActiveGeneration()) return;
+
+                previousSelection = branchSelections[parentMessageUuid];
+                lastGenerationRef.current = {
+                    parentMessageUuid,
+                    previousSelection,
+                };
+
+                void updateBranchSelectionState(
+                    parentMessageUuid,
+                    STREAMING_SELECTION_KEY,
+                    false,
+                );
+                setStreamingParentId(parentMessageUuid);
+                setStreamingText("");
+                streamingBufferRef.current = "";
+                streamingChunksRef.current = [];
+                streamingCreatedAtRef.current = Date.now() * 1000;
+                setIsStreamingOutro(false);
+                startupCompleted = true;
+            } catch (error) {
+                if (isActiveGeneration()) {
+                    const message = formatErrorMessage(error);
+                    showMiniDialog({ title: "Model error", message });
+                }
+                return;
+            } finally {
+                generationStartingRef.current = false;
+                if (!startupCompleted && isActiveGeneration()) {
+                    generationActiveRef.current = false;
+                    setIsGenerating(false);
+                }
+            }
+
+            let errorMessage: string | null = null;
+            preparedReplyRef.current = undefined;
+            activeKnowledgeSourcesRef.current = [];
+
+            try {
+                const normalSystemPrompt = buildChatSystemPrompt(systemPrompt);
+                const useConversationMemory =
+                    provider.getBackendKind() === "tauri" &&
+                    !imagePaths?.length;
+                let history = useConversationMemory
+                    ? []
+                    : buildHistory(
+                          historyPath,
+                          promptText,
+                          inputBudget,
+                          stopAtMessageUuid,
+                      );
+                const normalMessages: LlmMessage[] = [
+                    { role: "system", content: normalSystemPrompt },
+                    ...history,
+                    { role: "user", content: promptText },
+                ];
+                const countTokens = (messages: LlmMessage[]) =>
+                    messages.reduce(
+                        (total, message) =>
+                            total + approxTokens(message.content),
+                        0,
+                    );
+                const normalPromptTokenEstimate = countTokens(normalMessages);
+                if (
+                    provider.getBackendKind() === "wasm" &&
+                    normalPromptTokenEstimate > inputBudget
+                ) {
+                    throw new Error(
+                        "Prompt exceeds the model context window. Reduce history or increase context length.",
+                    );
+                }
+
+                let knowledgeContext: Awaited<
+                    ReturnType<typeof retrieveKnowledge>
+                > = null;
+                const enabledReadyPackIds = knowledgePacks
+                    .filter(
+                        (pack) =>
+                            (pack.status === "ready" ||
+                                pack.status === "updateAvailable") &&
+                            selectedPackIds.has(pack.stableId),
+                    )
+                    .map((pack) => pack.stableId);
+                const enabledReadyNoteIds = notesCollections
+                    .filter(
+                        (collection) =>
+                            selectedNoteIds.has(collection.id) &&
+                            collection.indexedDocumentCount > 0 &&
+                            collection.status !== "unavailable" &&
+                            collection.status !== "error",
+                    )
+                    .map((collection) => collection.id);
+                const knowledgeQuery = parseDocumentBlocks(parentMessage.text)
+                    .text.replaceAll(MEDIA_MARKER, "")
+                    .replace(/\[\d+ image attachments? provided\]/gi, "")
+                    .trim();
+                const conversationPath = useConversationMemory
+                    ? buildConversationPath(allMessages, parentMessage)
+                    : [];
+                let resolutionToken: string | undefined;
+                const remainingKnowledgeBytes = useConversationMemory
+                    ? 6000
+                    : Math.max(
+                          0,
+                          (inputBudget - normalPromptTokenEstimate) * 4 - 2,
+                      );
+                if (
+                    isTauriRuntime &&
+                    knowledgeQuery &&
+                    remainingKnowledgeBytes > 0 &&
+                    (enabledReadyPackIds.length > 0 ||
+                        enabledReadyNoteIds.length > 0)
+                ) {
+                    setConversationStatus("Finding sources");
+                    try {
+                        knowledgeContext =
+                            await provider.withKnowledgeRetrieval(
+                                (retrievalEpoch) =>
+                                    retrieveKnowledge(
+                                        knowledgeQuery,
+                                        enabledReadyPackIds,
+                                        enabledReadyNoteIds,
+                                        remainingKnowledgeBytes,
+                                        retrievalEpoch,
+                                    ),
+                                isActiveGeneration,
+                            );
+                        if (!isActiveGeneration()) return;
+                    } catch (error) {
+                        const { name } = tauriCommandError(error);
+                        if (
+                            !isActiveGeneration() ||
+                            name === "cancelled" ||
+                            name === "stale"
+                        ) {
+                            return;
+                        }
+                        if (name === "embedding_missing") {
+                            throw error;
+                        }
+                        log.warn(
+                            "Knowledge retrieval failed; continuing without source context",
+                            error,
+                        );
+                    }
+                    setConversationStatus(null);
+                }
+                if (!isActiveGeneration()) return;
+
+                if (
+                    useConversationMemory &&
+                    historyPath.some((message) => message.sources?.length)
+                ) {
+                    setConversationStatus("Finding sources");
+                    try {
+                        resolutionToken = await provider.withKnowledgeRetrieval(
+                            (cancellationEpoch) =>
+                                resolveDesktopSourceFollowup({
+                                    sessionUuid: activeSessionId,
+                                    path: conversationPath,
+                                    question: knowledgeQuery,
+                                    enabledStableIds: enabledReadyPackIds,
+                                    enabledNoteCollectionIds:
+                                        enabledReadyNoteIds,
+                                    cancellationEpoch,
+                                    candidates: knowledgeContext?.candidates,
+                                }),
+                            isActiveGeneration,
+                        );
+                        if (!isActiveGeneration()) return;
+                    } catch (error) {
+                        const { name } = tauriCommandError(error);
+                        if (
+                            !isActiveGeneration() ||
+                            name === "cancelled" ||
+                            name === "stale"
+                        )
+                            return;
+                        log.warn(
+                            "Source followup failed; continuing with available sources",
+                            error,
+                        );
+                    }
+                    setConversationStatus(null);
+                }
+
+                await provider.ensureModelReady(settings);
+                setLoadedModelName(provider.getCurrentModel()?.name ?? null);
+                setIsDownloading(false);
+                setDownloadStatus({ percent: 100, status: "Ready" });
+
+                if (!isActiveGeneration()) {
+                    return;
+                }
+
+                if (resetContext) {
+                    await provider.resetContext(
+                        provider.resolveRuntimeSettings(settings, false)
+                            .contextSize,
+                    );
+                    if (!isActiveGeneration()) return;
+                }
+
+                ({ maxTokens, inputBudget } =
+                    provider.resolveRuntimeSettings(settings));
+                if (
+                    provider.getBackendKind() === "tauri" &&
+                    !useConversationMemory
+                ) {
+                    history = buildHistory(
+                        historyPath,
+                        promptText,
+                        inputBudget,
+                        stopAtMessageUuid,
+                    );
+                    normalMessages.splice(
+                        1,
+                        normalMessages.length - 2,
+                        ...history,
+                    );
+                    if (countTokens(normalMessages) > inputBudget) {
+                        throw new Error(
+                            "Prompt exceeds the loaded model context window. Reduce history or increase context length.",
+                        );
+                    }
+                }
+
+                let messages = normalMessages;
+                let activeSources: GroundedSource[] = [];
+                if (knowledgeContext && !useConversationMemory) {
+                    const candidateMessages: LlmMessage[] = [
+                        {
+                            role: "system",
+                            content: `${normalSystemPrompt}\n\n${knowledgeContext.text}`,
+                        },
+                        ...normalMessages.slice(1),
+                    ];
+                    if (countTokens(candidateMessages) <= inputBudget) {
+                        messages = candidateMessages;
+                        activeSources = knowledgeContext.sources;
+                    }
+                }
+                if (useConversationMemory) {
+                    const prepared = await prepareDesktopConversation(
+                        {
+                            sessionUuid: activeSessionId,
+                            path: conversationPath,
+                            system: normalSystemPrompt,
+                            current: promptText,
+                            historyQuery: resolutionToken
+                                ? undefined
+                                : knowledgeQuery,
+                            maxTokens,
+                            groundingCandidates: resolutionToken
+                                ? undefined
+                                : knowledgeContext?.candidates,
+                            resolutionToken,
+                        },
+                        provider,
+                        {
+                            isCurrent: isActiveGeneration,
+                            onProgress: () =>
+                                setConversationStatus(
+                                    "Remembering earlier messages",
+                                ),
+                        },
+                    );
+                    if (!isActiveGeneration()) return;
+                    setConversationStatus(null);
+                    if (!prepared) {
+                        if (previousSelection) {
+                            void updateBranchSelectionState(
+                                parentMessageUuid,
+                                previousSelection,
+                            );
+                        }
+                        return;
+                    }
+                    preparedReplyRef.current = prepared;
+                }
+                activeKnowledgeSourcesRef.current = activeSources;
+                const nativeImagePaths =
+                    imagePaths?.length && provider.getBackendKind() === "tauri"
+                        ? imagePaths
+                        : undefined;
+                const mmprojPath = nativeImagePaths
+                    ? provider.getCurrentMmprojPath()
+                    : undefined;
+                if (nativeImagePaths && !mmprojPath) {
+                    throw new Error("MMProj model not available");
+                }
+
+                const generate = () =>
+                    (preparedReplyRef.current ?? provider).generateChatStream(
+                        {
+                            messages,
+                            imagePaths: nativeImagePaths,
+                            mmprojPath,
+                            mediaMarker: nativeImagePaths
+                                ? (mediaMarker ?? MEDIA_MARKER)
+                                : undefined,
+                            maxTokens,
+                            temperature: 0.7,
+                            topP: 0.9,
+                            repeatPenalty: REPEAT_PENALTY,
+                        },
+                        (event: GenerateEvent) => {
+                            if (!isActiveGeneration()) {
+                                const jobId =
+                                    event.type === "text"
+                                        ? event.job_id
+                                        : event.summary.job_id;
+                                void provider.cancelGeneration(jobId);
+                                return;
+                            }
+                            if (event.type === "text") {
+                                if (!currentJobIdRef.current) {
+                                    currentJobIdRef.current = event.job_id;
+                                }
+                                streamingChunksRef.current.push(event.text);
+                                scheduleStreamingFlush();
+                            } else {
+                                currentJobIdRef.current = event.summary.job_id;
+                            }
+                        },
+                    );
+                try {
+                    await generate();
+                } catch (error) {
+                    const { name } = tauriCommandError(error);
+                    if (
+                        name === "prompt_too_long" &&
+                        !streamingBufferRef.current &&
+                        streamingChunksRef.current.length === 0 &&
+                        activeSources.length > 0 &&
+                        !useConversationMemory
+                    ) {
+                        activeSources = [];
+                        activeKnowledgeSourcesRef.current = [];
+                        messages = normalMessages;
+                        try {
+                            await generate();
+                        } catch (retryError) {
+                            errorMessage =
+                                retryError instanceof Error
+                                    ? retryError.message
+                                    : String(retryError);
+                        }
+                    } else {
+                        errorMessage =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+                    }
+                }
+
+                if (!isActiveGeneration()) {
+                    return;
+                }
+
+                flushStreamingText();
+                const finalText = streamingBufferRef.current;
+
+                if (!finalText.trim()) {
+                    if (errorMessage) {
+                        showMiniDialog({
+                            title: "Generation failed",
+                            message: errorMessage,
+                        });
+                    }
+                    if (previousSelection) {
+                        void updateBranchSelectionState(
+                            parentMessageUuid,
+                            previousSelection,
+                        );
+                    }
+                    return;
+                }
+
+                const rawAssistantText = finalText.replaceAll("\0", "");
+                setIsStreamingOutro(true);
+
+                await new Promise<void>((resolve) => {
+                    window.setTimeout(resolve, STREAMING_OUTRO_DURATION_MS);
+                });
+
+                if (!isActiveGeneration()) {
+                    return;
+                }
+
+                activeKnowledgeSourcesRef.current = [];
+
+                const assistantMessage = await (preparedReplyRef.current
+                    ? preparedReplyRef.current.saveAnswer(rawAssistantText)
+                    : addMessage(
+                          activeSessionId,
+                          "assistant",
+                          rawAssistantText,
+                          chatKey,
+                          parentMessageUuid,
+                          [],
+                          activeSources,
+                      ));
+
+                if (!isActiveGeneration()) return;
+                void updateBranchSelectionState(
+                    parentMessageUuid,
+                    assistantMessage.messageUuid,
+                );
+                appendMessageToState(assistantMessage);
+                updateSessionAfterMessage(assistantMessage);
+
+                scheduleSessionTitle({
+                    sessionUuid: activeSessionId,
+                    assistantMessageUuid: assistantMessage.messageUuid,
+                    wasInterrupted: !!errorMessage,
+                });
+            } catch (error) {
+                if (!isActiveGeneration()) {
+                    return;
+                }
+                const { name } = tauriCommandError(error);
+                if (
+                    name === "model_missing" ||
+                    name === "not_found" ||
+                    name === "embedding_missing"
+                ) {
+                    setModelGateError(null);
+                    setDownloadStatus(null);
+                    setModelGateStatus("missing");
+                } else {
+                    const message = formatErrorMessage(error);
+                    if (name !== "cancelled" && name !== "stale") {
+                        showMiniDialog({ title: "Model error", message });
+                    }
+                }
+                if (previousSelection) {
+                    void updateBranchSelectionState(
+                        parentMessageUuid,
+                        previousSelection,
+                    );
+                }
+            } finally {
+                if (isActiveGeneration()) {
+                    activeKnowledgeSourcesRef.current = [];
+                    preparedReplyRef.current = undefined;
+                    setConversationStatus(null);
+                    generationActiveRef.current = false;
+                    setIsGenerating(false);
+                    setIsStreamingOutro(false);
+                    setIsDownloading(false);
+                    streamingBufferRef.current = "";
+                    streamingChunksRef.current = [];
+                    setStreamingText("");
+                    setStreamingParentId(null);
+                    streamingCreatedAtRef.current = null;
+                    currentJobIdRef.current = null;
+                    lastGenerationRef.current = null;
+                }
+            }
+        },
+        [
+            chatKey,
+            currentSessionId,
+            ensureProvider,
+            getModelSettings,
+            buildHistory,
+            allMessages,
+            branchSelections,
+            updateBranchSelectionState,
+            appendMessageToState,
+            updateSessionAfterMessage,
+            showMiniDialog,
+            approxTokens,
+            formatErrorMessage,
+            scheduleStreamingFlush,
+            flushStreamingText,
+            scheduleSessionTitle,
+            systemPrompt,
+            isTauriRuntime,
+            sourceSelection,
+            knowledgePacks,
+            notesCollections,
+        ],
+    );
+
+    const handleRetryMessage = useCallback(
+        async (message: ChatMessage) => {
+            if (message.sender !== "assistant") return;
+            if (!chatKey || !currentSessionId) return;
+            if (isDownloading) {
+                showMiniDialog({
+                    title: "Model download in progress",
+                    message: "Please wait for the model to finish downloading.",
+                });
+                return;
+            }
+            if (isGenerating) {
+                showMiniDialog({
+                    title: "Already generating",
+                    message: "Please wait for the current response to finish.",
+                });
+                return;
+            }
+            const parentUuid = message.parentMessageUuid;
+            if (!parentUuid) {
+                showMiniDialog({
+                    title: "Retry failed",
+                    message: "No parent message found for retry.",
+                });
+                return;
+            }
+            const parentMessage = allMessages.find(
+                (item) => item.messageUuid === parentUuid,
+            );
+            if (!parentMessage) {
+                showMiniDialog({
+                    title: "Retry failed",
+                    message: "Parent message is missing.",
+                });
+                return;
+            }
+            const historyPath = slicePathUntil(messageState.path, parentUuid);
+            handleChatActivity();
+            await startGeneration({
+                promptText: parentMessage.text,
+                parentMessage,
+                historyPath,
+                stopAtMessageUuid: parentUuid,
+                resetContext: true,
+                sessionUuid: currentSessionId,
+            });
+        },
+        [
+            allMessages,
+            handleChatActivity,
+            chatKey,
+            currentSessionId,
+            isDownloading,
+            isGenerating,
+            messageState.path,
+            slicePathUntil,
+            startGeneration,
+            showMiniDialog,
+        ],
+    );
+
+    const handlePrevBranch = useCallback(
+        (switcher: BranchSwitcher) => {
+            if (switcher.total <= 1) return;
+            const nextIndex =
+                (switcher.currentIndex - 1 + switcher.total) % switcher.total;
+            const target = switcher.targets[nextIndex];
+            if (!target) return;
+            cancelActiveGenerationForNavigation();
+            void updateBranchSelectionState(switcher.selectionKey, target);
+        },
+        [cancelActiveGenerationForNavigation, updateBranchSelectionState],
+    );
+
+    const handleNextBranch = useCallback(
+        (switcher: BranchSwitcher) => {
+            if (switcher.total <= 1) return;
+            const nextIndex = (switcher.currentIndex + 1) % switcher.total;
+            const target = switcher.targets[nextIndex];
+            if (!target) return;
+            cancelActiveGenerationForNavigation();
+            void updateBranchSelectionState(switcher.selectionKey, target);
+        },
+        [cancelActiveGenerationForNavigation, updateBranchSelectionState],
+    );
+
+    const handleOpenDrawer = useCallback(() => {
+        if (isSmall) {
+            setDrawerOpen(true);
+            return;
+        }
+        setDrawerCollapsed(false);
+    }, [isSmall]);
+
+    const handleCloseDrawer = useCallback(() => {
+        if (isSmall) {
+            setDrawerOpen(false);
+        } else {
+            setDrawerCollapsed(true);
+        }
+    }, [isSmall]);
+
+    const handleCollapseDrawer = useCallback(() => {
+        handleCloseDrawer();
+    }, [handleCloseDrawer]);
+
+    const openSettingsModal = useCallback(() => setShowSettingsModal(true), []);
+    const closeSettingsModal = useCallback(
+        () => setShowSettingsModal(false),
+        [],
+    );
+
+    const handleLogoClick = useCallback(() => {
+        if (typeof window === "undefined") return;
+        window.location.reload();
+    }, []);
+
+    const markUserScrollIntent = useCallback(() => {
+        userScrollIntentRef.current = true;
+        if (userScrollTimeoutRef.current) {
+            window.clearTimeout(userScrollTimeoutRef.current);
+        }
+        userScrollTimeoutRef.current = window.setTimeout(() => {
+            userScrollIntentRef.current = false;
+            userScrollTimeoutRef.current = null;
+        }, 200);
+    }, []);
+
+    const handleScroll = useCallback(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        const distance =
+            container.scrollHeight -
+            container.scrollTop -
+            container.clientHeight;
+        const atBottom = distance <= 120;
+        const previousTop = lastScrollTopRef.current;
+        const currentTop = container.scrollTop;
+        lastScrollTopRef.current = currentTop;
+
+        if (
+            currentTop < previousTop - 4 &&
+            userScrollIntentRef.current &&
+            !atBottom
+        ) {
+            setStickToBottom(false);
+            return;
+        }
+
+        if (atBottom) {
+            setStickToBottom(true);
+        }
+    }, []);
+
+    const handleStickToBottomChange = useCallback(
+        (value: boolean) => {
+            setStickToBottom(value);
+        },
+        [setStickToBottom],
+    );
+
+    useEffect(() => {
+        if (!isGenerating || !stickToBottom) return;
+
+        const frame = window.requestAnimationFrame(() => {
+            const container = scrollContainerRef.current;
+            if (!container) return;
+            container.scrollTop = container.scrollHeight;
+            lastScrollTopRef.current = container.scrollTop;
+        });
+
+        return () => {
+            window.cancelAnimationFrame(frame);
+        };
+    }, [displayMessages, isGenerating, loadingDots, stickToBottom]);
+
+    const handleOpenSessionSearch = useCallback(() => {
+        setShowSessionSearch(true);
+    }, []);
+    const handleCloseSessionSearch = useCallback(() => {
+        setShowSessionSearch(false);
+    }, []);
+
+    const saveLogs = useCallback(async () => {
+        log.info("Saving logs");
+        const electron = globalThis.electron;
+        if (electron) {
+            await electron.openLogDirectory();
+            return;
+        }
+
+        if (isTauriRuntime) {
+            try {
+                const { save } = await import("@tauri-apps/plugin-dialog");
+                const filename = `ensu-web-logs-${Date.now()}.txt`;
+                const path = await save({
+                    defaultPath: filename,
+                    filters: [{ name: "Logs", extensions: ["txt"] }],
+                });
+                if (!path) return;
+                const { writeFile } = await import("@tauri-apps/plugin-fs");
+                const encoded = new TextEncoder().encode(savedLogs());
+                await writeFile(path, encoded);
+                return;
+            } catch (error) {
+                log.error("Failed to export logs", error);
+                showMiniDialog({
+                    title: "Save logs failed",
+                    message:
+                        "We could not save the log file. Please check the console for errors.",
+                });
+                return;
+            }
+        }
+
+        saveStringAsFile(savedLogs(), `ente-web-logs-${Date.now()}.txt`);
+    }, [isTauriRuntime, showMiniDialog]);
+
+    const handleCheckForUpdates = useCallback(async () => {
+        await handleManualAppUpdateCheck(showMiniDialog);
+    }, [showMiniDialog]);
+
+    const openModelSettings = useCallback(() => {
+        if (!advancedUnlocked) return;
+        setShowModelSettings(true);
+    }, [advancedUnlocked]);
+    const closeModelSettings = useCallback(
+        () => setShowModelSettings(false),
+        [],
+    );
+    const openSystemPromptSettings = useCallback(() => {
+        if (!advancedUnlocked) return;
+        setShowSystemPromptSettings(true);
+    }, [advancedUnlocked]);
+    const closeSystemPromptSettings = useCallback(
+        () => setShowSystemPromptSettings(false),
+        [],
+    );
+    const handleDownloadKnowledgePack = useCallback(
+        (stableId: string) => {
+            if (activeKnowledgeDownloadsRef.current.has(stableId)) return;
+            activeKnowledgeDownloadsRef.current.add(stableId);
+            const isNew = !knowledgePacks.some(
+                (pack) =>
+                    pack.stableId === stableId &&
+                    (pack.status === "ready" ||
+                        pack.status === "updateAvailable"),
+            );
+
+            setKnowledgeErrors((current) => ({
+                ...current,
+                [stableId]: undefined,
+            }));
+            setKnowledgeDownloadProgress((current) => ({
+                ...current,
+                [stableId]: 0,
+            }));
+            void downloadKnowledgePack(stableId, (percent) => {
+                setKnowledgeDownloadProgress((current) => ({
+                    ...current,
+                    [stableId]: percent,
+                }));
+            })
+                .then((pack) => {
+                    if (isNew) handleSetPackEnabled(stableId, true);
+                    setKnowledgePacks((current) =>
+                        current.map((item) =>
+                            item.stableId === stableId ? pack : item,
+                        ),
+                    );
+                })
+                .catch((error: unknown) => {
+                    const { name } = tauriCommandError(error);
+                    if (name !== "cancelled") {
+                        setKnowledgeErrors((current) => ({
+                            ...current,
+                            [stableId]: knowledgeErrorMessage(error),
+                        }));
+                    }
+                    void refreshKnowledgeCatalog();
+                })
+                .finally(() => {
+                    activeKnowledgeDownloadsRef.current.delete(stableId);
+                    setKnowledgeDownloadProgress((current) => ({
+                        ...current,
+                        [stableId]: undefined,
+                    }));
+                });
+        },
+        [refreshKnowledgeCatalog, knowledgePacks, handleSetPackEnabled],
+    );
+    const handleCancelKnowledgePackDownload = useCallback(
+        (stableId: string) => {
+            void cancelKnowledgePackDownload(stableId).catch(
+                (error: unknown) => {
+                    log.warn("Failed to cancel Ensu Pack download", error);
+                },
+            );
+        },
+        [],
+    );
+    const handleBuildVersionTap = useCallback(() => {
+        if (advancedUnlocked || typeof window === "undefined") return;
+        if (buildVersionTapTimeoutRef.current) {
+            window.clearTimeout(buildVersionTapTimeoutRef.current);
+        }
+        buildVersionTapCountRef.current += 1;
+        if (buildVersionTapCountRef.current >= 5) {
+            buildVersionTapCountRef.current = 0;
+            setAdvancedUnlocked(true);
+            window.localStorage.setItem(ADVANCED_SETTINGS_UNLOCK_KEY, "1");
+            return;
+        }
+        buildVersionTapTimeoutRef.current = window.setTimeout(() => {
+            buildVersionTapCountRef.current = 0;
+            buildVersionTapTimeoutRef.current = null;
+        }, 1800);
+    }, [advancedUnlocked]);
+
+    const fallbackSuggestedModels = useMemo(
+        () =>
+            isTauriRuntime
+                ? FALLBACK_DESKTOP_MODEL_PRESETS
+                : FALLBACK_MOBILE_MODEL_PRESETS,
+        [isTauriRuntime],
+    );
+    const suggestedModels = resolvedModelPresets ?? fallbackSuggestedModels;
+    const isModelPreparationActive =
+        modelGateStatus === "checking" ||
+        modelGateStatus === "preloading" ||
+        modelGateStatus === "downloading";
+
+    const handleSaveModel = useCallback(
+        (draft: { modelId: string; contextLength: string }) => {
+            if (isModelPreparationActive) return;
+            setIsSavingModel(true);
+            if (typeof window !== "undefined") {
+                window.localStorage.setItem(
+                    MODEL_SETTINGS_STORAGE_KEY,
+                    JSON.stringify(draft),
+                );
+            }
+            setSelectedModelId(draft.modelId);
+            setContextLength(draft.contextLength);
+            modelGateRequestRef.current += 1;
+            setLoadedModelName(null);
+            setModelDownloadSizeBytes(null);
+            setModelGateStatus("checking");
+            setIsSavingModel(false);
+            setShowModelSettings(false);
+        },
+        [isModelPreparationActive],
+    );
+
+    const handleUseDefaultModel = useCallback(() => {
+        if (isModelPreparationActive) return;
+        if (typeof window !== "undefined") {
+            window.localStorage.setItem(
+                MODEL_SETTINGS_STORAGE_KEY,
+                JSON.stringify({ modelId: "", contextLength: "" }),
+            );
+        }
+        setSelectedModelId("");
+        setContextLength("");
+        modelGateRequestRef.current += 1;
+        setLoadedModelName(null);
+        setModelDownloadSizeBytes(null);
+        setModelGateStatus("checking");
+        setShowModelSettings(false);
+    }, [isModelPreparationActive]);
+
+    const handleSaveSystemPrompt = useCallback((promptText: string) => {
+        const normalizedPrompt = promptText.trim();
+        const isDefaultPrompt =
+            !normalizedPrompt ||
+            normalizedPrompt === DEFAULT_CHAT_SYSTEM_PROMPT_BODY;
+        if (typeof window !== "undefined") {
+            if (!isDefaultPrompt) {
+                window.localStorage.setItem(
+                    SYSTEM_PROMPT_STORAGE_KEY,
+                    normalizedPrompt,
+                );
+            } else {
+                window.localStorage.removeItem(SYSTEM_PROMPT_STORAGE_KEY);
+            }
+        }
+        setSystemPrompt(
+            isDefaultPrompt
+                ? DEFAULT_CHAT_SYSTEM_PROMPT_BODY
+                : normalizedPrompt,
+        );
+        setShowSystemPromptSettings(false);
+    }, []);
+
+    const handleUseDefaultSystemPrompt = useCallback(() => {
+        if (typeof window !== "undefined") {
+            window.localStorage.removeItem(SYSTEM_PROMPT_STORAGE_KEY);
+        }
+        setSystemPrompt(DEFAULT_CHAT_SYSTEM_PROMPT_BODY);
+        setShowSystemPromptSettings(false);
+    }, []);
+
+    const imageAttachmentSlotsRemaining = Math.max(
+        0,
+        MAX_IMAGE_ATTACHMENTS_PER_MESSAGE - pendingImages.length,
+    );
+    const isImageAttachmentLimitReached = imageAttachmentSlotsRemaining === 0;
+    const canHandleImageDrop =
+        showImageAttachment &&
+        !isGenerating &&
+        !isDownloading &&
+        !showModelGate &&
+        !isAttachingImages;
+    const showImageDropOverlay = canHandleImageDrop && isImageDragActive;
+    const imageDropOverlayTitle = isImageAttachmentLimitReached
+        ? "Image limit reached"
+        : "Drop images to attach";
+    const imageDropOverlayDescription = isImageAttachmentLimitReached
+        ? `You can attach up to ${MAX_IMAGE_ATTACHMENTS_PER_MESSAGE} images per message.`
+        : "PNG, JPG, WebP, GIF, BMP, HEIC, HEIF, AVIF";
+
+    useEffect(() => {
+        if (!canHandleImageDrop) {
+            setIsImageDragActive(false);
+        }
+    }, [canHandleImageDrop]);
+
+    const handleImageSelect = useCallback(
+        (files: File[]) => {
+            if (imageAttachmentSlotsRemaining <= 0) return;
+            const images = files.map((file) => ({
+                id: createAttachmentId(),
+                name: file.name.replace(/\0/g, ""),
+                size: file.size,
+                file,
+            }));
+            if (images.length) {
+                setPendingImages((prev) => {
+                    const slotsRemaining = Math.max(
+                        0,
+                        MAX_IMAGE_ATTACHMENTS_PER_MESSAGE - prev.length,
+                    );
+                    if (slotsRemaining === 0) return prev;
+                    return [...prev, ...images.slice(0, slotsRemaining)];
+                });
+            }
+        },
+        [imageAttachmentSlotsRemaining],
+    );
+
+    const processTauriImagePaths = useCallback(
+        async (selectedPaths: string[], source: "picker" | "drop") => {
+            if (imageAttachmentSlotsRemaining <= 0) return;
+            const pathsToProcess = selectedPaths.slice(
+                0,
+                imageAttachmentSlotsRemaining,
+            );
+            if (pathsToProcess.length === 0) {
+                return;
+            }
+
+            const epoch = imageAttachmentEpochRef.current;
+            setIsAttachingImages(true);
+
+            try {
+                const { invoke } = await import("@tauri-apps/api/core");
+                const files = await Promise.all(
+                    pathsToProcess.map(async (selectedPath) => {
+                        const normalized = selectedPath.replace(/\\/g, "/");
+                        const name =
+                            normalized.split("/").pop()?.replace(/\0/g, "") ||
+                            "image";
+                        const compressed = await invoke<number[]>(
+                            "chat_db_compress_attachment_image_file",
+                            { path: selectedPath },
+                        );
+                        const bytes = new Uint8Array(compressed);
+                        return new File(
+                            [toSafeBlobPart(bytes)],
+                            normalizedJpegAttachmentName(name),
+                            { type: "image/jpeg" },
+                        );
+                    }),
+                );
+
+                if (epoch !== imageAttachmentEpochRef.current) return;
+
+                log.info(
+                    `Compressed ${source === "drop" ? "dropped" : "selected"} image attachments`,
+                    {
+                        count: files.length,
+                        totalBytes: files.reduce(
+                            (sum, file) => sum + file.size,
+                            0,
+                        ),
+                    },
+                );
+
+                if (files.length > 0) {
+                    handleImageSelect(files);
+                    prewarmSelectedImageInference();
+                }
+            } catch (error) {
+                if (epoch !== imageAttachmentEpochRef.current) return;
+                log.error(
+                    `Failed to process ${source === "drop" ? "dropped" : "selected"} image attachment: ${formatImageProcessingErrorForLog(error)}`,
+                );
+                showMiniDialog(
+                    imageProcessingFailureDialog(error, pathsToProcess.length),
+                );
+                return;
+            } finally {
+                if (epoch === imageAttachmentEpochRef.current) {
+                    setIsAttachingImages(false);
+                }
+            }
+        },
+        [
+            handleImageSelect,
+            imageAttachmentSlotsRemaining,
+            prewarmSelectedImageInference,
+            showMiniDialog,
+        ],
+    );
+
+    const openTauriImageSelector = useCallback(async () => {
+        if (imageAttachmentSlotsRemaining <= 0) return;
+        try {
+            const { open: openFileDialog } =
+                await import("@tauri-apps/plugin-dialog");
+            const selection = await openFileDialog({
+                directory: false,
+                multiple: true,
+                filters: [
+                    {
+                        name: "Images",
+                        extensions: [...IMAGE_SELECTOR_EXTENSIONS],
+                    },
+                ],
+            });
+            if (!selection) {
+                return;
+            }
+            const selectedPaths = Array.isArray(selection)
+                ? selection
+                : [selection];
+            if (selectedPaths.length === 0) {
+                return;
+            }
+            await processTauriImagePaths(selectedPaths, "picker");
+        } catch (error) {
+            log.error("Failed to open image picker", error);
+            showMiniDialog({
+                title: "Image picker unavailable",
+                message: "Could not open the image picker. Please try again.",
+            });
+        }
+    }, [imageAttachmentSlotsRemaining, processTauriImagePaths, showMiniDialog]);
+
+    useEffect(() => {
+        if (!isTauriRuntime || !showImageAttachment) return;
+
+        let disposed = false;
+        let unlisten: (() => void) | undefined;
+
+        void import("@tauri-apps/api/webview")
+            .then(({ getCurrentWebview }) =>
+                getCurrentWebview().onDragDropEvent((event) => {
+                    if (
+                        event.payload.type === "enter" ||
+                        event.payload.type === "over"
+                    ) {
+                        if (canHandleImageDrop) {
+                            setIsImageDragActive(true);
+                        }
+                        return;
+                    }
+
+                    if (event.payload.type === "leave") {
+                        setIsImageDragActive(false);
+                        return;
+                    }
+
+                    setIsImageDragActive(false);
+                    if (!canHandleImageDrop) return;
+                    if (isImageAttachmentLimitReached) {
+                        showMiniDialog({
+                            title: "Image limit reached",
+                            message: `You can attach up to ${MAX_IMAGE_ATTACHMENTS_PER_MESSAGE} images per message.`,
+                        });
+                        return;
+                    }
+
+                    const imagePaths = event.payload.paths.filter((path) => {
+                        const lowerPath = path.toLowerCase();
+                        return IMAGE_SELECTOR_EXTENSIONS.some((extension) =>
+                            lowerPath.endsWith(`.${extension}`),
+                        );
+                    });
+                    if (imagePaths.length === 0) {
+                        showMiniDialog({
+                            title: "No supported images",
+                            message:
+                                "Drop PNG, JPG, WebP, GIF, BMP, HEIC, HEIF, or AVIF images.",
+                        });
+                        return;
+                    }
+
+                    void processTauriImagePaths(imagePaths, "drop");
+                }),
+            )
+            .then((dispose) => {
+                if (disposed) {
+                    dispose();
+                } else {
+                    unlisten = dispose;
+                }
+            })
+            .catch((error: unknown) => {
+                log.error(
+                    "Failed to subscribe to Tauri image drop events",
+                    error,
+                );
+            });
+
+        return () => {
+            disposed = true;
+            unlisten?.();
+        };
+    }, [
+        canHandleImageDrop,
+        isImageAttachmentLimitReached,
+        isTauriRuntime,
+        processTauriImagePaths,
+        showImageAttachment,
+        showMiniDialog,
+    ]);
+
+    const openPhotoPicker = useCallback(() => {
+        if (!showImageAttachment || isImageAttachmentLimitReached) return;
+        void openTauriImageSelector();
+    }, [
+        showImageAttachment,
+        isImageAttachmentLimitReached,
+        openTauriImageSelector,
+    ]);
+
+    const removePendingDocument = useCallback((id: string) => {
+        setPendingDocuments((prev) => prev.filter((doc) => doc.id !== id));
+    }, []);
+
+    const removePendingImage = useCallback((id: string) => {
+        setPendingImages((prev) => prev.filter((img) => img.id !== id));
+    }, []);
+
+    const handleSend = async (input: string) => {
+        if (isAttachingImages || pendingSendRef.current) return;
+        const trimmed = input.trim();
+        const hasDocuments = pendingDocuments.length > 0;
+        const hasImages = pendingImages.length > 0;
+        if (!chatKey) {
+            showMiniDialog({
+                title: "Chat unavailable",
+                message:
+                    "Encryption is still initializing. Please try again in a moment.",
+            });
+            return;
+        }
+        if (!trimmed && !hasDocuments && !hasImages) {
+            return;
+        }
+        if (
+            showModelGate ||
+            isModelPreparationActive ||
+            (isTauriRuntime && !sourcesReady)
+        )
+            return;
+        if (generationStartingRef.current || generationStoppingRef.current) {
+            return;
+        }
+        if (isDownloading) {
+            showMiniDialog({
+                title: "Model download in progress",
+                message: "Please wait for the model to finish downloading.",
+            });
+            return;
+        }
+        if (isGenerating) {
+            showMiniDialog({
+                title: "Already generating",
+                message: "Please wait for the current response to finish.",
+            });
+            return;
+        }
+
+        pendingSendRef.current = true;
+        handleChatActivity();
+        setIsPreparingMessage(true);
+        const messageSources = sourceSelection;
+        try {
+            setStickToBottom(true);
+
+            let activeSessionId = currentSessionId;
+            if (!activeSessionId) {
+                try {
+                    activeSessionId = await createSession(chatKey);
+                } catch (error) {
+                    onGenericError(error);
+                    return;
+                }
+                setCurrentSessionId(activeSessionId);
+                currentSessionIdRef.current = activeSessionId;
+                setIsDraftSession(false);
+                isDraftSessionRef.current = false;
+                updateRouteSession(activeSessionId, true);
+                await refreshSessions();
+            }
+
+            const userText = trimmed.replaceAll("\0", "");
+            const messageText = buildPromptWithDocuments(
+                userText,
+                pendingDocuments,
+            );
+            const persistedAttachmentIds = new Set(
+                (editingMessage?.attachments ?? []).map(({ id }) => id),
+            );
+            const newAttachmentIds = [
+                ...pendingDocuments.map(({ id }) => id),
+                ...pendingImages.map(({ id }) => id),
+            ].filter((id) => !persistedAttachmentIds.has(id));
+            const cleanupUnstoredAttachments = async () => {
+                await Promise.all(
+                    newAttachmentIds.map(async (id) => {
+                        try {
+                            await deleteAttachmentBytes(id);
+                        } catch (error) {
+                            log.warn(
+                                `Failed to clean up attachment payload ${id}`,
+                                error,
+                            );
+                        }
+                    }),
+                );
+            };
+            let inferenceImagePaths: string[] = [];
+
+            let attachments: ChatAttachment[] = [];
+            if (pendingDocuments.length > 0 || pendingImages.length > 0) {
+                try {
+                    const encoder = new TextEncoder();
+                    const documentAttachments = await Promise.all(
+                        pendingDocuments.map(async (doc) => {
+                            const bytes = encoder.encode(doc.text);
+                            await storeEncryptedAttachmentBytes(
+                                doc.id,
+                                bytes,
+                                chatKey,
+                                activeSessionId,
+                            );
+                            return {
+                                id: doc.id,
+                                kind: "document",
+                                name: doc.name.replace(/\0/g, ""),
+                                size: bytes.length,
+                            } satisfies ChatAttachment;
+                        }),
+                    );
+                    const imageAttachments = await Promise.all(
+                        pendingImages.map(async (img) => {
+                            const bytes = new Uint8Array(
+                                await img.file.arrayBuffer(),
+                            );
+                            await storeEncryptedAttachmentBytes(
+                                img.id,
+                                bytes,
+                                chatKey,
+                                activeSessionId,
+                            );
+                            const previewUrl = URL.createObjectURL(
+                                new Blob([toSafeBlobPart(bytes)]),
+                            );
+                            attachmentPreviewUrlsRef.current[img.id] =
+                                previewUrl;
+                            setAttachmentPreviews((prev) => ({
+                                ...prev,
+                                [img.id]: previewUrl,
+                            }));
+                            return {
+                                id: img.id,
+                                kind: "image",
+                                name: img.name.replace(/\0/g, ""),
+                                size: img.size,
+                            } satisfies ChatAttachment;
+                        }),
+                    );
+                    attachments = [...documentAttachments, ...imageAttachments];
+                } catch (error) {
+                    await cleanupUnstoredAttachments();
+                    log.error("Failed to store attachments", error);
+                    showMiniDialog({
+                        title: "Attachment error",
+                        message:
+                            "We could not attach the files. Please try again.",
+                    });
+                    return;
+                }
+            }
+
+            if (pendingImages.length > 0) {
+                try {
+                    inferenceImagePaths =
+                        await writeInferenceImages(pendingImages);
+                } catch (error) {
+                    await cleanupUnstoredAttachments();
+                    log.error("Failed to prepare images for inference", error);
+                    showMiniDialog({
+                        title: "Attachment error",
+                        message:
+                            "We could not prepare the images for inference. Please try again.",
+                    });
+                    return;
+                }
+            }
+
+            const promptText = buildPromptWithImages(
+                userText,
+                inferenceImagePaths.length,
+                pendingDocuments,
+            );
+
+            composerRef.current?.setText("");
+
+            let messageStored = false;
+            try {
+                if (editingMessage) {
+                    const parentUuid = editingMessage.parentMessageUuid;
+                    const selectionKey = parentUuid ?? ROOT_SELECTION_KEY;
+                    const historyPath = parentUuid
+                        ? slicePathUntil(messageState.path, parentUuid)
+                        : [];
+
+                    const newUserMessage = await addMessage(
+                        activeSessionId,
+                        "self",
+                        messageText,
+                        chatKey,
+                        parentUuid,
+                        attachments,
+                    );
+                    messageStored = true;
+
+                    void updateBranchSelectionState(
+                        selectionKey,
+                        newUserMessage.messageUuid,
+                    );
+                    appendMessageToState(newUserMessage);
+                    updateSessionAfterMessage(newUserMessage);
+                    setEditingMessage(null);
+                    setPendingDocuments([]);
+                    setPendingImages([]);
+
+                    await startGeneration({
+                        promptText,
+                        parentMessage: newUserMessage,
+                        historyPath,
+                        sessionUuid: activeSessionId,
+                        imagePaths: inferenceImagePaths,
+                        mediaMarker: MEDIA_MARKER,
+                        sources: messageSources,
+                    });
+                    return;
+                }
+
+                const basePath = messageState.path;
+                const leaf = basePath[basePath.length - 1];
+                const parentUuid = leaf?.messageUuid;
+                const selectionKey = parentUuid ?? ROOT_SELECTION_KEY;
+
+                const userMessage = await addMessage(
+                    activeSessionId,
+                    "self",
+                    messageText,
+                    chatKey,
+                    parentUuid,
+                    attachments,
+                );
+                messageStored = true;
+
+                void updateBranchSelectionState(
+                    selectionKey,
+                    userMessage.messageUuid,
+                );
+                appendMessageToState(userMessage);
+                updateSessionAfterMessage(userMessage);
+                setPendingDocuments([]);
+                setPendingImages([]);
+
+                await startGeneration({
+                    promptText,
+                    parentMessage: userMessage,
+                    historyPath: basePath,
+                    sessionUuid: activeSessionId,
+                    imagePaths: inferenceImagePaths,
+                    mediaMarker: MEDIA_MARKER,
+                    sources: messageSources,
+                });
+            } catch (error) {
+                if (!messageStored) await cleanupUnstoredAttachments();
+                log.error("Failed to store chat message", error);
+            } finally {
+                await cleanupInferenceImages(inferenceImagePaths);
+            }
+        } finally {
+            pendingSendRef.current = false;
+            setIsPreparingMessage(false);
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            imageAttachmentEpochRef.current += 1;
+            if (streamingFlushTimerRef.current) {
+                window.clearTimeout(streamingFlushTimerRef.current);
+            }
+            if (downloadProgressTimerRef.current) {
+                window.clearTimeout(downloadProgressTimerRef.current);
+            }
+            if (userScrollTimeoutRef.current) {
+                window.clearTimeout(userScrollTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const sidebar = (
+        <ChatSidebar
+            drawerCollapsed={drawerCollapsed}
+            drawerIconButtonSx={drawerIconButtonSx}
+            actionButtonSx={actionButtonSx}
+            smallIconProps={smallIconProps}
+            tinyIconProps={tinyIconProps}
+            actionIconProps={actionIconProps}
+            showSessionSearch={showSessionSearch}
+            sessionSearchRef={sessionSearchRef}
+            handleOpenSessionSearch={handleOpenSessionSearch}
+            handleCloseSessionSearch={handleCloseSessionSearch}
+            handleNewChat={handleNewChat}
+            handleOpenDrawer={handleOpenDrawer}
+            handleCollapseDrawer={handleCollapseDrawer}
+            sessions={sessions}
+            currentSessionId={currentSessionId}
+            handleSelectSession={handleSelectSession}
+            requestRenameSession={requestRenameSession}
+            requestDeleteSession={requestDeleteSession}
+            openSettingsModal={openSettingsModal}
+        />
+    );
+
+    if (loading || !modelSettingsLoaded) return <></>;
+
+    return (
+        <>
+            <Box
+                sx={{
+                    display: "flex",
+                    height: "var(--ensu-viewport-height, 100svh)",
+                    width: "100%",
+                    maxWidth: "100vw",
+                    bgcolor: "background.default",
+                    fontFamily: messageFontFamily,
+                    overflow: "hidden",
+                }}
+            >
+                <Drawer
+                    variant={isSmall ? "temporary" : "permanent"}
+                    open={isSmall ? drawerOpen : true}
+                    onClose={handleCloseDrawer}
+                    ModalProps={isSmall ? { keepMounted: true } : undefined}
+                    sx={{
+                        flexShrink: 0,
+                        "& .MuiDrawer-paper": {
+                            width: drawerWidth,
+                            boxSizing: "border-box",
+                            position: isSmall ? "fixed" : "relative",
+                            overflowX: "hidden",
+                            pointerEvents:
+                                isSmall || !drawerCollapsed ? "auto" : "none",
+                        },
+                    }}
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                backgroundColor: "background.default",
+                                borderRightColor: drawerCollapsed
+                                    ? "transparent"
+                                    : "divider",
+                            },
+                        },
+                    }}
+                >
+                    {sidebar}
+                </Drawer>
+
+                <Box
+                    ref={chatViewportRef}
+                    sx={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                        position: "relative",
+                        minWidth: 0,
+                        maxWidth: "100%",
+                        overflow: "hidden",
+                    }}
+                >
+                    <NavbarBase
+                        sx={{
+                            justifyContent: "space-between",
+                            px: 2,
+                            height: 64,
+                            minHeight: 64,
+                            bgcolor: isDesktopOverlay
+                                ? "transparent"
+                                : "background.paper",
+                            borderBottom: isDesktopOverlay ? "none" : undefined,
+                            position: isDesktopOverlay
+                                ? "absolute"
+                                : "relative",
+                            top: isDesktopOverlay ? 0 : undefined,
+                            left: isDesktopOverlay ? 0 : undefined,
+                            right: isDesktopOverlay ? 0 : undefined,
+                            zIndex: isDesktopOverlay ? 10 : undefined,
+                        }}
+                    >
+                        <Stack
+                            direction="row"
+                            sx={{ gap: 1.5, alignItems: "center" }}
+                        >
+                            {showDrawerToggle && (
+                                <IconButton
+                                    aria-label="Open menu"
+                                    onClick={handleOpenDrawer}
+                                    sx={drawerIconButtonSx}
+                                >
+                                    <HugeiconsIcon
+                                        icon={Menu01Icon}
+                                        {...smallIconProps}
+                                    />
+                                </IconButton>
+                            )}
+                            <Stack sx={{ gap: 0 }}>
+                                <Box
+                                    component="button"
+                                    onClick={handleLogoClick}
+                                    onMouseDown={(event) =>
+                                        event.preventDefault()
+                                    }
+                                    onDoubleClick={(event) =>
+                                        event.preventDefault()
+                                    }
+                                    onPointerDown={(event) =>
+                                        event.preventDefault()
+                                    }
+                                    sx={{
+                                        border: "none",
+                                        padding: 0,
+                                        background: "transparent",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        userSelect: "none",
+                                        WebkitUserSelect: "none",
+                                        MozUserSelect: "none",
+                                        msUserSelect: "none",
+                                        outline: "none",
+                                    }}
+                                >
+                                    <Box
+                                        component="img"
+                                        src={logoSrc}
+                                        alt="ensu"
+                                        draggable={false}
+                                        sx={{
+                                            height: 16,
+                                            width: "auto",
+                                            filter: logoFilter,
+                                        }}
+                                    />
+                                </Box>
+                            </Stack>
+                        </Stack>
+                    </NavbarBase>
+
+                    {hideMessagesForModelGate ? (
+                        <Box sx={{ flex: 1 }} />
+                    ) : (
+                        <ChatMessageList
+                            messages={displayMessages}
+                            attachmentPreviews={attachmentPreviews}
+                            branchSwitchers={branchSwitchers}
+                            loadingPhrase={loadingPhrase}
+                            preparationStatus={conversationStatus}
+                            loadingDots={loadingDots}
+                            isGenerating={isGenerating}
+                            isStreamingOutro={isStreamingOutro}
+                            stickToBottom={stickToBottom}
+                            onStickToBottomChange={handleStickToBottomChange}
+                            scrollContainerRef={scrollContainerRef}
+                            onScroll={handleScroll}
+                            onUserScrollIntent={markUserScrollIntent}
+                            onOpenAttachment={handleOpenAttachment}
+                            onEditMessage={handleEditMessage}
+                            onCopyMessage={handleCopyMessage}
+                            onRetryMessage={handleRetryMessage}
+                            onPrevBranch={handlePrevBranch}
+                            onNextBranch={handleNextBranch}
+                            onRequestPreview={loadAttachmentPreview}
+                            parseDocumentBlocks={parseDocumentBlocks}
+                            stripHiddenParts={stripHiddenParts}
+                            formatTime={formatTime}
+                            isDesktopOverlay={isDesktopOverlay}
+                            userBubbleBackground={userBubbleBackground}
+                            userMessageTextSx={userMessageTextSx}
+                            assistantTextSx={assistantTextSx}
+                            assistantMarkdownSx={assistantMarkdownSx}
+                            streamingMessageSx={streamingMessageSx}
+                            actionButtonSx={actionButtonSx}
+                            dialogTitleSx={dialogTitleSx}
+                            dialogCloseButtonSx={drawerIconButtonSx}
+                            dialogCloseIconProps={tinyIconProps}
+                            smallIconProps={smallIconProps}
+                            actionIconProps={actionIconProps}
+                        />
+                    )}
+
+                    <ChatComposer
+                        ref={composerRef}
+                        showModelGate={showModelGate}
+                        showDownloadProgress={showDownloadProgress}
+                        downloadStatus={downloadStatus}
+                        downloadStatusLabel={downloadStatusLabel}
+                        downloadSizeLabel={downloadSizeLabel}
+                        modelGateStatus={modelGateStatus}
+                        modelGateError={modelGateError}
+                        isDownloading={isDownloading}
+                        handleDownloadModel={handleDownloadModel}
+                        editingMessage={editingMessage}
+                        handleCancelEdit={handleCancelEdit}
+                        pendingDocuments={pendingDocuments}
+                        pendingImages={pendingImages}
+                        isAttachingImages={isAttachingImages}
+                        pendingImagePreviews={pendingImagePreviews}
+                        removePendingDocument={removePendingDocument}
+                        removePendingImage={removePendingImage}
+                        formatBytes={formatBytes}
+                        isGenerating={isGenerating}
+                        handleSend={handleSend}
+                        onActivity={handleChatActivity}
+                        handleStopGeneration={handleStopGeneration}
+                        retrySources={
+                            knowledgeCatalogError || notesCollectionsError
+                                ? () => {
+                                      void refreshKnowledgeCatalog();
+                                      retryNotesCollections();
+                                  }
+                                : undefined
+                        }
+                        isPreparingMessage={isPreparingMessage}
+                        sourcesLoading={isTauriRuntime && !sourcesReady}
+                        sourcesStatus={
+                            isTauriRuntime && !sourcesReady
+                                ? knowledgeCatalogError || notesCollectionsError
+                                    ? "Couldn’t load sources. Try again."
+                                    : "Loading sources for this chat…"
+                                : undefined
+                        }
+                        showAttachmentPicker={showImageAttachment}
+                        openPhotoPicker={openPhotoPicker}
+                        showImageAttachment={showImageAttachment}
+                        isImageAttachmentLimitReached={
+                            isImageAttachmentLimitReached
+                        }
+                        actionButtonSx={actionButtonSx}
+                        drawerIconButtonSx={drawerIconButtonSx}
+                        smallIconProps={smallIconProps}
+                        compactIconProps={compactIconProps}
+                        actionIconProps={actionIconProps}
+                    />
+                    {showImageDropOverlay && (
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                inset: 0,
+                                zIndex: 40,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                pointerEvents: "none",
+                                bgcolor: "rgba(0, 0, 0, 0.38)",
+                                backdropFilter: "blur(10px)",
+                                WebkitBackdropFilter: "blur(10px)",
+                            }}
+                        >
+                            <Stack
+                                sx={{
+                                    alignItems: "center",
+                                    gap: 0.75,
+                                    px: 3,
+                                    py: 2,
+                                    borderRadius: 2,
+                                    border: "1px solid rgba(255, 255, 255, 0.32)",
+                                    bgcolor: "rgba(0, 0, 0, 0.42)",
+                                    color: "#fff",
+                                    boxShadow:
+                                        "0 18px 48px rgba(0, 0, 0, 0.22)",
+                                }}
+                            >
+                                <Typography
+                                    variant="small"
+                                    sx={{ fontWeight: 700, color: "inherit" }}
+                                >
+                                    {imageDropOverlayTitle}
+                                </Typography>
+                                <Typography
+                                    variant="mini"
+                                    sx={{ color: "rgba(255, 255, 255, 0.78)" }}
+                                >
+                                    {imageDropOverlayDescription}
+                                </Typography>
+                            </Stack>
+                        </Box>
+                    )}
+                </Box>
+            </Box>
+
+            <ChatDialogs
+                showSettingsModal={showSettingsModal}
+                openSettingsModal={openSettingsModal}
+                closeSettingsModal={closeSettingsModal}
+                dialogPaperSx={dialogPaperSx}
+                dialogTitleSx={dialogTitleSx}
+                actionButtonSx={actionButtonSx}
+                drawerIconButtonSx={drawerIconButtonSx}
+                settingsItemSx={settingsItemSx}
+                smallIconProps={smallIconProps}
+                compactIconProps={compactIconProps}
+                tinyIconProps={tinyIconProps}
+                saveLogs={saveLogs}
+                handleCheckForUpdates={handleCheckForUpdates}
+                advancedUnlocked={advancedUnlocked}
+                buildVersion={buildVersion}
+                handleBuildVersionTap={handleBuildVersionTap}
+                openModelSettings={openModelSettings}
+                openSystemPromptSettings={openSystemPromptSettings}
+                isSmall={isSmall}
+                renameSessionId={renameSessionId}
+                renameSessionTitle={renameSessionTitle}
+                setRenameSessionTitle={setRenameSessionTitle}
+                handleCancelRenameSession={handleCancelRenameSession}
+                handleConfirmRenameSession={handleConfirmRenameSession}
+                deleteSessionId={deleteSessionId}
+                deleteSessionLabel={deleteSessionLabel}
+                handleCancelDeleteSession={handleCancelDeleteSession}
+                handleConfirmDeleteSession={handleConfirmDeleteSession}
+                showModelSettings={showModelSettings}
+                closeModelSettings={closeModelSettings}
+                selectedModelId={selectedModelId}
+                defaultModelName={resolvedDefaultModel.name}
+                loadedModelName={loadedModelName}
+                isTauriRuntime={isTauriRuntime}
+                suggestedModels={suggestedModels}
+                contextLength={contextLength}
+                isSavingModel={isSavingModel}
+                handleSaveModel={handleSaveModel}
+                handleUseDefaultModel={handleUseDefaultModel}
+                showSystemPromptSettings={showSystemPromptSettings}
+                closeSystemPromptSettings={closeSystemPromptSettings}
+                systemPrompt={systemPrompt}
+                handleSaveSystemPrompt={handleSaveSystemPrompt}
+                handleUseDefaultSystemPrompt={handleUseDefaultSystemPrompt}
+                knowledgePacks={knowledgePacks}
+                knowledgeCatalogLoading={
+                    knowledgeCatalogLoading || !packSettingsReady
+                }
+                knowledgeCatalogError={knowledgeCatalogError}
+                retryKnowledgeCatalog={refreshKnowledgeCatalog}
+                knowledgeDownloadProgress={knowledgeDownloadProgress}
+                knowledgeErrors={knowledgeErrors}
+                handleDownloadKnowledgePack={handleDownloadKnowledgePack}
+                handleCancelKnowledgePackDownload={
+                    handleCancelKnowledgePackDownload
+                }
+                notesCollections={notesCollections}
+                notesCollectionsLoading={notesCollectionsLoading}
+                notesCollectionsError={notesCollectionsError}
+                retryNotesCollections={retryNotesCollections}
+                handleAddNotesFolder={handleAddNotesFolder}
+                handleRemoveNotesCollection={handleRemoveNotesCollection}
+                onSettingsFlowVisibilityChange={
+                    handleSettingsFlowVisibilityChange
+                }
+                disabledNoteIds={disabledNoteIds}
+                disabledPackIds={disabledPackIds}
+                handleSetPackEnabled={handleSetPackEnabled}
+                handleSetNotesEnabled={handleSetNotesEnabled}
+                handleIndexNotesCollection={runNotesIndex}
+                chatNotificationOpen={chatNotificationOpen}
+                setChatNotificationOpen={setChatNotificationOpen}
+                chatNotification={chatNotification}
+                modelGateStatus={modelGateStatus}
+                imagePreview={imagePreview}
+                closeImagePreview={closeImagePreview}
+            />
+        </>
+    );
+};
+
+export default Page;

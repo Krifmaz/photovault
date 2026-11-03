@@ -1,0 +1,1652 @@
+import "dart:async";
+import "dart:math" show Random, min;
+
+import "package:ente_pure_utils/ente_pure_utils.dart";
+import "package:flutter/foundation.dart";
+import "package:logging/logging.dart";
+import "package:photos/core/event_bus.dart";
+import "package:photos/db/files_db.dart";
+import "package:photos/db/ml/base.dart";
+import "package:photos/db/ml/cluster_centroid_vector_db.dart";
+import "package:photos/db/ml/db.dart";
+import "package:photos/events/people_changed_event.dart";
+import "package:photos/models/base/id.dart";
+import "package:photos/models/file/file.dart";
+import "package:photos/models/ml/face/person.dart";
+import "package:photos/service_locator.dart";
+import "package:photos/services/machine_learning/face_ml/face_clustering/face_clustering.dart";
+import "package:photos/services/machine_learning/face_ml/face_filtering/face_filtering_constants.dart";
+import "package:photos/services/machine_learning/face_ml/feedback/cluster_averages.dart";
+import "package:photos/services/machine_learning/face_ml/feedback/dart_cluster_averages.dart";
+import "package:photos/services/machine_learning/face_ml/feedback/face_distances.dart";
+import "package:photos/services/machine_learning/face_ml/feedback/store_cluster_averages.dart";
+import "package:photos/services/machine_learning/face_ml/person/person_service.dart";
+import "package:photos/services/machine_learning/ml_result.dart";
+import "package:photos/services/search_service.dart";
+
+class ClusterSuggestion {
+  final PersonEntity person;
+  final String clusterIDToMerge;
+  final double distancePersonToCluster;
+  final bool usedOnlyMeanForSuggestion;
+  final List<EnteFile> filesInCluster;
+  final List<String> faceIDsInCluster;
+
+  ClusterSuggestion(
+    this.person,
+    this.clusterIDToMerge,
+    this.distancePersonToCluster,
+    this.usedOnlyMeanForSuggestion,
+    this.filesInCluster,
+    this.faceIDsInCluster,
+  );
+}
+
+class ClusterFeedbackService<T> {
+  final Logger _logger = Logger("ClusterFeedbackService");
+  static const int _allPeopleSuggestionNamedSampleLimit = 20;
+  static const int _allPeopleSuggestionVectorResultCount = 120;
+
+  ClusterFeedbackService._privateConstructor();
+  late final mlDataDB = MLDataDB.instance;
+  // Person suggestions belong to the Ente account, not the local gallery.
+  IMLDataDB<int> get _mlDataDBForCentroidVectorDb => MLDataDB.instance;
+  ClusterCentroidVectorDB get _clusterCentroidVectorDB =>
+      ClusterCentroidVectorDB.instance;
+  Future<void>? _prepareClusterCentroidVectorDbFuture;
+
+  static final ClusterFeedbackService instance =
+      ClusterFeedbackService._privateConstructor();
+
+  static String lastViewedClusterID = '';
+  static void setLastViewedClusterID(String clusterID) {
+    lastViewedClusterID = clusterID;
+  }
+
+  static void resetLastViewedClusterID() {
+    lastViewedClusterID = '';
+  }
+
+  Future<Set<String>> _getExcludedSuggestionClusterIDs() async {
+    final results = await Future.wait([
+      mlDataDB.getBadFaceSingletonClusterIDs(),
+      mlDataDB.getClustersWithThreeOrMoreNotPersonFeedback(),
+    ]);
+    return results[0].union(results[1]);
+  }
+
+  Future<List<ClusterSuggestion>> getSuggestionForPerson(
+    PersonEntity person, {
+    bool extremeFilesFirst = true,
+  }) async {
+    assert(
+      !isLocalGalleryMode,
+      "Person suggestions require an Ente account and should not run in local gallery mode.",
+    );
+    if (isLocalGalleryMode) {
+      _logger.info(
+        "Skipping getSuggestionForPerson in local gallery mode because person suggestions require an Ente account",
+      );
+      return [];
+    }
+    _logger.info(
+      'getSuggestionForPerson ${kDebugMode ? person.data.name : person.remoteID}',
+    );
+
+    try {
+      final startTime = DateTime.now();
+      final List<(String, double, bool)> foundSuggestions =
+          await _getSuggestions(person);
+      final findSuggestionsTime = DateTime.now();
+      _logger.info(
+        'getSuggestionForPerson `_getSuggestions`: Found ${foundSuggestions.length} suggestions in ${findSuggestionsTime.difference(startTime).inMilliseconds} ms',
+      );
+
+      final suggestionClusterIDs = foundSuggestions.map((e) => e.$1).toSet();
+      final Map<int, Set<String>> fileIdToClusterID = await mlDataDB
+          .getFileIdToClusterIDSetForCluster(suggestionClusterIDs);
+      final clusterIdToFaceIDs = await mlDataDB.getClusterToFaceIDs(
+        suggestionClusterIDs,
+      );
+      final Map<String, List<EnteFile>> clusterIDToFiles = {};
+      final allFiles = await SearchService.instance.getAllFilesForSearch();
+      for (final f in allFiles) {
+        if (!fileIdToClusterID.containsKey(f.uploadedFileID ?? -1)) {
+          continue;
+        }
+        final cluserIds = fileIdToClusterID[f.uploadedFileID ?? -1]!;
+        for (final cluster in cluserIds) {
+          if (clusterIDToFiles.containsKey(cluster)) {
+            clusterIDToFiles[cluster]!.add(f);
+          } else {
+            clusterIDToFiles[cluster] = [f];
+          }
+        }
+      }
+
+      final List<ClusterSuggestion> finalSuggestions = [];
+      for (final clusterSuggestion in foundSuggestions) {
+        if (clusterIDToFiles.containsKey(clusterSuggestion.$1)) {
+          finalSuggestions.add(
+            ClusterSuggestion(
+              person,
+              clusterSuggestion.$1,
+              clusterSuggestion.$2,
+              clusterSuggestion.$3,
+              clusterIDToFiles[clusterSuggestion.$1]!,
+              clusterIdToFaceIDs[clusterSuggestion.$1]!.toList(),
+            ),
+          );
+        }
+      }
+      final getFilesTime = DateTime.now();
+
+      final sortingStartTime = DateTime.now();
+      if (extremeFilesFirst) {
+        try {
+          await _sortSuggestionsOnDistanceToPerson(finalSuggestions);
+        } catch (e, s) {
+          _logger.severe("Error in sorting suggestions", e, s);
+        }
+      }
+      _logger.info(
+        'getSuggestionForPerson post-processing suggestions took ${DateTime.now().difference(findSuggestionsTime).inMilliseconds} ms, of which sorting took ${DateTime.now().difference(sortingStartTime).inMilliseconds} ms and getting files took ${getFilesTime.difference(findSuggestionsTime).inMilliseconds} ms',
+      );
+
+      return finalSuggestions;
+    } catch (e, s) {
+      _logger.severe("Error in getClusterFilesForPersonID", e, s);
+      rethrow;
+    }
+  }
+
+  Future<void> removeFilesFromPerson(
+    List<EnteFile> files,
+    PersonEntity p,
+  ) async {
+    try {
+      Future<void>? manualAssignmentUpdate;
+      final fileIDsToRemove = files
+          .map((file) => file.uploadedFileID)
+          .whereType<int>()
+          .toSet();
+
+      final manualFileIDs = p.data.manuallyAssigned.toSet();
+      final manualToRemove = manualFileIDs.intersection(fileIDsToRemove);
+      if (manualToRemove.isNotEmpty) {
+        _logger.info(
+          'Removing ${manualToRemove.length} manually assigned files from person ${p.remoteID}',
+        );
+        final updatedManual = manualFileIDs.difference(manualToRemove).toList();
+        final updatedPerson = p.copyWith(
+          data: p.data.copyWith(manuallyAssigned: updatedManual),
+        );
+        manualAssignmentUpdate = PersonService.instance.updatePerson(
+          updatedPerson,
+        );
+      }
+
+      final faceIDs = await mlDataDB
+          .getFaceIDsForPerson(p.remoteID)
+          .then((iterable) => iterable.toList());
+      faceIDs.retainWhere((faceID) {
+        final fileID = getFileIdFromFaceId<int>(faceID);
+        return files.any((file) => file.uploadedFileID == fileID);
+      });
+
+      if (faceIDs.isEmpty) {
+        if (manualAssignmentUpdate != null) {
+          await manualAssignmentUpdate;
+        }
+        if (manualToRemove.isNotEmpty) {
+          Bus.instance.fire(PeopleChangedEvent());
+        } else {
+          _logger.warning(
+            'No faces or manually assigned files found for person ${p.remoteID} that match the given files',
+          );
+        }
+        return;
+      }
+
+      final fileIDToCreationTime = await FilesDB.instance
+          .getFileIDToCreationTime();
+
+      final newFaceIdToClusterID = await FaceClustering.instance.reclusterFaces(
+        faceIDs,
+        fileIDToCreationTime: fileIDToCreationTime,
+        distanceThreshold: 0.20,
+      );
+      if (newFaceIdToClusterID.isEmpty) {
+        _logger.severe('No embeddings found for faces $faceIDs');
+        Bus.instance.fire(PeopleChangedEvent());
+        return;
+      }
+
+      // Record rejection so removed faces are not suggested again.
+      final notClusterIdToPersonId = <String, String>{};
+      for (final clusterId in newFaceIdToClusterID.values.toSet()) {
+        notClusterIdToPersonId[clusterId] = p.remoteID;
+      }
+      await mlDataDB.bulkCaptureNotPersonFeedback(notClusterIdToPersonId);
+
+      // Persist remotely so a later sync cannot undo the removal.
+      await PersonService.instance.removeFacesFromPerson(
+        person: p,
+        faceIDs: faceIDs.toSet(),
+      );
+
+      if (manualAssignmentUpdate != null) {
+        await manualAssignmentUpdate;
+      }
+
+      Bus.instance.fire(PeopleChangedEvent());
+      return;
+    } catch (e, s) {
+      _logger.severe("Error in removeFilesFromPerson", e, s);
+      rethrow;
+    }
+  }
+
+  Future<String> removeFaceFromPerson(
+    String faceID,
+    PersonEntity person,
+  ) async {
+    try {
+      final updatedClusterID = newClusterID();
+      final newFaceIdToClusterID = {faceID: updatedClusterID};
+      await mlDataDB.forceUpdateClusterIds(newFaceIdToClusterID);
+
+      // Record rejection so the removed face is not suggested again.
+      final notClusterIdToPersonId = {updatedClusterID: person.remoteID};
+      await mlDataDB.bulkCaptureNotPersonFeedback(notClusterIdToPersonId);
+
+      // Persist remotely so a later sync cannot undo the removal.
+      await PersonService.instance.removeFacesFromPerson(
+        person: person,
+        faceIDs: {faceID},
+      );
+
+      Bus.instance.fire(
+        PeopleChangedEvent(
+          type: PeopleEventType.removedFaceFromCluster,
+          relevantFaceIDs: [faceID],
+          source: person.remoteID,
+        ),
+      );
+      return updatedClusterID;
+    } catch (e, s) {
+      _logger.severe("Error in removeFaceFromPerson", e, s);
+      rethrow;
+    }
+  }
+
+  Future<void> removeFilesFromCluster(
+    List<EnteFile> files,
+    String clusterID,
+  ) async {
+    _logger.info('removeFilesFromCluster called');
+    try {
+      final faceIDs = await mlDataDB
+          .getFaceIDsForCluster(clusterID)
+          .then((iterable) => iterable.toList());
+      faceIDs.retainWhere((faceID) {
+        final fileID = getFileIdFromFaceId<int>(faceID);
+        return files.any((file) => file.uploadedFileID == fileID);
+      });
+      final fileIDToCreationTime = await FilesDB.instance
+          .getFileIDToCreationTime();
+
+      final newFaceIdToClusterID = await FaceClustering.instance.reclusterFaces(
+        faceIDs,
+        fileIDToCreationTime: fileIDToCreationTime,
+        distanceThreshold: 0.20,
+      );
+      if (newFaceIdToClusterID.isEmpty) {
+        _logger.severe(
+          'No faces or embeddings found for cluster $clusterID that match the given files',
+        );
+        return;
+      }
+
+      Bus.instance.fire(
+        PeopleChangedEvent(
+          relevantFiles: files,
+          type: PeopleEventType.removedFilesFromCluster,
+          source: clusterID,
+        ),
+      );
+      _logger.info('removeFilesFromCluster done');
+      return;
+    } catch (e, s) {
+      _logger.severe("Error in removeFilesFromCluster", e, s);
+      rethrow;
+    }
+  }
+
+  Future<String> removeFaceFromCluster({
+    required String faceID,
+    String? clusterID,
+  }) async {
+    try {
+      final updatedClusterID = newClusterID();
+      final newFaceIdToClusterID = {faceID: updatedClusterID};
+      await mlDataDB.forceUpdateClusterIds(newFaceIdToClusterID);
+
+      Bus.instance.fire(
+        PeopleChangedEvent(
+          type: PeopleEventType.removedFaceFromCluster,
+          relevantFaceIDs: [faceID],
+          source: clusterID ?? "",
+        ),
+      );
+      return updatedClusterID;
+    } catch (e, s) {
+      _logger.severe("Error in removeFaceFromCluster", e, s);
+      rethrow;
+    }
+  }
+
+  Future<void> addFacesToCluster(List<String> faceIDs, String clusterID) async {
+    final faceIDToClusterID = <String, String>{};
+    for (final faceID in faceIDs) {
+      faceIDToClusterID[faceID] = clusterID;
+    }
+    await mlDataDB.forceUpdateClusterIds(faceIDToClusterID);
+    Bus.instance.fire(PeopleChangedEvent());
+    return;
+  }
+
+  Future<List<ClusterSuggestion>> getAllLargePersonSuggestions() async {
+    final personsMap = await PersonService.instance.getPersonsMap();
+    if (personsMap.isEmpty) return [];
+    try {
+      final allClusterIdsToCountMapFuture = mlDataDB.clusterIdToFaceCount();
+      final personToClusterIDsFuture = mlDataDB.getPersonToClusterIDs();
+      final personToRejectedSuggestionsFuture = mlDataDB
+          .getPersonToRejectedSuggestions();
+      final excludedSuggestionClusterIDsFuture =
+          _getExcludedSuggestionClusterIDs();
+      final canUseVectorDbFuture =
+          _canUseClusterCentroidVectorDbForSuggestions();
+      await Future.wait<Object?>([
+        allClusterIdsToCountMapFuture,
+        personToClusterIDsFuture,
+        personToRejectedSuggestionsFuture,
+        excludedSuggestionClusterIDsFuture,
+        canUseVectorDbFuture,
+      ], eagerError: false);
+      final allClusterIdsToCountMap = await allClusterIdsToCountMapFuture;
+      final personToClusterIDs = await personToClusterIDsFuture;
+      final personToRejectedSuggestions =
+          await personToRejectedSuggestionsFuture;
+      final excludedSuggestionClusterIDs =
+          await excludedSuggestionClusterIDsFuture;
+      final canUseVectorDb = await canUseVectorDbFuture;
+      if (!canUseVectorDb) {
+        _logger.info(
+          "Cluster centroid vector DB unavailable for all-people suggestions, falling back to legacy mean suggestions",
+        );
+        return await _getAllLargePersonSuggestionsLegacy(
+          personsMap,
+          allClusterIdsToCountMap,
+          personToClusterIDs,
+          personToRejectedSuggestions,
+          excludedSuggestionClusterIDs,
+        );
+      }
+
+      final selectedPersonIDs = _selectPersonIDsForAllPeopleSuggestions(
+        personsMap,
+        personToClusterIDs,
+        allClusterIdsToCountMap,
+      );
+      if (selectedPersonIDs.isEmpty) {
+        return [];
+      }
+
+      final personIdToClusters = <String, Set<String>>{};
+      final selectedPersonClusters = <String>{};
+      for (final personID in selectedPersonIDs) {
+        final clusters = (personToClusterIDs[personID] ?? const <String>{})
+            .where(allClusterIdsToCountMap.containsKey)
+            .toSet();
+        if (clusters.isEmpty) {
+          continue;
+        }
+        personIdToClusters[personID] = clusters;
+        selectedPersonClusters.addAll(clusters);
+      }
+      if (personIdToClusters.isEmpty) {
+        return [];
+      }
+
+      final assignedClustersToAnyPerson = <String>{};
+      for (final clusters in personToClusterIDs.values) {
+        assignedClustersToAnyPerson.addAll(clusters);
+      }
+      final ignoredClustersForAverages = <String>{
+        ...assignedClustersToAnyPerson,
+        ...excludedSuggestionClusterIDs,
+      }.difference(selectedPersonClusters);
+
+      final clusterAvg = await _getUpdateClusterAvg(
+        allClusterIdsToCountMap,
+        ignoredClustersForAverages,
+        minClusterSize: 1,
+      );
+      if (clusterAvg.clusterIDs.isEmpty) {
+        return [];
+      }
+
+      final personIDToQueryClusters = <String, Set<String>>{};
+      final allQueryClusterIDs = <String>{};
+      for (final entry in personIdToClusters.entries) {
+        final validClusters = <String>{};
+        for (final clusterID in entry.value) {
+          if (!clusterAvg.clusterIDs.contains(clusterID)) {
+            continue;
+          }
+          validClusters.add(clusterID);
+          allQueryClusterIDs.add(clusterID);
+        }
+        if (validClusters.isNotEmpty) {
+          personIDToQueryClusters[entry.key] = validClusters;
+        }
+      }
+      if (personIDToQueryClusters.isEmpty || allQueryClusterIDs.isEmpty) {
+        return [];
+      }
+
+      late final Map<String, ClusterCentroidMatches> resultByQueryCluster;
+      try {
+        resultByQueryCluster = await _clusterCentroidVectorDB
+            .bulkSearchNearestForClusters(
+              allQueryClusterIDs,
+              candidateClusterIDs: clusterAvg.clusterIDs,
+              count: _allPeopleSuggestionVectorResultCount,
+              maxDistance: 0.65,
+            );
+      } catch (e, s) {
+        _logger.warning(
+          "Batched centroid search failed, falling back to legacy mean suggestions",
+          e,
+          s,
+        );
+        return await _getAllLargePersonSuggestionsLegacy(
+          personsMap,
+          allClusterIdsToCountMap,
+          personToClusterIDs,
+          personToRejectedSuggestions,
+          excludedSuggestionClusterIDs,
+        );
+      }
+
+      final queryClusterToMatches = <String, List<(String, double)>>{};
+      final queryClusterNeedsFallbackSearch = <String, bool>{};
+      final queryClustersMissingFromVectorIndex = <String>{};
+      for (final queryClusters in personIDToQueryClusters.values) {
+        for (final queryClusterID in queryClusters) {
+          final result = resultByQueryCluster[queryClusterID];
+          if (result == null) {
+            queryClustersMissingFromVectorIndex.add(queryClusterID);
+          }
+          queryClusterNeedsFallbackSearch[queryClusterID] =
+              result == null || result.reachedCount;
+          queryClusterToMatches[queryClusterID] =
+              result?.matches ?? const <(String, double)>[];
+        }
+      }
+      if (queryClustersMissingFromVectorIndex.isNotEmpty) {
+        _logger.warning(
+          "Batched centroid search missed ${queryClustersMissingFromVectorIndex.length} query clusters due to absent vector keys in the index; running filtered fallback for affected clusters",
+        );
+      }
+
+      final selectedClusterToFaceIDs = await mlDataDB.getClusterToFaceIDs(
+        selectedPersonClusters,
+      );
+      final personIDToFileIDs = <String, Set<int>>{};
+      for (final entry in personIDToQueryClusters.entries) {
+        final fileIDs = <int>{};
+        for (final clusterID in entry.value) {
+          final faceIDs =
+              selectedClusterToFaceIDs[clusterID] ?? const <String>[];
+          for (final faceID in faceIDs) {
+            fileIDs.add(getFileIdFromFaceId<int>(faceID));
+          }
+        }
+        personIDToFileIDs[entry.key] = fileIDs;
+      }
+
+      final personIDToIgnoredClusters = <String, Set<String>>{};
+      for (final entry in personIDToQueryClusters.entries) {
+        final ignored = <String>{}
+          ..addAll(assignedClustersToAnyPerson)
+          ..removeAll(entry.value)
+          ..addAll(personToRejectedSuggestions[entry.key] ?? const <String>{})
+          ..addAll(excludedSuggestionClusterIDs);
+        personIDToIgnoredClusters[entry.key] = ignored;
+      }
+
+      // If the global top-k gets fully consumed by ignored/self clusters,
+      // rerun only those starved queries with person-specific filtering.
+      final personIDToFallbackQueryClusters = <String, List<String>>{};
+      for (final entry in personIDToQueryClusters.entries) {
+        final personID = entry.key;
+        final personClusters = entry.value;
+        final ignoredClusters = personIDToIgnoredClusters[personID]!;
+        final fallbackQueryClusters = <String>[];
+
+        for (final queryClusterID in personClusters) {
+          final matchesForCluster =
+              queryClusterToMatches[queryClusterID] ??
+              const <(String, double)>[];
+          if (!(queryClusterNeedsFallbackSearch[queryClusterID] ?? false)) {
+            continue;
+          }
+          var hasUsableCandidate = false;
+          for (final match in matchesForCluster) {
+            final candidateClusterID = match.$1;
+            if (ignoredClusters.contains(candidateClusterID) ||
+                personClusters.contains(candidateClusterID)) {
+              continue;
+            }
+            if (!clusterAvg.clusterIDs.contains(candidateClusterID)) {
+              continue;
+            }
+            hasUsableCandidate = true;
+            break;
+          }
+          if (!hasUsableCandidate) {
+            fallbackQueryClusters.add(queryClusterID);
+          }
+        }
+
+        if (fallbackQueryClusters.isNotEmpty) {
+          personIDToFallbackQueryClusters[personID] = fallbackQueryClusters;
+        }
+      }
+
+      if (personIDToFallbackQueryClusters.isNotEmpty) {
+        final personIDToAllowedClusterIDs = <String, Set<String>>{};
+
+        Set<String> getAllowedClusterIDs(String personID) {
+          final cached = personIDToAllowedClusterIDs[personID];
+          if (cached != null) {
+            return cached;
+          }
+          final personClusters = personIDToQueryClusters[personID]!;
+          final ignoredClusters = personIDToIgnoredClusters[personID]!;
+          final allowedClusterIDs = <String>{};
+          for (final clusterID in clusterAvg.clusterIDs) {
+            if (ignoredClusters.contains(clusterID) ||
+                personClusters.contains(clusterID)) {
+              continue;
+            }
+            allowedClusterIDs.add(clusterID);
+          }
+          personIDToAllowedClusterIDs[personID] = allowedClusterIDs;
+          return allowedClusterIDs;
+        }
+
+        var fallbackQueryCount = 0;
+        for (final entry in personIDToFallbackQueryClusters.entries) {
+          final personID = entry.key;
+          final allowedClusterIDs = getAllowedClusterIDs(personID);
+          if (allowedClusterIDs.isEmpty) {
+            continue;
+          }
+
+          final queryClusterIDs = entry.value
+              .where(clusterAvg.clusterIDs.contains)
+              .toList(growable: false);
+          if (queryClusterIDs.isEmpty) {
+            continue;
+          }
+
+          List<List<(String, double)>> filteredMatchesByQuery;
+          try {
+            filteredMatchesByQuery = await clusterAvg.searchNearest(
+              queryClusterIDs,
+              allowedClusterIDs,
+              maxDistance: 0.65,
+              count: _allPeopleSuggestionVectorResultCount,
+            );
+          } catch (e, s) {
+            _logger.warning(
+              "Filtered centroid fallback search failed for person $personID",
+              e,
+              s,
+            );
+            continue;
+          }
+
+          final alignedLength = min(
+            queryClusterIDs.length,
+            filteredMatchesByQuery.length,
+          );
+          for (var i = 0; i < alignedLength; i++) {
+            final queryClusterID = queryClusterIDs[i];
+            final filteredMatches = filteredMatchesByQuery[i];
+            if (filteredMatches.isEmpty) {
+              continue;
+            }
+            queryClusterToMatches[queryClusterID] = filteredMatches;
+            fallbackQueryCount++;
+          }
+        }
+
+        if (fallbackQueryCount > 0) {
+          _logger.info(
+            "Ran filtered centroid fallback search for $fallbackQueryCount starved query clusters",
+          );
+        }
+      }
+
+      final personIDToCandidates = <String, List<(String, double)>>{};
+      final allCandidateClusterIDs = <String>{};
+      for (final entry in personIDToQueryClusters.entries) {
+        final personID = entry.key;
+        final personClusters = entry.value;
+        final ignoredClusters = personIDToIgnoredClusters[personID]!;
+        final bestDistanceByCluster = <String, double>{};
+
+        for (final queryClusterID in personClusters) {
+          final matchesForCluster =
+              queryClusterToMatches[queryClusterID] ??
+              const <(String, double)>[];
+          for (final match in matchesForCluster) {
+            final candidateClusterID = match.$1;
+            final distance = match.$2;
+            if (distance >= 0.65) {
+              break;
+            }
+            if (ignoredClusters.contains(candidateClusterID) ||
+                personClusters.contains(candidateClusterID)) {
+              continue;
+            }
+            if (!clusterAvg.clusterIDs.contains(candidateClusterID)) {
+              continue;
+            }
+            final previous = bestDistanceByCluster[candidateClusterID];
+            if (previous == null || distance < previous) {
+              bestDistanceByCluster[candidateClusterID] = distance;
+            }
+          }
+        }
+
+        if (bestDistanceByCluster.isEmpty) {
+          continue;
+        }
+
+        final candidates =
+            bestDistanceByCluster.entries
+                .map((e) => (e.key, e.value))
+                .toList(growable: false)
+              ..sort((a, b) => a.$2.compareTo(b.$2));
+        personIDToCandidates[personID] = candidates;
+        allCandidateClusterIDs.addAll(candidates.map((e) => e.$1));
+      }
+      if (personIDToCandidates.isEmpty || allCandidateClusterIDs.isEmpty) {
+        return [];
+      }
+
+      final candidateClusterToFaceIDs = await mlDataDB.getClusterToFaceIDs(
+        allCandidateClusterIDs,
+      );
+      final candidateClusterToFileIDs = <String, Set<int>>{};
+      for (final entry in candidateClusterToFaceIDs.entries) {
+        candidateClusterToFileIDs[entry.key] = entry.value
+            .map(getFileIdFromFaceId<int>)
+            .toSet();
+      }
+
+      final bestSuggestionPerPerson = <String, (String, double, bool)>{};
+      final personIDToMedianCandidates = <String, List<String>>{};
+      final overlapRejections = <(String, String)>{};
+      final overlapRejectedByPerson = <String, Set<String>>{};
+      final checkSizes = [20, kMinimumClusterSizeSearchResult, 10, 5, 1];
+
+      for (final entry in personIDToCandidates.entries) {
+        final personID = entry.key;
+        final candidates = entry.value;
+        final personClusters = personIDToQueryClusters[personID]!;
+        final personFileIDs = personIDToFileIDs[personID] ?? const <int>{};
+
+        final smallestPersonClusterSize = personClusters
+            .map((clusterID) => allClusterIdsToCountMap[clusterID] ?? 0)
+            .reduce((value, element) => min(value, element));
+
+        bool foundGoodMeanSuggestion = false;
+        for (final minimumSize in checkSizes.toSet()) {
+          if (smallestPersonClusterSize <
+              min(minimumSize, kMinimumClusterSizeSearchResult)) {
+            continue;
+          }
+          for (final candidate in candidates) {
+            final candidateClusterID = candidate.$1;
+            final meanDistance = candidate.$2;
+            if (meanDistance >= 0.45) {
+              break;
+            }
+            if ((allClusterIdsToCountMap[candidateClusterID] ?? 0) <
+                minimumSize) {
+              continue;
+            }
+            final candidateFileIDs =
+                candidateClusterToFileIDs[candidateClusterID] ?? const <int>{};
+            if (personFileIDs.isNotEmpty && candidateFileIDs.isNotEmpty) {
+              final overlap = personFileIDs.intersection(candidateFileIDs);
+              if (overlap.isNotEmpty &&
+                  ((overlap.length / candidateFileIDs.length) > 0.1)) {
+                overlapRejections.add((personID, candidateClusterID));
+                overlapRejectedByPerson
+                    .putIfAbsent(personID, () => <String>{})
+                    .add(candidateClusterID);
+                continue;
+              }
+            }
+            bestSuggestionPerPerson[personID] = (
+              candidateClusterID,
+              meanDistance,
+              true,
+            );
+            foundGoodMeanSuggestion = true;
+            break;
+          }
+          if (foundGoodMeanSuggestion) {
+            break;
+          }
+        }
+
+        if (foundGoodMeanSuggestion) {
+          continue;
+        }
+
+        final medianCandidates = <String>[];
+        final rejectedForPerson =
+            overlapRejectedByPerson[personID] ?? const <String>{};
+        for (final candidate in candidates) {
+          if (candidate.$2 >= 0.65) {
+            break;
+          }
+          final candidateClusterID = candidate.$1;
+          if (rejectedForPerson.contains(candidateClusterID)) {
+            continue;
+          }
+          medianCandidates.add(candidateClusterID);
+          if (medianCandidates.length >= 20) {
+            break;
+          }
+        }
+        if (medianCandidates.isNotEmpty) {
+          personIDToMedianCandidates[personID] = medianCandidates;
+        }
+      }
+
+      if (overlapRejections.isNotEmpty) {
+        for (final rejection in overlapRejections) {
+          await mlDataDB.captureNotPersonFeedback(
+            personID: rejection.$1,
+            clusterID: rejection.$2,
+          );
+        }
+      }
+
+      if (personIDToMedianCandidates.isNotEmpty) {
+        final closestByMedian = await FaceDistances.instance
+            .closestByMedianPerPerson(
+              personIDToQueryClusters,
+              personIDToMedianCandidates,
+              sampleSize: 50,
+              maxDistance: 0.62,
+              goodDistance: 0.55,
+            );
+        for (final entry in closestByMedian.entries) {
+          bestSuggestionPerPerson[entry.key] = (
+            entry.value.$1,
+            entry.value.$2,
+            false,
+          );
+        }
+      }
+
+      if (bestSuggestionPerPerson.isEmpty) {
+        return [];
+      }
+
+      final bestPersonPerCluster = <String, (String, double, bool)>{};
+      for (final entry in bestSuggestionPerPerson.entries) {
+        final personID = entry.key;
+        final suggestion = entry.value;
+        final previous = bestPersonPerCluster[suggestion.$1];
+        if (previous == null || suggestion.$2 < previous.$2) {
+          bestPersonPerCluster[suggestion.$1] = (
+            personID,
+            suggestion.$2,
+            suggestion.$3,
+          );
+        }
+      }
+      if (bestPersonPerCluster.isEmpty) {
+        return [];
+      }
+
+      final rankedSuggestions =
+          bestPersonPerCluster.entries
+              .map(
+                (entry) =>
+                    (entry.key, entry.value.$2, entry.value.$1, entry.value.$3),
+              )
+              .toList(growable: false)
+            ..sort((a, b) => a.$2.compareTo(b.$2));
+
+      final suggestionClusterIDs = rankedSuggestions
+          .map((entry) => entry.$1)
+          .toSet();
+
+      final fileIdToClusterID = await mlDataDB
+          .getFileIdToClusterIDSetForCluster(suggestionClusterIDs);
+      final clusterIdToFaceIDs = await mlDataDB.getClusterToFaceIDs(
+        suggestionClusterIDs,
+      );
+
+      final clusterIDToFiles = <String, List<EnteFile>>{};
+      final allFiles = await SearchService.instance.getAllFilesForSearch();
+      for (final file in allFiles) {
+        final fileID = file.uploadedFileID;
+        if (fileID == null) {
+          continue;
+        }
+        final clusterIDs = fileIdToClusterID[fileID];
+        if (clusterIDs == null) {
+          continue;
+        }
+        for (final clusterID in clusterIDs) {
+          clusterIDToFiles.putIfAbsent(clusterID, () => []).add(file);
+        }
+      }
+
+      final finalSuggestions = <ClusterSuggestion>[];
+      for (final suggestion in rankedSuggestions) {
+        final clusterID = suggestion.$1;
+        final personID = suggestion.$3;
+        final person = personsMap[personID];
+        final filesInCluster = clusterIDToFiles[clusterID];
+        final faceIDs = clusterIdToFaceIDs[clusterID];
+        if (person == null || filesInCluster == null || faceIDs == null) {
+          continue;
+        }
+        finalSuggestions.add(
+          ClusterSuggestion(
+            person,
+            clusterID,
+            suggestion.$2,
+            suggestion.$4,
+            filesInCluster,
+            faceIDs.toList(growable: false),
+          ),
+        );
+      }
+
+      try {
+        await _sortSuggestionsOnDistanceToPerson(finalSuggestions);
+      } catch (e, s) {
+        _logger.severe("Error in sorting suggestions", e, s);
+      }
+      return finalSuggestions;
+    } catch (e, s) {
+      _logger.severe("Error in getAllLargePersonSuggestions", e, s);
+      rethrow;
+    }
+  }
+
+  Set<String> _selectPersonIDsForAllPeopleSuggestions(
+    Map<String, PersonEntity> personsMap,
+    Map<String, Set<String>> personToClusterIDs,
+    Map<String, int> allClusterIdsToCountMap,
+  ) {
+    final eligiblePersons = personsMap.values
+        .where((person) {
+          if (person.data.isIgnored) {
+            return false;
+          }
+          final personClusters =
+              personToClusterIDs[person.remoteID] ?? const <String>{};
+          if (personClusters.isEmpty) {
+            return false;
+          }
+          for (final clusterID in personClusters) {
+            if (allClusterIdsToCountMap.containsKey(clusterID)) {
+              return true;
+            }
+          }
+          return false;
+        })
+        .toList(growable: false);
+
+    if (eligiblePersons.isEmpty) {
+      return {};
+    }
+
+    final namedPersons = eligiblePersons
+        .where((person) => person.data.name.trim().isNotEmpty)
+        .toList(growable: false);
+    if (namedPersons.length <= _allPeopleSuggestionNamedSampleLimit) {
+      return eligiblePersons.map((person) => person.remoteID).toSet();
+    }
+
+    final sampledNamedPersons = [...namedPersons]..shuffle(Random());
+    return sampledNamedPersons
+        .take(_allPeopleSuggestionNamedSampleLimit)
+        .map((person) => person.remoteID)
+        .toSet();
+  }
+
+  Future<List<ClusterSuggestion>> _getAllLargePersonSuggestionsLegacy(
+    Map<String, PersonEntity> personsMap,
+    Map<String, int> allClusterIdsToCountMap,
+    Map<String, Set<String>> personToClusterIDs,
+    Map<String, Set<String>> personToRejectedSuggestions,
+    Set<String> excludedSuggestionClusterIDs,
+  ) async {
+    final personIdToBiggestCluster = <String, String>{};
+    final biggestClusterToPersonID = <String, String>{};
+    final personIdToOtherPersonClusterIDs = <String, Set<String>>{};
+    for (final person in personsMap.values) {
+      final personID = person.remoteID;
+      final personClusters = personToClusterIDs[personID] ?? {};
+      if (person.data.isIgnored) {
+        personIdToOtherPersonClusterIDs[personID] = personClusters;
+        continue;
+      }
+      int biggestClusterSize = 0;
+      String biggestClusterID = '';
+      final Set<String> otherPersonClusterIDs = {};
+      for (final clusterID in personClusters) {
+        final clusterSize = allClusterIdsToCountMap[clusterID] ?? 0;
+        if (clusterSize > biggestClusterSize) {
+          if (biggestClusterSize > 0) {
+            otherPersonClusterIDs.add(biggestClusterID);
+          }
+          biggestClusterID = clusterID;
+          biggestClusterSize = clusterSize;
+        } else {
+          otherPersonClusterIDs.add(clusterID);
+        }
+      }
+      if (biggestClusterID.isNotEmpty) {
+        personIdToBiggestCluster[personID] = biggestClusterID;
+        biggestClusterToPersonID[biggestClusterID] = personID;
+      }
+      personIdToOtherPersonClusterIDs[personID] = otherPersonClusterIDs;
+    }
+    if (biggestClusterToPersonID.isEmpty ||
+        personIdToOtherPersonClusterIDs.isEmpty) {
+      return [];
+    }
+    final allPersonClusters = biggestClusterToPersonID.keys.toSet();
+    final allOtherPersonClustersToIgnore = <String>{
+      ...excludedSuggestionClusterIDs,
+    };
+    for (final ignoredClusters in personIdToOtherPersonClusterIDs.values) {
+      allOtherPersonClustersToIgnore.addAll(ignoredClusters);
+    }
+    final ignoredClustersForAverages = allOtherPersonClustersToIgnore
+        .difference(allPersonClusters);
+    final clusterAvg = await _getUpdateClusterAvg(
+      allClusterIdsToCountMap,
+      ignoredClustersForAverages,
+      minClusterSize: kMinimumClusterSizeSearchResult,
+    );
+
+    final personClusterToIgnoredClusters = <String, Set<String>>{};
+    for (final personID in personToRejectedSuggestions.keys) {
+      final personCluster = personIdToBiggestCluster[personID];
+      if (personCluster == null) continue;
+      final ignoredClusters = personToRejectedSuggestions[personID] ?? {};
+      personClusterToIgnoredClusters[personCluster] = ignoredClusters;
+    }
+
+    final foundSuggestions = await clusterAvg.suggestByMean(
+      allPersonClusters,
+      allOtherPersonClustersToIgnore,
+      0.55,
+      personClusterToIgnoredClusters: personClusterToIgnoredClusters,
+    );
+    if (foundSuggestions.isEmpty) {
+      return [];
+    }
+
+    final suggestionClusterIDs = foundSuggestions.map((e) => e.$1).toSet();
+    final fileIdToClusterID = await mlDataDB.getFileIdToClusterIDSetForCluster(
+      suggestionClusterIDs,
+    );
+    final clusterIdToFaceIDs = await mlDataDB.getClusterToFaceIDs(
+      suggestionClusterIDs,
+    );
+    final clusterIDToFiles = <String, List<EnteFile>>{};
+    final allFiles = await SearchService.instance.getAllFilesForSearch();
+    for (final file in allFiles) {
+      final fileID = file.uploadedFileID;
+      if (fileID == null) {
+        continue;
+      }
+      final clusterIds = fileIdToClusterID[fileID];
+      if (clusterIds == null) {
+        continue;
+      }
+      for (final cluster in clusterIds) {
+        clusterIDToFiles.putIfAbsent(cluster, () => []).add(file);
+      }
+    }
+
+    final finalSuggestions = <ClusterSuggestion>[];
+    for (final clusterSuggestion in foundSuggestions) {
+      final personID = biggestClusterToPersonID[clusterSuggestion.$3];
+      final person = personID == null ? null : personsMap[personID];
+      final files = clusterIDToFiles[clusterSuggestion.$1];
+      final faceIDs = clusterIdToFaceIDs[clusterSuggestion.$1];
+      if (person == null || files == null || faceIDs == null) {
+        continue;
+      }
+      finalSuggestions.add(
+        ClusterSuggestion(
+          person,
+          clusterSuggestion.$1,
+          clusterSuggestion.$2,
+          true,
+          files,
+          faceIDs.toList(growable: false),
+        ),
+      );
+    }
+    try {
+      await _sortSuggestionsOnDistanceToPerson(finalSuggestions);
+    } catch (e, s) {
+      _logger.severe("Error in sorting legacy suggestions", e, s);
+    }
+    return finalSuggestions;
+  }
+
+  Future<Set<String>?> checkAndDoAutomaticMerges(
+    PersonEntity p, {
+    required String personClusterID,
+    bool firePeopleChangedEvent = true,
+  }) async {
+    final faceIDs = await mlDataDB.getFaceIDsForCluster(personClusterID);
+
+    if (faceIDs.length < 2 * kMinimumClusterSizeSearchResult) {
+      final fileIDs = faceIDs.map(getFileIdFromFaceId<int>).toSet();
+      if (fileIDs.length < kMinimumClusterSizeSearchResult) {
+        _logger.info(
+          'Cluster $personClusterID has less than $kMinimumClusterSizeSearchResult faces, not doing automatic merges',
+        );
+        return null;
+      }
+    }
+    final List<(String, double, String)> suggestions =
+        await _getFastSuggestions(
+          p,
+          personClusterID,
+          PersonService.autoMergeThreshold,
+        );
+
+    if (suggestions.isEmpty) {
+      _logger.info(
+        'No automatic merge suggestions for ${kDebugMode ? p.data.name : "private"}',
+      );
+      return null;
+    }
+
+    _logger.info(
+      'suggestions for ${kDebugMode ? p.data.name : "private"} for cluster ID ${p.remoteID} are  suggestions $suggestions}',
+    );
+
+    for (final suggestion in suggestions) {
+      final clusterID = suggestion.$1;
+      await mlDataDB.assignClusterToPerson(
+        personID: p.remoteID,
+        clusterID: clusterID,
+      );
+    }
+
+    if (firePeopleChangedEvent) {
+      Bus.instance.fire(
+        PeopleChangedEvent(
+          type: PeopleEventType.automaticallyMergedClustersIntoPerson,
+          person: p,
+          newClusterIDs: suggestions.map((s) => s.$1).toSet(),
+        ),
+      );
+    }
+
+    return suggestions.map((s) => s.$1).toSet();
+  }
+
+  Future<void> addClusterToExistingPerson({
+    required PersonEntity person,
+    required String clusterID,
+  }) async {
+    if (person.data.rejectedFaceIDs.isNotEmpty) {
+      final clusterFaceIDs = await mlDataDB.getFaceIDsForCluster(clusterID);
+      final rejectedLengthBefore = person.data.rejectedFaceIDs.length;
+      person.data.rejectedFaceIDs.removeWhere(
+        (faceID) => clusterFaceIDs.contains(faceID),
+      );
+      final rejectedLengthAfter = person.data.rejectedFaceIDs.length;
+      if (rejectedLengthBefore != rejectedLengthAfter) {
+        _logger.info(
+          'Removed ${rejectedLengthBefore - rejectedLengthAfter} rejected faces from person ${person.data.name} due to adding cluster $clusterID',
+        );
+        await PersonService.instance.updatePerson(person);
+      }
+    }
+    await mlDataDB.assignClusterToPerson(
+      personID: person.remoteID,
+      clusterID: clusterID,
+    );
+    Bus.instance.fire(
+      PeopleChangedEvent(
+        type: PeopleEventType.addedClusterToPerson,
+        source: clusterID,
+      ),
+    );
+  }
+
+  Future<(PersonEntity, Set<String>?)> ignoreCluster(
+    String clusterID, {
+    bool firePeopleChangedEvent = true,
+  }) async {
+    final ignoredPerson = await PersonService.instance.addPerson(
+      name: '',
+      clusterID: clusterID,
+      isHidden: true,
+    );
+    final mergedClusterIDs = await checkAndDoAutomaticMerges(
+      ignoredPerson,
+      personClusterID: clusterID,
+      firePeopleChangedEvent: firePeopleChangedEvent,
+    );
+    if (firePeopleChangedEvent && mergedClusterIDs == null) {
+      Bus.instance.fire(
+        PeopleChangedEvent(person: ignoredPerson, source: "ignore_cluster"),
+      );
+    }
+    return (ignoredPerson, mergedClusterIDs);
+  }
+
+  Future<void> ignoreClusters(
+    Iterable<String> clusterIDs, {
+    void Function(int completed, int total)? onProgress,
+  }) async {
+    final remainingClusterIDs = clusterIDs.toSet();
+    final total = remainingClusterIDs.length;
+    final ignoredPersons = <PersonEntity>[];
+    final assignedClusterIDs = <String>{};
+    var automaticallyMerged = false;
+
+    try {
+      // Automatic merges can satisfy other requested clusters in the batch.
+      while (remainingClusterIDs.isNotEmpty) {
+        final clusterID = remainingClusterIDs.first;
+        final (ignoredPerson, mergedClusterIDs) = await ignoreCluster(
+          clusterID,
+          firePeopleChangedEvent: false,
+        );
+        ignoredPersons.add(ignoredPerson);
+        assignedClusterIDs.add(clusterID);
+        remainingClusterIDs.remove(clusterID);
+        if (mergedClusterIDs != null) {
+          automaticallyMerged = true;
+          assignedClusterIDs.addAll(mergedClusterIDs);
+          remainingClusterIDs.removeAll(mergedClusterIDs);
+        }
+        onProgress?.call(total - remainingClusterIDs.length, total);
+      }
+    } finally {
+      if (ignoredPersons.isNotEmpty) {
+        Bus.instance.fire(
+          PeopleChangedEvent(
+            type: automaticallyMerged
+                ? PeopleEventType.automaticallyMergedClustersIntoPerson
+                : PeopleEventType.defaultType,
+            person: ignoredPersons.first,
+            source: "ignore_clusters",
+            newClusterIDs: assignedClusterIDs,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<Map<String, List<String>>> splitCluster(String clusterID) async {
+    final faceIDs = await mlDataDB.getFaceIDsForCluster(clusterID);
+    final fileIDToCreationTime = await FilesDB.instance
+        .getFileIDToCreationTime();
+    final newFaceIdToClusterID = await FaceClustering.instance.reclusterFaces(
+      faceIDs.toList(),
+      fileIDToCreationTime: fileIDToCreationTime,
+      distanceThreshold: 0.22,
+    );
+    if (newFaceIdToClusterID.isEmpty) {
+      _logger.warning('No embeddings found for cluster $clusterID');
+      return {};
+    }
+    await mlDataDB.deleteClusterSummary(clusterID);
+
+    final newClusterIDToFaceIDs = <String, List<String>>{};
+    for (final MapEntry(key: faceID, value: newClusterID)
+        in newFaceIdToClusterID.entries) {
+      newClusterIDToFaceIDs.putIfAbsent(newClusterID, () => []).add(faceID);
+    }
+    _logger.info(
+      'Split cluster $clusterID into ${newClusterIDToFaceIDs.length} clusters',
+    );
+    return newClusterIDToFaceIDs;
+  }
+
+  Future<void> _prepareClusterCentroidVectorDbForSuggestions() {
+    _prepareClusterCentroidVectorDbFuture ??=
+        _prepareClusterCentroidVectorDbForSuggestionsInternal();
+    return _prepareClusterCentroidVectorDbFuture!;
+  }
+
+  Future<void> _prepareClusterCentroidVectorDbForSuggestionsInternal() async {
+    try {
+      if (!flagService.usearchForSuggestions) return;
+      if (!flagService.hasGrantedMLConsent) return;
+      if (!await _clusterCentroidVectorDB.isReady()) {
+        await _mlDataDBForCentroidVectorDb
+            .checkMigrateFillClusterCentroidVectorDB();
+      }
+      if (await _clusterCentroidVectorDB.isReady()) {
+        await _clusterCentroidVectorDB.warmup();
+      }
+    } catch (e, s) {
+      _logger.severe(
+        "Failed to prepare cluster centroid vector DB for suggestions",
+        e,
+        s,
+      );
+    } finally {
+      _prepareClusterCentroidVectorDbFuture = null;
+    }
+  }
+
+  Future<bool> _canUseClusterCentroidVectorDbForSuggestions() async {
+    if (!flagService.usearchForSuggestions) return false;
+    if (!flagService.hasGrantedMLConsent) return false;
+    if (await _clusterCentroidVectorDB.isReady()) return true;
+    unawaited(_prepareClusterCentroidVectorDbForSuggestions());
+    return false;
+  }
+
+  // Returns (cluster ID, distance, used mean rather than median).
+  Future<List<(String, double, bool)>> _getSuggestions(
+    PersonEntity p, {
+    int sampleSize = 50,
+    double maxMedianDistance = 0.62,
+    double goodMedianDistance = 0.55,
+    double maxMeanDistance = 0.65,
+    double goodMeanDistance = 0.45,
+  }) async {
+    final w = (kDebugMode ? EnteWatch('getSuggestions') : null)?..start();
+    final allClusterIdsToCountMap = await mlDataDB.clusterIdToFaceCount();
+    final ignoredClusters = await mlDataDB.getPersonIgnoredClusters(p.remoteID);
+    ignoredClusters.addAll(await _getExcludedSuggestionClusterIDs());
+    final personClusters = await mlDataDB.getPersonClusterIDs(p.remoteID);
+    if (personClusters.isEmpty) {
+      return [];
+    }
+    final ignoredClustersForAverages = ignoredClusters.difference(
+      personClusters,
+    );
+    final personFaceIDs = await mlDataDB.getFaceIDsForPerson(p.remoteID);
+    final personFileIDs = personFaceIDs.map(getFileIdFromFaceId<int>).toSet();
+    w?.log(
+      '${p.data.name} has ${personClusters.length} existing clusters, getting all database data done',
+    );
+    final smallestPersonClusterSize = personClusters
+        .map((clusterID) => allClusterIdsToCountMap[clusterID] ?? 0)
+        .reduce((value, element) => min(value, element));
+    final checkSizes = [20, kMinimumClusterSizeSearchResult, 10, 5, 1];
+    ClusterAverages? clusterAvgBigClusters;
+    final List<(String, double)> suggestionsMean = [];
+    bool canUseVectorDb = await _canUseClusterCentroidVectorDbForSuggestions();
+    for (final minimumSize in checkSizes.toSet()) {
+      if (smallestPersonClusterSize >=
+          min(minimumSize, kMinimumClusterSizeSearchResult)) {
+        clusterAvgBigClusters = await _getUpdateClusterAvg(
+          allClusterIdsToCountMap,
+          ignoredClustersForAverages,
+          minClusterSize: minimumSize,
+        );
+        w?.log(
+          'Calculate avg for ${clusterAvgBigClusters.clusterIDs.length} clusters of min size $minimumSize',
+        );
+        final suggestionsMeanBigClusters =
+            await _calcSuggestionsMeanWithFallback(
+              clusterAvgBigClusters,
+              personClusters,
+              ignoredClusters,
+              goodMeanDistance,
+              canUseVectorDb: canUseVectorDb,
+              perClusterResultCount: 8,
+              onVectorDbFailed: () => canUseVectorDb = false,
+            );
+        w?.log(
+          'Calculate suggestions using mean for ${clusterAvgBigClusters.clusterIDs.length} clusters of min size $minimumSize',
+        );
+        final candidateFaceIDs = await mlDataDB.getClusterToFaceIDs(
+          suggestionsMeanBigClusters.map((suggestion) => suggestion.$1).toSet(),
+        );
+        for (final suggestion in suggestionsMeanBigClusters) {
+          final suggestionSet =
+              (candidateFaceIDs[suggestion.$1] ?? const <String>[])
+                  .map((faceID) => getFileIdFromFaceId<int>(faceID))
+                  .toSet();
+          final overlap = personFileIDs.intersection(suggestionSet);
+          if (overlap.isNotEmpty &&
+              ((overlap.length / suggestionSet.length) > 0.1)) {
+            await mlDataDB.captureNotPersonFeedback(
+              personID: p.remoteID,
+              clusterID: suggestion.$1,
+            );
+            continue;
+          }
+          suggestionsMean.add((suggestion.$1, suggestion.$2));
+        }
+        if (suggestionsMean.isNotEmpty) {
+          return suggestionsMean
+              .map((e) => (e.$1, e.$2, true))
+              .toList(growable: false);
+        }
+      }
+    }
+    w?.reset();
+
+    final clusterAvg = clusterAvgBigClusters;
+    final moreSuggestionsMean = clusterAvg == null
+        ? <(String, double, String)>[]
+        : await _calcSuggestionsMeanWithFallback(
+            clusterAvg,
+            personClusters,
+            ignoredClusters,
+            maxMeanDistance,
+            canUseVectorDb: canUseVectorDb,
+            perClusterResultCount: 12,
+            onVectorDbFailed: () => canUseVectorDb = false,
+          );
+    if (moreSuggestionsMean.isEmpty) {
+      _logger.info(
+        "No suggestions found using mean, even with higher threshold",
+      );
+      return [];
+    }
+
+    moreSuggestionsMean.sort((a, b) => a.$2.compareTo(b.$2));
+    final otherClusterIdsCandidates = moreSuggestionsMean
+        .map((e) => e.$1)
+        .toList(growable: false);
+    _logger.info(
+      "Found potential suggestions from loose mean for median test: $otherClusterIdsCandidates",
+    );
+
+    w?.logAndReset("Starting median test");
+    final suggestionsMedian = await FaceDistances.instance.suggestByMedian(
+      personClusters,
+      otherClusterIdsCandidates,
+      sampleSize: sampleSize,
+      maxDistance: maxMedianDistance,
+      goodDistance: goodMedianDistance,
+    );
+    w?.log("Finished median test");
+    if (suggestionsMedian.isEmpty) {
+      _logger.info("No suggestions found using median");
+      return [];
+    } else {
+      _logger.info("Found suggestions using median: $suggestionsMedian");
+    }
+
+    final List<(String, double, bool)> finalSuggestionsMedian =
+        suggestionsMedian
+            .map(((e) => (e.$1, e.$2, false)))
+            .toList(growable: false)
+            .reversed
+            .toList(growable: false);
+
+    if (suggestionsMedian.last.$2 < goodMedianDistance) {
+      _logger.info(
+        "Found great suggestion using median: ${suggestionsMedian.last}",
+      );
+    }
+
+    return finalSuggestionsMedian;
+  }
+
+  // Returns (suggestion cluster ID, distance, person cluster ID).
+  Future<List<(String, double, String)>> _getFastSuggestions(
+    PersonEntity person,
+    String clusterID,
+    double threshold, {
+    Set<String>? extraIgnoredClusters,
+  }) async {
+    assert(
+      !isLocalGalleryMode,
+      "Fast person suggestions require an Ente account and should not run in local gallery mode.",
+    );
+    if (isLocalGalleryMode) {
+      _logger.info(
+        "Skipping _getFastSuggestions in local gallery mode because person suggestions require an Ente account",
+      );
+      return [];
+    }
+    final allClusterIdsToCountMap = (await mlDataDB.clusterIdToFaceCount());
+    final personignoredClusters = await mlDataDB.getPersonIgnoredClusters(
+      person.remoteID,
+    );
+    final ignoredClusters = personignoredClusters.union(
+      extraIgnoredClusters ?? {},
+    );
+    final startTime = DateTime.now();
+    final clusterAvg = await _getUpdateClusterAvg(
+      allClusterIdsToCountMap,
+      ignoredClusters,
+      minClusterSize: kMinimumClusterSizeSearchResult,
+    );
+    final avgCalcTime = DateTime.now();
+
+    final List<(String, double, String)> foundSuggestions = await clusterAvg
+        .suggestByMean({clusterID}, ignoredClusters, threshold);
+    final suggestionCalcTime = DateTime.now();
+    _logger.info(
+      "Calculated average vectors in ${avgCalcTime.difference(startTime).inMilliseconds}ms and suggestions in ${suggestionCalcTime.difference(avgCalcTime).inMilliseconds}ms",
+    );
+    return foundSuggestions;
+  }
+
+  Future<ClusterAverages> _getUpdateClusterAvg(
+    Map<String, int> allClusterIdsToCountMap,
+    Set<String> ignoredClusters, {
+    int minClusterSize = 1,
+  }) {
+    if (MLDataDB.isRustBackend) {
+      return StoreClusterAverages.refresh(
+        allClusterIdsToCountMap,
+        ignoredClusters,
+        minClusterSize: minClusterSize,
+      );
+    }
+    return DartClusterAverages.refresh(
+      allClusterIdsToCountMap,
+      ignoredClusters,
+      minClusterSize: minClusterSize,
+      shouldPersistClusterSummaryUpdates:
+          _prepareClusterCentroidVectorDbFuture == null,
+    );
+  }
+
+  Future<List<(String, double, String)>> _calcSuggestionsMeanWithFallback(
+    ClusterAverages clusterAvg,
+    Set<String> personClusters,
+    Set<String> ignoredClusters,
+    double maxClusterDistance, {
+    required bool canUseVectorDb,
+    int perClusterResultCount = 8,
+    required VoidCallback onVectorDbFailed,
+  }) async {
+    if (canUseVectorDb) {
+      try {
+        return await _calcSuggestionsMeanWithVectorDb(
+          clusterAvg,
+          personClusters,
+          ignoredClusters,
+          maxClusterDistance,
+          perClusterResultCount: perClusterResultCount,
+        );
+      } catch (e, s) {
+        _logger.warning(
+          "Cluster centroid vector DB mean suggestions failed, falling back to in-memory comparisons",
+          e,
+          s,
+        );
+        onVectorDbFailed();
+      }
+    }
+    return clusterAvg.suggestByMean(
+      personClusters,
+      ignoredClusters,
+      maxClusterDistance,
+    );
+  }
+
+  Future<List<(String, double, String)>> _calcSuggestionsMeanWithVectorDb(
+    ClusterAverages clusterAvg,
+    Set<String> personClusters,
+    Set<String> ignoredClusters,
+    double maxClusterDistance, {
+    int perClusterResultCount = 8,
+  }) async {
+    if (clusterAvg.clusterIDs.isEmpty) {
+      return [];
+    }
+    if (perClusterResultCount <= 0) {
+      return [];
+    }
+
+    final validPersonClusters = personClusters
+        .where(clusterAvg.clusterIDs.contains)
+        .toSet();
+    if (validPersonClusters.isEmpty) {
+      return [];
+    }
+
+    final otherClusters = clusterAvg.clusterIDs
+        .difference(validPersonClusters)
+        .difference(ignoredClusters);
+    if (otherClusters.isEmpty) {
+      return [];
+    }
+
+    final orderedPersonClusterIDs = validPersonClusters.toList(growable: false);
+    final matchesPerQuery = await clusterAvg.searchNearest(
+      orderedPersonClusterIDs,
+      otherClusters,
+      maxDistance: maxClusterDistance,
+      count: perClusterResultCount,
+    );
+
+    final bestSuggestionPerCluster = <String, (double, String)>{};
+    final alignedQueryLength = min(
+      orderedPersonClusterIDs.length,
+      matchesPerQuery.length,
+    );
+    for (var i = 0; i < alignedQueryLength; i++) {
+      final personClusterID = orderedPersonClusterIDs[i];
+      final matches = matchesPerQuery[i];
+
+      for (final match in matches) {
+        final suggestedClusterID = match.$1;
+        if (ignoredClusters.contains(suggestedClusterID) ||
+            validPersonClusters.contains(suggestedClusterID)) {
+          continue;
+        }
+        final previous = bestSuggestionPerCluster[suggestedClusterID];
+        if (previous == null || match.$2 < previous.$1) {
+          bestSuggestionPerCluster[suggestedClusterID] = (
+            match.$2,
+            personClusterID,
+          );
+        }
+      }
+    }
+
+    final suggestions = <(String, double, String)>[];
+    for (final entry in bestSuggestionPerCluster.entries) {
+      suggestions.add((entry.key, entry.value.$1, entry.value.$2));
+    }
+    suggestions.sort((a, b) => a.$2.compareTo(b.$2));
+    return suggestions.sublist(0, min(suggestions.length, 20));
+  }
+
+  Future<void> _sortSuggestionsOnDistanceToPerson(
+    List<ClusterSuggestion> suggestions, {
+    bool onlySortBigSuggestions = true,
+  }) async {
+    if (suggestions.isEmpty) {
+      debugPrint('No suggestions to sort');
+      return;
+    }
+    if (onlySortBigSuggestions) {
+      final bigSuggestions = suggestions
+          .where(
+            (s) => s.filesInCluster.length > kMinimumClusterSizeSearchResult,
+          )
+          .toList();
+      if (bigSuggestions.isEmpty) {
+        debugPrint('No big suggestions to sort');
+        return;
+      }
+    }
+    final startTime = DateTime.now();
+
+    final suggestionsToSort = suggestions
+        .where(
+          (suggestion) =>
+              !onlySortBigSuggestions || suggestion.filesInCluster.length > 8,
+        )
+        .toList(growable: false);
+    final distancesBySuggestion = FaceDistances.instance.distancesToPersons([
+      for (final suggestion in suggestionsToSort)
+        (suggestion.person.remoteID, suggestion.faceIDsInCluster),
+    ]);
+
+    var nextSuggestion = 0;
+    await for (final faceDistances in distancesBySuggestion) {
+      final suggestion = suggestionsToSort[nextSuggestion++];
+      if (faceDistances == null) {
+        continue;
+      }
+      final clusterID = suggestion.clusterIDToMerge;
+      final fileIdToDistanceMap = {};
+      for (final (faceID, distance) in faceDistances) {
+        fileIdToDistanceMap[getFileIdFromFaceId<int>(faceID)] = distance;
+      }
+      suggestion.filesInCluster.sort((b, a) {
+        final double distanceA = fileIdToDistanceMap[a.uploadedFileID!] ?? -1;
+        final double distanceB = fileIdToDistanceMap[b.uploadedFileID!] ?? -1;
+        return distanceA.compareTo(distanceB);
+      });
+
+      debugPrint(
+        "[${_logger.name}] Sorted suggestions for cluster $clusterID based on distance to person: ${suggestion.filesInCluster.map((e) => fileIdToDistanceMap[e.uploadedFileID]).toList()}",
+      );
+    }
+
+    final endTime = DateTime.now();
+    _logger.fine(
+      "Sorting suggestions based on distance to person took ${endTime.difference(startTime).inMilliseconds} ms for ${suggestions.length} suggestions",
+    );
+  }
+}

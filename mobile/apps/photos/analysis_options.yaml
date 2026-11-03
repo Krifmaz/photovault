@@ -1,0 +1,16 @@
+include: ../../analysis_options.yaml
+
+analyzer:
+  errors:
+    deprecated_member_use: warning
+    use_build_context_synchronously: error
+  exclude:
+    - thirdparty/**
+    - lib/generated/**
+    - rust_builder/**
+    - lib/src/rust/**
+    - rust/src/**
+    - test/**
+    - build/**
+    - android/**
+    - ios/**

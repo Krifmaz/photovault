@@ -1,0 +1,23 @@
+<resources>
+    <!-- PHOTOVAULT: brand name -->
+    <string name="app_name">Photovault</string>
+    <string name="backup">Backup</string>
+    <string name="asset_statements" translatable="false">
+        [{
+        \"include\": \"https://web.ente.io/.well-known/assetlinks.json\"
+        },
+        {
+        \"include\": \"https://photos.ente.com/.well-known/assetlinks.json\"
+        },
+        {
+        \"include\": \"https://auth.ente.io/.well-known/assetlinks.json\"
+        },
+        {
+        \"include\": \"https://auth.ente.com/.well-known/assetlinks.json\"
+        },
+        {
+        \"include\": \"https://locker.ente.com/.well-known/assetlinks.json\"
+        }]
+    </string>
+
+</resources>
