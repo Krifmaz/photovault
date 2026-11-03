@@ -16,6 +16,7 @@ pub mod jwt;
 pub mod mail;
 pub mod metrics;
 pub mod routes;
+pub mod social;
 pub mod state;
 pub mod storage;
 pub mod testing;
