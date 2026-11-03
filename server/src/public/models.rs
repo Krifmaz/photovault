@@ -1,8 +1,14 @@
-//! JSON shapes shared by the public-link and cast endpoints, serialised exactly
-//! like museum's `ente.File`, `ente.Collection`, `ente.PublicURL` and `ente.MemoryShare`
-//! (field names, `omitempty` and `null` behaviour included).
+//! JSON shapes of the public-link and cast endpoints. Files and collections are the
+//! library's [`crate::library::model`] types (museum's `ente.File`, `ente.Collection`,
+//! `ente.PublicURL`); this module adds the public-diff post-processing and museum's
+//! `ente.MemoryShare`.
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
+
+pub use crate::library::model::{
+    Collection, CollectionAttributes, CollectionUser, File, FileAttributes, FileInfo,
+    MagicMetadata, PublicUrl,
+};
 
 fn is_zero(v: &i64) -> bool {
     *v == 0
@@ -12,265 +18,42 @@ fn is_false(v: &bool) -> bool {
     !*v
 }
 
-/// museum `ente.MagicMetadata` (stored as JSON text).
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(default)]
-pub struct MagicMetadata {
-    /// Version.
-    #[serde(skip_serializing_if = "is_zero")]
-    pub version: i64,
-    /// Number of keys.
-    #[serde(skip_serializing_if = "is_zero")]
-    pub count: i64,
-    /// Encrypted payload.
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub data: String,
-    /// Decryption header.
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub header: String,
-}
-
-impl MagicMetadata {
-    /// Parse a stored JSON column (NULL/invalid → `None`).
-    pub fn from_db(s: Option<String>) -> Option<Self> {
-        s.and_then(|s| serde_json::from_str(&s).ok())
+/// museum `GetPublicDiff`/`GetCastDiff` post-processing for one entry: strip private
+/// metadata and pending actions (a pending `REMOVE`/`DELETE_SUGGESTED` reads as deleted),
+/// and scrub deleted entries.
+pub fn for_public_diff(mut f: File) -> File {
+    f.magic_metadata = None;
+    if let Some(a) = &f.action
+        && !f.is_deleted
+        && (a == "REMOVE" || a == "DELETE_SUGGESTED")
+    {
+        f.is_deleted = true;
     }
-}
-
-/// museum `ente.FileInfo`.
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(default)]
-pub struct FileInfo {
-    /// Size of the file object.
-    #[serde(rename = "fileSize", skip_serializing_if = "is_zero")]
-    pub file_size: i64,
-    /// Size of the thumbnail object.
-    #[serde(rename = "thumbSize", skip_serializing_if = "is_zero")]
-    pub thumb_size: i64,
-}
-
-impl FileInfo {
-    /// Parse a stored JSON column.
-    pub fn from_db(s: Option<String>) -> Option<Self> {
-        s.and_then(|s| serde_json::from_str(&s).ok())
+    f.action = None;
+    f.action_user = None;
+    if f.metadata.encrypted_data == "-" && !f.is_deleted {
+        tracing::warn!(file_id = f.id, "stale collection_file found");
+        f.is_deleted = true;
     }
+    crate::library::collections::scrub_deleted(f)
 }
 
-/// museum `ente.FileAttributes`.
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(default, rename_all = "camelCase")]
-pub struct FileAttributes {
-    /// Object key (only in upload requests/responses).
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub object_key: String,
-    /// Inline encrypted data (metadata).
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub encrypted_data: String,
-    /// Decryption header.
-    pub decryption_header: String,
-    /// Size in bytes.
-    pub size: i64,
-}
-
-/// museum `ente.File`.
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(default, rename_all = "camelCase")]
-pub struct File {
-    /// File id.
-    pub id: i64,
-    /// Owner.
-    #[serde(rename = "ownerID")]
-    pub owner_id: i64,
-    /// Collection (for diff rows).
-    #[serde(rename = "collectionID")]
-    pub collection_id: i64,
-    /// Collection owner (`null` when unknown).
-    #[serde(rename = "collectionOwnerID")]
-    pub collection_owner_id: Option<i64>,
-    /// When the file was added to the collection.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub collection_added_at: Option<i64>,
-    /// File key encrypted with the collection key.
-    pub encrypted_key: String,
-    /// Nonce for `encrypted_key`.
-    pub key_decryption_nonce: String,
-    /// File object attributes.
-    pub file: FileAttributes,
-    /// Thumbnail object attributes.
-    pub thumbnail: FileAttributes,
-    /// Metadata attributes.
-    pub metadata: FileAttributes,
-    /// Removed from the collection.
-    pub is_deleted: bool,
-    /// Version (microseconds).
-    pub updation_time: i64,
-    /// Private magic metadata.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub magic_metadata: Option<MagicMetadata>,
-    /// Public magic metadata.
-    #[serde(rename = "pubMagicMetadata", skip_serializing_if = "Option::is_none")]
-    pub pub_magic_metadata: Option<MagicMetadata>,
-    /// Object sizes.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub info: Option<FileInfo>,
-    /// Pending collection action (stripped from public/cast diffs).
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub action: Option<String>,
-    /// User who triggered `action`.
-    #[serde(rename = "actionUser", skip_serializing_if = "Option::is_none")]
-    pub action_user: Option<i64>,
-}
-
-impl File {
-    /// museum `scrubDeletedFiles`: deleted entries keep only identifiers and version.
-    pub fn scrubbed(&self) -> File {
-        File {
-            id: self.id,
-            owner_id: self.owner_id,
-            collection_id: self.collection_id,
-            collection_owner_id: self.collection_owner_id,
-            metadata: FileAttributes {
-                encrypted_data: "-".into(),
-                ..Default::default()
-            },
-            is_deleted: true,
-            updation_time: self.updation_time,
+/// The limited `publicURLs` form museum's `GetPublicCollection` exposes to link viewers.
+pub fn limited_public_urls(urls: Option<Vec<PublicUrl>>) -> Vec<PublicUrl> {
+    urls.unwrap_or_default()
+        .into_iter()
+        .map(|u| PublicUrl {
+            enable_download: u.enable_download,
+            enable_collect: u.enable_collect,
+            enable_comment: u.enable_comment,
+            password_enabled: u.password_enabled,
+            nonce: u.nonce,
+            mem_limit: u.mem_limit,
+            ops_limit: u.ops_limit,
+            enable_join: u.enable_join,
             ..Default::default()
-        }
-    }
-
-    /// museum `GetPublicDiff`/`GetCastDiff` post-processing for one entry.
-    pub fn for_public_diff(mut self) -> File {
-        self.magic_metadata = None;
-        if let Some(a) = &self.action
-            && !self.is_deleted
-            && (a == "REMOVE" || a == "DELETE_SUGGESTED")
-        {
-            self.is_deleted = true;
-        }
-        self.action = None;
-        self.action_user = None;
-        if self.metadata.encrypted_data == "-" && !self.is_deleted {
-            tracing::warn!(file_id = self.id, "stale collection_file found");
-            self.is_deleted = true;
-        }
-        if self.is_deleted {
-            self.scrubbed()
-        } else {
-            self
-        }
-    }
-}
-
-/// museum `ente.CollectionUser`.
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
-pub struct CollectionUser {
-    /// User id.
-    pub id: i64,
-    /// Email (empty on public views).
-    pub email: String,
-    /// Deprecated name.
-    pub name: String,
-    /// Role (empty for the owner on public views).
-    pub role: String,
-}
-
-/// museum `ente.CollectionAttributes`.
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(default, rename_all = "camelCase")]
-pub struct CollectionAttributes {
-    /// Encrypted folder path.
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub encrypted_path: String,
-    /// Nonce for the path.
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub path_decryption_nonce: String,
-    /// Version.
-    pub version: i64,
-}
-
-/// museum `ente.PublicURL` (the limited form exposed to link viewers).
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct PublicUrl {
-    /// Link URL (empty for viewers).
-    pub url: String,
-    /// Device limit.
-    pub device_limit: i64,
-    /// Expiry (0 = never).
-    pub valid_till: i64,
-    /// Downloads allowed.
-    pub enable_download: bool,
-    /// Uploads ("collect") allowed.
-    pub enable_collect: bool,
-    /// Comments allowed.
-    pub enable_comment: bool,
-    /// Password protected.
-    pub password_enabled: bool,
-    /// KDF nonce for the password.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub nonce: Option<String>,
-    /// KDF memory limit.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub mem_limit: Option<i64>,
-    /// KDF ops limit.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub ops_limit: Option<i64>,
-    /// Joining the album allowed.
-    pub enable_join: bool,
-    /// Minimum role to see the link.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub min_role: Option<String>,
-}
-
-/// museum `ente.Collection`.
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct Collection {
-    /// Collection id.
-    pub id: i64,
-    /// Owner.
-    pub owner: CollectionUser,
-    /// Collection key, encrypted for the owner.
-    pub encrypted_key: String,
-    /// Nonce for `encrypted_key`.
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub key_decryption_nonce: String,
-    /// Legacy plaintext name.
-    pub name: String,
-    /// Encrypted name.
-    pub encrypted_name: String,
-    /// Nonce for the name.
-    pub name_decryption_nonce: String,
-    /// album / folder / favorites / uncategorized.
-    #[serde(rename = "type")]
-    pub kind: String,
-    /// Attributes.
-    pub attributes: CollectionAttributes,
-    /// Sharees (`null` on public views).
-    pub sharees: Option<Vec<CollectionUser>>,
-    /// Public links.
-    #[serde(rename = "publicURLs")]
-    pub public_urls: Option<Vec<PublicUrl>>,
-    /// Version.
-    pub updation_time: i64,
-    /// When shared with the viewer.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub shared_at: Option<i64>,
-    /// Deleted.
-    #[serde(skip_serializing_if = "is_false")]
-    pub is_deleted: bool,
-    /// Private magic metadata.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub magic_metadata: Option<MagicMetadata>,
-    /// App (photos/locker).
-    pub app: String,
-    /// Public magic metadata.
-    #[serde(rename = "pubMagicMetadata", skip_serializing_if = "Option::is_none")]
-    pub pub_magic_metadata: Option<MagicMetadata>,
-    /// Sharee magic metadata.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub shared_magic_metadata: Option<MagicMetadata>,
+        })
+        .collect()
 }
 
 /// museum `ente.MemoryShare`.
@@ -331,7 +114,7 @@ mod tests {
             updation_time: 9,
             ..Default::default()
         };
-        let v = serde_json::to_value(f.for_public_diff()).unwrap();
+        let v = serde_json::to_value(for_public_diff(f)).unwrap();
         assert_eq!(
             v,
             serde_json::json!({"id":3,"ownerID":1,"collectionID":2,"collectionOwnerID":null,

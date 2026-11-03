@@ -17,9 +17,9 @@ async fn file_link(
         hex::encode(photovault_server::crypto::random_bytes(5)).to_uppercase()
     );
     sqlx::query(
-        "INSERT INTO public_file_tokens (id, file_id, owner_id, access_token, created_at, updated_at, \
+        "INSERT INTO public_file_tokens (id, app, file_id, owner_id, access_token, created_at, updated_at, \
          encrypted_file_key, encrypted_file_key_nonce, kdf_nonce, kdf_mem_limit, kdf_ops_limit) \
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+         VALUES ($1, 'photos', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
     )
     .bind(format!("fl_{token}"))
     .bind(file_id)

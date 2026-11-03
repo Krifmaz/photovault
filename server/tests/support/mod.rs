@@ -1,176 +1,16 @@
-//! Shared test helpers for the public-link and cast tests.
-//!
-//! The files/collections tables are owned by another workstream; tests create them
-//! here (museum's names and columns, BIGINT/TEXT/BOOLEAN) with `IF NOT EXISTS`, so
-//! once the real migrations land these statements become no-ops.
+//! Shared test helpers for the public-link and cast tests: rows inserted directly in
+//! the real library schema (migration `0200_library`), and a tiny HTTP client.
 
 #![allow(dead_code)]
 
-use photovault_server::db::{Engine, now_micros};
+use photovault_server::db::now_micros;
 use photovault_server::testing::TestServer;
 use sqlx::AnyPool;
 use std::collections::HashMap;
 
-/// A started server with the library fixture tables in place.
+/// A started server (real migrations, fresh database).
 pub async fn server() -> TestServer {
-    let srv = TestServer::start().await.expect("server starts");
-    create_library_tables(&srv).await;
-    srv
-}
-
-fn serial(engine: Engine) -> &'static str {
-    match engine {
-        Engine::Postgres => "BIGSERIAL PRIMARY KEY",
-        Engine::Sqlite => "INTEGER PRIMARY KEY AUTOINCREMENT",
-    }
-}
-
-/// Create the foreign tables this workstream queries.
-pub async fn create_library_tables(srv: &TestServer) {
-    let id = serial(srv.state.db.engine);
-    let ddl = [
-        format!(
-            "CREATE TABLE IF NOT EXISTS collections (
-                collection_id {id},
-                owner_id BIGINT NOT NULL,
-                encrypted_key TEXT NOT NULL,
-                key_decryption_nonce TEXT,
-                name TEXT,
-                encrypted_name TEXT,
-                name_decryption_nonce TEXT,
-                type TEXT NOT NULL,
-                attributes TEXT NOT NULL DEFAULT '{{}}',
-                updation_time BIGINT NOT NULL,
-                is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-                magic_metadata TEXT,
-                pub_magic_metadata TEXT,
-                app TEXT NOT NULL DEFAULT 'photos'
-            )"
-        ),
-        "CREATE TABLE IF NOT EXISTS collection_shares (
-            collection_id BIGINT NOT NULL,
-            from_user_id BIGINT NOT NULL,
-            to_user_id BIGINT NOT NULL,
-            encrypted_key TEXT NOT NULL,
-            updation_time BIGINT NOT NULL,
-            is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-            role_type TEXT NOT NULL DEFAULT 'VIEWER',
-            magic_metadata TEXT,
-            shared_at BIGINT,
-            UNIQUE (collection_id, from_user_id, to_user_id)
-        )"
-        .to_string(),
-        format!(
-            "CREATE TABLE IF NOT EXISTS files (
-                file_id {id},
-                owner_id BIGINT NOT NULL,
-                app TEXT NOT NULL DEFAULT 'photos',
-                file_decryption_header TEXT NOT NULL,
-                thumbnail_decryption_header TEXT NOT NULL,
-                metadata_decryption_header TEXT NOT NULL,
-                encrypted_metadata TEXT NOT NULL,
-                magic_metadata TEXT,
-                pub_magic_metadata TEXT,
-                info TEXT,
-                updation_time BIGINT NOT NULL
-            )"
-        ),
-        "CREATE TABLE IF NOT EXISTS collection_files (
-            file_id BIGINT NOT NULL,
-            collection_id BIGINT NOT NULL,
-            encrypted_key TEXT NOT NULL,
-            key_decryption_nonce TEXT NOT NULL,
-            is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-            updation_time BIGINT NOT NULL,
-            c_owner_id BIGINT,
-            f_owner_id BIGINT,
-            created_at BIGINT,
-            action TEXT,
-            action_user BIGINT,
-            UNIQUE (collection_id, file_id)
-        )"
-        .to_string(),
-        "CREATE TABLE IF NOT EXISTS object_keys (
-            file_id BIGINT NOT NULL,
-            o_type TEXT NOT NULL,
-            object_key TEXT NOT NULL UNIQUE,
-            size BIGINT NOT NULL,
-            is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-            PRIMARY KEY (file_id, o_type)
-        )"
-        .to_string(),
-        format!(
-            "CREATE TABLE IF NOT EXISTS public_collection_tokens (
-                id {id},
-                collection_id BIGINT NOT NULL,
-                access_token TEXT NOT NULL UNIQUE,
-                is_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-                valid_till BIGINT NOT NULL DEFAULT 0,
-                device_limit BIGINT NOT NULL DEFAULT 0,
-                pw_hash TEXT,
-                pw_nonce TEXT,
-                mem_limit BIGINT,
-                ops_limit BIGINT,
-                enable_download BOOLEAN NOT NULL DEFAULT TRUE,
-                enable_comment BOOLEAN NOT NULL DEFAULT FALSE,
-                enable_collect BOOLEAN NOT NULL DEFAULT FALSE,
-                enable_join BOOLEAN NOT NULL DEFAULT TRUE,
-                min_role TEXT,
-                created_at BIGINT NOT NULL DEFAULT 0,
-                updated_at BIGINT NOT NULL DEFAULT 0
-            )"
-        ),
-        "CREATE TABLE IF NOT EXISTS public_file_tokens (
-            id TEXT PRIMARY KEY,
-            file_id BIGINT NOT NULL,
-            owner_id BIGINT NOT NULL,
-            app TEXT NOT NULL DEFAULT 'photos',
-            access_token TEXT NOT NULL,
-            valid_till BIGINT NOT NULL DEFAULT 0,
-            device_limit BIGINT NOT NULL DEFAULT 0,
-            is_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-            enable_download BOOLEAN NOT NULL DEFAULT TRUE,
-            pw_hash TEXT,
-            pw_nonce TEXT,
-            mem_limit BIGINT,
-            ops_limit BIGINT,
-            created_at BIGINT NOT NULL DEFAULT 0,
-            updated_at BIGINT NOT NULL DEFAULT 0,
-            encrypted_file_key TEXT,
-            encrypted_file_key_nonce TEXT,
-            kdf_nonce TEXT,
-            kdf_mem_limit BIGINT,
-            kdf_ops_limit BIGINT,
-            encrypted_share_key TEXT
-        )"
-        .to_string(),
-        "CREATE TABLE IF NOT EXISTS file_data (
-            file_id BIGINT NOT NULL,
-            user_id BIGINT NOT NULL,
-            data_type TEXT NOT NULL,
-            size BIGINT NOT NULL,
-            latest_bucket TEXT NOT NULL DEFAULT 'local',
-            is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-            obj_id TEXT,
-            obj_nonce TEXT,
-            obj_size BIGINT,
-            created_at BIGINT NOT NULL DEFAULT 0,
-            updated_at BIGINT NOT NULL DEFAULT 0,
-            PRIMARY KEY (file_id, data_type)
-        )"
-        .to_string(),
-        "CREATE TABLE IF NOT EXISTS usage (
-            user_id BIGINT PRIMARY KEY,
-            storage_consumed BIGINT NOT NULL DEFAULT 0
-        )"
-        .to_string(),
-    ];
-    for stmt in ddl {
-        sqlx::query(&stmt)
-            .execute(&srv.state.db.pool)
-            .await
-            .expect("fixture DDL");
-    }
+    TestServer::start().await.expect("server starts")
 }
 
 /// Insert a user and a session token; returns (user_id, token).
@@ -300,10 +140,12 @@ pub async fn album_link(db: &AnyPool, collection_id: i64, extra: &[(&str, &str)]
         hex::encode(photovault_server::crypto::random_bytes(5)).to_uppercase()
     );
     let (id,): (i64,) = sqlx::query_as(
-        "INSERT INTO public_collection_tokens (collection_id, access_token) VALUES ($1, $2) RETURNING id",
+        "INSERT INTO public_collection_tokens (collection_id, access_token, created_at, updated_at) \
+         VALUES ($1, $2, $3, $3) RETURNING id",
     )
     .bind(collection_id)
     .bind(&token)
+    .bind(now_micros())
     .fetch_one(db)
     .await
     .expect("insert link");
