@@ -39,8 +39,9 @@ Full guide: [`docs/src/importers.md`](../docs/src/importers.md).
 ## Tests
 
 `cargo test -p photovault-import` runs everything offline: crypto vectors,
-mock Immich and mock Ente servers, synthetic iCloud exports, and a whole
-pipeline run. Two extra tests need Go and run Ente's own code against ours:
+mock Immich and mock Ente servers, synthetic iCloud exports, a whole
+pipeline run, and an end-to-end import into the real Photovault server
+(in process, SQLite and local disk, including a multipart upload). Two extra tests need Go and run Ente's own code against ours:
 
 ```sh
 GO=/usr/local/go/bin/go cargo test -p photovault-import --test crypto_vectors -- --include-ignored

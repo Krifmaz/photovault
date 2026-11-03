@@ -43,3 +43,5 @@ zip = { version = "9", default-features = false, features = ["deflate"] }
 
 [dev-dependencies]
 axum = { version = "0.8", features = ["macros"] }
+# End-to-end tests against the real Photovault server, in process.
+photovault-server = { path = "../server" }

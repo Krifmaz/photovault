@@ -76,15 +76,22 @@ pub struct Account {
 impl Account {
     /// Create an account the way an Ente app does at sign-up.
     pub fn new(email: &str, password: &str, opts: AccountOptions) -> Self {
+        Self::with_kdf(email, password, opts, TEST_OPS_LIMIT, TEST_MEM_LIMIT)
+    }
+
+    /// Like [`Self::new`] with explicit Argon2 limits (a real server insists
+    /// on `ops * mem` being the strength the apps use).
+    pub fn with_kdf(
+        email: &str,
+        password: &str,
+        opts: AccountOptions,
+        ops_limit: u64,
+        mem_limit: u64,
+    ) -> Self {
         crypto::init();
         let kek_salt = crypto::random_bytes(16);
-        let kek = crypto::derive_argon_key(
-            password.as_bytes(),
-            &kek_salt,
-            TEST_OPS_LIMIT,
-            TEST_MEM_LIMIT,
-        )
-        .expect("kek");
+        let kek = crypto::derive_argon_key(password.as_bytes(), &kek_salt, ops_limit, mem_limit)
+            .expect("kek");
         let master_key = crypto::generate_key();
         let (public_key, secret_key) = crypto::box_keypair();
         let (enc_key, key_nonce) = crypto::secretbox_seal(&master_key, &kek).expect("seal");
@@ -102,8 +109,8 @@ impl Account {
             "publicKey": crypto::b64(&public_key),
             "encryptedSecretKey": crypto::b64(&enc_sk),
             "secretKeyDecryptionNonce": crypto::b64(&sk_nonce),
-            "memLimit": TEST_MEM_LIMIT,
-            "opsLimit": TEST_OPS_LIMIT,
+            "memLimit": mem_limit,
+            "opsLimit": ops_limit,
         });
         Self {
             email: email.into(),

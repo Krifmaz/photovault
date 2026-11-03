@@ -1815,6 +1815,7 @@ dependencies = [
  "libsodium-sys-stable",
  "md-5",
  "num-bigint-dig",
+ "photovault-server",
  "reqwest",
  "rpassword",
  "rustls",
