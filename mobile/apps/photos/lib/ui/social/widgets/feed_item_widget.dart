@@ -1,3 +1,4 @@
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_icons/ente_icons.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
@@ -257,7 +258,7 @@ class _FeedTypeIconWithTimeline extends StatelessWidget {
         return const Icon(
           EnteIcons.likeFilled,
           size: 18,
-          color: Color(0xFF00B33C),
+          color: encoreLightAccent2, // PHOTOVAULT: theme
         );
       case FeedItemType.comment:
         return Icon(
@@ -286,7 +287,7 @@ class _FeedTypeIconWithTimeline extends StatelessWidget {
               child: Icon(
                 EnteIcons.likeFilled,
                 size: 10,
-                color: Color(0xFF00B33C),
+                color: encoreLightAccent2, // PHOTOVAULT: theme
               ),
             ),
           ],
@@ -306,7 +307,7 @@ class _FeedTypeIconWithTimeline extends StatelessWidget {
               child: Icon(
                 EnteIcons.likeFilled,
                 size: 10,
-                color: Color(0xFF00B33C),
+                color: encoreLightAccent2, // PHOTOVAULT: theme
               ),
             ),
           ],

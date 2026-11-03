@@ -121,7 +121,7 @@
   "addSelected": "منتخب شدہ شامل کریں",
   "addTag": "ٹیگ شامل کریں",
   "addToAlbum": "البم میں شامل کریں",
-  "addToEnte": "Ente میں شامل کریں",
+  "addToEnte": "Photovault میں شامل کریں",
   "addToHiddenAlbum": "پوشیدہ البم میں شامل کریں",
   "addToPerson": "شخص میں شامل کریں",
   "@addToPerson": {
@@ -171,7 +171,7 @@
   "allowAppToOpenSharedAlbumLinks": "ایپ کو مشترکہ البم لنکس کھولنے کی اجازت دیں",
   "allowDownloads": "ڈاؤن لوڈز کی اجازت دیں",
   "allowJoiningAlbum": "البم میں شامل ہونے کی اجازت دیں",
-  "allowPermBody": "براہ کرم سیٹنگز سے اپنی تصاویر تک رسائی کی اجازت دیں تاکہ Ente آپ کی لائبریری کو ڈسپلے اور بیک اپ کر سکے.",
+  "allowPermBody": "براہ کرم سیٹنگز سے اپنی تصاویر تک رسائی کی اجازت دیں تاکہ Photovault آپ کی لائبریری کو ڈسپلے اور بیک اپ کر سکے.",
   "allowPermTitle": "تصاویر تک رسائی کی اجازت دیں",
   "allPersonGroupingWillReset": "اس شخص کے لیے تمام گروپنگ ری سیٹ ہو جائے گی، اور آپ اس شخص کے لیے دی گئی تمام تجاویز کھو دیں گے",
   "allTabEmptyHint": "یہاں ابھی کچھ نہیں ہے۔ کوڈ شامل کرنے کے لیے + پر ٹیپ کریں یا اسے بحال کرنے کے لیے ردی کی ٹوکری (Trash) کھولیں۔",
@@ -205,11 +205,11 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Ente کا ایک نیا ورژن دستیاب ہے.",
+  "aNewVersionOfEnteIsAvailable": "Photovault کا ایک نیا ورژن دستیاب ہے.",
   "appearance": "ظاہری شکل",
   "appIcon": "ایپ آئیکن",
   "appleId": "ایپل آئی ڈی",
-  "applePhotosUnsupportedResource": "یہ فائل Apple Photos میں محفوظ نہیں ہو سکی۔ آپ اسے Ente میں اب بھی دیکھ سکتے ہیں۔",
+  "applePhotosUnsupportedResource": "یہ فائل Apple Photos میں محفوظ نہیں ہو سکی۔ آپ اسے Photovault میں اب بھی دیکھ سکتے ہیں۔",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -287,7 +287,7 @@
   "autoAddPeople": "لوگ خود بخود شامل کریں",
   "autoAddToAlbum": "البم میں خودکار شامل کریں",
   "autoCastDialogBody": "آپ کو یہاں دستیاب Cast ڈیوائسز نظر آئیں گی.",
-  "autoCastiOSPermission": "یقینی بنائیں کہ سیٹنگز میں Ente Photos ایپ کے لیے لوکل نیٹ ورک کی اجازتیں آن ہیں.",
+  "autoCastiOSPermission": "یقینی بنائیں کہ سیٹنگز میں Photovault ایپ کے لیے لوکل نیٹ ورک کی اجازتیں آن ہیں.",
   "autoLock": "آٹو لاک",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -334,7 +334,7 @@
   "backupSettings": "بیک اپ کی ترتیبات",
   "backupStatus": "بیک اپ کی حیثیت",
   "backupStatusDescription": "بیک اپ کی گئی آئٹمز یہاں نظر آئیں گی",
-  "backupToEnte": "Ente میں بیک اپ کریں",
+  "backupToEnte": "Photovault میں بیک اپ کریں",
   "backupVideos": "ویڈیوز کا بیک اپ لیں",
   "beach": "ریت اور سمندر",
   "birthday": "سالگرہ",
@@ -585,7 +585,7 @@
   "createAccountTitle": "اکاؤنٹ بنائیں",
   "createAlbum": "البم بنائیں",
   "createAlbumActionHint": "تصاویر منتخب کرنے کے لیے دیر تک دبائیں اور البم بنانے کے لیے + پر کلک کریں",
-  "createAnEnteAccount": "Ente اکاؤنٹ بنائیں",
+  "createAnEnteAccount": "Photovault اکاؤنٹ بنائیں",
   "createBackupNow": "ابھی بیک اپ بنائیں",
   "createCollaborativeLink": "تعاونی لنک بنائیں",
   "createCollage": "کولاج بنائیں",
@@ -663,7 +663,7 @@
   "deleteFiles": "فائلیں ڈیلیٹ کریں",
   "deleteFromBoth": "دونوں سے ڈیلیٹ کریں",
   "deleteFromDevice": "ڈیوائس سے ڈیلیٹ کریں",
-  "deleteFromEnte": "Ente سے ڈیلیٹ کریں",
+  "deleteFromEnte": "Photovault سے ڈیلیٹ کریں",
   "deleteHiddenFilesFromDevice": "ڈیوائس سے پوشیدہ فائلیں ڈیلیٹ کریں",
   "deleteHiddenFilesFromDeviceDescription": "اپنی ڈیوائس سے پوشیدہ فائلوں کی مقامی کاپیاں ڈیلیٹ کریں",
   "deleteItemCount": "{count, plural, one{{count} آئٹم حذف کریں} other{{count} آئٹمز حذف کریں}}",
@@ -880,7 +880,7 @@
   "editOrder": "ترتیب میں ترمیم کریں",
   "editPerson": "شخص میں ترمیم کریں",
   "editsSaved": "ترامیم محفوظ ہو گئیں",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "مقام میں ترامیم صرف Ente کے اندر دیکھی جائیں گی",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "مقام میں ترامیم صرف Photovault کے اندر دیکھی جائیں گی",
   "editStorageLimit": "سٹوریج کی حد میں ترمیم کریں",
   "editTag": "ٹیگ میں ترمیم کریں",
   "editTime": "وقت میں ترمیم کریں",
@@ -906,7 +906,7 @@
     }
   },
   "emailHint": "اپنا ای میل ایڈریس درج کریں",
-  "emailNeedsEnteAccountForFamily": "{email} کا Ente اکاؤنٹ نہیں ہے۔\n\nانہیں دعوت نامہ بھیجیں اور جب وہ Ente پر اکاؤنٹ بنا لیں تو فیملی میں شامل کریں.",
+  "emailNeedsEnteAccountForFamily": "{email} کا Photovault اکاؤنٹ نہیں ہے۔\n\nانہیں دعوت نامہ بھیجیں اور جب وہ Photovault پر اکاؤنٹ بنا لیں تو فیملی میں شامل کریں.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -915,7 +915,7 @@
       }
     }
   },
-  "emailNoEnteAccountPhotos": "{email} کے پاس Ente اکاؤنٹ نہیں ہے\n\nانہیں تصاویر کا اشتراک کرنے کے لیے دعوت نامہ بھیجیں.",
+  "emailNoEnteAccountPhotos": "{email} کے پاس Photovault اکاؤنٹ نہیں ہے\n\nانہیں تصاویر کا اشتراک کرنے کے لیے دعوت نامہ بھیجیں.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1183,8 +1183,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "ریکوری کی بھول گئے؟",
-  "free10GB": "<bold-green>ente</bold-green> فوٹوز پر ۱۰ جی بی مفت",
-  "freeStorageOffer": "<bold-green>ente</bold-green> فوٹوز پر ۱۰٪ کی چھوٹ",
+  "free10GB": "<bold-green>Photovault</bold-green> فوٹوز پر ۱۰ جی بی مفت",
+  "freeStorageOffer": "<bold-green>Photovault</bold-green> فوٹوز پر ۱۰٪ کی چھوٹ",
   "freeStorageOfferDescription": "پہلے سال ۱۰٪ چھوٹ حاصل کرنے کے لیے کوڈ ”AUTH“ استعمال کریں",
   "freeTrial": "مفت ٹرائل",
   "freeUpAmount": "{sizeInMBorGB} خالی کریں",
@@ -1211,7 +1211,7 @@
   "grantFullAccessPrompt": "براہ کرم سیٹنگز ایپ میں تمام تصاویر تک رسائی کی اجازت دیں",
   "grantGalleryPermissionDesc": "چہرے کی پہچان کے ساتھ تصاویر تک رسائی اور ترتیب دینے کی اجازت دیں۔ تمام پراسیسنگ آپ کے ڈیوائس پر ہی ہوتی ہے.",
   "grantPermission": "اجازت دیں",
-  "grantPermissionDesc": "براہ مہربانی Ente کو اپنی لائبریری تک رسائی دیں تاکہ ہم چہرہ پہچان کے ذریعے اسے ترتیب دے سکیں۔ تمام پراسیسنگ آپ کے ڈیوائس پر ہوتی ہے۔",
+  "grantPermissionDesc": "براہ مہربانی Photovault کو اپنی لائبریری تک رسائی دیں تاکہ ہم چہرہ پہچان کے ذریعے اسے ترتیب دے سکیں۔ تمام پراسیسنگ آپ کے ڈیوائس پر ہوتی ہے۔",
   "greenery": "ہریالی زندگی",
   "grid": "گرڈ",
   "groupBy": "گروپ کریں",
@@ -1223,11 +1223,11 @@
   "guestView": "مہمان کا منظر",
   "guestViewEnablePreSteps": "مہمان کا منظر فعال کرنے کے لیے، براہ کرم اپنی سسٹم کی ترتیبات میں ڈیوائس پاس کوڈ یا اسکرین لاک سیٹ کریں.",
   "happyBirthday": "سالگرہ مبارک! 🥳",
-  "hearUsWhereOptionalTitle": "آپ نے Ente کے بارے میں کیسے سنا؟ (اختیاری)",
+  "hearUsWhereOptionalTitle": "آپ نے Photovault کے بارے میں کیسے سنا؟ (اختیاری)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "آپ نے Ente کے بارے میں کیسے سنا؟",
+  "hearUsWhereTitle": "آپ نے Photovault کے بارے میں کیسے سنا؟",
   "help": "مدد",
   "helpAndSupport": "مدد و سپورٹ",
   "hidden": "پوشیدہ",
@@ -1278,7 +1278,7 @@
   "importBitwardenGuide": "Bitwarden ٹولز میں ”Export vault“ کا آپشن استعمال کریں اور ان انکرپٹڈ (unencrypted) JSON فائل امپورٹ کریں۔",
   "importCodeDelimiterInfo": "کوڈز کو کوما یا نئی لائن کے ذریعے الگ کیا جا سکتا ہے",
   "importCodes": "کوڈز امپورٹ کریں",
-  "importEnteEncGuide": "Ente سے ایکسپورٹ کی گئی انکرپٹڈ JSON فائل منتخب کریں",
+  "importEnteEncGuide": "Photovault سے ایکسپورٹ کی گئی انکرپٹڈ JSON فائل منتخب کریں",
   "importEnterSetupKey": "سیٹ اپ کی (Key) درج کریں",
   "importFailureDesc": "منتخب فائل کو پارس (parse) نہیں کیا جا سکا۔",
   "importFromGallery": "گیلری سے امپورٹ کریں",
@@ -1304,7 +1304,7 @@
     }
   },
   "importSuccessTitle": "واہ!",
-  "importTypeEnteEncrypted": "Ente انکرپٹڈ ایکسپورٹ",
+  "importTypeEnteEncrypted": "Photovault انکرپٹڈ ایکسپورٹ",
   "incorrectCode": "غلط کوڈ",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -1351,7 +1351,7 @@
       }
     }
   },
-  "inviteToEnte": "Ente پر مدعو کریں",
+  "inviteToEnte": "Photovault پر مدعو کریں",
   "ok": "ٹھیک ہے",
   "@ok": {
     "description": "Generic OK button label"
@@ -1524,7 +1524,7 @@
   "@loginSessionExpiredDetails": {
     "description": "Login session expired details"
   },
-  "loginToEnte": "Ente میں لاگ ان کریں",
+  "loginToEnte": "Photovault میں لاگ ان کریں",
   "loginToExistingAccount": "موجودہ اکاؤنٹ میں لاگ ان کریں",
   "loginWithAuthAccount": "اپنے Auth اکاؤنٹ کے ساتھ لاگ ان کریں",
   "loginWithTOTP": "TOTP کے ساتھ لاگ ان کریں",
@@ -1624,7 +1624,7 @@
   "mixedGrouping": "ملی جلی گروپنگ؟",
   "mlConsent": "مشین لرننگ کو فعال کریں",
   "mlConsentConfirmation": "میں سمجھتا ہوں، اور مشین لرننگ کو فعال کرنا چاہتا ہوں",
-  "mlConsentDescription": "اگر آپ مشین لرننگ کو فعال کرتے ہیں، تو اینٹی Ente فائلوں سے چہرے کی ساخت جیسی معلومات اخذ کرے گا، بشمول وہ فائلیں جو آپ کے ساتھ شیئر کی گئی ہیں.\n\nیہ عمل آپ کے اپنے آلے پر ہوگا، اور تیار کردہ تمام بائیومیٹرک معلومات مکمل طور پر اینڈ ٹو اینڈ انکرپٹڈ ہوں گی.",
+  "mlConsentDescription": "اگر آپ مشین لرننگ کو فعال کرتے ہیں، تو اینٹی Photovault فائلوں سے چہرے کی ساخت جیسی معلومات اخذ کرے گا، بشمول وہ فائلیں جو آپ کے ساتھ شیئر کی گئی ہیں.\n\nیہ عمل آپ کے اپنے آلے پر ہوگا، اور تیار کردہ تمام بائیومیٹرک معلومات مکمل طور پر اینڈ ٹو اینڈ انکرپٹڈ ہوں گی.",
   "mlIndexingDescription": "نوٹ کریں کہ مشین لرننگ تمام آئٹمز پراسیس ہونے تک زیادہ انٹرنیٹ اور بیٹری استعمال کرے گی۔ تیز پراسیسنگ کے لیے ڈیسک ٹاپ ایپ استعمال کریں، تمام نتائج خود بخود سنک ہو جائیں گے.",
   "mlProgressBannerDescription": "آپ کی تصاویر پر چہروں، اشیاء اور مزید کا پتہ لگانے کے لیے ڈیوائس پر کارروائی کی جا رہی ہے.",
   "mlProgressBannerStatus": "{total} میں سے {indexed} تصاویر پر کارروائی کی گئی",
@@ -1811,7 +1811,7 @@
     "type": "text"
   },
   "oneLineAboutTheIssue": "مسئلے کے بارے میں ایک لائن",
-  "onEnte": "<branding>ente</branding> پر",
+  "onEnte": "<branding>Photovault</branding> پر",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -2501,7 +2501,7 @@
   "secretCanNotBeEmpty": "خفیہ کوڈ (Secret) خالی نہیں ہو سکتا",
   "security": "سیکیورٹی",
   "seePublicAlbumLinksInApp": "ایپ میں عوامی البم لنکس دیکھیں",
-  "selectAlbumsToBackUpToEnte": "Ente میں بیک اپ کرنے کے لیے البمز منتخب کریں",
+  "selectAlbumsToBackUpToEnte": "Photovault میں بیک اپ کرنے کے لیے البمز منتخب کریں",
   "selectAlbumToLikePhoto": "اس تصویر کو لائک کرنے کے لیے البم منتخب کریں",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -2536,7 +2536,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "منتخب کردہ فائلیں Ente پر نہیں ہیں",
+  "selectedFilesAreNotOnEnte": "منتخب کردہ فائلیں Photovault پر نہیں ہیں",
   "selectedItemsWillBeRemovedFromThisPerson": "منتخب آئٹمز اس شخص سے ہٹا دیے جائیں گے، لیکن آپ کی لائبریری سے ڈیلیٹ نہیں ہوں گے.",
   "selectedPhotos": "{count} منتخب",
   "@selectedPhotos": {
@@ -2669,9 +2669,9 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Ente ڈاؤن لوڈ کریں تاکہ میں آپ کو اپنے فیملی پلان میں شامل کر سکوں۔\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Ente ڈاؤن لوڈ کریں تاکہ ہم اصل معیار کی تصاویر اور ویڈیوز آسانی سے شیئر کر سکیں۔\n\nhttps://ente.com",
-  "shareWithNonenteUsers": "غیر Ente صارفین کے ساتھ شیئر کریں",
+  "shareTextRecommendUsingEnteForFamily": "Photovault ڈاؤن لوڈ کریں تاکہ میں آپ کو اپنے فیملی پلان میں شامل کر سکوں۔\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Photovault ڈاؤن لوڈ کریں تاکہ ہم اصل معیار کی تصاویر اور ویڈیوز آسانی سے شیئر کر سکیں۔\n\nhttps://ente.com",
+  "shareWithNonenteUsers": "غیر Photovault صارفین کے ساتھ شیئر کریں",
   "shareYourSubscription": "اپنی سبسکرپشن اپنے پیاروں کے ساتھ شیئر کریں",
   "sharing": "شیئر کیا جا رہا ہے...",
   "sharingAndCollaboration": "شیئرنگ اور تعاون",
@@ -2688,7 +2688,7 @@
   "showPerson": "شخص دکھائیں",
   "showQRAuthMessage": "QR کوڈ دکھانے کے لیے توثیق کریں",
   "showTextOnWidget": "ویجیٹ پر متن دکھائیں",
-  "sigInBackupReminder": "Ente سائن ان کے بعد خود بخود کوڈز کا بیک اپ لے لے گا۔\n\nہم اب بھی اضافی بیک اپ کے طور پر کوڈز ایکسپورٹ کرنے کی سفارش کرتے ہیں۔",
+  "sigInBackupReminder": "Photovault سائن ان کے بعد خود بخود کوڈز کا بیک اپ لے لے گا۔\n\nہم اب بھی اضافی بیک اپ کے طور پر کوڈز ایکسپورٹ کرنے کی سفارش کرتے ہیں۔",
   "signInToBackup": "اپنے کوڈز کا بیک اپ لینے کے لیے سائن ان کریں",
   "signUp": "سائن اپ کریں",
   "signUpTerms": "میں <u-terms>سروس کی شرائط</u-terms> اور <u-policy>پرائیویسی پالیسی</u-policy> سے اتفاق کرتا ہوں",
@@ -2830,7 +2830,7 @@
   "suggestions": "تجاویز",
   "sunrise": "افق پر",
   "support": "سپورٹ",
-  "supportEnte": "<bold-green>ente</bold-green> کو سپورٹ کریں",
+  "supportEnte": "<bold-green>Photovault</bold-green> کو سپورٹ کریں",
   "syncing": "Sync ہو رہا ہے...",
   "syncProgress": "{completed}/{total} یادیں محفوظ",
   "@syncProgress": {

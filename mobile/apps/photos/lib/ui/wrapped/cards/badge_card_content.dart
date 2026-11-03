@@ -523,8 +523,8 @@ class _BadgeSharePill extends StatelessWidget {
   }
 }
 
-const Color _kBadgeBaseGreen = Color(0xFF08C225);
-const Color _kBadgeCloudTint = Color(0xFF0BCA29);
+const Color _kBadgeBaseGreen = encoreDarkAccent2; // PHOTOVAULT: theme
+const Color _kBadgeCloudTint = encoreDarkAccent; // PHOTOVAULT: theme
 const double _kBadgeLogoRotationRadians = -9.91 * math.pi / 180;
 
 Widget? buildBadgeDebugCardContent(

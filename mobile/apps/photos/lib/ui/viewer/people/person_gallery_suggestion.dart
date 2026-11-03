@@ -1,6 +1,7 @@
 import "dart:async";
 import "dart:typed_data";
 
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_strings/ente_strings.dart";
 import 'package:flutter/material.dart';
 import "package:logging/logging.dart";
@@ -480,7 +481,7 @@ class _PersonGallerySuggestionState extends State<PersonGallerySuggestion>
 
     final colorScheme = getEnteColorScheme(context);
     final textTheme = getEnteTextTheme(context);
-    const primaryActionColor = Color(0xFF08C225);
+    const primaryActionColor = encoreLightAccent2; // PHOTOVAULT: theme
     final cardRadius = BorderRadius.circular(20);
     final actionButtonRadius = BorderRadius.circular(14);
     const closeButtonSize = 24.0;

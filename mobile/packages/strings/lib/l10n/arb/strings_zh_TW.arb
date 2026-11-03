@@ -128,7 +128,7 @@
   "addSelected": "新增已選擇的",
   "addTag": "新增標簽",
   "addToAlbum": "加入到相簿",
-  "addToEnte": "新增到 Ente",
+  "addToEnte": "新增到 Photovault",
   "addToHiddenAlbum": "新增到隱藏相簿",
   "addToPerson": "加入到人物",
   "@addToPerson": {
@@ -179,7 +179,7 @@
   "allowAppToOpenSharedAlbumLinks": "允許應用程式開啟共享相簿連結",
   "allowDownloads": "允許下載",
   "allowJoiningAlbum": "允許加入相簿",
-  "allowPermBody": "請在「設定」中允許存取您的照片，以便 Ente 顯示並備份您的圖庫。",
+  "allowPermBody": "請在「設定」中允許存取您的照片，以便 Photovault 顯示並備份您的圖庫。",
   "allowPermTitle": "允許存取照片",
   "allPersonGroupingWillReset": "此人物的所有分群都會重設，您將失去為此人物所做的所有建議",
   "allTabEmptyHint": "這裡還沒有內容。點擊 + 新增驗證碼，或開啟回收桶來復原刪除的項目。",
@@ -209,10 +209,10 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "有新版本的 Ente 可用。",
+  "aNewVersionOfEnteIsAvailable": "有新版本的 Photovault 可用。",
   "appearance": "外觀",
   "appleId": "Apple ID",
-  "applePhotosUnsupportedResource": "此檔案無法儲存到 Apple Photos。您仍可在 Ente 中查看。",
+  "applePhotosUnsupportedResource": "此檔案無法儲存到 Apple Photos。您仍可在 Photovault 中查看。",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -291,7 +291,7 @@
   "autoAddPeople": "自動新增人物",
   "autoAddToAlbum": "自動新增到相簿",
   "autoCastDialogBody": "您會在這裡看到可用的投放裝置。",
-  "autoCastiOSPermission": "請確定在「設定」中已開啟 Ente Photos 應用程式的區域網路權限。",
+  "autoCastiOSPermission": "請確定在「設定」中已開啟 Photovault 應用程式的區域網路權限。",
   "autoLock": "自動鎖定",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -344,7 +344,7 @@
   "backupSettings": "備份設定",
   "backupStatus": "備份狀態",
   "backupStatusDescription": "已備份的項目會顯示在這裡",
-  "backupToEnte": "備份到 Ente",
+  "backupToEnte": "備份到 Photovault",
   "backupVideos": "備份影片",
   "beach": "沙灘與海洋",
   "birthday": "生日",
@@ -474,7 +474,7 @@
   "codeChangeLimitReached": "抱歉，您已達到更改推薦碼的次數上限。",
   "codeCopiedToClipboard": "驗證碼已複製到剪貼簿",
   "codeIssuerHint": "發行方",
-  "collabLinkSectionDescription": "讓沒有 Ente 帳號的人也能新增照片",
+  "collabLinkSectionDescription": "讓沒有 Photovault 帳號的人也能新增照片",
   "collageLayout": "版面配置",
   "collageSaved": "拼貼已儲存到相簿",
   "collectionLabel": "集合",
@@ -603,7 +603,7 @@
   "createAccountTitle": "建立帳號",
   "createAlbum": "建立相簿",
   "createAlbumActionHint": "長按以選取照片，然後點擊 + 來建立相簿",
-  "createAnEnteAccount": "建立 Ente 帳號",
+  "createAnEnteAccount": "建立 Photovault 帳號",
   "createBackupNow": "立刻建立備份",
   "createCollaborativeLink": "建立協作連結",
   "createCollage": "建立拼貼",
@@ -673,7 +673,7 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "已從 Ente 刪除",
+  "deletedFromEnte": "已從 Photovault 刪除",
   "deletedItemsStayHereForThirtyDays": "刪除的項目會在此保留 30 天",
   "deleteDuplicates": "刪除重複項目",
   "deleteEmptyAlbums": "刪除空白相簿",
@@ -682,7 +682,7 @@
   "deleteFromBoth": "從兩者刪除",
   "deleteFromDevice": "從裝置刪除",
   "deleteFromDeviceQuestion": "從裝置刪除？",
-  "deleteFromEnte": "從 Ente 刪除",
+  "deleteFromEnte": "從 Photovault 刪除",
   "deleteHiddenFilesFromDevice": "從裝置刪除隱藏檔案",
   "deleteHiddenFilesFromDeviceDescription": "從您的裝置刪除隱藏檔案的本機副本",
   "deleteItemCount": "{count, plural, one{刪除 {count} 個項目} other{刪除 {count} 個項目}}",
@@ -910,7 +910,7 @@
   "editOrder": "編輯順序",
   "editPerson": "編輯人物",
   "editsSaved": "編輯已儲存",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "位置的編輯只會在 Ente 內顯示",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "位置的編輯只會在 Photovault 內顯示",
   "editStorageLimit": "編輯儲存空間上限",
   "editTag": "編輯標籤",
   "editTime": "編輯時間",
@@ -936,7 +936,7 @@
     }
   },
   "emailHint": "請輸入您的電子信箱位址",
-  "emailNeedsEnteAccountForFamily": "{email} 沒有 Ente 帳號。\n\n傳送邀請給他們，並在他們於 Ente 建立帳號後將他們加入您的家庭。",
+  "emailNeedsEnteAccountForFamily": "{email} 沒有 Photovault 帳號。\n\n傳送邀請給他們，並在他們於 Photovault 建立帳號後將他們加入您的家庭。",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -945,7 +945,7 @@
       }
     }
   },
-  "emailNoEnteAccountPhotos": "{email} 沒有 Ente 帳號。\n\n傳送邀請給他們以分享照片。",
+  "emailNoEnteAccountPhotos": "{email} 沒有 Photovault 帳號。\n\n傳送邀請給他們以分享照片。",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -981,7 +981,7 @@
   "@encryptionKeys": {
     "description": "Encryption keys title"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enterAlbumName": "輸入相簿名稱",
   "enterAnEmailAddress": "輸入電子信箱位址",
   "enterAValidEmailAddress": "輸入有效的電子信箱位址",
@@ -1205,8 +1205,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "沒有復原金鑰嗎？",
-  "free10GB": "<bold-green>ente</bold-green> Photos享有 10GB 免費空間",
-  "freeStorageOffer": "購買 <bold-green>ente</bold-green> Photos 可享受 10% 優惠",
+  "free10GB": "<bold-green>Photovault</bold-green>享有 10GB 免費空間",
+  "freeStorageOffer": "購買 <bold-green>Photovault</bold-green> 可享受 10% 優惠",
   "freeStorageOfferDescription": "使用優惠碼「AUTH」可享受首年 10% 折扣",
   "freeTrial": "免費試用",
   "freeUpAmount": "釋放 {sizeInMBorGB}",
@@ -1243,7 +1243,7 @@
   "grantFullAccessPrompt": "請在「設定」應用程式中允許存取所有照片",
   "grantGalleryPermissionDesc": "授予權限以存取並透過臉部辨識整理照片。所有處理都在您的裝置上進行。",
   "grantPermission": "授予權限",
-  "grantPermissionDesc": "請允許 Ente 存取您的圖庫，以便我們透過臉部辨識整理照片。所有處理都在您的裝置上進行。",
+  "grantPermissionDesc": "請允許 Photovault 存取您的圖庫，以便我們透過臉部辨識整理照片。所有處理都在您的裝置上進行。",
   "greenery": "盎然生機",
   "grid": "網格",
   "groupBy": "分組方式",
@@ -1255,11 +1255,11 @@
   "guestView": "訪客視角",
   "guestViewEnablePreSteps": "若要啟用訪客視角，請在系統設定中設定裝置密碼或螢幕鎖定。",
   "happyBirthday": "生日快樂！🥳",
-  "hearUsWhereOptionalTitle": "您是怎麼知道 Ente 的？（可選）",
+  "hearUsWhereOptionalTitle": "您是怎麼知道 Photovault 的？（可選）",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "您是如何得知 Ente 的？",
+  "hearUsWhereTitle": "您是如何得知 Photovault 的？",
   "help": "說明",
   "helpAndSupport": "說明與支援",
   "hidden": "已隱藏",
@@ -1308,7 +1308,7 @@
   "importBitwardenGuide": "使用 Bitwarden Tools 中的「匯出密碼庫」選項，然後匯入未加密的 JSON 檔案。",
   "importCodeDelimiterInfo": "金鑰可以用逗號或分行符號分隔",
   "importCodes": "匯入驗證碼",
-  "importEnteEncGuide": "選擇從 Ente 匯出的 JSON 加密檔案",
+  "importEnteEncGuide": "選擇從 Photovault 匯出的 JSON 加密檔案",
   "importEnterSetupKey": "輸入設定金鑰",
   "importFailureDesc": "無法解析選取的檔案。",
   "importFromGallery": "從圖庫中匯入",
@@ -1346,7 +1346,7 @@
     }
   },
   "importSuccessTitle": "耶！",
-  "importTypeEnteEncrypted": "Ente 加密匯出",
+  "importTypeEnteEncrypted": "Photovault 加密匯出",
   "incorrectDetails": "詳細資訊不正確",
   "incorrectRecoveryKey": "復原金鑰不正確",
   "@incorrectRecoveryKey": {
@@ -1557,7 +1557,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "登入 Ente",
+  "loginToEnte": "登入 Photovault",
   "loginToExistingAccount": "登入現有帳號",
   "loginWithAuthAccount": "使用您的Auth帳戶登入",
   "loginWithTOTP": "使用 TOTP 登入",
@@ -1595,7 +1595,7 @@
   "maps": "地圖",
   "mapsPrivacyNotice": "系統會將約略座標傳送給注重隱私的第三方（如 OpenStreetMap）以顯示地圖與位置。",
   "me": "自己",
-  "mediaManagementHintMessage": "開啟允許 Ente 管理媒體檔案的設定，就不需要每次確認。",
+  "mediaManagementHintMessage": "開啟允許 Photovault 管理媒體檔案的設定，就不需要每次確認。",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -1662,7 +1662,7 @@
   "mixedGrouping": "混合分群？",
   "mlConsent": "啟用機器學習",
   "mlConsentConfirmation": "我了解，並希望啟用機器學習",
-  "mlConsentDescription": "若啟用機器學習，Ente 將從檔案（包括與您分享的檔案）中提取臉部幾何等資訊。\n\n此處理將在您的裝置上進行，任何產生的生物辨識資訊都會經過端對端加密。",
+  "mlConsentDescription": "若啟用機器學習，Photovault 將從檔案（包括與您分享的檔案）中提取臉部幾何等資訊。\n\n此處理將在您的裝置上進行，任何產生的生物辨識資訊都會經過端對端加密。",
   "mlIndexingDescription": "請注意，在所有項目處理完成前，機器學習會增加頻寬與電池使用量。建議使用桌面版應用程式以加快處理速度，所有結果都會自動同步。",
   "mlProgressBannerDescription": "您的照片正在裝置上處理，以偵測臉孔、物件等。",
   "mlProgressBannerStatus": "已處理 {indexed} / {total} 張照片",
@@ -1847,7 +1847,7 @@
     "type": "text"
   },
   "oneLineAboutTheIssue": "簡短描述問題",
-  "onEnte": "已備份至 <branding>ente</branding>",
+  "onEnte": "已備份至 <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -2340,7 +2340,7 @@
   "resendInvite": "重新發送邀請",
   "reset": "重設",
   "resetIgnoredFiles": "重設忽略的檔案",
-  "resetIgnoredFilesDescription": "重設這些忽略的檔案，讓 Ente 再次嘗試上傳。",
+  "resetIgnoredFilesDescription": "重設這些忽略的檔案，讓 Photovault 再次嘗試上傳。",
   "resetPasswordTitle": "重設密碼",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -2555,7 +2555,7 @@
   "secretCanNotBeEmpty": "密碼不能留白",
   "seeAllCollections": "查看所有集合",
   "seePublicAlbumLinksInApp": "在應用程式中查看公開相簿連結",
-  "selectAlbumsToBackUpToEnte": "選擇要備份到 Ente 的相簿",
+  "selectAlbumsToBackUpToEnte": "選擇要備份到 Photovault 的相簿",
   "selectAlbumToLikePhoto": "選擇要按讚此照片的相簿",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -2591,7 +2591,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "選取的檔案不在 Ente 上",
+  "selectedFilesAreNotOnEnte": "選取的檔案不在 Photovault 上",
   "selectedFilesBackedUpToEnte": "這些檔案將從所有的相簿中移除。您可以從回收桶復原。",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -2754,9 +2754,9 @@
     }
   },
   "shareStorageWith5Members": "與 5 位成員共享空間",
-  "shareTextRecommendUsingEnteForFamily": "下載 Ente，讓我可以將你加入我的家庭方案\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "下載 Ente，讓我們輕鬆分享原始畫質的照片與影片\n\nhttps://ente.com",
-  "shareWithNonenteUsers": "與非 Ente 使用者分享",
+  "shareTextRecommendUsingEnteForFamily": "下載 Photovault，讓我可以將你加入我的家庭方案\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "下載 Photovault，讓我們輕鬆分享原始畫質的照片與影片\n\nhttps://ente.com",
+  "shareWithNonenteUsers": "與非 Photovault 使用者分享",
   "shareYourSubscription": "與摯愛分享您的訂閱",
   "sharing": "正在分享……",
   "sharingAndCollaboration": "分享與協作",
@@ -2803,7 +2803,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "這個檔案在您的裝置以及 Ente 皆存在。",
+  "singleFileInBothLocalAndRemote": "這個檔案在您的裝置以及 Photovault 皆存在。",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -2818,7 +2818,7 @@
   "snowAdventures": "冬日冒險",
   "socialNotifications": "讚與留言",
   "socialNotificationsExplanation": "您照片的讚，以及您所屬相簿的留言",
-  "someSelectedFilesBackedUpToEnte": "這些項目在您的裝置以及 Ente 皆存在。",
+  "someSelectedFilesBackedUpToEnte": "這些項目在您的裝置以及 Photovault 皆存在。",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -2919,7 +2919,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "您的 {id} 已連結到另一個 Ente 帳號。\n如果您想將此 {id} 用於這個帳號，請聯絡我們的客服支援。",
+  "subAlreadyLinkedErrMessage": "您的 {id} 已連結到另一個 Photovault 帳號。\n如果您想將此 {id} 用於這個帳號，請聯絡我們的客服支援。",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -2947,7 +2947,7 @@
   "suggestions": "建議",
   "sunrise": "日出地平線",
   "support": "支援",
-  "supportEnte": "支援 <bold-green>ente</bold-green>",
+  "supportEnte": "支援 <bold-green>Photovault</bold-green>",
   "syncing": "同步中……",
   "syncProgress": "{completed}/{total} 個回憶已保存",
   "@syncProgress": {

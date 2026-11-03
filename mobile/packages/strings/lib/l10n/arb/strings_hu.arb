@@ -81,7 +81,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "Megjelent az Ente új verziója.",
+  "aNewVersionOfEnteIsAvailable": "Megjelent az Photovault új verziója.",
   "appearance": "Megjelenés",
   "appIcon": "Alkalmazásikon",
   "appleId": "Apple ID",
@@ -230,7 +230,7 @@
   "codeChangeLimitReached": "Sajnáljuk, elérted a kódmódosítások maximális számát.",
   "codeCopiedToClipboard": "A kód a vágólapra másolva",
   "codeIssuerHint": "Kibocsátó",
-  "collabLinkSectionDescription": "Engedélyezheti másoknak, hogy Ente fiók nélkül adjanak hozzá fotókat",
+  "collabLinkSectionDescription": "Engedélyezheti másoknak, hogy Photovault fiók nélkül adjanak hozzá fotókat",
   "collaborator": "Együttműködő",
   "collageLayout": "Elrendezés",
   "collectionCannotBeDeleted": "Ez a gyujtemeny nem torolheto",
@@ -369,7 +369,7 @@
   "deleteFromBoth": "Törlés mindkettőből",
   "deleteFromDevice": "Törlés az eszközről",
   "deleteFromDeviceQuestion": "Törlöd az eszközről?",
-  "deleteFromEnte": "Törlés az Ente-ből",
+  "deleteFromEnte": "Törlés az Photovault-ből",
   "deleteItemCount": "{count, plural, one{Törölsz {count} elemet} other{Törölsz {count} elemet}}",
   "@deleteItemCount": {
     "placeholders": {
@@ -534,7 +534,7 @@
     }
   },
   "emailHint": "Adja meg az e-mail címét",
-  "emailNeedsEnteAccountForFamily": "A(z) {email} nem rendelkezik Ente-fiókkal.\n\nKüldj neki meghívót, és add hozzá a családodhoz, miután létrehozott egy Ente-fiókot.",
+  "emailNeedsEnteAccountForFamily": "A(z) {email} nem rendelkezik Photovault-fiókkal.\n\nKüldj neki meghívót, és add hozzá a családodhoz, miután létrehozott egy Photovault-fiókot.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -543,7 +543,7 @@
       }
     }
   },
-  "emailNoEnteAccountPhotos": "{email} címnek nincs Ente fiókja.\n\nKüldjön nekik meghívót fotók megosztására.",
+  "emailNoEnteAccountPhotos": "{email} címnek nincs Photovault fiókja.\n\nKüldjön nekik meghívót fotók megosztására.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -574,7 +574,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enterAnEmailAddress": "E-mail cím megadása",
   "enterAValidEmailAddress": "Adjon meg egy érvényes e-mail címet",
   "enterCode": "Kód beírása",
@@ -701,7 +701,7 @@
   "getStarted": "Kezdjünk bele",
   "giveUsAStarOnGithub": "Adj nekünk egy csillagot a Githubon",
   "googlePlayId": "Google Play ID",
-  "hearUsWhereOptionalTitle": "Honnan hallottál Ente-ről? (opcionális)",
+  "hearUsWhereOptionalTitle": "Honnan hallottál Photovault-ről? (opcionális)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -740,7 +740,7 @@
   "importBitwardenGuide": "Használd a Bitwarden eszközök \"Export Vault\" opcióját és importáld a titkosítatlan JSON fájlt.",
   "importCodeDelimiterInfo": "A kódokat vesszővel vagy új sorral lehet elválasztani",
   "importCodes": "Kódok importálása",
-  "importEnteEncGuide": "Válassza ki az Ente-ből exportált titkosított JSON fájlt",
+  "importEnteEncGuide": "Válassza ki az Photovault-ből exportált titkosított JSON fájlt",
   "importEnterSetupKey": "Adj meg egy beállítási kulcsot",
   "importFailureDesc": "Nem sikerült elemezni a kiválasztott fájlt.",
   "importFromGallery": "Importálás galériából",
@@ -778,7 +778,7 @@
     }
   },
   "importSuccessTitle": "Jaj!",
-  "importTypeEnteEncrypted": "Ente titkosított exportálás",
+  "importTypeEnteEncrypted": "Photovault titkosított exportálás",
   "incorrectCode": "Helytelen kód",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -826,7 +826,7 @@
       }
     }
   },
-  "inviteToEnte": "Meghívás az Ente-re",
+  "inviteToEnte": "Meghívás az Photovault-re",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -961,7 +961,7 @@
   "minimizeToTrayOnClose": "Bezárásra minimalizálás a tálcára",
   "mlConsent": "Gépi tanulás engedélyezése",
   "mlConsentConfirmation": "Értem, és szeretném engedélyezni a gépi tanulást",
-  "mlConsentDescription": "Ha engedélyezi a gépi tanulást, az Ente olyan információkat fog kinyerni, mint az arc geometriája, a fájlokból, beleértve azokat is, amelyeket Önnel megosztott.\n\nEz az Ön eszközén fog megtörténni, és minden generált biometrikus információ végponttól végpontig titkosítva lesz.",
+  "mlConsentDescription": "Ha engedélyezi a gépi tanulást, az Photovault olyan információkat fog kinyerni, mint az arc geometriája, a fájlokból, beleértve azokat is, amelyeket Önnel megosztott.\n\nEz az Ön eszközén fog megtörténni, és minden generált biometrikus információ végponttól végpontig titkosítva lesz.",
   "mlIndexingDescription": "Fontos: a gépi tanulás a feldolgozás végéig megnövelt adatforgalmat és akkumulátorhasználatot eredményez. Gyorsabb feldolgozáshoz érdemes az asztali alkalmazást használni; az eredmények automatikusan szinkronizálódnak.",
   "moderateStrength": "Közepes",
   "@moderateStrength": {
@@ -1427,9 +1427,9 @@
     }
   },
   "shareTextRecommendUsingEnteForFamily": "Töltsd le az Entét, hogy hozzáadhassalak a családi csomagomhoz\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Töltsd le az Ente alkalmazást, hogy könnyen megoszthassuk az eredeti minőségű fotókat és videókat https://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Töltsd le az Photovault alkalmazást, hogy könnyen megoszthassuk az eredeti minőségű fotókat és videókat https://ente.com",
   "shareThisLink": "Ez a link lehetove teszi barkinek, aki megkapja, hogy hozzaferjen az elemehez. Barmikor eltavolithatja a hozzaferest a link torlesevel.",
-  "shareWithNonenteUsers": "Megosztás nem Ente felhasználókkal",
+  "shareWithNonenteUsers": "Megosztás nem Photovault felhasználókkal",
   "shareYourSubscription": "Oszd meg az előfizetésedet a szeretteiddel",
   "sharing": "Megosztás...",
   "sharingAndCollaboration": "Megosztás és együttműködés",
@@ -1438,7 +1438,7 @@
   "showLargeIcons": "Nagy ikonok megjelenítése",
   "showMemories": "Emlékek megjelenítése",
   "showQRAuthMessage": "Hitelesítés a QR kód megjelenítéséhez",
-  "sigInBackupReminder": "Az Ente automatikusan biztonsági mentést készít a kódokról bejelentkezés után.\n\nTovábbra is javasoljuk, hogy exportáld a kódokat további biztonsági mentésként.",
+  "sigInBackupReminder": "Az Photovault automatikusan biztonsági mentést készít a kódokról bejelentkezés után.\n\nTovábbra is javasoljuk, hogy exportáld a kódokat további biztonsági mentésként.",
   "signInToBackup": "Jelentkezz be a kódok biztonsági mentéséhez",
   "signOutOtherDevices": "Jelentkezzen ki a többi eszközről",
   "@signOutOtherDevices": {
@@ -1454,14 +1454,14 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "Ez az elem az eszközön és az Ente-ben is elérhető.",
+  "singleFileInBothLocalAndRemote": "Ez az elem az eszközön és az Photovault-ben is elérhető.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
   "skip": "Kihagyás",
   "socialNotifications": "Tetszések és hozzászólások",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "Valaki, aki megoszt Önnel albumokat, ugyanazt az azonosítót fogja látni az eszközén.",
-  "someSelectedFilesBackedUpToEnte": "Ezek az elemek az eszközön és az Ente-n is elérhetőek.",
+  "someSelectedFilesBackedUpToEnte": "Ezek az elemek az eszközön és az Photovault-n is elérhetőek.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },

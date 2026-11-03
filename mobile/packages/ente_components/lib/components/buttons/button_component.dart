@@ -558,7 +558,8 @@ class _ButtonComponentState extends State<ButtonComponent>
   }) {
     final colors = _componentColors(context);
     return switch (widget.variant) {
-      ButtonComponentVariant.primary => colors.specialWhite,
+      // PHOTOVAULT: theme (readable on Encore accent)
+      ButtonComponentVariant.primary => colors.onPrimary,
       ButtonComponentVariant.secondary => colors.textBase,
       ButtonComponentVariant.neutral => colors.textReverse,
       ButtonComponentVariant.critical => colors.specialWhite,

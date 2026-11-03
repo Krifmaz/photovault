@@ -1,5 +1,7 @@
-import 'package:ente_components/theme/colors.dart'
-    show ColorTokens, ComponentApp;
+// PHOTOVAULT: theme (ColorTokens no longer referenced)
+import 'package:ente_components/theme/colors.dart' show ComponentApp;
+// PHOTOVAULT: theme
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:ente_components/theme/text_styles.dart' as component;
 import 'package:ente_components/theme/theme.dart'
     show ComponentColorTokens, ComponentTheme;
@@ -10,7 +12,8 @@ import 'package:photos/theme/ente_theme.dart';
 final lightThemeData = ThemeData(
   fontFamily: 'Inter',
   brightness: Brightness.light,
-  popupMenuTheme: PopupMenuThemeData(color: ColorTokens.light.fillLight),
+  // PHOTOVAULT: theme
+  popupMenuTheme: const PopupMenuThemeData(color: encoreLightPanel),
   hintColor: const Color.fromRGBO(158, 158, 158, 1),
   primaryColor: const Color.fromRGBO(255, 110, 64, 1),
   primaryColorLight: const Color.fromRGBO(0, 0, 0, 0.541),
@@ -21,22 +24,22 @@ final lightThemeData = ThemeData(
     size: 50.0,
   ),
   colorScheme: const ColorScheme.light(
-    primary: Colors.black,
+    primary: encoreLightAccent, // PHOTOVAULT: theme
     secondary: Color.fromARGB(255, 163, 163, 163),
     surface: backgroundColorLight,
     surfaceTint: Colors.transparent,
   ),
   outlinedButtonTheme: buildOutlinedButtonThemeData(
     bgDisabled: const Color.fromRGBO(158, 158, 158, 1),
-    bgEnabled: const Color.fromRGBO(0, 0, 0, 1),
+    bgEnabled: encoreLightAccent, // PHOTOVAULT: theme
     fgDisabled: const Color.fromRGBO(255, 255, 255, 1),
-    fgEnabled: const Color.fromRGBO(255, 255, 255, 1),
+    fgEnabled: encoreLightOnAccent, // PHOTOVAULT: theme
   ),
   elevatedButtonTheme: buildElevatedButtonThemeData(
-    onPrimary: const Color.fromRGBO(255, 255, 255, 1),
-    primary: const Color.fromRGBO(0, 0, 0, 1),
+    onPrimary: encoreLightOnAccent, // PHOTOVAULT: theme
+    primary: encoreLightAccent, // PHOTOVAULT: theme
   ),
-  switchTheme: getSwitchThemeData(const Color.fromRGBO(102, 187, 106, 1)),
+  switchTheme: getSwitchThemeData(encoreLightAccent2), // PHOTOVAULT: theme
   scaffoldBackgroundColor: backgroundColorLight,
   appBarTheme: const AppBarTheme().copyWith(
     backgroundColor: backgroundColorLight,
@@ -44,14 +47,15 @@ final lightThemeData = ThemeData(
     iconTheme: const IconThemeData(color: Colors.black),
     elevation: 0,
   ),
-  textTheme: _buildTextTheme(const Color.fromRGBO(0, 0, 0, 1)),
+  textTheme: _buildTextTheme(encoreLightText), // PHOTOVAULT: theme
   primaryTextTheme: const TextTheme().copyWith(
     bodyMedium: const TextStyle(color: Colors.yellow),
     bodyLarge: const TextStyle(color: Colors.orange),
   ),
-  cardColor: const Color.fromRGBO(250, 250, 250, 1.0),
+  cardColor: encoreLightPanel, // PHOTOVAULT: theme
+  cardTheme: _encoreCardTheme, // PHOTOVAULT: theme
   dialogTheme: const DialogThemeData(
-    backgroundColor: Color.fromRGBO(250, 250, 250, 1.0),
+    backgroundColor: encoreLightPanel, // PHOTOVAULT: theme
     titleTextStyle: TextStyle(
       color: Colors.black,
       fontSize: 24,
@@ -64,24 +68,25 @@ final lightThemeData = ThemeData(
       fontWeight: FontWeight.w500,
     ),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      // PHOTOVAULT: theme: Encore card radius.
+      borderRadius: BorderRadius.all(Radius.circular(EncoreTokens.radiusCard)),
     ),
   ),
   inputDecorationTheme: const InputDecorationTheme().copyWith(
     focusedBorder: const UnderlineInputBorder(
-      borderSide: BorderSide(color: Color.fromRGBO(45, 194, 98, 1.0)),
+      borderSide: BorderSide(color: encoreLightAccent2), // PHOTOVAULT: theme
     ),
   ),
   checkboxTheme: CheckboxThemeData(
     side: const BorderSide(color: Colors.black, width: 2),
     fillColor: WidgetStateProperty.resolveWith((states) {
       return states.contains(WidgetState.selected)
-          ? const Color.fromRGBO(0, 0, 0, 1)
+          ? encoreLightAccent // PHOTOVAULT: theme
           : const Color.fromRGBO(255, 255, 255, 1);
     }),
     checkColor: WidgetStateProperty.resolveWith((states) {
       return states.contains(WidgetState.selected)
-          ? const Color.fromRGBO(255, 255, 255, 1)
+          ? encoreLightOnAccent // PHOTOVAULT: theme
           : const Color.fromRGBO(0, 0, 0, 1);
     }),
   ),
@@ -98,7 +103,8 @@ final lightThemeData = ThemeData(
 final darkThemeData = ThemeData(
   fontFamily: 'Inter',
   brightness: Brightness.dark,
-  popupMenuTheme: PopupMenuThemeData(color: ColorTokens.dark.fillLight),
+  // PHOTOVAULT: theme
+  popupMenuTheme: const PopupMenuThemeData(color: encoreDarkPanel),
   primaryColorLight: const Color.fromRGBO(255, 255, 255, 0.702),
   iconTheme: const IconThemeData(color: Colors.white),
   primaryIconTheme: const IconThemeData(
@@ -108,34 +114,35 @@ final darkThemeData = ThemeData(
   ),
   hintColor: const Color.fromRGBO(158, 158, 158, 1),
   colorScheme: const ColorScheme.dark(
-    primary: Colors.white,
+    primary: encoreDarkAccent, // PHOTOVAULT: theme
     surface: backgroundColorDark,
     secondary: Color.fromARGB(255, 163, 163, 163),
     surfaceTint: Colors.transparent,
   ),
   buttonTheme: const ButtonThemeData().copyWith(
-    buttonColor: const Color.fromRGBO(45, 194, 98, 1.0),
+    buttonColor: encoreDarkAccent, // PHOTOVAULT: theme
   ),
-  textTheme: _buildTextTheme(const Color.fromRGBO(255, 255, 255, 1)),
-  switchTheme: getSwitchThemeData(const Color.fromRGBO(102, 187, 106, 1)),
+  textTheme: _buildTextTheme(encoreDarkText), // PHOTOVAULT: theme
+  switchTheme: getSwitchThemeData(encoreDarkAccent2), // PHOTOVAULT: theme
   outlinedButtonTheme: buildOutlinedButtonThemeData(
     bgDisabled: const Color.fromRGBO(158, 158, 158, 1),
-    bgEnabled: const Color.fromRGBO(255, 255, 255, 1),
+    bgEnabled: encoreDarkAccent, // PHOTOVAULT: theme
     fgDisabled: const Color.fromRGBO(255, 255, 255, 1),
-    fgEnabled: const Color.fromRGBO(0, 0, 0, 1),
+    fgEnabled: encoreDarkOnAccent, // PHOTOVAULT: theme
   ),
   elevatedButtonTheme: buildElevatedButtonThemeData(
-    onPrimary: const Color.fromRGBO(0, 0, 0, 1),
-    primary: const Color.fromRGBO(255, 255, 255, 1),
+    onPrimary: encoreDarkOnAccent, // PHOTOVAULT: theme
+    primary: encoreDarkAccent, // PHOTOVAULT: theme
   ),
   scaffoldBackgroundColor: backgroundColorDark,
   appBarTheme: const AppBarTheme().copyWith(
     backgroundColor: backgroundColorDark,
     elevation: 0,
   ),
-  cardColor: const Color.fromRGBO(10, 15, 15, 1.0),
+  cardColor: encoreDarkPanel, // PHOTOVAULT: theme
+  cardTheme: _encoreCardTheme, // PHOTOVAULT: theme
   dialogTheme: const DialogThemeData(
-    backgroundColor: Color.fromRGBO(15, 15, 15, 1.0),
+    backgroundColor: encoreDarkBg2, // PHOTOVAULT: theme
     titleTextStyle: TextStyle(
       color: Colors.white,
       fontSize: 24,
@@ -148,26 +155,27 @@ final darkThemeData = ThemeData(
       fontWeight: FontWeight.w500,
     ),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      // PHOTOVAULT: theme: Encore card radius.
+      borderRadius: BorderRadius.all(Radius.circular(EncoreTokens.radiusCard)),
     ),
   ),
   inputDecorationTheme: const InputDecorationTheme().copyWith(
     focusedBorder: const UnderlineInputBorder(
-      borderSide: BorderSide(color: Color.fromRGBO(45, 194, 98, 1.0)),
+      borderSide: BorderSide(color: encoreDarkAccent2), // PHOTOVAULT: theme
     ),
   ),
   checkboxTheme: CheckboxThemeData(
     side: const BorderSide(color: Colors.grey, width: 2),
     fillColor: WidgetStateProperty.resolveWith((states) {
       if (states.contains(WidgetState.selected)) {
-        return const Color.fromRGBO(158, 158, 158, 1);
+        return encoreDarkAccent; // PHOTOVAULT: theme
       } else {
         return const Color.fromRGBO(0, 0, 0, 1);
       }
     }),
     checkColor: WidgetStateProperty.resolveWith((states) {
       if (states.contains(WidgetState.selected)) {
-        return const Color.fromRGBO(0, 0, 0, 1);
+        return encoreDarkOnAccent; // PHOTOVAULT: theme
       } else {
         return const Color.fromRGBO(158, 158, 158, 1);
       }
@@ -210,15 +218,15 @@ TextTheme _buildTextTheme(Color textColor) {
 }
 
 extension CustomColorScheme on ColorScheme {
-  Color get videoPlayerPrimaryColor => brightness == Brightness.light
-      ? const Color.fromRGBO(0, 179, 60, 1)
-      : const Color.fromRGBO(1, 222, 77, 1);
+  // PHOTOVAULT: theme
+  Color get videoPlayerPrimaryColor =>
+      brightness == Brightness.light ? encoreLightAccent2 : encoreDarkAccent2;
 
   Color get videoPlayerBorderColor => brightness == Brightness.light
       ? const Color(0xFF424242)
       : const Color(0xFFFFFFFF);
 
-  Color get imageEditorPrimaryColor => const Color.fromRGBO(8, 194, 37, 1);
+  Color get imageEditorPrimaryColor => encoreDarkAccent2; // PHOTOVAULT: theme
 
   Color get editorBackgroundColor => brightness == Brightness.light
       ? const Color(0xFFF5F5F5)
@@ -238,15 +246,17 @@ extension CustomColorScheme on ColorScheme {
   Color get inverseTextColor =>
       brightness != Brightness.light ? textBaseLight : textBaseDark;
 
-  Color get boxSelectColor => brightness == Brightness.light
-      ? const Color.fromRGBO(67, 186, 108, 1)
-      : const Color.fromRGBO(16, 32, 32, 1);
+  // PHOTOVAULT: theme
+  Color get boxSelectColor =>
+      brightness == Brightness.light ? encoreLightAccent2 : encoreDarkPanel2;
 
   Color get boxUnSelectColor => brightness == Brightness.light
       ? const Color.fromRGBO(240, 240, 240, 1)
       : const Color.fromRGBO(8, 18, 18, 0.4);
 
-  Color get greenAlternative => const Color.fromRGBO(45, 194, 98, 1.0);
+  // PHOTOVAULT: theme
+  Color get greenAlternative =>
+      brightness == Brightness.light ? encoreLightAccent2 : encoreDarkAccent2;
 
   Color get dynamicFABBackgroundColor => brightness == Brightness.light
       ? const Color.fromRGBO(0, 0, 0, 1)
@@ -261,9 +271,10 @@ extension CustomColorScheme on ColorScheme {
     elevation: 0,
   ).style;
 
+  // PHOTOVAULT: theme
   Color get recoveryKeyBoxColor => brightness == Brightness.light
-      ? const Color.fromRGBO(49, 155, 86, 0.2)
-      : const Color(0xFF1DB954);
+      ? encoreLightAccent2.withValues(alpha: 0.2)
+      : encoreDarkAccent2;
 
   Color get frostyBlurBackdropFilterColor => brightness == Brightness.light
       ? const Color.fromRGBO(238, 238, 238, 0.5)
@@ -277,7 +288,9 @@ extension CustomColorScheme on ColorScheme {
       ? const Color.fromRGBO(255, 255, 255, 1)
       : const Color.fromRGBO(10, 15, 15, 1.0);
 
-  Color get greenText => const Color.fromARGB(255, 40, 190, 113);
+  // PHOTOVAULT: theme
+  Color get greenText =>
+      brightness == Brightness.light ? encoreLightAccent2 : encoreDarkAccent2;
 
   Color get cupertinoPickerTopColor => brightness == Brightness.light
       ? const Color.fromARGB(255, 238, 238, 238)
@@ -347,7 +360,10 @@ OutlinedButtonThemeData buildOutlinedButtonThemeData({
   return OutlinedButtonThemeData(
     style:
         OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          // PHOTOVAULT: theme: Encore control radius.
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(EncoreTokens.radiusControl),
+          ),
           alignment: Alignment.center,
           padding: const EdgeInsets.fromLTRB(50, 16, 50, 16),
           textStyle: const TextStyle(
@@ -395,7 +411,10 @@ ElevatedButtonThemeData buildElevatedButtonThemeData({
       ),
       padding: const EdgeInsets.symmetric(vertical: 18),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(8)),
+        // PHOTOVAULT: theme: Encore control radius.
+        borderRadius: BorderRadius.all(
+          Radius.circular(EncoreTokens.radiusControl),
+        ),
       ),
     ),
   );
@@ -427,3 +446,10 @@ SwitchThemeData getSwitchThemeData(Color activeColor) {
     }),
   );
 }
+
+// PHOTOVAULT: theme: Encore rounded cards.
+const CardThemeData _encoreCardTheme = CardThemeData(
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(EncoreTokens.radiusCard)),
+  ),
+);

@@ -466,7 +466,7 @@
     }
   },
   "importSuccessTitle": "Jee!",
-  "importTypeEnteEncrypted": "Ente krüptitud ekspordina",
+  "importTypeEnteEncrypted": "Photovault krüptitud ekspordina",
   "incorrectCode": "Vigane kood",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -811,7 +811,7 @@
   "shouldHideCode": "Peida koodid",
   "showLargeIcons": "Näita suuri ikoone",
   "showQRAuthMessage": "QR-koodi näitamiseks tuvasta end",
-  "sigInBackupReminder": "Peale sisselogimist varundab Ente koode automaatselt.\n\nTäiendava varukoopia mõttes soovitame, et ka ekspordid oma koode.",
+  "sigInBackupReminder": "Peale sisselogimist varundab Photovault koode automaatselt.\n\nTäiendava varukoopia mõttes soovitame, et ka ekspordid oma koode.",
   "signInToBackup": "Oma koodide varindamiseks logi sisse",
   "signOutOtherBody": "Kui arvad, et sinu salasõna on võõrastele teada, siis sa võid sundkorras kõik oma muud seadmed välja logida.",
   "@signOutOtherBody": {

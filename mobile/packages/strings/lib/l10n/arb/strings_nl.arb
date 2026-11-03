@@ -76,7 +76,7 @@
   "addTo": "Toevoegen aan",
   "addToAlbum": "Toevoegen aan album",
   "addToCollection": "Toevoegen aan collectie",
-  "addToEnte": "Toevoegen aan Ente",
+  "addToEnte": "Toevoegen aan Photovault",
   "addToHiddenAlbum": "Toevoegen aan verborgen album",
   "addToPerson": "Toevoegen aan persoon",
   "@addToPerson": {
@@ -118,7 +118,7 @@
   "allowAppToOpenSharedAlbumLinks": "App toestaan gedeelde album links te openen",
   "allowDownloads": "Downloads toestaan",
   "allowJoiningAlbum": "Samenvoegen van album toestaan",
-  "allowPermBody": "Geef toegang tot je foto's vanuit Instellingen zodat Ente je bibliotheek kan weergeven en back-uppen.",
+  "allowPermBody": "Geef toegang tot je foto's vanuit Instellingen zodat Photovault je bibliotheek kan weergeven en back-uppen.",
   "allowPermTitle": "Toegang tot foto's toestaan",
   "allPersonGroupingWillReset": "Alle groepen voor deze persoon worden gereset, en je verliest alle suggesties die voor deze persoon zijn gedaan",
   "allTabEmptyHint": "Nog niets hier. Tik op + om een code toe te voegen of de prullenbak te openen om er een te herstellen.",
@@ -152,11 +152,11 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Er is een nieuwe versie van Ente beschikbaar.",
+  "aNewVersionOfEnteIsAvailable": "Er is een nieuwe versie van Photovault beschikbaar.",
   "appearance": "Uiterlijk",
   "appIcon": "App icoon",
   "appleId": "Apple ID",
-  "applePhotosUnsupportedResource": "Dit bestand kon niet worden opgeslagen in Apple Foto's. U kunt het nog steeds bekijken in Ente.",
+  "applePhotosUnsupportedResource": "Dit bestand kon niet worden opgeslagen in Apple Foto's. U kunt het nog steeds bekijken in Photovault.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -242,7 +242,7 @@
   "autoAddPeople": "Automatisch personen toevoegen",
   "autoAddToAlbum": "Automatisch toevoegen aan album",
   "autoCastDialogBody": "Je zult de beschikbare Cast apparaten hier zien.",
-  "autoCastiOSPermission": "Zorg ervoor dat lokale netwerkrechten zijn ingeschakeld voor de Ente Photos app, in Instellingen.",
+  "autoCastiOSPermission": "Zorg ervoor dat lokale netwerkrechten zijn ingeschakeld voor de Photovault app, in Instellingen.",
   "autoLock": "Automatische vergrendeling",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -596,7 +596,7 @@
   "deleteFiles": "Verwijder bestanden",
   "deleteFromBoth": "Verwijder van beide",
   "deleteFromDevice": "Verwijder van apparaat",
-  "deleteFromEnte": "Verwijder van Ente",
+  "deleteFromEnte": "Verwijder van Photovault",
   "deleteHiddenFilesFromDevice": "Verborgen bestanden van apparaat verwijderen",
   "deleteHiddenFilesFromDeviceDescription": "Lokale kopieën van verborgen bestanden van uw apparaat verwijderen",
   "deleteItemCount": "{count, plural, one{Verwijder {count} bestand} other{Verwijder {count} bestanden}}",
@@ -826,7 +826,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Bewerkingen opgeslagen",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Bewerkte locatie wordt alleen gezien binnen Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Bewerkte locatie wordt alleen gezien binnen Photovault",
   "editStorageLimit": "Bewerk opslag limiet",
   "editTag": "Bewerk label",
   "editTime": "Tijd bewerken",
@@ -852,13 +852,13 @@
     }
   },
   "emailHint": "Voer je e-mailadres in",
-  "emailNoEnteAccount": "{email} heeft geen Ente-account.\n\nStuur een uitnodiging om items te delen.",
+  "emailNoEnteAccount": "{email} heeft geen Photovault-account.\n\nStuur een uitnodiging om items te delen.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} heeft geen Ente account.\n\nStuur ze een uitnodiging om foto's te delen.",
+  "emailNoEnteAccountPhotos": "{email} heeft geen Photovault account.\n\nStuur ze een uitnodiging om foto's te delen.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -905,7 +905,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteLocker": "Ente Locker",
   "@enteLocker": {
     "description": "Product name"
@@ -1111,8 +1111,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "Herstelcode vergeten?",
-  "free10GB": "10GB gratis op <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "10% korting op <bold-green>ente</bold-green> photos",
+  "free10GB": "10GB gratis op <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "10% korting op <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Gebruik de code \"AUTH\" voor 10% korting op je eerste jaar",
   "freeTrial": "Gratis proefversie",
   "freeUpAmount": "Maak {sizeInMBorGB} vrij",
@@ -1147,7 +1147,7 @@
   "guestView": "Gasten weergave",
   "guestViewEnablePreSteps": "Om gasten weergave in te schakelen, moet u een toegangscode of schermvergrendeling instellen in uw systeeminstellingen.",
   "happyBirthday": "Fijne verjaardag! 🥳",
-  "hearUsWhereTitle": "Hoe heb je over Ente gehoord?",
+  "hearUsWhereTitle": "Hoe heb je over Photovault gehoord?",
   "help": "Hulp",
   "hidden": "Verborgen",
   "hide": "Verbergen",
@@ -1194,7 +1194,7 @@
   "importBitwardenGuide": "Gebruik de optie \"Exporteer kluis\" in Bitwarden Tools en importeer het niet-versleutelde JSON-bestand.",
   "importCodeDelimiterInfo": "De codes mogen gescheiden worden door een komma of een nieuwe regel",
   "importCodes": "Codes importeren",
-  "importEnteEncGuide": "Selecteer het versleutelde JSON-bestand dat vanuit Ente is geëxporteerd",
+  "importEnteEncGuide": "Selecteer het versleutelde JSON-bestand dat vanuit Photovault is geëxporteerd",
   "importEnterSetupKey": "Voer een toegangssleutel in",
   "importFailureDesc": "Kon het geselecteerde bestand niet lezen.",
   "importFromGallery": "Importeer vanuit galerij",
@@ -1221,7 +1221,7 @@
     }
   },
   "importSuccessTitle": "Joepie!",
-  "importTypeEnteEncrypted": "Ente-versleutelde export",
+  "importTypeEnteEncrypted": "Photovault-versleutelde export",
   "incorrectCode": "Onjuiste code",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -1274,7 +1274,7 @@
       }
     }
   },
-  "inviteToEnte": "Uitnodigen voor Ente",
+  "inviteToEnte": "Uitnodigen voor Photovault",
   "ok": "Oké",
   "@ok": {
     "description": "Generic OK button label"
@@ -1526,7 +1526,7 @@
   "mixedGrouping": "Gemixte groep?",
   "mlConsent": "Schakel machine learning in",
   "mlConsentConfirmation": "Ik begrijp het, en wil machine learning inschakelen",
-  "mlConsentDescription": "Als u machine learning inschakelt, zal Ente informatie zoals gezichtsgeometrie uit bestanden extraheren, inclusief degenen die met u gedeeld worden.\n\nDit gebeurt op uw apparaat, en alle gegenereerde biometrische informatie zal end-to-end versleuteld worden.",
+  "mlConsentDescription": "Als u machine learning inschakelt, zal Photovault informatie zoals gezichtsgeometrie uit bestanden extraheren, inclusief degenen die met u gedeeld worden.\n\nDit gebeurt op uw apparaat, en alle gegenereerde biometrische informatie zal end-to-end versleuteld worden.",
   "mlProgressBannerDescription": "Je foto's worden op je apparaat verwerkt om gezichten, objecten en meer te detecteren.",
   "mlProgressBannerTitle": "Hou vol!",
   "moderateStrength": "Matig",
@@ -1566,11 +1566,11 @@
   "moveToHiddenAlbum": "Verplaatsen naar verborgen album",
   "movingFilesToAlbum": "Bestanden verplaatsen naar album...",
   "name": "Naam",
-  "networkConnectionRefusedErr": "Kan geen verbinding maken met Ente, probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met support.",
+  "networkConnectionRefusedErr": "Kan geen verbinding maken met Photovault, probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met support.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Kan geen verbinding maken met Ente, controleer uw netwerkinstellingen en neem contact op met ondersteuning als de fout zich blijft voordoen.",
+  "networkHostLookUpErr": "Kan geen verbinding maken met Photovault, controleer uw netwerkinstellingen en neem contact op met ondersteuning als de fout zich blijft voordoen.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1696,7 +1696,7 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "onEnte": "Op <branding>ente</branding>",
+  "onEnte": "Op <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -2354,7 +2354,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Geselecteerde bestanden staan niet op Ente",
+  "selectedFilesAreNotOnEnte": "Geselecteerde bestanden staan niet op Photovault",
   "selectedItemsWillBeRemovedFromThisPerson": "Geselecteerde bestanden worden van deze persoon verwijderd, maar niet uit uw bibliotheek verwijderd.",
   "selectedPhotos": "{count} geselecteerd",
   "@selectedPhotos": {
@@ -2482,10 +2482,10 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Download Ente zodat ik je kan toevoegen aan mijn familie abonnement\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Ente zodat we gemakkelijk foto's en video's van originele kwaliteit kunnen delen\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault zodat ik je kan toevoegen aan mijn familie abonnement\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault zodat we gemakkelijk foto's en video's van originele kwaliteit kunnen delen\n\nhttps://ente.com",
   "shareThisLink": "Met deze link kan iedereen die hem ontvangt je item openen. Je kunt de toegang op elk moment intrekken door de link te verwijderen.",
-  "shareWithNonenteUsers": "Delen met niet-Ente gebruikers",
+  "shareWithNonenteUsers": "Delen met niet-Photovault gebruikers",
   "sharing": "Delen...",
   "sharingAndCollaboration": "Delen en samenwerking",
   "shiftDatesAndTime": "Verschuif datum en tijd",
@@ -2498,7 +2498,7 @@
   "showPerson": "Toon persoon",
   "showQRAuthMessage": "Authenticeren om QR-code te tonen",
   "showTextOnWidget": "Tekst op widget weergeven",
-  "sigInBackupReminder": "Ente zal automatisch codes back-uppen na het inloggen.\n\nWij raden nog steeds aan om de codes te exporteren als extra backup.",
+  "sigInBackupReminder": "Photovault zal automatisch codes back-uppen na het inloggen.\n\nWij raden nog steeds aan om de codes te exporteren als extra backup.",
   "signInToBackup": "Meld je aan voor back-ups van je codes",
   "signOutOtherBody": "Als je denkt dat iemand je wachtwoord zou kunnen kennen, kun je alle andere apparaten die je account gebruiken dwingen om uit te loggen.",
   "@signOutOtherBody": {
@@ -2625,7 +2625,7 @@
   "suggestions": "Suggesties",
   "sunrise": "Aan de horizon",
   "support": "Ondersteuning",
-  "supportEnte": "Steun <bold-green>ente</bold-green>",
+  "supportEnte": "Steun <bold-green>Photovault</bold-green>",
   "syncing": "Synchroniseren...",
   "syncProgress": "{completed}/{total} herinneringen bewaard",
   "@syncProgress": {

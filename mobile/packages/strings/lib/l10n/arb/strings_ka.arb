@@ -60,7 +60,7 @@
     "description": "Generating encryption keys title"
   },
   "getStarted": "დაწყება",
-  "hearUsWhereOptionalTitle": "როგორ შეიტყვეთ Ente-ს შესახებ? (არასავალდებულო)",
+  "hearUsWhereOptionalTitle": "როგორ შეიტყვეთ Photovault-ს შესახებ? (არასავალდებულო)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },

@@ -34,7 +34,8 @@ ButtonTheme _primaryPalette(EnteColorScheme c) => ButtonTheme(
   hoverBg: c.greenDark,
   pressedBg: c.greenDarker,
   disabledBg: c.fillDark,
-  foreground: Colors.white,
+  // PHOTOVAULT: theme (Encore accent, readable foreground)
+  foreground: c.onAccent,
   disabledForeground: c.contentLighter,
 );
 

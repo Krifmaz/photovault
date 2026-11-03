@@ -487,7 +487,7 @@
   "@forgotPassword": {
     "description": "Forgot password link label"
   },
-  "freeStorageOffer": "Попуст од 10% на <bold-green>ente</bold-green> photos",
+  "freeStorageOffer": "Попуст од 10% на <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Употребите кôд \"AUTH\" да би добили попуст од 10% прве године",
   "freeTrial": "Бесплатна проба",
   "freeUpDeviceSpace": "Ослободи простор на уређају",
@@ -508,7 +508,7 @@
   "grantPermission": "Дозволите приступ",
   "greenery": "Зеленило",
   "happyBirthday": "Срећан рођендан! 🥳",
-  "hearUsWhereOptionalTitle": "Како сте чули о Ente? (опционо)",
+  "hearUsWhereOptionalTitle": "Како сте чули о Photovault? (опционо)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -548,7 +548,7 @@
   "importBitwardenGuide": "Употребите \"Извоз Сефа\" из Bitwarden и увезите нешифровану JSON датотеку.",
   "importCodeDelimiterInfo": "Кôдови се могу одвојити зарезом или новом линијом",
   "importCodes": "Увоз кôдова",
-  "importEnteEncGuide": "Одабрати шифровану извозну JSON датотеку од Ente",
+  "importEnteEncGuide": "Одабрати шифровану извозну JSON датотеку од Photovault",
   "importEnterSetupKey": "Унети кључ за подешавање",
   "importFailureDesc": "Није могао да анализира изабрану датотеку.",
   "importFromGallery": "Увези из галерије",
@@ -574,7 +574,7 @@
     }
   },
   "importSuccessTitle": "Jeeee!",
-  "importTypeEnteEncrypted": "Ente шифрован извоз",
+  "importTypeEnteEncrypted": "Photovault шифрован извоз",
   "incorrectCode": "Погрешан кôд",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -753,11 +753,11 @@
   "moveToAlbum": "Премести у албум",
   "movingFilesToAlbum": "Премештам фајлове у албум...",
   "name": "Име",
-  "networkConnectionRefusedErr": "Није могуће повезивање са Ente-ом, покушајте поново мало касније. Ако грешка настави, обратите се подршци.",
+  "networkConnectionRefusedErr": "Није могуће повезивање са Photovault-ом, покушајте поново мало касније. Ако грешка настави, обратите се подршци.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Није могуће повезивање са Ente-ом, молимо вас да проверите мрежне поставке и контактирајте подршку ако грешка и даље постоји.",
+  "networkHostLookUpErr": "Није могуће повезивање са Photovault-ом, молимо вас да проверите мрежне поставке и контактирајте подршку ако грешка и даље постоји.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1155,7 +1155,7 @@
   "showMoreFaces": "Прикажи још лица",
   "showPerson": "Покажи особу",
   "showQRAuthMessage": "Аутентификуј се за приказ QR кôда",
-  "sigInBackupReminder": "Ente ће аутоматски направити резервне кодове након пријављивања.\n\nИ даље препоручујемо извоз кодова као додатну резервну копију.",
+  "sigInBackupReminder": "Photovault ће аутоматски направити резервне кодове након пријављивања.\n\nИ даље препоручујемо извоз кодова као додатну резервну копију.",
   "signInToBackup": "Пријавите се да бисте сачували кôдове",
   "signOutOtherBody": "Ако мислиш да неко може знати твоју лозинку, можеш приморати одјављивање све остале уређаје које користе твој налог.",
   "@signOutOtherBody": {
@@ -1225,7 +1225,7 @@
   "successfullyUnarchived": "Успешно премештено из архиве",
   "sunrise": "На хирозонту",
   "support": "Подршка",
-  "supportEnte": "Подржи <bold-green>ente</bold-green>",
+  "supportEnte": "Подржи <bold-green>Photovault</bold-green>",
   "syncing": "Синхронизујем...",
   "syncStopped": "Синхронизација прекинута",
   "tag": "Ознака",

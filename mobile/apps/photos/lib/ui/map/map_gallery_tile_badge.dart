@@ -1,3 +1,4 @@
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:flutter/material.dart";
 import "package:photos/theme/ente_theme.dart";
 
@@ -28,7 +29,7 @@ class MapGalleryTileBadge extends StatelessWidget {
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(2)),
           shape: BoxShape.rectangle,
-          color: Colors.green,
+          color: encoreLightAccent2, // PHOTOVAULT: theme
         ),
         child: Text(
           formatNumber(size),

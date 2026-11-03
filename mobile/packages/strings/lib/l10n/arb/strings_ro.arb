@@ -55,7 +55,7 @@
   "addSelected": "Adăugați selectate",
   "addToAlbum": "Adăugare la album",
   "addToCollection": "Adauga la colectie",
-  "addToEnte": "Adăugare la Ente",
+  "addToEnte": "Adăugare la Photovault",
   "addToHiddenAlbum": "Adăugați la album ascuns",
   "addYourPhotosNow": "Adăugați-vă fotografiile acum",
   "advanced": "Avansat",
@@ -79,7 +79,7 @@
   "allowAppToOpenSharedAlbumLinks": "Permiteți aplicației să deschidă link-uri de album partajate",
   "allowDownloads": "Permiteți descărcările",
   "allowJoiningAlbum": "Permiteți alăturarea albumului",
-  "allowPermBody": "Vă rugăm să permiteți accesul la fotografiile dvs. din Setări, astfel încât Ente să vă poată afișa și salva biblioteca.",
+  "allowPermBody": "Vă rugăm să permiteți accesul la fotografiile dvs. din Setări, astfel încât Photovault să vă poată afișa și salva biblioteca.",
   "allowPermTitle": "Permiteți accesul la fotografii",
   "allPersonGroupingWillReset": "Toate grupările pentru această persoană vor fi resetate și veți pierde toate sugestiile făcute pentru această persoană",
   "androidBiometricHint": "Verifică identitatea",
@@ -94,7 +94,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "Este disponibilă o nouă versiune de Ente.",
+  "aNewVersionOfEnteIsAvailable": "Este disponibilă o nouă versiune de Photovault.",
   "appleId": "Apple ID",
   "appLock": "Blocare aplicație",
   "@appLock": {
@@ -151,7 +151,7 @@
   "authToViewYourMemories": "Vă rugăm să vă autentificați pentru a vă vizualiza amintirile",
   "authToViewYourRecoveryKey": "Vă rugăm să vă autentificați pentru a vedea cheia de recuperare",
   "autoCastDialogBody": "Veți vedea dispozitivele disponibile pentru Cast aici.",
-  "autoCastiOSPermission": "Asigurați-vă că permisiunile de rețea locală sunt activate pentru aplicația Ente Foto, în Setări.",
+  "autoCastiOSPermission": "Asigurați-vă că permisiunile de rețea locală sunt activate pentru aplicația Photovault Foto, în Setări.",
   "autoLockFeatureDescription": "Timpul după care aplicația se blochează după ce a fost pusă în fundal",
   "@autoLockFeatureDescription": {
     "description": "Description of auto lock feature"
@@ -225,7 +225,7 @@
   "codeChangeLimitReached": "Ne pare rău, ați atins limita de modificări ale codului.",
   "codeCopiedToClipboard": "Cod copiat în clipboard",
   "codeIssuerHint": "Emitent",
-  "collabLinkSectionDescription": "Permiteți utilizatorilor să adauge fotografii fără a avea un cont Ente",
+  "collabLinkSectionDescription": "Permiteți utilizatorilor să adauge fotografii fără a avea un cont Photovault",
   "collaborator": "Colaborator",
   "collageLayout": "Aspect",
   "collageSaved": "Colaj salvat în galerie",
@@ -368,7 +368,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "Ștergeți albumele goale?",
   "deleteFromBoth": "Ștergeți din ambele",
   "deleteFromDevice": "Ștergeți de pe dispozitiv",
-  "deleteFromEnte": "Ștergeți din Ente",
+  "deleteFromEnte": "Ștergeți din Photovault",
   "deleteLink": "Sterge link",
   "deleteLocation": "Ștergeți locația",
   "deletePhotos": "Ștergeți fotografiile",
@@ -498,7 +498,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Editări salvate",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Editările locației vor fi vizibile doar pe Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Editările locației vor fi vizibile doar pe Photovault",
   "eligible": "eligibil",
   "email": "E-mail",
   "@email": {
@@ -520,7 +520,7 @@
     }
   },
   "emailHint": "Introduceți adresa de e-mail",
-  "emailNoEnteAccountPhotos": "{email} nu are un cont Ente.\n\nTrimiteți-le o invitație pentru a distribui fotografii.",
+  "emailNoEnteAccountPhotos": "{email} nu are un cont Photovault.\n\nTrimiteți-le o invitație pentru a distribui fotografii.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -741,7 +741,7 @@
   },
   "importSelectJsonFile": "Selectează fișierul JSON",
   "importSuccessTitle": "Ura!",
-  "importTypeEnteEncrypted": "Export Ente criptat",
+  "importTypeEnteEncrypted": "Export Photovault criptat",
   "incorrectCode": "Cod incorect",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -784,7 +784,7 @@
   "invalidQRCode": "Codul QR nu este valid",
   "invalidRecoveryKey": "Cheia de recuperare pe care ați introdus-o nu este validă. Vă rugăm să vă asigurați că aceasta conține 24 de cuvinte și să verificați ortografia fiecăruia.\n\nDacă ați introdus un cod de recuperare mai vechi, asigurați-vă că acesta conține 64 de caractere și verificați fiecare dintre ele.",
   "invite": "Invitați",
-  "inviteToEnte": "Invitați la Ente",
+  "inviteToEnte": "Invitați la Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -938,7 +938,7 @@
   "mergeWithExisting": "Îmbinare cu unul existent",
   "mlConsent": "Activați învățarea automată",
   "mlConsentConfirmation": "Înțeleg și doresc să activez învățarea automată",
-  "mlConsentDescription": "Dacă activați învățarea automată, Ente va extrage informații precum geometria fețelor din fișiere, inclusiv din cele distribuite cu dvs.\n\nAcest lucru se va întâmpla pe dispozitivul dvs., iar orice informații biometrice generate vor fi criptate integral.",
+  "mlConsentDescription": "Dacă activați învățarea automată, Photovault va extrage informații precum geometria fețelor din fișiere, inclusiv din cele distribuite cu dvs.\n\nAcest lucru se va întâmpla pe dispozitivul dvs., iar orice informații biometrice generate vor fi criptate integral.",
   "moderateStrength": "Moderată",
   "@moderateStrength": {
     "description": "Moderate password strength label"
@@ -965,11 +965,11 @@
   "moveToHiddenAlbum": "Mutați în albumul ascuns",
   "movingFilesToAlbum": "Se mută fișierele în album...",
   "name": "Nume",
-  "networkConnectionRefusedErr": "Nu se poate conecta la Ente, vă rugăm să reîncercați după un timp. Dacă eroarea persistă, contactați asistența.",
+  "networkConnectionRefusedErr": "Nu se poate conecta la Photovault, vă rugăm să reîncercați după un timp. Dacă eroarea persistă, contactați asistența.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nu se poate conecta la Ente, vă rugăm să verificați setările de rețea și să contactați asistenta dacă eroarea persistă.",
+  "networkHostLookUpErr": "Nu se poate conecta la Photovault, vă rugăm să verificați setările de rețea și să contactați asistenta dacă eroarea persistă.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1048,7 +1048,7 @@
   "offlineModeWarning": "Ai ales să continui fără backup-uri. Te rog salvează-ți backup-urile manual ca să fii sigur că ai codurile în siguranță.",
   "onboardingDesc": "Salvați-vă fotografiile și videoclipurile. Toate aminitirle într-un singur loc.",
   "onboardingTitle": "Pentru tot ce nu vreți să uitați",
-  "onEnte": "Pe <branding>ente</branding>",
+  "onEnte": "Pe <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1380,7 +1380,7 @@
   "selectALocationFirst": "Selectați mai întâi o locație",
   "selectCoverPhoto": "Selectați fotografia de copertă",
   "selectDate": "Selectati data",
-  "selectedFilesAreNotOnEnte": "Fișierele selectate nu sunt pe Ente",
+  "selectedFilesAreNotOnEnte": "Fișierele selectate nu sunt pe Photovault",
   "selectedPhotos": "{count} selectate",
   "@selectedPhotos": {
     "description": "Display the number of selected photos",
@@ -1450,7 +1450,7 @@
   "shareKey": "Distribuiți cheia",
   "shareLink": "Distribuiți linkul",
   "shareThisLink": "Acest link permite oricui il primeste sa acceseze elementul dumneavoastra. Puteti revoca accesul oricand stergand link-ul.",
-  "shareWithNonenteUsers": "Distribuiți cu utilizatori din afara Ente",
+  "shareWithNonenteUsers": "Distribuiți cu utilizatori din afara Photovault",
   "sharing": "Se distribuie...",
   "shouldHideCode": "Ascunde codurile",
   "showLargeIcons": "Afișează iconițele mari",

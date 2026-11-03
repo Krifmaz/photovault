@@ -110,7 +110,8 @@ class _ToggleSwitchComponentState extends State<ToggleSwitchComponent> {
                 : Switch(
                     inactiveTrackColor: colors.fillDark,
                     activeTrackColor: colors.primary,
-                    activeThumbColor: colors.specialWhite,
+                    // PHOTOVAULT: theme (readable on Encore accent)
+                    activeThumbColor: colors.onPrimary,
                     inactiveThumbColor: colors.primary,
                     trackOutlineColor: WidgetStateColor.resolveWith(
                       (_) => enabled ? colors.primary : colors.strokeFaint,

@@ -1,3 +1,5 @@
+// PHOTOVAULT: theme (Photos uses the Encore tokens)
+import 'package:ente_components/theme/photovault/encore_color_tokens.dart';
 import 'package:flutter/material.dart';
 
 // Figma: https://www.figma.com/design/BuBNPPytxlVnqfmCUW0mgz/Ente-Visual-Design?node-id=57-6281&view=variables
@@ -65,6 +67,9 @@ class ColorTokens {
     required this.specialScrim,
     required this.specialWhite,
     required this.specialWhiteOverlay,
+    // PHOTOVAULT: theme. Foreground on `primary`; Ente hard-codes white,
+    // which is unreadable on Encore's cream accent.
+    this.onPrimary = specialWhiteLight,
   });
 
   final Color primaryLight;
@@ -128,6 +133,9 @@ class ColorTokens {
   final Color specialWhite;
   final Color specialWhiteOverlay;
 
+  /// PHOTOVAULT: theme. Text/icon colour on top of [primary].
+  final Color onPrimary;
+
   static const light = colorTokensLight;
   static const dark = colorTokensDark;
 
@@ -135,6 +143,12 @@ class ColorTokens {
     ComponentApp app, {
     Brightness brightness = Brightness.light,
   }) {
+    // PHOTOVAULT: theme. Photos uses the Encore palette for every role.
+    if (app == ComponentApp.photos) {
+      return brightness == Brightness.dark
+          ? encoreColorTokensDark
+          : encoreColorTokensLight;
+    }
     final base = brightness == Brightness.dark
         ? colorTokensDark
         : colorTokensLight;
@@ -203,6 +217,7 @@ class ColorTokens {
       specialScrim: specialScrim,
       specialWhite: specialWhite,
       specialWhiteOverlay: specialWhiteOverlay,
+      onPrimary: onPrimary, // PHOTOVAULT: theme
     );
   }
 }

@@ -33,7 +33,8 @@ enum ButtonType {
 
   Color defaultButtonColor(EnteColorScheme colorScheme) {
     if (isPrimary) {
-      return colorScheme.primary500;
+      // PHOTOVAULT: theme (Encore accent, readable foreground)
+      return colorScheme.greenBase;
     }
     if (isSecondary) {
       return colorScheme.fillFaint;
@@ -52,7 +53,8 @@ enum ButtonType {
 
   Color? pressedButtonColor(EnteColorScheme colorScheme) {
     if (isPrimary) {
-      return colorScheme.primary700;
+      // PHOTOVAULT: theme (Encore accent, readable foreground)
+      return colorScheme.greenDark;
     }
     if (isSecondary) {
       return colorScheme.fillFaintPressed;
@@ -113,7 +115,11 @@ enum ButtonType {
     required EnteColorScheme colorScheme,
     required EnteColorScheme inverseColorScheme,
   }) {
-    if (isPrimary || this == ButtonType.critical) {
+    // PHOTOVAULT: theme (Encore accent, readable foreground)
+    if (isPrimary) {
+      return inverseColorScheme.strokeBase;
+    }
+    if (this == ButtonType.critical) {
       return strokeBaseDark;
     }
     if (this == ButtonType.neutral || this == ButtonType.trailingIcon) {
@@ -152,7 +158,11 @@ enum ButtonType {
     required EnteTextTheme textTheme,
     required EnteTextTheme inverseTextTheme,
   }) {
-    if (isPrimary || this == ButtonType.critical) {
+    // PHOTOVAULT: theme (Encore accent, readable foreground)
+    if (isPrimary) {
+      return inverseTextTheme.bodyBold;
+    }
+    if (this == ButtonType.critical) {
       return textTheme.bodyBold.copyWith(color: textBaseDark);
     }
     if (this == ButtonType.neutral || this == ButtonType.trailingIcon) {

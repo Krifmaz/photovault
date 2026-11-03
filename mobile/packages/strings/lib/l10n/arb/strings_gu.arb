@@ -126,8 +126,8 @@
   "albumUpdated": "આલ્બમ અપડેટ કરવામાં આવ્યું",
   "align": "હારબંધ ગોઠવવું",
   "all": "તમામ",
-  "allowJoiningDescription": "Ente એકાઉન્ટ ધરાવતા દર્શકો તમારા આલ્બમમાં જોડાઈ શકે છે અને અપડેટ રહી શકે છે",
-  "allowPermBody": "કૃપા કરીને સેટિંગ્સ માંથી તમારા ફોટાની ઍક્સેસ આપો, જેથી Ente તમારી લાઇબ્રેરીને પ્રદર્શિત કરી શકે અને તેનો બેકઅપ લઈ શકે.",
+  "allowJoiningDescription": "Photovault એકાઉન્ટ ધરાવતા દર્શકો તમારા આલ્બમમાં જોડાઈ શકે છે અને અપડેટ રહી શકે છે",
+  "allowPermBody": "કૃપા કરીને સેટિંગ્સ માંથી તમારા ફોટાની ઍક્સેસ આપો, જેથી Photovault તમારી લાઇબ્રેરીને પ્રદર્શિત કરી શકે અને તેનો બેકઅપ લઈ શકે.",
   "allowPermTitle": "ફોટાઓનો એક્સેસ આપો",
   "allPersonGroupingWillReset": "આ વ્યક્તિ માટેના તમામ જૂથો રીસેટ થઈ જશે, અને આ વ્યક્તિ માટે આપવામાં આવેલા તમામ સૂચનો તમે ગુમાવી દેશો",
   "allTabEmptyHint": "અહીં હજુ કંઈ નથી. કોડ ઉમેરવા માટે + પર ટેપ કરો અથવા કોડ પાછો મેળવવા માટે ટ્રેશ ખોલો.",
@@ -590,8 +590,8 @@
   "faqs": "વારંવાર પૂછાતા પ્રશ્નો",
   "featurePassAutomatically": "કટોકટીના સમયે તેને આપમેળે આગળ મોકલો",
   "featureSaveImportant": "તમારા મહત્વપૂર્ણ દસ્તાવેજો અને પ્રમાણપત્રો સાચવી રાખો",
-  "free10GB": "<bold-green>ente</bold-green> ફોટા પર ૧૦GB મફત",
-  "freeStorageOffer": "<bold-green>ente</bold-green> ફોટા પર 10% છૂટ",
+  "free10GB": "<bold-green>Photovault</bold-green> ફોટા પર ૧૦GB મફત",
+  "freeStorageOffer": "<bold-green>Photovault</bold-green> ફોટા પર 10% છૂટ",
   "general": "સામાન્ય",
   "generatingEncryptionKeysTitle": "એન્ક્રિપ્શન ચાવીઓ જનરેટ કરી રહ્યાં છીએ...",
   "@generatingEncryptionKeysTitle": {
@@ -600,18 +600,18 @@
   "getStarted": "શરૂ કરો",
   "grantFullAccessPrompt": "સેટિંગ્સ એપમાં તમામ ફોટાઓ માટે પ્રવેશ આપો",
   "grantGalleryPermissionDesc": "ચહેરાની ઓળખ દ્વારા ફોટાને એક્સેસ કરવાની અને તેને વ્યવસ્થિત કરવાની પરવાનગી આપો. તમામ પ્રક્રિયા તમારા ઉપકરણ પર જ થાય છે.",
-  "grantPermissionDesc": "કૃપા કરીને Ente ને તમારી લાઇબ્રેરી એક્સેસ કરવાની મંજૂરી આપો, જેથી અમે ચહેરાની ઓળખ દ્વારા તેને વ્યવસ્થિત કરી શકીએ. તમામ પ્રક્રિયા તમારા ઉપકરણ પર જ થાય છે.",
+  "grantPermissionDesc": "કૃપા કરીને Photovault ને તમારી લાઇબ્રેરી એક્સેસ કરવાની મંજૂરી આપો, જેથી અમે ચહેરાની ઓળખ દ્વારા તેને વ્યવસ્થિત કરી શકીએ. તમામ પ્રક્રિયા તમારા ઉપકરણ પર જ થાય છે.",
   "groupByDay": "દિવસ",
   "groupByYear": "વર્ષ",
   "groupSelfies": "આપણે બધા",
   "guestView": "અતિથિ દૃષ્ટિકોણ",
   "guestViewEnablePreSteps": "ગેસ્ટ વ્યૂ સક્ષમ કરવા માટે, કૃપા કરીને તમારી સિસ્ટમ સેટિંગ્સમાં ડિવાઇસ પાસકોડ અથવા સ્ક્રીન લૉક સેટ કરો.",
   "happyBirthday": "જન્મદિવસની શુભકામનાઓ! 🥳",
-  "hearUsWhereOptionalTitle": "તમે Ente વિશે કેવી રીતે જાણ્યું? (વૈકલ્પિક)",
+  "hearUsWhereOptionalTitle": "તમે Photovault વિશે કેવી રીતે જાણ્યું? (વૈકલ્પિક)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "તમે Ente વિશે કેવી રીતે જાણ્યું?",
+  "hearUsWhereTitle": "તમે Photovault વિશે કેવી રીતે જાણ્યું?",
   "help": "મદદ",
   "helpAndSupport": "મદદ અને સહાય",
   "hidden": "છુપાયેલું",
@@ -731,7 +731,7 @@
   "maps": "નકશાઓ",
   "mapsPrivacyNotice": "નકશો અને સ્થાન દર્શાવવા માટે, OpenStreetMap જેવા ગોપનીયતા પ્રત્યે સભાન ત્રીજા પક્ષોને અંદાજિત નિર્દેશાંકો મોકલવામાં આવશે.",
   "merchandise": "વેપારી વસ્તુઓ",
-  "mlConsentDescription": "જો તમે મશીન લર્નિંગ સક્રિય કરો છો, તો Ente ફાઇલોમાંથી — જેમાં તમારી સાથે શેર કરવામાં આવેલી ફાઇલોનો પણ સમાવેશ થાય છે — ચહેરાની ભૂમિતિ જેવી માહિતી તારવી લેશે.\n\nઆ પ્રક્રિયા તમારા ઉપકરણ પર જ થશે, અને તેમાંથી તૈયાર થતી કોઈપણ બાયોમેટ્રિક માહિતી એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ હશે.",
+  "mlConsentDescription": "જો તમે મશીન લર્નિંગ સક્રિય કરો છો, તો Photovault ફાઇલોમાંથી — જેમાં તમારી સાથે શેર કરવામાં આવેલી ફાઇલોનો પણ સમાવેશ થાય છે — ચહેરાની ભૂમિતિ જેવી માહિતી તારવી લેશે.\n\nઆ પ્રક્રિયા તમારા ઉપકરણ પર જ થશે, અને તેમાંથી તૈયાર થતી કોઈપણ બાયોમેટ્રિક માહિતી એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ હશે.",
   "nextTotpTitle": "આગળ",
   "no": "ના",
   "noRecoveryKeyNoDecryption": "અમારા એન્ડ-ટુ-એન્ડ એન્ક્રિપ્શન પ્રોટોકોલની પ્રકૃતિને કારણે, તમારા પાસવર્ડ અથવા રિકવરી કી વિના તમારો ડેટા ડિક્રિપ્ટ કરી શકાતો નથી",
@@ -748,7 +748,7 @@
     }
   },
   "offlineModeWarning": "તમે બેકઅપ લીધા વિના આગળ વધવાનું પસંદ કર્યું છે. તમારા કોડ સુરક્ષિત રહે તે સુનિશ્ચિત કરવા માટે કૃપા કરીને મેન્યુઅલ બેકઅપ લો.",
-  "onEnte": "<branding>ente</branding> પર",
+  "onEnte": "<branding>Photovault</branding> પર",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -941,9 +941,9 @@
   "@legacyKitSheetIntro": {
     "description": "Written in the voice of the account owner, addressed to the sheet holder"
   },
-  "noEnteAccountWithThisEmail": "આ ઈમેલ સાથે કોઈ Ente એકાઉન્ટ નથી.",
+  "noEnteAccountWithThisEmail": "આ ઈમેલ સાથે કોઈ Photovault એકાઉન્ટ નથી.",
   "shareALinkInline": "એક લિંક શેર કરો.",
   "personAlreadyHasAccess": "આ વ્યક્તિ પાસે પહેલેથી જ એક્સેસ છે.",
   "notEnoughStorageTitle": "પૂરતી સ્ટોરેજ નથી",
-  "notEnoughStorageBody": "Ente પર નવા ફોટા ઉમેરવા માટે તમારી પાસે પૂરતી ખાલી જગ્યા નથી. વધુ ફોટા ઉમેરવાનું ચાલુ રાખવા માટે જગ્યા ખાલી કરો અથવા અપગ્રેડ કરો."
+  "notEnoughStorageBody": "Photovault પર નવા ફોટા ઉમેરવા માટે તમારી પાસે પૂરતી ખાલી જગ્યા નથી. વધુ ફોટા ઉમેરવાનું ચાલુ રાખવા માટે જગ્યા ખાલી કરો અથવા અપગ્રેડ કરો."
 }

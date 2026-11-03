@@ -63,7 +63,7 @@
   "addTag": "إضافة وسم",
   "addToAlbum": "إضافة إلى الألبوم",
   "addToCollection": "إضافة إلى المجموعة",
-  "addToEnte": "إضافة إلى Ente",
+  "addToEnte": "إضافة إلى Photovault",
   "addToHiddenAlbum": "إضافة إلى الألبوم المخفي",
   "addYourPhotosNow": "أضف صورك الآن",
   "adjust": "تعديل",
@@ -98,7 +98,7 @@
   },
   "allowAppToOpenSharedAlbumLinks": "السماح للتطبيق بفتح روابط الألبومات المشتركة",
   "allowDownloads": "السماح بالتنزيلات",
-  "allowPermBody": "يرجى السماح بالوصول إلى صورك من الإعدادات حتى يتمكن Ente من عرض نسختك الاحتياطية ومكتبتك.",
+  "allowPermBody": "يرجى السماح بالوصول إلى صورك من الإعدادات حتى يتمكن Photovault من عرض نسختك الاحتياطية ومكتبتك.",
   "allowPermTitle": "السماح بالوصول إلى الصور",
   "allPersonGroupingWillReset": "سيتم إعادة تعيين جميع تجمعات هذا الشخص، وستفقد جميع الاقتراحات المقدمة لهذا الشخص.",
   "allTabEmptyHint": "لا يوجد شيء هنا حتى الآن. انقر على زر + لإضافة رمز أو افتح سلة المهملات لاستعادة رمز.",
@@ -119,7 +119,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "يتوفر إصدار جديد من Ente.",
+  "aNewVersionOfEnteIsAvailable": "يتوفر إصدار جديد من Photovault.",
   "appIcon": "أيقونة التطبيق",
   "appleId": "معرّف Apple",
   "appLockDescription": "اختر نوع قُفْل الشاشة: افتراضي أو مخصص.",
@@ -177,7 +177,7 @@
   "autoAddPeople": "إضافة الأشخاص التلقائية",
   "autoAddToAlbum": "إضافة تلقائية إلى الألبوم",
   "autoCastDialogBody": "سترى أجهزة Cast المتاحة هنا.",
-  "autoCastiOSPermission": "تأكد من تشغيل أذونات الشبكة المحلية لتطبيق Ente Photos في الإعدادات.",
+  "autoCastiOSPermission": "تأكد من تشغيل أذونات الشبكة المحلية لتطبيق Photovault في الإعدادات.",
   "autoLock": "قفل تلقائي",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -417,7 +417,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "حذف الألبومات الفارغة؟",
   "deleteFromBoth": "الحذف من كليهما",
   "deleteFromDevice": "الحذف من الجهاز",
-  "deleteFromEnte": "حذف من Ente",
+  "deleteFromEnte": "حذف من Photovault",
   "deleteLink": "حذف الرابط",
   "deleteLinkQuestion": "حذف الرابط؟",
   "deleteLocation": "حذف الموقع",
@@ -572,7 +572,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "تم حفظ التعديلات.",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "ستكون التعديلات على الموقع مرئية فقط داخل Ente.",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "ستكون التعديلات على الموقع مرئية فقط داخل Photovault.",
   "editTag": "حرر الوسم",
   "editTime": "تعديل الوقت",
   "eligible": "مؤهل",
@@ -592,13 +592,13 @@
     }
   },
   "emailHint": "أدخل عنوان بريدك الإلكتروني",
-  "emailNoEnteAccount": "لا يملك {email} حساب Ente.\n\nأرسل له دعوة لمشاركة العناصر.",
+  "emailNoEnteAccount": "لا يملك {email} حساب Photovault.\n\nأرسل له دعوة لمشاركة العناصر.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} لا يملك حسابًا على Ente.\n\nأرسل له دعوة لمشاركة الصور.",
+  "emailNoEnteAccountPhotos": "{email} لا يملك حسابًا على Photovault.\n\nأرسل له دعوة لمشاركة الصور.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -781,8 +781,8 @@
   "focusOnSearchBar": "التركيز على البحث عند بدء التطبيق",
   "font": "الخط",
   "food": "متعة الطهي",
-  "free10GB": "مساحة 10GB مجانية على <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "خَصْم 10٪ على صور <bold-green>ente</bold-green>",
+  "free10GB": "مساحة 10GB مجانية على <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "خَصْم 10٪ على صور <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "استخدم الكود \"AUTH\" وأحصل على 10٪ خَصْم في السنة الأولى",
   "freeTrial": "تجربة مجانية",
   "freeUpAmount": "تحرير {sizeInMBorGB}",
@@ -810,7 +810,7 @@
   "guestView": "عرض الضيف",
   "guestViewEnablePreSteps": "لتمكين عرض الضيف، يرجى إعداد رمز مرور الجهاز أو قفل الشاشة في إعدادات النظام.",
   "happyBirthday": "عيد ميلاد سعيد! 🥳",
-  "hearUsWhereOptionalTitle": "كيف سمعت عن Ente؟ (اختياري)",
+  "hearUsWhereOptionalTitle": "كيف سمعت عن Photovault؟ (اختياري)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -853,7 +853,7 @@
   "importBitwardenGuide": "استخدم خيار \"تصدير خزانة\" داخل أدوات Bitwarden واستيراد ملف JSON غير مشفر.",
   "importCodeDelimiterInfo": "يمكن فصل الرموز بفاصلة أو سطر جديد",
   "importCodes": "استورد شيفرات",
-  "importEnteEncGuide": "اختر ملف JSON المشفر المصدَّر من Ente",
+  "importEnteEncGuide": "اختر ملف JSON المشفر المصدَّر من Photovault",
   "importEnterSetupKey": "أدخِل مفتاح الإعداد",
   "importFailureDesc": "تعذر إعراب الملف المنتقى.",
   "importFromGallery": "‎استيراد من معر الصور ‎",
@@ -917,7 +917,7 @@
   "invalidProtonExportMessage": "المِلف الذي حددته ليس مِلف تصدير Proton Authenticator صالحًا.",
   "invalidProtonExportTitle": "تصدير Proton غير صالح",
   "invite": "دعوة",
-  "inviteToEnte": "دعوة إلى Ente",
+  "inviteToEnte": "دعوة إلى Photovault",
   "ok": "حسنًا",
   "@ok": {
     "description": "Generic OK button label"
@@ -1092,7 +1092,7 @@
   "mixedGrouping": "تجميع مختلط؟",
   "mlConsent": "تمكين تعلم الآلة",
   "mlConsentConfirmation": "أنا أفهم، وأرغب في تمكين تعلم الآلة",
-  "mlConsentDescription": "إذا قمت بتمكين تعلم الآلة، سيقوم Ente باستخراج معلومات مثل هندسة الوجه من الملفات، بما في ذلك تلك التي تمت مشاركتها معك.\n\nسيحدث هذا على جهازك، وسيتم تشفير أي معلومات بيومترية تم إنشاؤها تشفيرًا تامًا من طرف إلى طرف.",
+  "mlConsentDescription": "إذا قمت بتمكين تعلم الآلة، سيقوم Photovault باستخراج معلومات مثل هندسة الوجه من الملفات، بما في ذلك تلك التي تمت مشاركتها معك.\n\nسيحدث هذا على جهازك، وسيتم تشفير أي معلومات بيومترية تم إنشاؤها تشفيرًا تامًا من طرف إلى طرف.",
   "modifyYourQueryOrTrySearchingFor": "قم بتعديل استعلامك، أو حاول البحث عن",
   "moments": "اللحظات",
   "month": "شهر",
@@ -1203,7 +1203,7 @@
   "notSupportedForHOTP": "غير مدعوم لـ HOTP",
   "notThisPerson": "ليس هذا الشخص؟",
   "offlineModeWarning": "لقد اخترت المضي قدما بدون نسخ احتياطية. يرجى أخذ نسخ احتياطية يدوية للتأكد من سلامة الرموز الخاصة بك.",
-  "onEnte": "على <branding>Ente</branding>",
+  "onEnte": "على <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1635,7 +1635,7 @@
       "count": {}
     }
   },
-  "selectedFilesAreNotOnEnte": "الملفات المحددة ليست موجودة على Ente.",
+  "selectedFilesAreNotOnEnte": "الملفات المحددة ليست موجودة على Photovault.",
   "selectedItemsWillBeRemovedFromThisPerson": "سيتم إزالة العناصر المحددة من هذا الشخص، ولكن لن يتم حذفها من مكتبتك.",
   "selectedPhotos": "تم تحديد {count}",
   "@selectedPhotos": {
@@ -1732,7 +1732,7 @@
   "sharedWith": "مشترك مع",
   "shareLink": "مشاركة الرابط",
   "shareThisLink": "يسمح هذا الرابط لأي شخص يستلمه بالوصول إلى عنصرك. يمكنك إزالة الوصول في أي وقت عن طريق حذف الرابط.",
-  "shareWithNonenteUsers": "المشاركة مع غير مستخدمي Ente",
+  "shareWithNonenteUsers": "المشاركة مع غير مستخدمي Photovault",
   "sharing": "جارٍ المشاركة...",
   "shiftDatesAndTime": "تغيير التواريخ والوقت",
   "shouldHideCode": "إخفاء الرموز",
@@ -1742,7 +1742,7 @@
   "showMoreFaces": "إظهار المزيد من الوجوه",
   "showPerson": "إظهار الشخص",
   "showQRAuthMessage": "المصادقة لإظهار رمز QR",
-  "sigInBackupReminder": "سيقوم Ente تلقائيًا بإنشاء نسخة احتياطية لرموزك بعد تسجيل الدخول.\n\nننصح بتصدير الرموز كنسخة احتياطية إضافية.",
+  "sigInBackupReminder": "سيقوم Photovault تلقائيًا بإنشاء نسخة احتياطية لرموزك بعد تسجيل الدخول.\n\nننصح بتصدير الرموز كنسخة احتياطية إضافية.",
   "signInToBackup": "قم بتسجيل الدخول للنسخ الاحتياطي للرموز الخاصة بك",
   "signOutFromOtherDevices": "تسجيل الخروج من الأجهزة الأخرى",
   "@signOutFromOtherDevices": {

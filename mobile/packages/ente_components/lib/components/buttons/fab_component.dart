@@ -63,7 +63,8 @@ class _FABComponentState extends State<FABComponent> {
         _isPressed ? colors.warningDark : colors.warning,
     };
     final foregroundColor = switch (widget.variant) {
-      FABComponentVariant.primary ||
+      // PHOTOVAULT: theme (readable on Encore accent)
+      FABComponentVariant.primary => colors.onPrimary,
       FABComponentVariant.destructive => colors.specialWhite,
       FABComponentVariant.secondary ||
       FABComponentVariant.outlined => colors.primary,

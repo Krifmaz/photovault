@@ -47,7 +47,7 @@
   "addPhotos": "Legg til bilder",
   "addSelected": "Legg til valgte",
   "addToAlbum": "Legg til i album",
-  "addToEnte": "Legg til i Ente",
+  "addToEnte": "Legg til i Photovault",
   "addToHiddenAlbum": "Legg til i skjult album",
   "addYourPhotosNow": "Legg til bildene dine nå",
   "admiringThem": "Beundrer {name}",
@@ -74,11 +74,11 @@
   },
   "allowAppToOpenSharedAlbumLinks": "Tillat app å åpne delte albumlenker",
   "allowDownloads": "Tillat nedlastinger",
-  "allowPermBody": "Vennligst gi tilgang til bildene dine i Innstillinger, slik at Ente kan vise og sikkerhetskopiere biblioteket.",
+  "allowPermBody": "Vennligst gi tilgang til bildene dine i Innstillinger, slik at Photovault kan vise og sikkerhetskopiere biblioteket.",
   "allowPermTitle": "Gi tilgang til bilder",
   "allPersonGroupingWillReset": "Alle grupperinger for denne personen vil bli tilbakestilt, og du vil miste alle forslag for denne personen",
   "allWillShiftRangeBasedOnFirst": "Dette er den første i gruppen. Andre valgte bilder vil automatisk forflyttet basert på denne nye datoen",
-  "aNewVersionOfEnteIsAvailable": "En ny versjon av Ente er tilgjengelig.",
+  "aNewVersionOfEnteIsAvailable": "En ny versjon av Photovault er tilgjengelig.",
   "appIcon": "App-ikon",
   "appleId": "Apple ID",
   "appLock": "Applås",
@@ -130,7 +130,7 @@
   "authToViewYourMemories": "Vennligst autentiser deg for å se minnene dine",
   "authToViewYourRecoveryKey": "Vennligst autentiser deg for å se gjennopprettingsnøkkelen din",
   "autoCastDialogBody": "Du vil se tilgjengelige Cast enheter her.",
-  "autoCastiOSPermission": "Kontroller at lokale nettverkstillatelser er slått på for Ente Photos-appen, i innstillinger.",
+  "autoCastiOSPermission": "Kontroller at lokale nettverkstillatelser er slått på for Photovault-appen, i innstillinger.",
   "autoLockFeatureDescription": "Tid før appen låses etter at den er lagt i bakgrunnen",
   "@autoLockFeatureDescription": {
     "description": "Description of auto lock feature"
@@ -314,7 +314,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "Slette tomme albumer?",
   "deleteFromBoth": "Slett fra begge",
   "deleteFromDevice": "Slett fra enhet",
-  "deleteFromEnte": "Slett fra Ente",
+  "deleteFromEnte": "Slett fra Photovault",
   "deleteLocation": "Slett sted",
   "deletePhotos": "Slett bilder",
   "deleteProgress": "Sletter {currentlyDeleting} / {totalCount}",
@@ -432,7 +432,7 @@
   "editLocation": "Rediger plassering",
   "editPerson": "Rediger person",
   "editsSaved": "Endringer lagret",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Endringer i plassering vil kun være synlige i Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Endringer i plassering vil kun være synlige i Photovault",
   "editTime": "Endre tidspunkt",
   "eligible": "kvalifisert",
   "email": "E-post",
@@ -455,7 +455,7 @@
     }
   },
   "emailHint": "Skriv inn e-postadressen din",
-  "emailNoEnteAccountPhotos": "{email} har ikke en Ente-konto.\n\nsender dem en invitasjon til å dele bilder.",
+  "emailNoEnteAccountPhotos": "{email} har ikke en Photovault-konto.\n\nsender dem en invitasjon til å dele bilder.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -656,7 +656,7 @@
   "invalidKey": "Ugyldig nøkkel",
   "invalidRecoveryKey": "Gjenopprettingsnøkkelen du har skrevet inn er ikke gyldig. Kontroller at den inneholder 24 ord og kontroller stavemåten av hvert ord.\n\nHvis du har angitt en eldre gjenopprettingskode, må du kontrollere at den er 64 tegn lang, og kontrollere hvert av dem.",
   "invite": "Inviter",
-  "inviteToEnte": "Inviter til Ente",
+  "inviteToEnte": "Inviter til Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -807,7 +807,7 @@
   "mergeWithExisting": "Slå sammen med eksisterende",
   "mlConsent": "Aktiver maskinlæring",
   "mlConsentConfirmation": "Jeg forstår, og ønsker å aktivere maskinlæring",
-  "mlConsentDescription": "Hvis du aktiverer maskinlæring, vil Ente hente ut informasjon som ansiktsgeometri fra filer, inkludert de som er delt med deg.\n\nDette skjer på enheten din, og all generert biometrisk informasjon blir ende-til-ende-kryptert.",
+  "mlConsentDescription": "Hvis du aktiverer maskinlæring, vil Photovault hente ut informasjon som ansiktsgeometri fra filer, inkludert de som er delt med deg.\n\nDette skjer på enheten din, og all generert biometrisk informasjon blir ende-til-ende-kryptert.",
   "moderateStrength": "Moderat",
   "@moderateStrength": {
     "description": "Moderate password strength label"
@@ -837,11 +837,11 @@
   "moveToHiddenAlbum": "Flytt til skjult album",
   "movingFilesToAlbum": "Flytter filer til album...",
   "name": "Navn",
-  "networkConnectionRefusedErr": "Kan ikke koble til Ente, prøv igjen etter en stund. Hvis feilen vedvarer, vennligst kontakt kundestøtte.",
+  "networkConnectionRefusedErr": "Kan ikke koble til Photovault, prøv igjen etter en stund. Hvis feilen vedvarer, vennligst kontakt kundestøtte.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Kan ikke koble til Ente, kontroller nettverksinnstillingene og kontakt kundestøtte hvis feilen vedvarer.",
+  "networkHostLookUpErr": "Kan ikke koble til Photovault, kontroller nettverksinnstillingene og kontakt kundestøtte hvis feilen vedvarer.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -901,7 +901,7 @@
     }
   },
   "notThisPerson": "Ikke denne personen?",
-  "onEnte": "På <branding>ente</branding>",
+  "onEnte": "På <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1284,7 +1284,7 @@
   "selectALocationFirst": "Velg en plassering først",
   "selectCoverPhoto": "Velg forsidebilde",
   "selectDate": "Velg dato",
-  "selectedFilesAreNotOnEnte": "Valgte filer er ikke på Ente",
+  "selectedFilesAreNotOnEnte": "Valgte filer er ikke på Photovault",
   "selectedItemsWillBeRemovedFromThisPerson": "Valgte elementer fjernes fra denne personen, men blir ikke slettet fra biblioteket ditt.",
   "selectedPhotos": "{count} valgt",
   "@selectedPhotos": {
@@ -1360,7 +1360,7 @@
   "share": "Del",
   "shareALink": "Del en lenke",
   "shareLink": "Del link",
-  "shareWithNonenteUsers": "Del med brukere som ikke har Ente",
+  "shareWithNonenteUsers": "Del med brukere som ikke har Photovault",
   "sharing": "Deler...",
   "shiftDatesAndTime": "Forskyv datoer og klokkeslett",
   "showMemories": "Vis minner",

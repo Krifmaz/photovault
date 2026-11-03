@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:ente_qr_ui/ente_qr_ui.dart';
 import 'package:ente_strings/ente_strings.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +98,7 @@ class PublicLinkEnabledActionsWidget extends StatelessWidget {
                   return QrCodeDialog(
                     data: url,
                     title: collection.displayName,
-                    accentColor: const Color(0xFF08C225),
+                    accentColor: encoreLightAccent2, // PHOTOVAULT: theme
                     shareFileName: 'ente_qr_${collection.displayName}.png',
                     shareText:
                         'Scan this QR code to view my ${collection.displayName} album on ente',

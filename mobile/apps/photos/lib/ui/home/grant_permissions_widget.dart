@@ -46,7 +46,8 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
   );
   late final rive.FileLoader _permissionsAnimationLoader;
 
-  static const double _logoWidth = 50;
+  // PHOTOVAULT: branding. Wider "Photovault" wordmark (Ente: 50).
+  static const double _logoWidth = 96;
 
   @override
   void initState() {
@@ -98,8 +99,9 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
         automaticallyImplyLeading: false,
         toolbarHeight: max(kMinInteractiveDimension, skipLabelHeight),
         centerTitle: true,
+        // PHOTOVAULT: branding (Photovault wordmark instead of Ente's)
         title: SvgPicture.asset(
-          "packages/ente_components/assets/ente_wordmark.svg",
+          "assets/ente-branding.svg",
           width: _logoWidth,
           colorFilter: ColorFilter.mode(colorScheme.content, BlendMode.srcIn),
         ),

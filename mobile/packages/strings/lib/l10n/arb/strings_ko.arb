@@ -231,7 +231,7 @@
   "allowDownloads": "다운로드 허용",
   "allowJoining": "참여 허용",
   "allowJoiningAlbum": "앨범에 참여 허용",
-  "allowJoiningDescription": "Ente 계정이 있는 사용자는 귀하의 앨범에 참여하여 최신 소식을 확인할 수 있습니다",
+  "allowJoiningDescription": "Photovault 계정이 있는 사용자는 귀하의 앨범에 참여하여 최신 소식을 확인할 수 있습니다",
   "allowPermBody": "Ente가 라이브러리를 표시하고 백업할 수 있도록 설정에서 사진 접근을 허용해 주세요.",
   "allowPermTitle": "사진에 대한 접근 허용",
   "allPersonGroupingWillReset": "이 사람에 대한 모든 grouping 이 초기화되며, 이 사람과 관련하여 제공된 모든 추천 항목도 사라집니다",
@@ -386,7 +386,7 @@
   "autoAddPeople": "사람에 자동 추가",
   "autoAddToAlbum": "앨범에 자동 추가",
   "autoCastDialogBody": "여기에서 사용 가능한 Cast 기기를 확인할 수 있습니다.",
-  "autoCastiOSPermission": "설정에서 Ente Photos의 Local 네트워크 권한이 있는지 확인하세요.",
+  "autoCastiOSPermission": "설정에서 Photovault Photos의 Local 네트워크 권한이 있는지 확인하세요.",
   "autoLock": "자동 잠금",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -623,7 +623,7 @@
   "codeChangeLimitReached": "죄송합니다. 코드 변경 횟수 한도에 도달했습니다.",
   "codeCopiedToClipboard": "코드가 클립보드에 복사되었습니다",
   "codeIssuerHint": "발행인",
-  "collabLinkSectionDescription": "Ente 계정이 없는 사람도 사진을 추가 할 수 있게 허용",
+  "collabLinkSectionDescription": "Photovault 계정이 없는 사람도 사진을 추가 할 수 있게 허용",
   "collaborator": "공동 작업자",
   "collageLayout": "레이아웃",
   "collageSaved": "콜라주가 갤러리에 저장되었습니다",
@@ -714,7 +714,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Ente Photos, Ente Auth, Ente Locker 전체에서 내 데이터가 삭제된다는 것을 이해합니다.",
+  "confirmDeleteAccountAcrossApps": "Photovault, Ente Auth, Ente Locker 전체에서 내 데이터가 삭제된다는 것을 이해합니다.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -806,7 +806,7 @@
   "createAccountTitle": "계정 생성",
   "createAlbum": "앨범 만들기",
   "createAlbumActionHint": "길게 눌러 사진을 선택한 후 +를 눌러 앨범을 만드세요",
-  "createAnEnteAccount": "Ente 계정 만들기",
+  "createAnEnteAccount": "Photovault 계정 만들기",
   "createAnotherKit": "다른 키트 만들기",
   "createBackupNow": "지금 백업 생성",
   "createCollaborativeLink": "협업 링크 만들기",
@@ -924,7 +924,7 @@
   "deleteDuplicates": "중복 제거",
   "deleteEmptyAlbums": "빈 앨범 삭제",
   "deleteEmptyAlbumsWithQuestionMark": "빈 앨범을 삭제하시겠습니까?",
-  "deleteEnteAccount": "Ente 계정 삭제",
+  "deleteEnteAccount": "Photovault 계정 삭제",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -1224,7 +1224,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "편집 내용이 저장되었습니다",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "위치 편집 내용은 Ente 안에서만 표시됩니다",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "위치 편집 내용은 Photovault 안에서만 표시됩니다",
   "editStorageLimit": "저장 공간 한도 편집",
   "editTag": "태그 수정하기",
   "editTime": "시간 편집",
@@ -1250,7 +1250,7 @@
     }
   },
   "emailHint": "이메일을 입력하세요",
-  "emailNeedsEnteAccountForFamily": "{email}님은 Ente 계정이 없습니다.\n\n초대를 보낸 후, 상대방이 Ente 계정을 만들면 가족에 추가하세요.",
+  "emailNeedsEnteAccountForFamily": "{email}님은 Photovault 계정이 없습니다.\n\n초대를 보낸 후, 상대방이 Photovault 계정을 만들면 가족에 추가하세요.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -1259,13 +1259,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email}는 Ente 계정이 없습니다.\n\n항목을 공유하려면 초대장을 보내세요.",
+  "emailNoEnteAccount": "{email}는 Photovault 계정이 없습니다.\n\n항목을 공유하려면 초대장을 보내세요.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email}님은 Ente 계정이 없습니다.\n\n사진을 공유하려면 초대를 보내세요.",
+  "emailNoEnteAccountPhotos": "{email}님은 Photovault 계정이 없습니다.\n\n사진을 공유하려면 초대를 보내세요.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1317,7 +1317,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -1326,7 +1326,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1778,8 +1778,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "복구키를 잊었나요?",
-  "free10GB": "<bold-green>ente</bold-green> Photos에서 10GB 무료로 이용",
-  "freeStorageOffer": "<bold-green>ente</bold-green> Photos에서 10% 할인 받기",
+  "free10GB": "<bold-green>Photovault</bold-green>에서 10GB 무료로 이용",
+  "freeStorageOffer": "<bold-green>Photovault</bold-green>에서 10% 할인 받기",
   "freeStorageOfferDescription": "\"AUTH\" 코드를 사용하면 첫해 10% 할인",
   "freeTrial": "무료 체험",
   "freeUpAmount": "{sizeInMBorGB} 확보",
@@ -2864,12 +2864,12 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "하나의 계정으로 Ente Photos, Ente Auth, Ente Locker를 모두 사용할 수 있습니다.",
+  "oneAccountAcrossEnteApps": "하나의 계정으로 Photovault, Ente Auth, Ente Locker를 모두 사용할 수 있습니다.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
   "oneLineAboutTheIssue": "문제에 대한 한 줄 설명",
-  "onEnte": "<branding>ente</branding>에 있음",
+  "onEnte": "<branding>Photovault</branding>에 있음",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -3005,7 +3005,7 @@
       }
     }
   },
-  "permanentlyDeleteYourEnteAccount": "Ente 계정을 영구 삭제하시겠습니까?",
+  "permanentlyDeleteYourEnteAccount": "Photovault 계정을 영구 삭제하시겠습니까?",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -3196,7 +3196,7 @@
     }
   },
   "publicLink": "공개 링크",
-  "publicLinkAccessDescription": "링크가 있는 사람은 누구나 Ente 계정 없이 앨범을 열 수 있습니다.",
+  "publicLinkAccessDescription": "링크가 있는 사람은 누구나 Photovault 계정 없이 앨범을 열 수 있습니다.",
   "publicLinkCollectDescription": "이 링크가 있는 사람은 누구나 앨범에 사진을 추가할 수 있습니다.",
   "publicLinkEnabled": "공개 링크 활성화됨",
   "publicLinkViewDescription": "이 링크가 있는 사람은 누구나 앨범에 접근할 수 있습니다.",
@@ -4084,7 +4084,7 @@
   "shareTextRecommendUsingEnte": "원본 화질 그대로 파일을 쉽게 공유할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
   "shareTextRecommendUsingEnteForFamily": "내 가족 요금제에 추가할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
   "shareTextRecommendUsingEnteForPhotos": "원본 화질 그대로 사진과 동영상을 쉽게 공유할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
-  "shareTextReferralInvite": "Ente Photos에서 20GB를 무료로 받으세요! https://ente.com/invite 에서 앱을 다운로드하고 코드 {referralCode}을 입력하세요.",
+  "shareTextReferralInvite": "Photovault Photos에서 20GB를 무료로 받으세요! https://ente.com/invite 에서 앱을 다운로드하고 코드 {referralCode}을 입력하세요.",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}
@@ -4156,7 +4156,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "이 항목은 기기와 Ente 모두에 있습니다.",
+  "singleFileInBothLocalAndRemote": "이 항목은 기기와 Photovault 모두에 있습니다.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -4281,7 +4281,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "회원님의 {id} 계정은 이미 다른 Ente 계정에 연결되어 있습니다.\n이 계정에서 {id} 계정을 사용하려면 지원팀에 문의해 주세요.",
+  "subAlreadyLinkedErrMessage": "회원님의 {id} 계정은 이미 다른 Photovault 계정에 연결되어 있습니다.\n이 계정에서 {id} 계정을 사용하려면 지원팀에 문의해 주세요.",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -4311,7 +4311,7 @@
   "suggestions": "제안",
   "sunrise": "지평선 너머로",
   "support": "지원",
-  "supportEnte": "<bold-green>ente</bold-green> 지원",
+  "supportEnte": "<bold-green>Photovault</bold-green> 지원",
   "syncing": "동기화 중...",
   "syncProgress": "추억 {completed}/{total}개 보존됨",
   "@syncProgress": {
@@ -4500,7 +4500,7 @@
     }
   },
   "trustedContacts": "신뢰할 수 있는 연락처",
-  "trustedContactsEmptyDescription": "다른 Ente 사용자를 신뢰할 수 있는 연락처로 지정하여 계정을 복구할 수 있도록 하세요",
+  "trustedContactsEmptyDescription": "다른 Photovault 사용자를 신뢰할 수 있는 연락처로 지정하여 계정을 복구할 수 있도록 하세요",
   "trustedContactStatusAccepted": "수락됨",
   "@trustedContactStatusAccepted": {
     "description": "Short status label shown for an accepted trusted contact"
@@ -4662,7 +4662,7 @@
   "@uploadStorageLimitErrorTitle": {
     "description": "Title shown when uploads fail due to running out of storage"
   },
-  "uploadSubscriptionExpiredErrorBody": "Ente Photos 구독이 만료되었습니다. 계속 업로드하려면 구독을 갱신하세요.",
+  "uploadSubscriptionExpiredErrorBody": "Photovault 구독이 만료되었습니다. 계속 업로드하려면 구독을 갱신하세요.",
   "@uploadSubscriptionExpiredErrorBody": {
     "description": "Body shown when uploads fail because the Photos subscription is expired"
   },
@@ -5054,7 +5054,7 @@
       }
     }
   },
-  "noEnteAccountWithThisEmail": "이 이메일로 가입된 Ente 계정이 없습니다.",
+  "noEnteAccountWithThisEmail": "이 이메일로 가입된 Photovault 계정이 없습니다.",
   "shareALinkInline": "링크를 공유하세요.",
   "personAlreadyHasAccess": "이 사람은 이미 접근 권한이 있습니다.",
   "removePersonTitle": "{name}님을 제거하시겠습니까?",

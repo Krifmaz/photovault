@@ -1,6 +1,7 @@
 import "dart:async";
 
 import "package:collection/collection.dart";
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_components/theme/text_styles.dart" as component;
 import "package:ente_icons/ente_icons.dart";
 import "package:ente_strings/ente_strings.dart";
@@ -25,7 +26,7 @@ import "package:photos/ui/social/likes_bottom_sheet.dart";
 
 final _logger = Logger("FileSocialOverlay");
 
-const _likedColor = Color(0xFF08C225);
+const _likedColor = encoreDarkAccent2; // PHOTOVAULT: theme
 const _socialControlsSize = 48.0;
 // TODO: Restore both icons to 24px after updating their ente_icons assets to
 // follow HugeIcons sizing guidelines.

@@ -1,3 +1,5 @@
+// PHOTOVAULT
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:flutter/material.dart';
 
 // Figma: https://www.figma.com/design/BuBNPPytxlVnqfmCUW0mgz/Ente-Visual-Design?node-id=2207-41577&m=dev
@@ -7,8 +9,11 @@ class Radii {
   static const double xs = 4;
   static const double sm = 8;
   static const double md = 12;
-  static const double lg = 16;
-  static const double button = 20;
+  // PHOTOVAULT: theme. Encore card radius (`radius.card`, was 16).
+  static const double lg = EncoreTokens.radiusCard;
+  // PHOTOVAULT: theme. Used by both buttons and menu/settings cards, so it
+  // takes Encore's card radius (`radius.card`, was 20).
+  static const double button = EncoreTokens.radiusCard;
   static const double bottomSheet = 20;
   static const double sheet = 24;
   static const Radius buttonRadius = Radius.circular(button);

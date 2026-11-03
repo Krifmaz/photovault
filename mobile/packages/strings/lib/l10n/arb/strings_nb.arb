@@ -323,8 +323,8 @@
   "@forgotPassword": {
     "description": "Forgot password link label"
   },
-  "free10GB": "10 GB gratis hos <bold-green>ente</bold-green> bilder",
-  "freeStorageOffer": "10 % avslag på <bold-green>ente</bold-green> bilder",
+  "free10GB": "10 GB gratis hos <bold-green>Photovault</bold-green> bilder",
+  "freeStorageOffer": "10 % avslag på <bold-green>Photovault</bold-green> bilder",
   "freeStorageOfferDescription": "Bruk kode «AUTH» for 10 % avslag det første året",
   "general": "Generelt",
   "generatingEncryptionKeys": "Genererer krypteringsnøkler …",
@@ -337,7 +337,7 @@
   },
   "getStarted": "Kom i gang",
   "giveUsAStarOnGithub": "Gi oss en stjerne på GitHub",
-  "hearUsWhereOptionalTitle": "Hvordan fikk du høre om Ente? (valgfritt)",
+  "hearUsWhereOptionalTitle": "Hvordan fikk du høre om Photovault? (valgfritt)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -370,7 +370,7 @@
   "importBitwardenGuide": "Bruk «Eksporter hvelv»-innstillingen i Bitwarden sine verktøy og importer den ukrypterte JSON-fila.",
   "importCodeDelimiterInfo": "Kodene kan skilles med et komma eller en ny linje",
   "importCodes": "Importer koder",
-  "importEnteEncGuide": "Velg den krypterte JSON-fila eksportert fra Ente",
+  "importEnteEncGuide": "Velg den krypterte JSON-fila eksportert fra Photovault",
   "importEnterSetupKey": "Skriv inn en oppsettsnøkkel",
   "importFailureDesc": "Klarte ikke tolke den valgte fila.",
   "importFromGallery": "Importer fra galleri",
@@ -409,7 +409,7 @@
     }
   },
   "importSuccessTitle": "Jippi!",
-  "importTypeEnteEncrypted": "Ente kryptert eksport",
+  "importTypeEnteEncrypted": "Photovault kryptert eksport",
   "incorrectCode": "Feil kode",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -514,11 +514,11 @@
       "count": {}
     }
   },
-  "networkConnectionRefusedErr": "Klarte ikke koble til Ente, prøv igjen etter en stund. Hvis feilen vedvarer, ta kontakt med kundestøtte.",
+  "networkConnectionRefusedErr": "Klarte ikke koble til Photovault, prøv igjen etter en stund. Hvis feilen vedvarer, ta kontakt med kundestøtte.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Klarte ikke koble til Ente, kontroller nettverksinnstillingene og ta kontakt med kundestøtte hvis feilen vedvarer.",
+  "networkHostLookUpErr": "Klarte ikke koble til Photovault, kontroller nettverksinnstillingene og ta kontakt med kundestøtte hvis feilen vedvarer.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -801,7 +801,7 @@
   "shouldHideCode": "Skjul koder",
   "showLargeIcons": "Vis store ikoner",
   "showQRAuthMessage": "Autentiser for å vise QR-kode",
-  "sigInBackupReminder": "Ente vil på automatisk vis sikkerhetskopiere kodene etter innlogging.\n\nVi anbefaler fremdeles å eksportere kodene som ekstra beskyttelse.",
+  "sigInBackupReminder": "Photovault vil på automatisk vis sikkerhetskopiere kodene etter innlogging.\n\nVi anbefaler fremdeles å eksportere kodene som ekstra beskyttelse.",
   "signInToBackup": "Logg inn for å sikkerhetskopiere kodene",
   "signOutFromOtherDevices": "Logg ut fra andre enheter",
   "@signOutFromOtherDevices": {
@@ -849,7 +849,7 @@
   "success": "Vellykket",
   "suggestFeatures": "Foreslå funksjoner",
   "support": "Brukerstøtte",
-  "supportEnte": "Støtt <bold-green>ente</bold-green>",
+  "supportEnte": "Støtt <bold-green>Photovault</bold-green>",
   "tag": "Merkelapp",
   "tags": "Merkelapper",
   "tapToUnlock": "Trykk for å låse opp",

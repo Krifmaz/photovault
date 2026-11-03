@@ -170,7 +170,7 @@
   "addToAlbum": "添加到相册",
   "addToCollection": "添加到集合",
   "addToCollections": "添加到集合",
-  "addToEnte": "添加到 Ente",
+  "addToEnte": "添加到 Photovault",
   "addToHiddenAlbum": "添加到隐藏相册",
   "addToPerson": "添加到人员",
   "@addToPerson": {
@@ -250,8 +250,8 @@
   "allowDownloads": "允许下载",
   "allowJoining": "允许加入",
   "allowJoiningAlbum": "允许加入相册",
-  "allowJoiningDescription": "拥有 Ente 账户的查看者可以加入您的相册并保持同步",
-  "allowPermBody": "请从“设置”中选择允许访问您的照片，以便 Ente 可以显示和备份您的图库。",
+  "allowJoiningDescription": "拥有 Photovault 账户的查看者可以加入您的相册并保持同步",
+  "allowPermBody": "请从“设置”中选择允许访问您的照片，以便 Photovault 可以显示和备份您的图库。",
   "allowPermTitle": "允许访问照片",
   "allPersonGroupingWillReset": "此人的所有分组都将被重设，并且您将丢失针对此人的所有建议",
   "allTabEmptyHint": "这里暂时没有任何内容。点按 + 添加代码，或打开回收站恢复代码。",
@@ -285,7 +285,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "有新版本的 Ente 可供使用。",
+  "aNewVersionOfEnteIsAvailable": "有新版本的 Photovault 可供使用。",
   "aNewVersionOfEnteLockerIsAvailable": "有新版本的 Ente Locker 可使用。",
   "anythingElse": "还有什么要补充吗？",
   "@anythingElse": {
@@ -294,7 +294,7 @@
   "appearance": "外观",
   "appIcon": "应用图标",
   "appleId": "Apple ID",
-  "applePhotosUnsupportedResource": "此文件无法保存到 Apple 照片。您仍可以在 Ente 中查看它。",
+  "applePhotosUnsupportedResource": "此文件无法保存到 Apple 照片。您仍可以在 Photovault 中查看它。",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -405,7 +405,7 @@
   "autoAddPeople": "自动添加人物",
   "autoAddToAlbum": "自动添加到相册",
   "autoCastDialogBody": "您将在此处看到可用的 Cast 设备。",
-  "autoCastiOSPermission": "请确保已在“设置”中为 Ente Photos 应用打开本地网络权限。",
+  "autoCastiOSPermission": "请确保已在“设置”中为 Photovault 应用打开本地网络权限。",
   "autoLock": "自动锁定",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -467,7 +467,7 @@
   "backupModeScreenWillDim": "屏幕将自动变暗以节省电量",
   "backupModeSettingsDescription": "保持应用打开以完成备份",
   "backupModeStart": "启动备份模式",
-  "backupModeStayInEnte": "请留在 Ente 中。切换应用会暂停备份。",
+  "backupModeStayInEnte": "请留在 Photovault 中。切换应用会暂停备份。",
   "backupModeTapToWakeScreen": "点按以唤醒屏幕",
   "backupOnlyNewPhotos": "仅备份新照片",
   "backupOnlyNewPhotosAllFoldersSelected": "当前已选择备份所有文件夹。\n\n您可以先继续，或调整已选择的文件夹。",
@@ -489,7 +489,7 @@
   "backupSettings": "备份设置",
   "backupStatus": "备份状态",
   "backupStatusDescription": "已备份的项目将显示在此处",
-  "backupToEnte": "备份到 Ente",
+  "backupToEnte": "备份到 Photovault",
   "backupVideos": "备份视频",
   "beach": "沙滩与大海",
   "birthday": "生日",
@@ -650,7 +650,7 @@
   "codeChangeLimitReached": "抱歉，您已达到代码更改的限制。",
   "codeCopiedToClipboard": "代码已复制到剪贴板",
   "codeIssuerHint": "发行方",
-  "collabLinkSectionDescription": "允许他人在没有 Ente 账号的情况下添加照片",
+  "collabLinkSectionDescription": "允许他人在没有 Photovault 账号的情况下添加照片",
   "collaborator": "协作者",
   "collageLayout": "布局",
   "collageSaved": "拼贴已保存到相册",
@@ -741,7 +741,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "我了解这会删除我在 Ente Photos、Ente Auth 和 Ente Locker 中的全部数据。",
+  "confirmDeleteAccountAcrossApps": "我了解这会删除我在 Photovault、Ente Auth 和 Ente Locker 中的全部数据。",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -833,7 +833,7 @@
   "createAccountTitle": "创建账户",
   "createAlbum": "创建相册",
   "createAlbumActionHint": "长按选择照片，然后点击 + 创建相册",
-  "createAnEnteAccount": "创建 Ente 账户",
+  "createAnEnteAccount": "创建 Photovault 账户",
   "createAnotherKit": "创建另一个工具包",
   "createBackupNow": "立即创建备份",
   "createCollaborativeLink": "创建协作链接",
@@ -946,12 +946,12 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "已从 Ente 删除",
+  "deletedFromEnte": "已从 Photovault 删除",
   "deletedItemsStayHereForThirtyDays": "已删除的项目将在此保留 30 天",
   "deleteDuplicates": "删除重复项",
   "deleteEmptyAlbums": "删除空相册",
   "deleteEmptyAlbumsWithQuestionMark": "要删除空相册吗？",
-  "deleteEnteAccount": "删除 Ente 账户",
+  "deleteEnteAccount": "删除 Photovault 账户",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -959,7 +959,7 @@
   "deleteFromBoth": "同时从两者中删除",
   "deleteFromDevice": "从设备中删除",
   "deleteFromDeviceQuestion": "从设备中删除？",
-  "deleteFromEnte": "从 Ente 中删除",
+  "deleteFromEnte": "从 Photovault 中删除",
   "deleteHiddenFilesFromDevice": "从设备删除隐藏文件",
   "deleteHiddenFilesFromDeviceDescription": "删除您设备上隐藏文件的本地副本",
   "deleteItemCount": "{count, plural, other{删除 {count} 个项目}}",
@@ -1253,7 +1253,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "已保存编辑",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "对位置的编辑只能在 Ente 内看到",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "对位置的编辑只能在 Photovault 内看到",
   "editStorageLimit": "编辑存储上限",
   "editTag": "编辑标签",
   "editTime": "修改时间",
@@ -1279,7 +1279,7 @@
     }
   },
   "emailHint": "请输入您的电子邮件地址",
-  "emailNeedsEnteAccountForFamily": "{email} 还没有 Ente 账户。\n\n请先向对方发送邀请，待其在 Ente 创建账户后即可加入您的家庭。",
+  "emailNeedsEnteAccountForFamily": "{email} 还没有 Photovault 账户。\n\n请先向对方发送邀请，待其在 Photovault 创建账户后即可加入您的家庭。",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -1288,13 +1288,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email} 还没有 Ente 账户。\n\n请向对方发送邀请以共享项目。",
+  "emailNoEnteAccount": "{email} 还没有 Photovault 账户。\n\n请向对方发送邀请以共享项目。",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} 还没有 Ente 账户。\n\n请向对方发送邀请以共享照片。",
+  "emailNoEnteAccountPhotos": "{email} 还没有 Photovault 账户。\n\n请向对方发送邀请以共享照片。",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1346,7 +1346,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -1355,7 +1355,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1733,7 +1733,7 @@
       }
     }
   },
-  "filesInAlbumSafelyOnEnte": "{count, plural, one{相册中的此项目已备份到 Ente，删除设备副本即可释放空间且不会丢失。} other{相册中的全部 {formattedNumber} 个项目均已备份到 Ente，删除设备副本即可释放空间且不会丢失。}}",
+  "filesInAlbumSafelyOnEnte": "{count, plural, one{相册中的此项目已备份到 Photovault，删除设备副本即可释放空间且不会丢失。} other{相册中的全部 {formattedNumber} 个项目均已备份到 Photovault，删除设备副本即可释放空间且不会丢失。}}",
   "@filesInAlbumSafelyOnEnte": {
     "description": "Explains that device copies for files in an album can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1777,7 +1777,7 @@
       }
     }
   },
-  "filesSafelyOnEnte": "{count, plural, one{此项目已备份到 Ente，删除设备副本即可释放空间且不会丢失。} other{全部 {formattedNumber} 个项目均已备份到 Ente，删除设备副本即可释放空间且不会丢失。}}",
+  "filesSafelyOnEnte": "{count, plural, one{此项目已备份到 Photovault，删除设备副本即可释放空间且不会丢失。} other{全部 {formattedNumber} 个项目均已备份到 Photovault，删除设备副本即可释放空间且不会丢失。}}",
   "@filesSafelyOnEnte": {
     "description": "Explains that device copies can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1825,8 +1825,8 @@
   },
   "forgotPasswordPrompt": "忘记密码？",
   "forgotRecoveryKey": "丢失恢复密钥？",
-  "free10GB": "在 <bold-green>ente</bold-green> Photos 上可享 10 GB 免费空间",
-  "freeStorageOffer": "购买 <bold-green>ente</bold-green> Photos 可享 10% 折扣",
+  "free10GB": "在 <bold-green>Photovault</bold-green> 上可享 10 GB 免费空间",
+  "freeStorageOffer": "购买 <bold-green>Photovault</bold-green> 可享 10% 折扣",
   "freeStorageOfferDescription": "使用优惠码“AUTH”可享受首年 10% 折扣",
   "free": "免费",
   "freeTrial": "免费试用",
@@ -1882,7 +1882,7 @@
   "grantGalleryPermissionDesc": "授予权限以使用人脸识别访问并整理照片。所有处理均在您的设备上进行。",
   "grantGalleryPermissionTitle": "来寻找您最爱的照片吧",
   "grantPermission": "授予权限",
-  "grantPermissionDesc": "请允许 Ente 访问您的图库，以便我们使用人脸识别进行整理。所有处理均在您的设备上进行。",
+  "grantPermissionDesc": "请允许 Photovault 访问您的图库，以便我们使用人脸识别进行整理。所有处理均在您的设备上进行。",
   "greenery": "绿色生活",
   "grid": "网格",
   "photosInOriginalProportions": "原始比例的照片",
@@ -1897,11 +1897,11 @@
   "guestView": "访客视图",
   "guestViewEnablePreSteps": "要启用访客视图，请在系统设置中设置设备密码或屏幕锁。",
   "happyBirthday": "生日快乐！ 🥳",
-  "hearUsWhereOptionalTitle": "您是怎么知道 Ente 的？（可选）",
+  "hearUsWhereOptionalTitle": "您是怎么知道 Photovault 的？（可选）",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "您是如何了解到 Ente 的？",
+  "hearUsWhereTitle": "您是如何了解到 Photovault 的？",
   "help": "帮助",
   "helpAndSupport": "帮助和支持",
   "hidden": "已隐藏",
@@ -2003,7 +2003,7 @@
   "importBitwardenGuide": "使用 Bitwarden 工具中的“导出密码库”选项并导入未加密的 JSON 文件。",
   "importCodeDelimiterInfo": "代码可以用逗号或换行符分隔",
   "importCodes": "导入代码",
-  "importEnteEncGuide": "选择从 Ente 导出的 JSON 加密文件",
+  "importEnteEncGuide": "选择从 Photovault 导出的 JSON 加密文件",
   "importEnterSetupKey": "输入设置密钥",
   "importFailureDesc": "无法解析选定的文件。",
   "importFileTooLarge": "所选文件过大。最大为 {size}。",
@@ -2052,7 +2052,7 @@
     }
   },
   "importSuccessTitle": "耶！",
-  "importTypeEnteEncrypted": "Ente 加密导出",
+  "importTypeEnteEncrypted": "Photovault 加密导出",
   "incorrectCode": "代码错误",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -2115,7 +2115,7 @@
       }
     }
   },
-  "inviteToEnte": "邀请使用 Ente",
+  "inviteToEnte": "邀请使用 Photovault",
   "ok": "确定",
   "@ok": {
     "description": "Generic OK button label"
@@ -2498,7 +2498,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "登录 Ente",
+  "loginToEnte": "登录 Photovault",
   "loginToExistingAccount": "登录现有账户",
   "loginWithAuthAccount": "使用您的 Ente Auth 账户登录",
   "loginWithTOTP": "使用 TOTP 登录",
@@ -2547,7 +2547,7 @@
   "mapsPrivacyNotice": "我们会将大致坐标发送给注重隐私的第三方（例如 OpenStreetMap），以便显示地图和位置。",
   "markingAsImportant": "正在标记为重要...",
   "me": "我",
-  "mediaManagementHintMessage": "在设置中为 Ente 开启媒体管理权限后，这些提示就不会再出现。",
+  "mediaManagementHintMessage": "在设置中为 Photovault 开启媒体管理权限后，这些提示就不会再出现。",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -2644,7 +2644,7 @@
   "mixedGrouping": "混合分组？",
   "mlConsent": "启用机器学习",
   "mlConsentConfirmation": "我了解了，并希望启用机器学习",
-  "mlConsentDescription": "如果您启用机器学习，Ente 将从文件（包括与您共享的文件）中提取面部几何形状等信息。\n\n这将在您的设备上进行，并且任何生成的生物特征信息都将被端到端加密。",
+  "mlConsentDescription": "如果您启用机器学习，Photovault 将从文件（包括与您共享的文件）中提取面部几何形状等信息。\n\n这将在您的设备上进行，并且任何生成的生物特征信息都将被端到端加密。",
   "mlConsentPrivacyDetails": "请<policy>点击此处</policy>，了解我们隐私政策中有关此功能的更多详情",
   "@mlConsentPrivacyDetails": {
     "description": "Machine learning consent screen sentence; only the text inside the policy tags is tappable and opens the privacy policy"
@@ -2750,11 +2750,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "无法连接到 Ente，请稍后重试。如果错误仍然存在，请联系支持人员。",
+  "networkConnectionRefusedErr": "无法连接到 Photovault，请稍后重试。如果错误仍然存在，请联系支持人员。",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "无法连接到 Ente，请检查您的网络设置，如果错误仍然存在，请联系支持人员。",
+  "networkHostLookUpErr": "无法连接到 Photovault，请检查您的网络设置，如果错误仍然存在，请联系支持人员。",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2922,12 +2922,12 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "您在 Ente Photos、Ente Auth 和 Ente Locker 中共用一个账户。",
+  "oneAccountAcrossEnteApps": "您在 Photovault、Ente Auth 和 Ente Locker 中共用一个账户。",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
   "oneLineAboutTheIssue": "用一句话描述问题",
-  "onEnte": "在 <branding>ente</branding> 上",
+  "onEnte": "在 <branding>Photovault</branding> 上",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -3066,7 +3066,7 @@
       }
     }
   },
-  "permanentlyDeleteYourEnteAccount": "要永久删除您的 Ente 账户吗？",
+  "permanentlyDeleteYourEnteAccount": "要永久删除您的 Photovault 账户吗？",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -3089,7 +3089,7 @@
   },
   "pets": "毛茸茸的伙伴",
   "photoGridSize": "照片网格大小",
-  "photoLibraryAddPermissionRequired": "Ente 需要权限才能将照片和视频保存到 Apple 照片。您可以在“设置”中允许访问。",
+  "photoLibraryAddPermissionRequired": "Photovault 需要权限才能将照片和视频保存到 Apple 照片。您可以在“设置”中允许访问。",
   "photoLibraryAddPermissionRestricted": "此设备上的照片图库访问受限。",
   "photoOrder": "照片顺序",
   "photoViewerFilmstripLabel": "照片选择器",
@@ -3257,8 +3257,8 @@
     }
   },
   "publicLink": "公开链接",
-  "publicCollectionLinkAccessDescription": "任何拥有该链接的人，无需 Ente 账户即可打开该合集。",
-  "publicLinkAccessDescription": "任何人无需 Ente 账户即可通过此链接打开相册。",
+  "publicCollectionLinkAccessDescription": "任何拥有该链接的人，无需 Photovault 账户即可打开该合集。",
+  "publicLinkAccessDescription": "任何人无需 Photovault 账户即可通过此链接打开相册。",
   "publicLinkCollectDescription": "任何人都可以通过此链接向您的相册添加照片。",
   "publicLinkEnabled": "公开链接已启用",
   "publicLinkViewDescription": "任何人都可以通过此链接访问您的相册。",
@@ -3593,7 +3593,7 @@
   "resendInvite": "重新发送邀请",
   "reset": "重设",
   "resetIgnoredFiles": "重置忽略的文件",
-  "resetIgnoredFilesDescription": "重置这些被忽略的文件，让 Ente 再次尝试上传。",
+  "resetIgnoredFilesDescription": "重置这些被忽略的文件，让 Photovault 再次尝试上传。",
   "resetPasswordTitle": "重置密码",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -3745,7 +3745,7 @@
     "description": "Description text asking user if they want to save to storage or share with other apps"
   },
   "savePerson": "保存人物",
-  "saveToEnte": "保存到 Ente",
+  "saveToEnte": "保存到 Photovault",
   "saveToLocker": "保存到 Locker",
   "saveYourRecoveryKeyIfYouHaventAlready": "若您尚未保存，请妥善保存此恢复密钥",
   "saving": "正在保存...",
@@ -3906,7 +3906,7 @@
   "securityDesc": "加密、恢复密钥、应用锁和账户保护",
   "seeAllCollections": "所有集合",
   "seePublicAlbumLinksInApp": "在应用程序中查看公开相册链接",
-  "selectAlbumsToBackUpToEnte": "选择要备份到 Ente 的相册",
+  "selectAlbumsToBackUpToEnte": "选择要备份到 Photovault 的相册",
   "selectAlbumToLikePhoto": "选择相册以点赞此照片",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -3942,7 +3942,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "所选文件不在 Ente 上",
+  "selectedFilesAreNotOnEnte": "所选文件不在 Photovault 上",
   "selectedFilesBackedUpToEnte": "这些项目将从所有相册中删除。您可以从回收站恢复它们。",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -4102,7 +4102,7 @@
   "share": "分享",
   "shareALink": "共享链接",
   "shareAnAlbum": "共享相册",
-  "shareCodeEarnStorage": "让您的 Ente 存储空间翻倍",
+  "shareCodeEarnStorage": "让您的 Photovault 存储空间翻倍",
   "shareCodes": "分享代码",
   "shareCodesDuration": "选择您要分享代码的期限。",
   "shareCollection": "共享集合",
@@ -4155,17 +4155,17 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "下载 Ente，方便我们轻松共享原始质量的文件\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "下载 Ente，这样我就能把您加入我的家庭计划：\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "下载 Ente，这样我们就能轻松共享原始画质的照片和视频：\n\nhttps://ente.com",
-  "shareTextReferralInvite": "使用 Ente Photos 获得 20 GB 免费空间！在 https://ente.com/invite 下载应用并使用代码 {referralCode}。",
+  "shareTextRecommendUsingEnte": "下载 Photovault，方便我们轻松共享原始质量的文件\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "下载 Photovault，这样我就能把您加入我的家庭计划：\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "下载 Photovault，这样我们就能轻松共享原始画质的照片和视频：\n\nhttps://ente.com",
+  "shareTextReferralInvite": "使用 Photovault 获得 20 GB 免费空间！在 https://ente.com/invite 下载应用并使用代码 {referralCode}。",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}
     }
   },
   "shareThisLink": "任何人收到此链接即可访问您的项目。您可以随时删除链接以移除访问权限。",
-  "shareWithNonenteUsers": "与非 Ente 用户共享",
+  "shareWithNonenteUsers": "与非 Photovault 用户共享",
   "shareYourFeedbackHere": "在此分享您的反馈",
   "@shareYourFeedbackHere": {
     "description": "Placeholder for optional account deletion feedback"
@@ -4196,7 +4196,7 @@
   "showQRAuthMessage": "显示二维码需要身份验证",
   "showTextOnWidget": "在小组件上显示文字",
   "shuffle": "随机播放",
-  "sigInBackupReminder": "登录后 Ente 会自动备份代码。\n\n我们仍然建议您导出代码作为额外备份。",
+  "sigInBackupReminder": "登录后 Photovault 会自动备份代码。\n\n我们仍然建议您导出代码作为额外备份。",
   "signInToBackup": "登录以备份您的代码",
   "signOutFromOtherDevices": "退出其他设备",
   "@signOutFromOtherDevices": {
@@ -4230,7 +4230,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "此项目在您的设备和 Ente 上均可用。",
+  "singleFileInBothLocalAndRemote": "此项目在您的设备和 Photovault 上均可用。",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -4249,7 +4249,7 @@
   "socialNotifications": "点赞与评论",
   "socialNotificationsExplanation": "您照片获得的点赞以及您所在相册中的评论",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "与您共享相册的人应在其设备上看到相同的 ID。",
-  "someSelectedFilesBackedUpToEnte": "这些项目在设备和 Ente 上均可用。",
+  "someSelectedFilesBackedUpToEnte": "这些项目在设备和 Photovault 上均可用。",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -4357,7 +4357,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "您的 {id} 已关联到另一个 Ente 账户。\n如果您想在此账户上使用您的 {id}，请联系我们的支持团队。",
+  "subAlreadyLinkedErrMessage": "您的 {id} 已关联到另一个 Photovault 账户。\n如果您想在此账户上使用您的 {id}，请联系我们的支持团队。",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -4387,7 +4387,7 @@
   "suggestions": "建议",
   "sunrise": "在地平线上",
   "support": "支持",
-  "supportEnte": "支持 <bold-green>ente</bold-green>",
+  "supportEnte": "支持 <bold-green>Photovault</bold-green>",
   "syncing": "正在同步...",
   "syncProgress": "已保存 {completed}/{total} 段回忆",
   "@syncProgress": {
@@ -4458,7 +4458,7 @@
   "@thisEmailIsAlreadyInUse": {
     "description": "Error message when email is already in use"
   },
-  "thisHelpsUsImproveEnte": "这有助于我们改进 Ente",
+  "thisHelpsUsImproveEnte": "这有助于我们改进 Photovault",
   "@thisHelpsUsImproveEnte": {
     "description": "Subtitle under account deletion reason prompt"
   },
@@ -4576,7 +4576,7 @@
     }
   },
   "trustedContacts": "可信联系人",
-  "trustedContactsEmptyDescription": "指定另一位 Ente 用户作为可信联系人，以恢复您的账户",
+  "trustedContactsEmptyDescription": "指定另一位 Photovault 用户作为可信联系人，以恢复您的账户",
   "trustedContactStatusAccepted": "已接受",
   "@trustedContactStatusAccepted": {
     "description": "Short status label shown for an accepted trusted contact"
@@ -4741,7 +4741,7 @@
   "@uploadStorageLimitErrorTitle": {
     "description": "Title shown when uploads fail due to running out of storage"
   },
-  "uploadSubscriptionExpiredErrorBody": "您的 Ente Photos 订阅已过期。请续订以继续上传。",
+  "uploadSubscriptionExpiredErrorBody": "您的 Photovault 订阅已过期。请续订以继续上传。",
   "@uploadSubscriptionExpiredErrorBody": {
     "description": "Body shown when uploads fail because the Photos subscription is expired"
   },
@@ -5145,7 +5145,7 @@
       }
     }
   },
-  "noEnteAccountWithThisEmail": "没有使用此电子邮件的 Ente 账户。",
+  "noEnteAccountWithThisEmail": "没有使用此电子邮件的 Photovault 账户。",
   "shareALinkInline": "或共享链接。",
   "personAlreadyHasAccess": "此人已拥有访问权限。",
   "removePersonTitle": "要移除 {name} 吗？",
@@ -5181,5 +5181,5 @@
     }
   },
   "notEnoughStorageTitle": "存储空间不足",
-  "notEnoughStorageBody": "您在 Ente 上的可用空间不足，无法添加新照片。请释放空间或升级以继续添加。"
+  "notEnoughStorageBody": "您在 Photovault 上的可用空间不足，无法添加新照片。请释放空间或升级以继续添加。"
 }

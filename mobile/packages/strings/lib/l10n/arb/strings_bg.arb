@@ -140,7 +140,7 @@
   "addTo": "Add to",
   "addToAlbum": "Add to album",
   "addToCollection": "Add to collection",
-  "addToEnte": "Add to Ente",
+  "addToEnte": "Add to Photovault",
   "addToHiddenAlbum": "Add to hidden album",
   "addToPerson": "Add to person",
   "@addToPerson": {
@@ -202,7 +202,7 @@
   "allowAppToOpenSharedAlbumLinks": "Allow app to open shared album links",
   "allowDownloads": "Allow downloads",
   "allowJoiningAlbum": "Allow joining album",
-  "allowPermBody": "Please allow access to your photos from Settings so Ente can display and backup your library.",
+  "allowPermBody": "Please allow access to your photos from Settings so Photovault can display and backup your library.",
   "allowPermTitle": "Allow access to photos",
   "allPersonGroupingWillReset": "All groupings for this person will be reset, and you will lose all suggestions made for this person",
   "allTabEmptyHint": "Nothing here yet. Tap + to add a code or open Trash to recover one.",
@@ -236,7 +236,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "A new version of Ente is available.",
+  "aNewVersionOfEnteIsAvailable": "A new version of Photovault is available.",
   "aNewVersionOfEnteLockerIsAvailable": "A new version of Ente Locker is available.",
   "anythingElse": "Нещо друго?",
   "@anythingElse": {
@@ -245,7 +245,7 @@
   "appearance": "Appearance",
   "appIcon": "App icon",
   "appleId": "Apple ID",
-  "applePhotosUnsupportedResource": "This file could not be saved to Apple Photos. You can still view it in Ente.",
+  "applePhotosUnsupportedResource": "This file could not be saved to Apple Photos. You can still view it in Photovault.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -356,7 +356,7 @@
   "autoAddPeople": "Auto-add people",
   "autoAddToAlbum": "Auto-add to album",
   "autoCastDialogBody": "You'll see available Cast devices here.",
-  "autoCastiOSPermission": "Make sure Local Network permissions are turned on for the Ente Photos app, in Settings.",
+  "autoCastiOSPermission": "Make sure Local Network permissions are turned on for the Photovault app, in Settings.",
   "autoLock": "Автоматично заключване",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -409,7 +409,7 @@
   "backupSettings": "Backup settings",
   "backupStatus": "Backup status",
   "backupStatusDescription": "Items that have been backed up will show up here",
-  "backupToEnte": "Backup to Ente",
+  "backupToEnte": "Backup to Photovault",
   "backupVideos": "Backup videos",
   "beach": "Sand and sea",
   "birthday": "Birthday",
@@ -563,7 +563,7 @@
   "codeChangeLimitReached": "Sorry, you've reached the limit of code changes.",
   "codeCopiedToClipboard": "Code copied to clipboard",
   "codeIssuerHint": "Издател",
-  "collabLinkSectionDescription": "Позволи да добавят снимки без да е необходим профил в Ente",
+  "collabLinkSectionDescription": "Позволи да добавят снимки без да е необходим профил в Photovault",
   "collaborator": "Collaborator",
   "collageLayout": "Layout",
   "collageSaved": "Collage saved to gallery",
@@ -653,7 +653,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Аз осъзнзвам, че това ще изтрие моите данни в Ente Photos, Ente Auth и Ente Locker. ",
+  "confirmDeleteAccountAcrossApps": "Аз осъзнзвам, че това ще изтрие моите данни в Photovault, Ente Auth и Ente Locker. ",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -741,7 +741,7 @@
   "createAccountTitle": "Създаване на акаунт",
   "createAlbum": "Create album",
   "createAlbumActionHint": "Long press to select photos and click + to create an album",
-  "createAnEnteAccount": "Създаване на профил в Ente",
+  "createAnEnteAccount": "Създаване на профил в Photovault",
   "createAnotherKit": "Create another kit",
   "createBackupNow": "Създаване на резервно копие сега",
   "createCollaborativeLink": "Create collaborative link",
@@ -853,12 +853,12 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Изтрито от Ente",
+  "deletedFromEnte": "Изтрито от Photovault",
   "deletedItemsStayHereForThirtyDays": "Изтритите елементи остават тук 30 дни",
   "deleteDuplicates": "Изтриване на дубликатите",
   "deleteEmptyAlbums": "Изтриване на празните албуми",
   "deleteEmptyAlbumsWithQuestionMark": "Да се изтрият ли празните албуми?",
-  "deleteEnteAccount": "Изтриване на профил в Ente",
+  "deleteEnteAccount": "Изтриване на профил в Photovault",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -866,7 +866,7 @@
   "deleteFromBoth": "Изтриване и от двете места",
   "deleteFromDevice": "Изтриване от устройството",
   "deleteFromDeviceQuestion": "Да се изтрие ли от устройството?",
-  "deleteFromEnte": "Изтриване от Ente",
+  "deleteFromEnte": "Изтриване от Photovault",
   "deleteHiddenFilesFromDevice": "Изтриване на скритите файлове от устройството",
   "deleteHiddenFilesFromDeviceDescription": "Изтриване на локалните копия на скрити файлове от устройството ви",
   "deleteItemCount": "{count, plural, one{Изтриване на {count} елемент} other{Изтриване на {count} елемента}}",
@@ -1152,7 +1152,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Edits saved",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Edits to location will only be seen within Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Edits to location will only be seen within Photovault",
   "editStorageLimit": "Edit storage limit",
   "editTag": "Редакция на етикет",
   "editTime": "Edit time",
@@ -1178,7 +1178,7 @@
     }
   },
   "emailHint": "Въведете Вашият имейл адрес",
-  "emailNeedsEnteAccountForFamily": "{email} няма профил в Ente.\n\nИзпратете им покана и добавете към семейния профил, когато са създали личния си профил в Ente.",
+  "emailNeedsEnteAccountForFamily": "{email} няма профил в Photovault.\n\nИзпратете им покана и добавете към семейния профил, когато са създали личния си профил в Photovault.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -1187,13 +1187,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email} няма профил в Ente.\n\nИзпратете им покана, за да може да споделяте неща.",
+  "emailNoEnteAccount": "{email} няма профил в Photovault.\n\nИзпратете им покана, за да може да споделяте неща.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} няма профил в Ente.\n\nИзпратете им покана, за да може да споделяте снимки.",
+  "emailNoEnteAccountPhotos": "{email} няма профил в Photovault.\n\nИзпратете им покана, за да може да споделяте снимки.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1244,7 +1244,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -1253,7 +1253,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1568,7 +1568,7 @@
       }
     }
   },
-  "filesInAlbumSafelyOnEnte": "{count, plural, one{This item in the album is backed up to Ente, delete the device copy to free space without losing it.} other{All {formattedNumber} items in the album are backed up to Ente, delete device copies to free space without losing them.}}",
+  "filesInAlbumSafelyOnEnte": "{count, plural, one{This item in the album is backed up to Photovault, delete the device copy to free space without losing it.} other{All {formattedNumber} items in the album are backed up to Photovault, delete device copies to free space without losing them.}}",
   "@filesInAlbumSafelyOnEnte": {
     "description": "Explains that device copies for files in an album can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1612,7 +1612,7 @@
       }
     }
   },
-  "filesSafelyOnEnte": "{count, plural, one{This item is backed up to Ente, delete the device copy to free space without losing it.} other{All {formattedNumber} items are backed up to Ente, delete device copies to free space without losing them.}}",
+  "filesSafelyOnEnte": "{count, plural, one{This item is backed up to Photovault, delete the device copy to free space without losing it.} other{All {formattedNumber} items are backed up to Photovault, delete device copies to free space without losing them.}}",
   "@filesSafelyOnEnte": {
     "description": "Explains that device copies can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1659,8 +1659,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "Забравен ключ за възстановяване?",
-  "free10GB": "10GB free on <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "10% отстъпка в <bold-green>ente</bold-green> Photos",
+  "free10GB": "10GB free on <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "10% отстъпка в <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Използвайте промокод „AUTH“, за да получите 10% отстъпка през първата година",
   "freeTrial": "Free trial",
   "freeUpAmount": "Free up {sizeInMBorGB}",
@@ -1715,7 +1715,7 @@
   "grantGalleryPermissionDesc": "Grant permission to access and organize photos with face recognition. All processing happens on your device.",
   "grantGalleryPermissionTitle": "Let's find your favourites",
   "grantPermission": "Grant permission",
-  "grantPermissionDesc": "Please allow Ente to access your library so we can organize it with face recognition. All processing happens on your device.",
+  "grantPermissionDesc": "Please allow Photovault to access your library so we can organize it with face recognition. All processing happens on your device.",
   "greenery": "The green life",
   "grid": "Grid",
   "groupBy": "Group by",
@@ -1727,11 +1727,11 @@
   "guestView": "Guest view",
   "guestViewEnablePreSteps": "To enable guest view, please setup device passcode or screen lock in your system settings.",
   "happyBirthday": "Happy birthday! 🥳",
-  "hearUsWhereOptionalTitle": "Как научихте за Ente? (по избор)",
+  "hearUsWhereOptionalTitle": "Как научихте за Photovault? (по избор)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "How did you hear about Ente?",
+  "hearUsWhereTitle": "How did you hear about Photovault?",
   "help": "Help",
   "helpAndSupport": "Help & Support",
   "hidden": "Hidden",
@@ -1798,7 +1798,7 @@
   "importBitwardenGuide": "Използвайте опцията „Експортиране на хранилище“ в Bitwarden Tools и импортирайте некриптирания JSON файл.",
   "importCodeDelimiterInfo": "Кодовете могат да бъдат разделени със запетая или нов ред",
   "importCodes": "Импортиране на кодове",
-  "importEnteEncGuide": "Изберете шифрования JSON файл, експортиран от Ente",
+  "importEnteEncGuide": "Изберете шифрования JSON файл, експортиран от Photovault",
   "importEnterSetupKey": "Въведете първия си код",
   "importFailureDesc": "Неуспешно обработване на избрания файл.",
   "importFromGallery": "Импортиране от галерията",
@@ -1837,7 +1837,7 @@
     }
   },
   "importSuccessTitle": "Ура!",
-  "importTypeEnteEncrypted": "Ente шифрован експорт",
+  "importTypeEnteEncrypted": "Photovault шифрован експорт",
   "incorrectCode": "Неправилен код",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -1899,7 +1899,7 @@
       }
     }
   },
-  "inviteToEnte": "Invite to Ente",
+  "inviteToEnte": "Invite to Photovault",
   "ok": "ОК",
   "@ok": {
     "description": "Generic OK button label"
@@ -2153,7 +2153,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Login to Ente",
+  "loginToEnte": "Login to Photovault",
   "loginToExistingAccount": "Вход в съществуващ профил",
   "loginWithAuthAccount": "Вход с вашия Auth профил",
   "loginWithTOTP": "Влизане с еднократен код",
@@ -2202,7 +2202,7 @@
   "mapsPrivacyNotice": "Approximate coordinates will be sent to privacy conscious third parties like OpenStreetMap to show the map and location.",
   "markingAsImportant": "Marking as important...",
   "me": "Me",
-  "mediaManagementHintMessage": "Turn on media management for Ente in settings, and the prompts stop.",
+  "mediaManagementHintMessage": "Turn on media management for Photovault in settings, and the prompts stop.",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -2270,7 +2270,7 @@
   "mixedGrouping": "Mixed grouping?",
   "mlConsent": "Enable machine learning",
   "mlConsentConfirmation": "I understand, and wish to enable machine learning",
-  "mlConsentDescription": "If you enable machine learning, Ente will extract information like face geometry from files, including those shared with you.\n\nThis will happen on your device, and any generated biometric information will be end-to-end encrypted.",
+  "mlConsentDescription": "If you enable machine learning, Photovault will extract information like face geometry from files, including those shared with you.\n\nThis will happen on your device, and any generated biometric information will be end-to-end encrypted.",
   "mlIndexingDescription": "Please note that machine learning will result in higher bandwidth and battery usage until all items are processed. Consider using the desktop app for faster processing, and all results will be synced automatically.",
   "mlProgressBannerDescription": "Your photos are getting processed on device to detect faces, objects and more.",
   "mlProgressBannerStatus": "{indexed} out of {total} photos processed",
@@ -2347,11 +2347,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не може да се свърже с Ente, моля, опитайте отново след известно време. Ако проблемът продължава, моля, свържете се с поддръжката.",
+  "networkConnectionRefusedErr": "Не може да се свърже с Photovault, моля, опитайте отново след известно време. Ако проблемът продължава, моля, свържете се с поддръжката.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Не може да се свърже с Ente, моля, проверете мрежовите си настройки и се свържете с поддръжката, ако проблемът продължава.",
+  "networkHostLookUpErr": "Не може да се свърже с Photovault, моля, проверете мрежовите си настройки и се свържете с поддръжката, ако проблемът продължава.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2516,12 +2516,12 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Имате един общ профил за Ente Photos, Ente Auth и Ente Locker.",
+  "oneAccountAcrossEnteApps": "Имате един общ профил за Photovault, Ente Auth и Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
   "oneLineAboutTheIssue": "One line about the issue",
-  "onEnte": "On <branding>ente</branding>",
+  "onEnte": "On <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -2657,7 +2657,7 @@
       }
     }
   },
-  "permanentlyDeleteYourEnteAccount": "Окончателно изтриване на Ente профила?",
+  "permanentlyDeleteYourEnteAccount": "Окончателно изтриване на Photovault профила?",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -3138,7 +3138,7 @@
   "resendInvite": "Resend invite",
   "reset": "Reset",
   "resetIgnoredFiles": "Reset ignored files",
-  "resetIgnoredFilesDescription": "Reset these ignored files to let Ente try uploading them again.",
+  "resetIgnoredFilesDescription": "Reset these ignored files to let Photovault try uploading them again.",
   "resetPasswordTitle": "Нулиране на паролата",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -3386,7 +3386,7 @@
   "securityDesc": "Шифроване, ключове за възстановяване, заключване на приложението и защита на профила",
   "seeAllCollections": "All collections",
   "seePublicAlbumLinksInApp": "See public album links in app",
-  "selectAlbumsToBackUpToEnte": "Select albums to back up to Ente",
+  "selectAlbumsToBackUpToEnte": "Select albums to back up to Photovault",
   "selectAlbumToLikePhoto": "Select the album to like this photo",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -3422,7 +3422,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Selected files are not on Ente",
+  "selectedFilesAreNotOnEnte": "Selected files are not on Photovault",
   "selectedFilesBackedUpToEnte": "These items will be deleted from all albums. You can recover them from Trash.",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -3605,11 +3605,11 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Download Ente so we can easily share original quality files\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Download Ente so I can add you to my family plan\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Ente so we can easily share original quality photos and videos\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos\n\nhttps://ente.com",
   "shareThisLink": "This link allows anyone who receives it to access your item. You can remove access at any time by deleting the link.",
-  "shareWithNonenteUsers": "Share with non-Ente users",
+  "shareWithNonenteUsers": "Share with non-Photovault users",
   "shareYourFeedbackHere": "Споделете вашата обратната връзка тук",
   "@shareYourFeedbackHere": {
     "description": "Placeholder for optional account deletion feedback"
@@ -3639,7 +3639,7 @@
   "showPerson": "Show person",
   "showQRAuthMessage": "Удостоверете се, за да покажете QR кода",
   "showTextOnWidget": "Show text on widget",
-  "sigInBackupReminder": "Ente will automatically backup codes after sign-in.\n\nWe still recommend exporting codes as an extra backup.",
+  "sigInBackupReminder": "Photovault will automatically backup codes after sign-in.\n\nWe still recommend exporting codes as an extra backup.",
   "signInToBackup": "Влезте, за да архивирате Вашите кодове",
   "signOutFromOtherDevices": "Излизане от други устройства",
   "@signOutFromOtherDevices": {
@@ -3673,7 +3673,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "This item is available on your device and Ente.",
+  "singleFileInBothLocalAndRemote": "This item is available on your device and Photovault.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -3689,7 +3689,7 @@
   "socialNotifications": "Likes and comments",
   "socialNotificationsExplanation": "Likes on your photos and comments on albums you are a part of",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "Someone sharing albums with you should see the same ID on their device.",
-  "someSelectedFilesBackedUpToEnte": "These items are available on device and Ente.",
+  "someSelectedFilesBackedUpToEnte": "These items are available on device and Photovault.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -3794,7 +3794,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "Вашият {id} вече е свързан с друг Ente профил.\nАко искате да използвате вашия {id} с този профил, моля, свържете се с екипа по поддръжка.",
+  "subAlreadyLinkedErrMessage": "Вашият {id} вече е свързан с друг Photovault профил.\nАко искате да използвате вашия {id} с този профил, моля, свържете се с екипа по поддръжка.",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -3824,7 +3824,7 @@
   "suggestions": "Suggestions",
   "sunrise": "On the horizon",
   "support": "Поддръжка",
-  "supportEnte": "Подкрепете <bold-green>ente</bold-green>",
+  "supportEnte": "Подкрепете <bold-green>Photovault</bold-green>",
   "syncing": "Syncing...",
   "syncProgress": "{completed}/{total} memories preserved",
   "@syncProgress": {
@@ -3895,7 +3895,7 @@
   "@thisEmailIsAlreadyInUse": {
     "description": "Error message when email is already in use"
   },
-  "thisHelpsUsImproveEnte": "Това ни помага да подобряваме Ente",
+  "thisHelpsUsImproveEnte": "Това ни помага да подобряваме Photovault",
   "@thisHelpsUsImproveEnte": {
     "description": "Subtitle under account deletion reason prompt"
   },
@@ -4012,7 +4012,7 @@
     }
   },
   "trustedContacts": "Trusted contacts",
-  "trustedContactsEmptyDescription": "Посочете друг потребител на Ente като доверен контакт, който да може да възстанови профила ви",
+  "trustedContactsEmptyDescription": "Посочете друг потребител на Photovault като доверен контакт, който да може да възстанови профила ви",
   "trustedContactStatusAccepted": "Accepted",
   "@trustedContactStatusAccepted": {
     "description": "Short status label shown for an accepted trusted contact"
@@ -4171,7 +4171,7 @@
   "@uploadStorageLimitErrorTitle": {
     "description": "Title shown when uploads fail due to running out of storage"
   },
-  "uploadSubscriptionExpiredErrorBody": "Your Ente Photos subscription has expired. Renew your subscription to continue uploading.",
+  "uploadSubscriptionExpiredErrorBody": "Your Photovault subscription has expired. Renew your subscription to continue uploading.",
   "@uploadSubscriptionExpiredErrorBody": {
     "description": "Body shown when uploads fail because the Photos subscription is expired"
   },

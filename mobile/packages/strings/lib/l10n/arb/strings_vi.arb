@@ -171,7 +171,7 @@
   "addToAlbum": "Thêm vào album",
   "addToCollection": "Thêm vào bộ sưu tập",
   "addToCollections": "Thêm vào bộ sưu tập",
-  "addToEnte": "Thêm vào Ente",
+  "addToEnte": "Thêm vào Photovault",
   "addToHiddenAlbum": "Thêm vào album ẩn",
   "addToPerson": "Thêm vào người",
   "@addToPerson": {
@@ -251,8 +251,8 @@
   "allowDownloads": "Cho phép tải xuống",
   "allowJoining": "Cho phép tham gia",
   "allowJoiningAlbum": "Cho phép ghép album",
-  "allowJoiningDescription": "Người xem có tài khoản Ente có thể tham gia album của bạn và cập nhật thông tin",
-  "allowPermBody": "Vui lòng cho phép truy cập vào ảnh của bạn từ Cài đặt để Ente có thể hiển thị và sao lưu thư viện của bạn.",
+  "allowJoiningDescription": "Người xem có tài khoản Photovault có thể tham gia album của bạn và cập nhật thông tin",
+  "allowPermBody": "Vui lòng cho phép truy cập vào ảnh của bạn từ Cài đặt để Photovault có thể hiển thị và sao lưu thư viện của bạn.",
   "allowPermTitle": "Cho phép truy cập ảnh",
   "allPersonGroupingWillReset": "Tất cả nhóm của người này sẽ được đặt lại, và bạn sẽ mất tất cả các gợi ý đã được tạo ra cho người này",
   "allTabEmptyHint": "Chưa có gì ở đây. Nhấn + để thêm mã hoặc mở Thùng rác để khôi phục mã.",
@@ -286,7 +286,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Ente có phiên bản mới.",
+  "aNewVersionOfEnteIsAvailable": "Photovault có phiên bản mới.",
   "aNewVersionOfEnteLockerIsAvailable": "Ente Locker có phiên bản mới.",
   "anythingElse": "Còn gì nữa không?",
   "@anythingElse": {
@@ -295,7 +295,7 @@
   "appearance": "Giao diện",
   "appIcon": "Biểu tượng ứng dụng",
   "appleId": "ID Apple",
-  "applePhotosUnsupportedResource": "Không thể lưu tệp này vào Apple Photos. Bạn vẫn có thể xem trong Ente.",
+  "applePhotosUnsupportedResource": "Không thể lưu tệp này vào Apple Photos. Bạn vẫn có thể xem trong Photovault.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -406,7 +406,7 @@
   "autoAddPeople": "Tự động thêm người",
   "autoAddToAlbum": "Tự động thêm vào album",
   "autoCastDialogBody": "Bạn sẽ thấy các thiết bị phát khả dụng ở đây.",
-  "autoCastiOSPermission": "Hãy chắc rằng quyền Mạng cục bộ đã được bật cho ứng dụng Ente Photos, trong Cài đặt.",
+  "autoCastiOSPermission": "Hãy chắc rằng quyền Mạng cục bộ đã được bật cho ứng dụng Photovault, trong Cài đặt.",
   "autoLock": "Tự động khóa",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -468,7 +468,7 @@
   "backupModeScreenWillDim": "Màn hình sẽ mờ đi để tiết kiệm pin",
   "backupModeSettingsDescription": "Hãy giữ ứng dụng mở để hoàn tất quá trình sao lưu",
   "backupModeStart": "Bắt đầu chế độ sao lưu",
-  "backupModeStayInEnte": "Hãy giữ ứng dụng Ente chạy. Việc chuyển sang ứng dụng khác sẽ tạm dừng quá trình sao lưu.",
+  "backupModeStayInEnte": "Hãy giữ ứng dụng Photovault chạy. Việc chuyển sang ứng dụng khác sẽ tạm dừng quá trình sao lưu.",
   "backupModeTapToWakeScreen": "Nhấn để đánh thức màn hình",
   "backupOnlyNewPhotos": "Sao lưu chỉ những ảnh mới",
   "backupOnlyNewPhotosAllFoldersSelected": "Tất cả các thư mục hiện đã được chọn để sao lưu.\n\nBạn có thể tiếp tục ngay bây giờ, hoặc cập nhật các thư mục đã chọn.",
@@ -490,7 +490,7 @@
   "backupSettings": "Cài đặt sao lưu",
   "backupStatus": "Trạng thái sao lưu",
   "backupStatusDescription": "Các mục đã được sao lưu sẽ hiển thị ở đây",
-  "backupToEnte": "Sao lưu lên Ente",
+  "backupToEnte": "Sao lưu lên Photovault",
   "backupVideos": "Sao lưu video",
   "beach": "Cát và biển",
   "birthday": "Sinh nhật",
@@ -651,7 +651,7 @@
   "codeChangeLimitReached": "Rất tiếc, bạn đã đạt hạn mức thay đổi mã.",
   "codeCopiedToClipboard": "Mã đã được sao chép vào bộ nhớ tạm",
   "codeIssuerHint": "Dịch vụ",
-  "collabLinkSectionDescription": "Cho phép mọi người thêm ảnh mà không cần tài khoản Ente",
+  "collabLinkSectionDescription": "Cho phép mọi người thêm ảnh mà không cần tài khoản Photovault",
   "collaborator": "Cộng tác viên",
   "collageLayout": "Bố cục",
   "collageSaved": "Ảnh ghép đã được lưu vào thư viện",
@@ -742,7 +742,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Tôi hiểu rằng điều này sẽ xóa dữ liệu của tôi trên Ente Photos, Ente Auth và Ente Locker.",
+  "confirmDeleteAccountAcrossApps": "Tôi hiểu rằng điều này sẽ xóa dữ liệu của tôi trên Photovault, Ente Auth và Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -834,7 +834,7 @@
   "createAccountTitle": "Tạo một tài khoản",
   "createAlbum": "Tạo album",
   "createAlbumActionHint": "Nhấn giữ để chọn ảnh và nhấn + để tạo album",
-  "createAnEnteAccount": "Tạo tài khoản Ente",
+  "createAnEnteAccount": "Tạo tài khoản Photovault",
   "createAnotherKit": "Tạo kit khác",
   "createBackupNow": "Sao lưu ngay",
   "createCollaborativeLink": "Tạo liên kết cộng tác",
@@ -947,12 +947,12 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Đã xóa khỏi Ente",
+  "deletedFromEnte": "Đã xóa khỏi Photovault",
   "deletedItemsStayHereForThirtyDays": "Các mục đã xóa sẽ được lưu giữ tại đây trong 30 ngày",
   "deleteDuplicates": "Xóa trùng lặp",
   "deleteEmptyAlbums": "Xóa album trống",
   "deleteEmptyAlbumsWithQuestionMark": "Xóa album trống?",
-  "deleteEnteAccount": "Xóa tài khoản Ente",
+  "deleteEnteAccount": "Xóa tài khoản Photovault",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -960,7 +960,7 @@
   "deleteFromBoth": "Xóa khỏi cả hai",
   "deleteFromDevice": "Xóa khỏi thiết bị",
   "deleteFromDeviceQuestion": "Xóa khỏi thiết bị?",
-  "deleteFromEnte": "Xóa khỏi Ente",
+  "deleteFromEnte": "Xóa khỏi Photovault",
   "deleteHiddenFilesFromDevice": "Xóa các tệp ẩn khỏi thiết bị",
   "deleteHiddenFilesFromDeviceDescription": "Xóa các bản sao cục bộ của các tệp ẩn khỏi thiết bị của bạn",
   "deleteItemCount": "{count, plural, other{Xóa {count} mục}}",
@@ -1261,7 +1261,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Chỉnh sửa đã được lưu",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Các chỉnh sửa vị trí sẽ chỉ thấy được trong Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Các chỉnh sửa vị trí sẽ chỉ thấy được trong Photovault",
   "editStorageLimit": "Sửa dung lượng giới hạn",
   "editTag": "Sửa thẻ",
   "editTime": "Chỉnh sửa thời gian",
@@ -1287,7 +1287,7 @@
     }
   },
   "emailHint": "Nhập địa chỉ email của bạn",
-  "emailNeedsEnteAccountForFamily": "{email} chưa có tài khoản Ente.\n\nHãy gửi lời mời cho họ và thêm họ vào danh sách gia đình của bạn sau khi họ đã tạo tài khoản trên Ente.",
+  "emailNeedsEnteAccountForFamily": "{email} chưa có tài khoản Photovault.\n\nHãy gửi lời mời cho họ và thêm họ vào danh sách gia đình của bạn sau khi họ đã tạo tài khoản trên Photovault.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -1296,13 +1296,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email} chưa có tài khoản Ente.\n\nHãy gửi lời mời chia sẻ với họ.",
+  "emailNoEnteAccount": "{email} chưa có tài khoản Photovault.\n\nHãy gửi lời mời chia sẻ với họ.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} không có tài khoản Ente.\n\nGửi họ một lời mời để chia sẻ ảnh.",
+  "emailNoEnteAccountPhotos": "{email} không có tài khoản Photovault.\n\nGửi họ một lời mời để chia sẻ ảnh.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1354,7 +1354,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -1363,7 +1363,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1741,7 +1741,7 @@
       }
     }
   },
-  "filesInAlbumSafelyOnEnte": "{count, plural, other {Toàn bộ {formattedNumber} mục trong album đã được sao lưu trên Ente, xóa các bản sao trên thiết bị để giải phóng dung lượng.}}",
+  "filesInAlbumSafelyOnEnte": "{count, plural, other {Toàn bộ {formattedNumber} mục trong album đã được sao lưu trên Photovault, xóa các bản sao trên thiết bị để giải phóng dung lượng.}}",
   "@filesInAlbumSafelyOnEnte": {
     "description": "Explains that device copies for files in an album can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1785,7 +1785,7 @@
       }
     }
   },
-  "filesSafelyOnEnte": "{count, plural, other {Toàn bộ {formattedNumber} mục đã được sao lưu trên Ente, xóa các bản sao trên thiết bị để giải phóng dung lượng.}}",
+  "filesSafelyOnEnte": "{count, plural, other {Toàn bộ {formattedNumber} mục đã được sao lưu trên Photovault, xóa các bản sao trên thiết bị để giải phóng dung lượng.}}",
   "@filesSafelyOnEnte": {
     "description": "Explains that device copies can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1833,8 +1833,8 @@
   },
   "forgotPasswordPrompt": "Quên mật khẩu?",
   "forgotRecoveryKey": "Quên mã khôi phục?",
-  "free10GB": "10GB miễn phí với <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "Giảm 10% <bold-green>ente</bold-green> Photos",
+  "free10GB": "10GB miễn phí với <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "Giảm 10% <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Dùng mã \"AUTH\" để giảm 10% năm đầu tiên",
   "free": "Miễn phí",
   "freeTrial": "Dùng thử miễn phí",
@@ -1890,7 +1890,7 @@
   "grantGalleryPermissionDesc": "Cấp quyền truy cập và sắp xếp ảnh bằng nhận dạng khuôn mặt. Tất cả quá trình xử lý diễn ra trên thiết bị của bạn.",
   "grantGalleryPermissionTitle": "Hãy tìm những gì bạn thích",
   "grantPermission": "Cấp quyền",
-  "grantPermissionDesc": "Vui lòng cho phép Ente truy cập thư viện của bạn để chúng tôi có thể sắp xếp bằng nhận diện khuôn mặt. Toàn bộ quá trình này diễn ra trên thiết bị của bạn.",
+  "grantPermissionDesc": "Vui lòng cho phép Photovault truy cập thư viện của bạn để chúng tôi có thể sắp xếp bằng nhận diện khuôn mặt. Toàn bộ quá trình này diễn ra trên thiết bị của bạn.",
   "greenery": "Cây cối",
   "grid": "Lưới",
   "photosInOriginalProportions": "Ảnh ở tỷ lệ ban đầu",
@@ -1905,11 +1905,11 @@
   "guestView": "Chế độ khách",
   "guestViewEnablePreSteps": "Để bật chế độ khách, vui lòng thiết lập mã khóa thiết bị hoặc khóa màn hình trong cài đặt hệ thống của bạn.",
   "happyBirthday": "Chúc mừng sinh nhật! 🥳",
-  "hearUsWhereOptionalTitle": "Bạn biết Ente từ đâu? (tùy chọn)",
+  "hearUsWhereOptionalTitle": "Bạn biết Photovault từ đâu? (tùy chọn)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "Bạn biết Ente từ đâu?",
+  "hearUsWhereTitle": "Bạn biết Photovault từ đâu?",
   "help": "Trợ giúp",
   "helpAndSupport": "Trợ giúp & Hỗ trợ",
   "hidden": "Đã ẩn",
@@ -2011,7 +2011,7 @@
   "importBitwardenGuide": "Dùng tùy chọn \"Xuất kho\" của Bitwarden và nhập tệp JSON không có mã hóa.",
   "importCodeDelimiterInfo": "Phân tách mã bằng dấu phẩy hoặc xuống dòng",
   "importCodes": "Nhập mã",
-  "importEnteEncGuide": "Chọn tệp JSON Ente đã mã hóa",
+  "importEnteEncGuide": "Chọn tệp JSON Photovault đã mã hóa",
   "importEnterSetupKey": "Nhập khóa thiết lập",
   "importFailureDesc": "Không thể phân tích tệp đã chọn.",
   "importFileTooLarge": "Tệp đã chọn quá lớn. Kích cỡ tối đa: {size}.",
@@ -2060,7 +2060,7 @@
     }
   },
   "importSuccessTitle": "Tuyệt!",
-  "importTypeEnteEncrypted": "Tệp xuất Ente mã hóa",
+  "importTypeEnteEncrypted": "Tệp xuất Photovault mã hóa",
   "incorrectCode": "Mã không chính xác",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -2123,7 +2123,7 @@
       }
     }
   },
-  "inviteToEnte": "Mời sử dụng Ente",
+  "inviteToEnte": "Mời sử dụng Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -2506,7 +2506,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Đăng nhập Ente",
+  "loginToEnte": "Đăng nhập Photovault",
   "loginToExistingAccount": "Đăng nhập tài khoản có sẵn",
   "loginWithAuthAccount": "Đăng nhập bằng tài khoản Ente Auth",
   "loginWithTOTP": "Đăng nhập bằng TOTP",
@@ -2555,7 +2555,7 @@
   "mapsPrivacyNotice": "Tọa độ gần đúng sẽ được gửi đến các bên thứ ba quan tâm đến quyền riêng tư như OpenStreetMap để hiển thị bản đồ và vị trí.",
   "markingAsImportant": "Dang danh dau quan trong...",
   "me": "Tôi",
-  "mediaManagementHintMessage": "Bật quản lý media cho Ente trong cài đặt, và nó sẽ ổn.",
+  "mediaManagementHintMessage": "Bật quản lý media cho Photovault trong cài đặt, và nó sẽ ổn.",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -2652,7 +2652,7 @@
   "mixedGrouping": "Nhóm hỗn hợp?",
   "mlConsent": "Bật học máy",
   "mlConsentConfirmation": "Tôi hiểu và muốn bật học máy",
-  "mlConsentDescription": "Nếu bạn bật học máy, Ente sẽ trích xuất thông tin như hình dạng khuôn mặt từ các tệp, gồm cả những tệp mà bạn được chia sẻ.\n\nViệc này sẽ diễn ra trên thiết bị của bạn, với mọi thông tin sinh trắc học tạo ra đều được mã hóa đầu cuối.",
+  "mlConsentDescription": "Nếu bạn bật học máy, Photovault sẽ trích xuất thông tin như hình dạng khuôn mặt từ các tệp, gồm cả những tệp mà bạn được chia sẻ.\n\nViệc này sẽ diễn ra trên thiết bị của bạn, với mọi thông tin sinh trắc học tạo ra đều được mã hóa đầu cuối.",
   "mlConsentPrivacyDetails": "Vui lòng <policy>nhấn vào đây</policy> để biết thêm chi tiết về chính sách bảo mật",
   "@mlConsentPrivacyDetails": {
     "description": "Machine learning consent screen sentence; only the text inside the policy tags is tappable and opens the privacy policy"
@@ -2758,11 +2758,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Không thể kết nối với Ente, vui lòng thử lại sau ít phút. Nếu lỗi vẫn tiếp diễn, hãy liên hệ với bộ phận hỗ trợ.",
+  "networkConnectionRefusedErr": "Không thể kết nối với Photovault, vui lòng thử lại sau ít phút. Nếu lỗi vẫn tiếp diễn, hãy liên hệ với bộ phận hỗ trợ.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Không thể kết nối với Ente, vui lòng kiểm tra cài đặt mạng của bạn và liên hệ với bộ phận hỗ trợ nếu lỗi vẫn tiếp diễn.",
+  "networkHostLookUpErr": "Không thể kết nối với Photovault, vui lòng kiểm tra cài đặt mạng của bạn và liên hệ với bộ phận hỗ trợ nếu lỗi vẫn tiếp diễn.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2931,12 +2931,12 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Bạn chỉ cần một tài khoản duy nhất cho cả Ente Photos, Ente Auth và Ente Locker.",
+  "oneAccountAcrossEnteApps": "Bạn chỉ cần một tài khoản duy nhất cho cả Photovault, Ente Auth và Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
   "oneLineAboutTheIssue": "Một dòng về vấn đề",
-  "onEnte": "Trên <branding>ente</branding>",
+  "onEnte": "Trên <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -3075,7 +3075,7 @@
       }
     }
   },
-  "permanentlyDeleteYourEnteAccount": "Xóa vĩnh viễn tài khoản Ente của bạn?",
+  "permanentlyDeleteYourEnteAccount": "Xóa vĩnh viễn tài khoản Photovault của bạn?",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -3098,7 +3098,7 @@
   },
   "pets": "Thú cưng",
   "photoGridSize": "Kích thước lưới ảnh",
-  "photoLibraryAddPermissionRequired": "Ente cần quyền lưu ảnh và video vào Apple Photos. Bạn có thể cấp quyền truy cập trong phần Cài đặt.",
+  "photoLibraryAddPermissionRequired": "Photovault cần quyền lưu ảnh và video vào Apple Photos. Bạn có thể cấp quyền truy cập trong phần Cài đặt.",
   "photoLibraryAddPermissionRestricted": "Quyền truy cập Thư viện ảnh bị hạn chế trên thiết bị này.",
   "photoOrder": "Thứ tự ảnh",
   "photoViewerFilmstripLabel": "Chọn ảnh",
@@ -3266,8 +3266,8 @@
     }
   },
   "publicLink": "Liên kết công khai",
-  "publicCollectionLinkAccessDescription": "Bất kỳ ai có liên kết đều có thể mở bộ sưu tập mà không cần tài khoản Ente.",
-  "publicLinkAccessDescription": "Bất kỳ ai có liên kết đều có thể mở album mà không cần tài khoản Ente.",
+  "publicCollectionLinkAccessDescription": "Bất kỳ ai có liên kết đều có thể mở bộ sưu tập mà không cần tài khoản Photovault.",
+  "publicLinkAccessDescription": "Bất kỳ ai có liên kết đều có thể mở album mà không cần tài khoản Photovault.",
   "publicLinkCollectDescription": "Bất kỳ ai có liên kết đều có thể thêm ảnh vào album của bạn.",
   "publicLinkEnabled": "Liên kết công khai đã được bật",
   "publicLinkViewDescription": "Bất kỳ ai có liên kết đều có thể truy cập album của bạn.",
@@ -3602,7 +3602,7 @@
   "resendInvite": "Gửi lại lời mời",
   "reset": "Đặt lại",
   "resetIgnoredFiles": "Đặt lại các tệp bị bỏ qua",
-  "resetIgnoredFilesDescription": "Đặt lại các tệp bị bỏ qua này để Ente có thể thử tải lên lại.",
+  "resetIgnoredFilesDescription": "Đặt lại các tệp bị bỏ qua này để Photovault có thể thử tải lên lại.",
   "resetPasswordTitle": "Đặt lại mật khẩu",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -3754,7 +3754,7 @@
     "description": "Description text asking user if they want to save to storage or share with other apps"
   },
   "savePerson": "Lưu người",
-  "saveToEnte": "Lưu vào Ente",
+  "saveToEnte": "Lưu vào Photovault",
   "saveToLocker": "Luu vao Locker",
   "saveYourRecoveryKeyIfYouHaventAlready": "Lưu mã khôi phục của bạn nếu bạn chưa làm",
   "saving": "Đang lưu...",
@@ -3916,7 +3916,7 @@
   "securityDesc": "Mã hóa, khóa khôi phục, khóa ứng dụng và bảo vệ tài khoản",
   "seeAllCollections": "Xem tat ca bo suu tap",
   "seePublicAlbumLinksInApp": "Xem liên kết album công khai trong ứng dụng",
-  "selectAlbumsToBackUpToEnte": "Chọn những album sẽ sao lưu lên Ente",
+  "selectAlbumsToBackUpToEnte": "Chọn những album sẽ sao lưu lên Photovault",
   "selectAlbumToLikePhoto": "Chọn album để thích ảnh này",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -3966,7 +3966,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Các tệp đã chọn không có trên Ente",
+  "selectedFilesAreNotOnEnte": "Các tệp đã chọn không có trên Photovault",
   "selectedFilesBackedUpToEnte": "Những nục này sẽ bị xóa khỏi tất cả album. Bạn có thể khôi phục chúng từ Thùng rác.",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -4126,7 +4126,7 @@
   "share": "Chia sẻ",
   "shareALink": "Chia sẻ một liên kết",
   "shareAnAlbum": "Chia sẻ một album",
-  "shareCodeEarnStorage": "Nhân đôi dung lượng Ente của bạn",
+  "shareCodeEarnStorage": "Nhân đôi dung lượng Photovault của bạn",
   "shareCodes": "Chia sẻ mã",
   "shareCodesDuration": "Chọn thời hạn bạn muốn chia sẻ mã.",
   "shareCollection": "Chia sẻ bộ sưu tập",
@@ -4189,17 +4189,17 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Tải Ente để chúng ta có thể dễ dàng chia sẻ tệp chất lượng gốc\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Tải Ente để tôi có thể thêm bạn vào gói gia đình\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Tải Ente để chúng ta có thể dễ dàng chia sẻ ảnh và video chất lượng gốc\n\nhttps://ente.com",
-  "shareTextReferralInvite": "Nhận miễn phí 20 GB với Ente Photos! Tải ứng dụng tại https://ente.com/invite và sử dụng mã {referralCode}.",
+  "shareTextRecommendUsingEnte": "Tải Photovault để chúng ta có thể dễ dàng chia sẻ tệp chất lượng gốc\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Tải Photovault để tôi có thể thêm bạn vào gói gia đình\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Tải Photovault để chúng ta có thể dễ dàng chia sẻ ảnh và video chất lượng gốc\n\nhttps://ente.com",
+  "shareTextReferralInvite": "Nhận miễn phí 20 GB với Photovault! Tải ứng dụng tại https://ente.com/invite và sử dụng mã {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}
     }
   },
   "shareThisLink": "Lien ket nay cho phep bat ky ai nhan duoc truy cap muc cua ban. Ban co the xoa quyen truy cap bat ky luc nao bang cach xoa lien ket.",
-  "shareWithNonenteUsers": "Chia sẻ với người không dùng Ente",
+  "shareWithNonenteUsers": "Chia sẻ với người không dùng Photovault",
   "shareYourFeedbackHere": "Chia sẻ trải nghiệm",
   "@shareYourFeedbackHere": {
     "description": "Placeholder for optional account deletion feedback"
@@ -4230,7 +4230,7 @@
   "showQRAuthMessage": "Xác thực để hiện mã QR",
   "showTextOnWidget": "Hiện chữ trên widget",
   "shuffle": "Ngẫu nhiên",
-  "sigInBackupReminder": "Ente sẽ tự động sao lưu mã sau khi đăng nhập.\n\nChúng tôi vẫn khuyên bạn nên xuất mã để sao lưu thêm.",
+  "sigInBackupReminder": "Photovault sẽ tự động sao lưu mã sau khi đăng nhập.\n\nChúng tôi vẫn khuyên bạn nên xuất mã để sao lưu thêm.",
   "signInToBackup": "Đăng nhập để sao lưu mã của bạn",
   "signOutFromOtherDevices": "Đăng xuất khỏi các thiết bị khác",
   "@signOutFromOtherDevices": {
@@ -4264,7 +4264,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "Mục này có sẵn trên thiết bị của bạn và Ente.",
+  "singleFileInBothLocalAndRemote": "Mục này có sẵn trên thiết bị của bạn và Photovault.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -4283,7 +4283,7 @@
   "socialNotifications": "Thích và bình luận",
   "socialNotificationsExplanation": "Lượt thích trên ảnh của bạn và bình luận trên các album mà bạn tham gia",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "Ai đó chia sẻ album với bạn nên thấy cùng một ID trên thiết bị của họ.",
-  "someSelectedFilesBackedUpToEnte": "Những mục này có sẵn trên thiết bị của bạn và Ente.",
+  "someSelectedFilesBackedUpToEnte": "Những mục này có sẵn trên thiết bị của bạn và Photovault.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -4391,7 +4391,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "ID {id} đã được liên kết với một tài khoản Ente khác.\nNếu bạn muốn sử dụng ID {id} với tài khoản này, vui lòng liên hệ bộ phận hỗ trợ.",
+  "subAlreadyLinkedErrMessage": "ID {id} đã được liên kết với một tài khoản Photovault khác.\nNếu bạn muốn sử dụng ID {id} với tài khoản này, vui lòng liên hệ bộ phận hỗ trợ.",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -4421,7 +4421,7 @@
   "suggestions": "Gợi ý",
   "sunrise": "Đường chân trời",
   "support": "Hỗ trợ",
-  "supportEnte": "Hỗ trợ <bold-green>ente</bold-green>",
+  "supportEnte": "Hỗ trợ <bold-green>Photovault</bold-green>",
   "syncing": "Đang đồng bộ...",
   "syncProgress": "{completed}/{total} kỷ niệm đã được lưu giữ",
   "@syncProgress": {
@@ -4492,7 +4492,7 @@
   "@thisEmailIsAlreadyInUse": {
     "description": "Error message when email is already in use"
   },
-  "thisHelpsUsImproveEnte": "Điều này giúp chúng tôi cải thiện Ente",
+  "thisHelpsUsImproveEnte": "Điều này giúp chúng tôi cải thiện Photovault",
   "@thisHelpsUsImproveEnte": {
     "description": "Subtitle under account deletion reason prompt"
   },
@@ -4610,7 +4610,7 @@
     }
   },
   "trustedContacts": "Liên hệ tin cậy",
-  "trustedContactsEmptyDescription": "Đề cử một người dùng Ente khác làm liên hệ tin cậy để khôi phục tài khoản của bạn",
+  "trustedContactsEmptyDescription": "Đề cử một người dùng Photovault khác làm liên hệ tin cậy để khôi phục tài khoản của bạn",
   "trustedContactStatusAccepted": "Đã chấp nhận",
   "@trustedContactStatusAccepted": {
     "description": "Short status label shown for an accepted trusted contact"
@@ -4775,7 +4775,7 @@
   "@uploadStorageLimitErrorTitle": {
     "description": "Title shown when uploads fail due to running out of storage"
   },
-  "uploadSubscriptionExpiredErrorBody": "Gói Ente Photos của bạn đã hết hạn. Hãy gia hạn gói để tiếp tục tải ảnh lên.",
+  "uploadSubscriptionExpiredErrorBody": "Gói Photovault của bạn đã hết hạn. Hãy gia hạn gói để tiếp tục tải ảnh lên.",
   "@uploadSubscriptionExpiredErrorBody": {
     "description": "Body shown when uploads fail because the Photos subscription is expired"
   },
@@ -5179,7 +5179,7 @@
       }
     }
   },
-  "noEnteAccountWithThisEmail": "Không có tài khoản Ente nào được liên kết với email này.",
+  "noEnteAccountWithThisEmail": "Không có tài khoản Photovault nào được liên kết với email này.",
   "shareALinkInline": "Chia sẻ một liên kết.",
   "personAlreadyHasAccess": "Người này đã có quyền truy cập.",
   "removePersonTitle": "Gỡ bỏ {name}?",
@@ -5215,5 +5215,5 @@
     }
   },
   "notEnoughStorageTitle": "Không đủ dung lượng",
-  "notEnoughStorageBody": "Bạn không đủ dung lượng trống trên Ente để thêm ảnh mới. Hãy giải phóng dung lượng hoặc nâng cấp gói dịch vụ để tiếp tục thêm ảnh."
+  "notEnoughStorageBody": "Bạn không đủ dung lượng trống trên Photovault để thêm ảnh mới. Hãy giải phóng dung lượng hoặc nâng cấp gói dịch vụ để tiếp tục thêm ảnh."
 }

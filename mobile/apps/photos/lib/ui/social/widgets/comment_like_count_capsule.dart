@@ -1,3 +1,4 @@
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_icons/ente_icons.dart";
 import "package:flutter/material.dart";
 import "package:photos/theme/ente_theme.dart";
@@ -43,7 +44,7 @@ class CommentLikeCountCapsule extends StatelessWidget {
             const Icon(
               EnteIcons.likeFilled,
               size: 14,
-              color: Color(0xFF08C225),
+              color: encoreLightAccent2, // PHOTOVAULT: theme
             ),
             const SizedBox(width: 2),
             Text(

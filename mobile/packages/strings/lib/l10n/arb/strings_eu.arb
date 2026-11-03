@@ -102,7 +102,7 @@
   "deleteAlbumDialog": "Ezabatu nahi dituzu album honetan dauden argazkiak (eta bideoak) parte diren beste album <bold>guztietatik</bold> ere?",
   "deleteFromBoth": "Ezabatu bietatik",
   "deleteFromDevice": "Ezabatu gailutik",
-  "deleteFromEnte": "Ezabatu Ente-tik",
+  "deleteFromEnte": "Ezabatu Photovault-tik",
   "deletePhotos": "Ezabatu argazkiak",
   "deleteSharedAlbum": "Partekatutako albuma ezabatu?",
   "deleteSharedAlbumDialogBody": "Albuma guztiontzat ezabatuko da \n\nAlbum honetan dauden beste pertsonek partekatutako argazkiak ezin izango dituzu eskuratu",
@@ -155,7 +155,7 @@
     "description": "Error message when email is already registered"
   },
   "emailHint": "Sartu zure e-posta helbidea",
-  "emailNoEnteAccountPhotos": "{email}-(e)k ez du Ente konturik. \n\nBidali gonbidapena argazkiak partekatzeko.",
+  "emailNoEnteAccountPhotos": "{email}-(e)k ez du Photovault konturik. \n\nBidali gonbidapena argazkiak partekatzeko.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -226,7 +226,7 @@
   "invalidEmailAddress": "Helbide hau ez da zuzena",
   "invalidKey": "Kode okerra",
   "invalidRecoveryKey": "Sartu duzun berreskuratze kodea ez da zuzena. Mesedez, ziurtatu 24 hitz duela, eta egiaztatu hitz bakoitzaren idazkera. \n\nBerreskuratze kode zaharren bat sartu baduzu, ziurtatu 64 karaktere duela, eta egiaztatu horietako bakoitza.",
-  "inviteToEnte": "Gonbidatu Ente-ra",
+  "inviteToEnte": "Gonbidatu Photovault-ra",
   "ok": "Ondo",
   "@ok": {
     "description": "Generic OK button label"
@@ -274,7 +274,7 @@
   },
   "mlConsent": "Aktibatu ikasketa automatikoa",
   "mlConsentConfirmation": "Ulertzen dut, eta ikasketa automatikoa aktibatu nahi dut",
-  "mlConsentDescription": "Ikasketa automatikoa aktibatuz gero, Ente-k fitxategietatik informazioa aterako du (ad. argazkien geometria), zurekin partekatutako argazkietatik ere.\n\nHau zure gailuan gertatuko da, eta sortutako informazio biometrikoa puntutik puntura zifratuta egongo da.",
+  "mlConsentDescription": "Ikasketa automatikoa aktibatuz gero, Photovault-k fitxategietatik informazioa aterako du (ad. argazkien geometria), zurekin partekatutako argazkietatik ere.\n\nHau zure gailuan gertatuko da, eta sortutako informazio biometrikoa puntutik puntura zifratuta egongo da.",
   "moderateStrength": "Ertaina",
   "@moderateStrength": {
     "description": "Moderate password strength label"
@@ -429,7 +429,7 @@
   },
   "setupComplete": "Prestaketa burututa",
   "shareALink": "Partekatu esteka",
-  "shareWithNonenteUsers": "Partekatu Ente erabiltzen ez dutenekin",
+  "shareWithNonenteUsers": "Partekatu Photovault erabiltzen ez dutenekin",
   "sharing": "Partekatzen...",
   "signUpTerms": "<u-terms>Zerbitzu baldintzak</u-terms> eta <u-policy>pribatutasun politikak</u-policy> onartzen ditut",
   "@signUpTerms": {

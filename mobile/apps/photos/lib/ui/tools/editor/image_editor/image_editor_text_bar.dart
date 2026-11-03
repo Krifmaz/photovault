@@ -1,4 +1,5 @@
 import "package:ente_components/ente_components.dart";
+import "package:ente_components/theme/photovault/encore_tokens.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
 import "package:hugeicons/hugeicons.dart";
@@ -634,7 +635,9 @@ class _ImageEditorTextBarState extends State<ImageEditorTextBar> {
       (Colors.white, strings.imageEditorWhite),
       (colors.blue, strings.imageEditorBlue),
       (colors.warning, strings.imageEditorRed),
-      (colors.green, strings.imageEditorGreen),
+      // PHOTOVAULT: theme. `green` is the brand accent now; keep a real
+      // green for the swatch labelled "Green".
+      (encoreDarkOk, strings.imageEditorGreen),
       (colors.caution, strings.imageEditorOrange),
       (colors.accentPink, strings.imageEditorPink),
       (colors.accentTeal, strings.imageEditorTeal),

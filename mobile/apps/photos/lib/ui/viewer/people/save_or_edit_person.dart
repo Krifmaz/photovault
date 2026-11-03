@@ -880,7 +880,7 @@ class _MergeWithExistingGraphic extends StatelessWidget {
               ),
               child: HugeIcon(
                 icon: HugeIcons.strokeRoundedArrowLeftRight,
-                color: colors.specialWhite,
+                color: colors.onPrimary, // PHOTOVAULT: theme
                 size: 12,
                 strokeWidth: 2,
               ),

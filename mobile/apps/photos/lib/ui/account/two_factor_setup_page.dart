@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:ente_crypto/ente_crypto.dart';
 import 'package:ente_pure_utils/ente_pure_utils.dart';
 import "package:ente_strings/ente_strings.dart";
@@ -37,7 +38,7 @@ class _TwoFactorSetupPageState extends State<TwoFactorSetupPage>
     height: 45,
     width: 45,
     decoration: BoxDecoration(
-      border: Border.all(color: const Color.fromRGBO(45, 194, 98, 1.0)),
+      border: Border.all(color: encoreLightAccent2), // PHOTOVAULT: theme
       borderRadius: BorderRadius.circular(15.0),
     ),
   );
@@ -213,7 +214,8 @@ class _TwoFactorSetupPageState extends State<TwoFactorSetupPage>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 border: Border.all(
-                  color: const Color.fromRGBO(45, 194, 98, 0.5),
+                  // PHOTOVAULT: theme
+                  color: encoreLightAccent2.withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -222,7 +224,8 @@ class _TwoFactorSetupPageState extends State<TwoFactorSetupPage>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 border: Border.all(
-                  color: const Color.fromRGBO(45, 194, 98, 0.5),
+                  // PHOTOVAULT: theme
+                  color: encoreLightAccent2.withValues(alpha: 0.5),
                 ),
               ),
             ),

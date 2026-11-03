@@ -57,7 +57,7 @@
   "addSelected": "Дадаць выбраныя",
   "addTag": "Дадаць тэг",
   "addToAlbum": "Дадаць у альбом",
-  "addToEnte": "Дадаць у Ente",
+  "addToEnte": "Дадаць у Photovault",
   "addToHiddenAlbum": "Дадаць у схаваны альбом",
   "addYourPhotosNow": "Дадайце свае фатаграфіі",
   "adjust": "Рэгуляваць",
@@ -90,7 +90,7 @@
   "allowAppToOpenSharedAlbumLinks": "Дазволіць праграме адкрываць спасылкі на агульныя альбомы",
   "allowDownloads": "Дазволіць спампоўванні",
   "allowJoiningAlbum": "Дазволіць далучэнне да альбома",
-  "allowPermBody": "Дазвольце доступ да сваіх фатаграфій з налад, каб Ente мог адлюстраваць і зарэзерваваць вашу бібліятэку.",
+  "allowPermBody": "Дазвольце доступ да сваіх фатаграфій з налад, каб Photovault мог адлюстраваць і зарэзерваваць вашу бібліятэку.",
   "allowPermTitle": "Дазволіць доступ да фатаграфій",
   "allPersonGroupingWillReset": "Усе групы для гэтай асобы будуць скінуты, а вы згубіце ўсе прапановы, якія зроблены для яе",
   "allTabEmptyHint": "Пакуль тут нічога няма. Націсніце +, каб дадаць код або адкрыйце сметніцу для аднаўлення.",
@@ -109,7 +109,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "Даступна новая версія Ente.",
+  "aNewVersionOfEnteIsAvailable": "Даступна новая версія Photovault.",
   "appIcon": "Значок праграмы",
   "appleId": "Ідэнтыфікатар Apple",
   "appLock": "Блакіроўка праграмы",
@@ -183,7 +183,7 @@
   "autoAddPeople": "Аўтададаванне людзей",
   "autoAddToAlbum": "Аўтададаванне альбома",
   "autoCastDialogBody": "Паглядзець даступныя прылады Cast можна тут.",
-  "autoCastiOSPermission": "Пераканайцеся, што для праграмы Ente Photos уключаны дазволы лакальнай сеткі ў наладах.",
+  "autoCastiOSPermission": "Пераканайцеся, што для праграмы Photovault уключаны дазволы лакальнай сеткі ў наладах.",
   "autoLock": "Аўтаблакіроўка",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -413,9 +413,9 @@
   "deleteEmptyAlbums": "Выдаліць пустыя альбомы",
   "deleteEmptyAlbumsWithQuestionMark": "Выдаліць пустыя альбомы?",
   "deleteFiles": "Выдаліць файлы",
-  "deleteFromBoth": "Выдаліць і ў Ente, і на вашай прыладзе",
+  "deleteFromBoth": "Выдаліць і ў Photovault, і на вашай прыладзе",
   "deleteFromDevice": "Выдаліць з прылады",
-  "deleteFromEnte": "Выдаліць з Ente",
+  "deleteFromEnte": "Выдаліць з Photovault",
   "deleteLocation": "Выдаліць месцазнаходжанне",
   "deleteMultipleAlbumDialog": "Таксама выдаліць фатаграфіі (разам з відэа), якія знаходзяцца ў гэтых {count} альбомах, з <bold>усіх</bold> іншых альбомаў, часткай якіх яны з'яўляюцца?",
   "@deleteMultipleAlbumDialog": {
@@ -578,7 +578,7 @@
   "editOrder": "Рэдагаваць заказ",
   "editPerson": "Рэдагаваць асобу",
   "editsSaved": "Рэдагаванні захаваны",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Рэдагаванні месцазнаходжання будзе бачна толькі ў Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Рэдагаванні месцазнаходжання будзе бачна толькі ў Photovault",
   "editTag": "Рэдагаваць тэг",
   "editTime": "Рэдагаваць час",
   "eligible": "прыдатны",
@@ -602,7 +602,7 @@
     }
   },
   "emailHint": "Увядзіце свой адрас электроннай пошты",
-  "emailNoEnteAccountPhotos": "У {email} адсутнічае ўліковы запіс Ente.\n\nАдпраўце запрашэнне карыстальніку, каб абагуліць фатаграфіі.",
+  "emailNoEnteAccountPhotos": "У {email} адсутнічае ўліковы запіс Photovault.\n\nАдпраўце запрашэнне карыстальніку, каб абагуліць фатаграфіі.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -800,8 +800,8 @@
   "@forgotPassword": {
     "description": "Forgot password link label"
   },
-  "free10GB": "10 ГБ бясплатнай прасторы на <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "Скідка ў памеры 10% на <bold-green>ente</bold-green> Photos",
+  "free10GB": "10 ГБ бясплатнай прасторы на <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "Скідка ў памеры 10% на <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Выкарыстоўвайце код «AUTH», каб атрымаць скідку ў памеры 10% за першы год",
   "freeTrial": "Бясплатная пробны перыяд",
   "freeUpAmount": "Вызваліць {sizeInMBorGB}",
@@ -834,7 +834,7 @@
   "guestView": "Гасцявы прагляд",
   "guestViewEnablePreSteps": "Наладзьце код доступу або блакіроўку экрана ў сістэмных наладах вашай прылады, каб уключыць гасцявы ўваход.",
   "happyBirthday": "З днём нараджэння! 🥳",
-  "hearUsWhereOptionalTitle": "Адкуль вы пачулі пра Ente? (неабавязкова)",
+  "hearUsWhereOptionalTitle": "Адкуль вы пачулі пра Photovault? (неабавязкова)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -887,7 +887,7 @@
   "importBitwardenGuide": "Скарыстайцеся параметрам «Экспартаваць сховішча» ў Bitwarden Tools і імпартуйце файл JSON.",
   "importCodeDelimiterInfo": "Коды могуць быць адасоблены коскамі або новым радком",
   "importCodes": "Імпартаваць коды",
-  "importEnteEncGuide": "Выберыце зашыфраваны файл JSON, які экспартаваны з Ente",
+  "importEnteEncGuide": "Выберыце зашыфраваны файл JSON, які экспартаваны з Photovault",
   "importEnterSetupKey": "Увядзіце ключ наладжвання",
   "importFailureDesc": "Не ўдалося прааналізаваць выбраны файл.",
   "importFromGallery": "Імпартаваць з галерэі",
@@ -925,7 +925,7 @@
     }
   },
   "importSuccessTitle": "Ура!",
-  "importTypeEnteEncrypted": "Шыфраванне экспартавання з Ente",
+  "importTypeEnteEncrypted": "Шыфраванне экспартавання з Photovault",
   "incorrectCode": "Няправільны код",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -966,7 +966,7 @@
   "invalidQRCode": "Памылковы QR-код",
   "invalidRecoveryKey": "Уведзены ключ аднаўлення з'яўляецца несапраўдным. Пераканайцеся, што ён змяшчае 24 словы і ўсе словы напісаны слушна.\nКалі ўведзены стары код аднаўлення, то варта пераканацца, што яго даўжыня складае 64 сімвалы і ўсе сімвалы напісаны слушна.",
   "invite": "Запрасіць",
-  "inviteToEnte": "Запрасіць у Ente",
+  "inviteToEnte": "Запрасіць у Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -1138,7 +1138,7 @@
   "mixedGrouping": "Змешаная група?",
   "mlConsent": "Уключана машыннае навучанне",
   "mlConsentConfirmation": "Я разумею і хачу ўключыць машыннае навучанне",
-  "mlConsentDescription": "Ente будзе вымаць такую ​​інфармацыю з файлаў (таксама з файлаў, якія абагулілі з вамі), як геаметрыя твару.\nДадзены працэс адбываецца на вашай прыладзе, і любая згенерыраваная біяметрычная інфармацыя будзе абаронена скразным шыфраваннем.",
+  "mlConsentDescription": "Photovault будзе вымаць такую ​​інфармацыю з файлаў (таксама з файлаў, якія абагулілі з вамі), як геаметрыя твару.\nДадзены працэс адбываецца на вашай прыладзе, і любая згенерыраваная біяметрычная інфармацыя будзе абаронена скразным шыфраваннем.",
   "modifyYourQueryOrTrySearchingFor": "Змяніце свой запыт або паспрабуйце шукаць",
   "moments": "Моманты",
   "month": "месяц",
@@ -1172,11 +1172,11 @@
   "moveToHiddenAlbum": "Перамясціць у схаваны альбом",
   "movingFilesToAlbum": "Перамяшчэнне файлаў у альбом...",
   "name": "Назва",
-  "networkConnectionRefusedErr": "Немагчыма падключыцца да Ente. Паспрабуйце яшчэ раз праз некаторы час. Звярніцеся ў службу падтрымкі кліентаў, калі праблема застанецца.",
+  "networkConnectionRefusedErr": "Немагчыма падключыцца да Photovault. Паспрабуйце яшчэ раз праз некаторы час. Звярніцеся ў службу падтрымкі кліентаў, калі праблема застанецца.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Немагчыма падключыцца да сервера Ente. Праверце свае сеткавыя налады. Звярніцеся ў службу падтрымкі кліентаў, калі праблема застанецца.",
+  "networkHostLookUpErr": "Немагчыма падключыцца да сервера Photovault. Праверце свае сеткавыя налады. Звярніцеся ў службу падтрымкі кліентаў, калі праблема застанецца.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1267,7 +1267,7 @@
   "ocrModelsPrepareFailed": "Не ўдалося падрыхтаваць мадэлі аптычнага распазнавання",
   "ocrNoTextDetected": "Тэкст не выяўлены",
   "offlineModeWarning": "Вы выбралі працягнуць без рэзервовых копій. Зрабіце рэзервовую копію кодаў уручную, каб не згубіць доступ да іх.",
-  "onEnte": "У <branding>Ente</branding>",
+  "onEnte": "У <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1802,7 +1802,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Выбраныя файлы адсутнічаюць у Ente",
+  "selectedFilesAreNotOnEnte": "Выбраныя файлы адсутнічаюць у Photovault",
   "selectedItemsWillBeRemovedFromThisPerson": "Выбраныя элементы будуць выдалены ў гэтай асобы, але не выдалены з вашай бібліятэкі.",
   "selectedPhotos": "Выбрана: {count}",
   "@selectedPhotos": {
@@ -1902,7 +1902,7 @@
   "shareCodes": "Абагуліць коды",
   "shareCodesDuration": "Выберыце працягласць, на якую вы хочаце абагуліць коды.",
   "shareLink": "Абагуліць спасылку",
-  "shareWithNonenteUsers": "Абагуліць з карыстальнікамі, якія не карыстаюцца Ente",
+  "shareWithNonenteUsers": "Абагуліць з карыстальнікамі, якія не карыстаюцца Photovault",
   "sharing": "Абагульванне...",
   "shiftDatesAndTime": "Перанос даты і часу",
   "shouldHideCode": "Схаваць коды",
@@ -1913,7 +1913,7 @@
   "showMoreFaces": "Паказаць больш твараў",
   "showPerson": "Паказаць асобу",
   "showQRAuthMessage": "Прайдзіце аўтэнтыфікацыю, каб паказаць QR-код",
-  "sigInBackupReminder": "Ente будзе аўтаматычна рэзерваваць коды пасля ўваходу.\n\nНастойліва рэкамендуецца экспартаваць коды ў якасці дадатковага рэзервовага капіявання.",
+  "sigInBackupReminder": "Photovault будзе аўтаматычна рэзерваваць коды пасля ўваходу.\n\nНастойліва рэкамендуецца экспартаваць коды ў якасці дадатковага рэзервовага капіявання.",
   "signInToBackup": "Увайсці для рэзервовага капіявання кодаў",
   "signOutFromOtherDevices": "Выйсці з іншых прылад",
   "@signOutFromOtherDevices": {
@@ -2029,7 +2029,7 @@
   "suggestFeatures": "Прапанаваць функцыю",
   "sunrise": "На гарызонце",
   "support": "Падтрымка",
-  "supportEnte": "Падтрымка <bold-green>ente</bold-green>",
+  "supportEnte": "Падтрымка <bold-green>Photovault</bold-green>",
   "syncing": "Сінхранізацыя...",
   "syncProgress": "{completed}/{total} успамінаў захавана",
   "@syncProgress": {

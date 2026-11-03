@@ -2,6 +2,7 @@ import "dart:io";
 import "dart:math" as math;
 import "dart:ui" as ui;
 
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_components/theme/text_styles.dart";
 import "package:ente_icons/ente_icons.dart";
 import "package:ente_pure_utils/ente_pure_utils.dart";
@@ -1083,8 +1084,8 @@ class _MonthGrid extends StatelessWidget {
         if (completed) {
           return const Center(
             child: _CompletedDayPill(
-              background: Color(0xFF1DB954),
-              iconColor: Colors.white,
+              background: encoreLightAccent2, // PHOTOVAULT: theme
+              iconColor: encoreLightOnAccent,
             ),
           );
         }

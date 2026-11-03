@@ -4,6 +4,8 @@ import "dart:ui" as ui;
 
 import "package:audio_session/audio_session.dart";
 import "package:ente_components/theme/colors.dart" as components;
+// PHOTOVAULT: theme (Encore tokens, used by cards/badge_card_content.dart)
+import "package:ente_components/theme/photovault/encore_tokens.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
@@ -721,7 +723,11 @@ class _WrappedViewerPageState extends State<WrappedViewerPage>
                       leading: BackButton(
                         onPressed: () => unawaited(_closeViewer()),
                       ),
-                      title: Text("Ente Rewind", style: textTheme.largeBold),
+                      // PHOTOVAULT: branding
+                      title: Text(
+                        "Photovault Rewind",
+                        style: textTheme.largeBold,
+                      ),
                       backgroundColor: Colors.black,
                       foregroundColor: enteColorScheme.textBase,
                       elevation: 0,

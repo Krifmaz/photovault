@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+// PHOTOVAULT: theme. Colour values come from the Encore tokens.
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:flutter/material.dart';
 
 class EnteColorScheme {
@@ -78,6 +80,9 @@ class EnteColorScheme {
   final Color redDarker;
   final Color redLight;
 
+  /// PHOTOVAULT: theme. Foreground on [greenBase] (the primary accent).
+  final Color onAccent;
+
   const EnteColorScheme(
     this.backgroundColour,
     this.backgroundElevated,
@@ -139,6 +144,7 @@ class EnteColorScheme {
     this.caution500 = _caution500,
     this.golden700 = _golden700,
     this.golden500 = _golden500,
+    this.onAccent = encoreDarkOnAccent, // PHOTOVAULT: theme
   });
 }
 
@@ -183,15 +189,21 @@ const EnteColorScheme lightScheme = EnteColorScheme(
   contentReverseLight,
   strokeLight,
   strokeDarkLight,
-  green,
-  greenDark,
-  greenDarker,
+  // PHOTOVAULT: theme. Ente's brand green -> Encore accent (light).
+  encoreLightAccent,
+  encoreLightAccent2,
+  encoreLightAccentDarker,
   greenLightLight,
   greenStrokeLight,
   red,
   redDark,
   redDarker,
   redLightLight,
+  primary700: encoreLightAccentDarker,
+  primary500: encoreLightAccent2,
+  primary400: encoreLightAccent2,
+  primary300: encoreLightAccent2,
+  onAccent: encoreLightOnAccent,
 );
 
 const EnteColorScheme darkScheme = EnteColorScheme(
@@ -235,25 +247,31 @@ const EnteColorScheme darkScheme = EnteColorScheme(
   contentReverseDark,
   strokeDark,
   strokeDarkDark,
-  green,
-  greenDark,
-  greenDarker,
+  // PHOTOVAULT: theme. Ente's brand green -> Encore accent (dark).
+  encoreDarkAccent,
+  encoreDarkAccent2,
+  encoreDarkAccentDarker,
   greenLightDark,
   greenStrokeDark,
   red,
   redDark,
   redDarker,
   redLightDark,
+  primary700: encoreDarkAccentDarker,
+  primary500: encoreDarkAccent2,
+  primary400: encoreDarkAccent2,
+  primary300: encoreDarkAccent,
+  onAccent: encoreDarkOnAccent,
 );
 
-const Color backgroundColorLight = Color.fromRGBO(244, 244, 244, 1);
-const Color backgroundColorDark = Color.fromRGBO(22, 22, 22, 1);
+const Color backgroundColorLight = encoreLightBg; // PHOTOVAULT: theme
+const Color backgroundColorDark = encoreDarkBg; // PHOTOVAULT: theme
 
-const Color backgroundElevatedLight = Color.fromRGBO(255, 255, 255, 1);
-const Color backgroundElevated2Light = Color.fromRGBO(251, 251, 251, 1);
+const Color backgroundElevatedLight = encoreLightPanel; // PHOTOVAULT: theme
+const Color backgroundElevated2Light = encoreLightBg2; // PHOTOVAULT: theme
 
-const Color backgroundElevatedDark = Color.fromRGBO(27, 27, 27, 1);
-const Color backgroundElevated2Dark = Color.fromRGBO(37, 37, 37, 1);
+const Color backgroundElevatedDark = encoreDarkBg2; // PHOTOVAULT: theme
+const Color backgroundElevated2Dark = encoreDarkPanel; // PHOTOVAULT: theme
 
 const Color backdropBaseLight = Color.fromRGBO(255, 255, 255, 0.92);
 const Color backdropMutedLight = Color.fromRGBO(255, 255, 255, 0.75);
@@ -263,17 +281,17 @@ const Color backdropBaseDark = Color.fromRGBO(0, 0, 0, 0.90);
 const Color backdropMutedDark = Color.fromRGBO(0, 0, 0, 0.65);
 const Color backdropFaintDark = Color.fromRGBO(0, 0, 0, 0.20);
 
-const Color textBaseLight = Color.fromRGBO(0, 0, 0, 1);
-const Color textMutedLight = Color.fromRGBO(0, 0, 0, 0.6);
-const Color textFaintLight = Color.fromRGBO(0, 0, 0, 0.5);
+const Color textBaseLight = encoreLightText; // PHOTOVAULT: theme
+const Color textMutedLight = encoreLightMuted; // PHOTOVAULT: theme
+const Color textFaintLight = encoreLightFaint; // PHOTOVAULT: theme
 const Color blurTextBaseLight = Color.fromRGBO(0, 0, 0, 0.65);
 
-const Color textBaseDark = Color.fromRGBO(255, 255, 255, 1);
-const Color textMutedDark = Color.fromRGBO(255, 255, 255, 0.7);
-const Color textFaintDark = Color.fromRGBO(255, 255, 255, 0.5);
+const Color textBaseDark = encoreDarkText; // PHOTOVAULT: theme
+const Color textMutedDark = encoreDarkMuted; // PHOTOVAULT: theme
+const Color textFaintDark = encoreDarkFaint; // PHOTOVAULT: theme
 const Color blurTextBaseDark = Color.fromRGBO(255, 255, 255, 0.95);
 
-const Color fillBaseLight = Color.fromRGBO(0, 0, 0, 1);
+const Color fillBaseLight = encoreLightText; // PHOTOVAULT: theme
 const Color fillBasePressedLight = Color.fromRGBO(0, 0, 0, 0.87);
 const Color fillStrongLight = Color.fromRGBO(0, 0, 0, 0.24);
 const Color fillMutedLight = Color.fromRGBO(0, 0, 0, 0.12);
@@ -281,7 +299,7 @@ const Color fillFaintLight = Color.fromRGBO(0, 0, 0, 0.04);
 const Color fillFaintPressedLight = Color.fromRGBO(0, 0, 0, 0.08);
 const Color fillBaseGreyLight = Color.fromRGBO(242, 242, 242, 1);
 
-const Color fillBaseDark = Color.fromRGBO(255, 255, 255, 1);
+const Color fillBaseDark = encoreDarkText; // PHOTOVAULT: theme
 const Color fillBasePressedDark = Color.fromRGBO(255, 255, 255, 0.9);
 const Color fillStrongDark = Color.fromRGBO(255, 255, 255, 0.32);
 const Color fillMutedDark = Color.fromRGBO(255, 255, 255, 0.16);
@@ -289,7 +307,7 @@ const Color fillFaintDark = Color.fromRGBO(255, 255, 255, 0.12);
 const Color fillFaintPressedDark = Color.fromRGBO(255, 255, 255, 0.06);
 const Color fillBaseGreyDark = Color.fromRGBO(66, 66, 66, 1);
 
-const Color strokeBaseLight = Color.fromRGBO(0, 0, 0, 1);
+const Color strokeBaseLight = encoreLightText; // PHOTOVAULT: theme
 const Color strokeMutedLight = Color.fromRGBO(0, 0, 0, 0.24);
 const Color strokeFaintLight = Color.fromRGBO(0, 0, 0, 0.12);
 const Color strokeFainterLight = Color.fromRGBO(0, 0, 0, 0.06);
@@ -297,7 +315,7 @@ const Color blurStrokeBaseLight = Color.fromRGBO(0, 0, 0, 0.65);
 const Color blurStrokeFaintLight = Color.fromRGBO(0, 0, 0, 0.08);
 const Color blurStrokePressedLight = Color.fromRGBO(0, 0, 0, 0.50);
 
-const Color strokeBaseDark = Color.fromRGBO(255, 255, 255, 1);
+const Color strokeBaseDark = encoreDarkText; // PHOTOVAULT: theme
 const Color strokeMutedDark = Color.fromRGBO(255, 255, 255, 0.24);
 const Color strokeFaintDark = Color.fromRGBO(255, 255, 255, 0.16);
 const Color strokeFainterDark = Color.fromRGBO(255, 255, 255, 0.08);
@@ -309,7 +327,7 @@ const Color tabIconLight = Color.fromRGBO(0, 0, 0, 0.85);
 const Color tabIconDark = Color.fromRGBO(255, 255, 255, 0.80);
 
 const Color menuItemIconStrokeLight = Color(0xFF979797);
-const Color menuItemIconStrokeDark = Color.fromRGBO(255, 255, 255, 1);
+const Color menuItemIconStrokeDark = encoreDarkText; // PHOTOVAULT: theme
 
 const Color fixedStrokeMutedWhite = Color.fromRGBO(255, 255, 255, 0.50);
 const Color strokeSolidMutedLight = Color.fromRGBO(147, 147, 147, 1);
@@ -318,74 +336,74 @@ const Color strokeSolidFaintLight = Color.fromRGBO(221, 221, 221, 1);
 // Keep light for scanability.
 const Color qrBoxColor = Color.fromRGBO(245, 245, 247, 1);
 
-const Color _primary700 = Color.fromRGBO(0, 179, 60, 1);
-const Color _primary500 = Color.fromRGBO(29, 185, 84, 1);
-const Color _primary400 = Color.fromRGBO(38, 203, 95, 1);
-const Color _primary300 = Color.fromRGBO(1, 222, 77, 1);
+const Color _primary700 = encoreDarkAccentDarker; // PHOTOVAULT: theme
+const Color _primary500 = encoreDarkAccent2; // PHOTOVAULT: theme
+const Color _primary400 = encoreDarkAccent2; // PHOTOVAULT: theme
+const Color _primary300 = encoreDarkAccent; // PHOTOVAULT: theme
 
-const Color _warning700 = Color.fromRGBO(234, 63, 63, 1);
-const Color _warning500 = Color.fromRGBO(255, 101, 101, 1);
-const Color warning500 = Color.fromRGBO(255, 101, 101, 1);
-const Color _warning400 = Color.fromRGBO(255, 111, 111, 1);
-const Color _warning800 = Color(0xFFF53434);
+const Color _warning700 = encoreDarkErrDark; // PHOTOVAULT: theme
+const Color _warning500 = encoreDarkErr; // PHOTOVAULT: theme
+const Color warning500 = encoreDarkErr; // PHOTOVAULT: theme
+const Color _warning400 = encoreDarkErr; // PHOTOVAULT: theme
+const Color _warning800 = encoreDarkErrDarker; // PHOTOVAULT: theme
 
-const Color _caution500 = Color.fromRGBO(255, 194, 71, 1);
+const Color _caution500 = encoreDarkWarn; // PHOTOVAULT: theme
 
 const Color _golden700 = Color(0xFFFDB816);
 const Color _golden500 = Color(0xFFFFC336);
 
-const Color green = Color.fromRGBO(8, 194, 37, 1);
-const Color greenLightLight = Color.fromRGBO(231, 246, 233, 1);
-const Color greenLightDark = Color.fromRGBO(33, 33, 33, 1);
-const Color greenDark = Color.fromRGBO(6, 157, 30, 1);
-const Color greenDarker = Color.fromRGBO(5, 124, 24, 1);
-const Color greenStrokeLight = Color.fromRGBO(186, 236, 194, 1);
-const Color greenStrokeDark = Color.fromRGBO(28, 65, 34, 1);
+const Color green = encoreDarkAccent; // PHOTOVAULT: theme
+const Color greenLightLight = encoreLightPanel2; // PHOTOVAULT: theme
+const Color greenLightDark = encoreDarkPanel2; // PHOTOVAULT: theme
+const Color greenDark = encoreDarkAccent2; // PHOTOVAULT: theme
+const Color greenDarker = encoreDarkAccentDarker; // PHOTOVAULT: theme
+const Color greenStrokeLight = encoreLightAccentStroke; // PHOTOVAULT: theme
+const Color greenStrokeDark = encoreDarkAccentStroke; // PHOTOVAULT: theme
 
-const Color red = Color.fromRGBO(246, 58, 58, 1);
-const Color redLightLight = Color.fromRGBO(250, 235, 235, 1);
-const Color redLightDark = Color.fromRGBO(33, 33, 33, 1);
-const Color redDark = Color.fromRGBO(221, 52, 52, 1);
-const Color redDarker = Color.fromRGBO(197, 46, 46, 1);
+const Color red = encoreDarkErr; // PHOTOVAULT: theme
+const Color redLightLight = encoreLightErrTint; // PHOTOVAULT: theme
+const Color redLightDark = encoreDarkErrTint; // PHOTOVAULT: theme
+const Color redDark = encoreDarkErrDark; // PHOTOVAULT: theme
+const Color redDarker = encoreDarkErrDarker; // PHOTOVAULT: theme
 
-const Color fillLight = Color.fromRGBO(255, 255, 255, 1);
-const Color fillDark = Color.fromRGBO(33, 33, 33, 1);
+const Color fillLight = encoreLightPanel; // PHOTOVAULT: theme
+const Color fillDark = encoreDarkPanel; // PHOTOVAULT: theme
 
-const Color fillDarkLight = Color.fromRGBO(245, 245, 245, 1);
+const Color fillDarkLight = encoreLightPanel2; // PHOTOVAULT: theme
 const Color fillDarkDark = Color.fromRGBO(10, 10, 10, 1);
 
-const Color fillDarkerLight = Color.fromRGBO(233, 233, 233, 1);
+const Color fillDarkerLight = encoreLightBorder; // PHOTOVAULT: theme
 const Color fillDarkerDark = Color.fromRGBO(20, 20, 20, 1);
 
 const Color fillDarkestLight = Color.fromRGBO(210, 210, 210, 1);
-const Color fillDarkestDark = Color.fromRGBO(41, 41, 41, 1);
+const Color fillDarkestDark = encoreDarkPanel2; // PHOTOVAULT: theme
 
-const Color fillReverseLight = Color.fromRGBO(0, 0, 0, 1);
-const Color fillReverseDark = Color.fromRGBO(255, 255, 255, 1);
+const Color fillReverseLight = encoreLightText; // PHOTOVAULT: theme
+const Color fillReverseDark = encoreDarkText; // PHOTOVAULT: theme
 
-const Color contentLight = Color.fromRGBO(0, 0, 0, 1);
-const Color contentDark = Color.fromRGBO(255, 255, 255, 1);
+const Color contentLight = encoreLightText; // PHOTOVAULT: theme
+const Color contentDark = encoreDarkText; // PHOTOVAULT: theme
 
-const Color contentDarkLight = Color.fromRGBO(26, 26, 26, 1);
-const Color contentDarkDark = Color.fromRGBO(229, 229, 229, 1);
+const Color contentDarkLight = encoreLightText; // PHOTOVAULT: theme
+const Color contentDarkDark = encoreDarkText; // PHOTOVAULT: theme
 
-const Color contentDarkerLight = Color.fromRGBO(21, 21, 21, 1);
-const Color contentDarkerDark = Color.fromRGBO(204, 204, 204, 1);
+const Color contentDarkerLight = encoreLightText; // PHOTOVAULT: theme
+const Color contentDarkerDark = encoreDarkText; // PHOTOVAULT: theme
 
-const Color contentLightLight = Color.fromRGBO(102, 102, 102, 1);
-const Color contentLightDark = Color.fromRGBO(153, 153, 153, 1);
+const Color contentLightLight = encoreLightMuted; // PHOTOVAULT: theme
+const Color contentLightDark = encoreDarkMuted; // PHOTOVAULT: theme
 
-const Color contentLighterLight = Color.fromRGBO(150, 150, 150, 1);
-const Color contentLighterDark = Color.fromRGBO(150, 150, 150, 1);
+const Color contentLighterLight = encoreLightFaint; // PHOTOVAULT: theme
+const Color contentLighterDark = encoreDarkFaint; // PHOTOVAULT: theme
 
 const Color contentLightestLight = Color.fromRGBO(222, 222, 222, 1);
 const Color contentLightestDark = Color.fromRGBO(10, 10, 10, 1);
 
 const Color contentReverseLight = Color.fromRGBO(255, 255, 255, 1);
-const Color contentReverseDark = Color.fromRGBO(0, 0, 0, 1);
+const Color contentReverseDark = encoreDarkOnAccent; // PHOTOVAULT: theme
 
-const Color strokeLight = Color.fromRGBO(235, 235, 235, 1);
+const Color strokeLight = encoreLightBorder; // PHOTOVAULT: theme
 const Color strokeDark = Color.fromRGBO(20, 20, 20, 1);
 
-const Color strokeDarkLight = Color.fromRGBO(224, 224, 224, 1);
-const Color strokeDarkDark = Color.fromRGBO(62, 62, 62, 1);
+const Color strokeDarkLight = encoreLightBorder; // PHOTOVAULT: theme
+const Color strokeDarkDark = encoreDarkBorder; // PHOTOVAULT: theme

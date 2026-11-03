@@ -1,3 +1,5 @@
+// PHOTOVAULT: theme
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_ui/theme/theme_config.dart";
 import 'package:flutter/material.dart';
 
@@ -26,16 +28,15 @@ class EnteColorScheme extends ThemeExtension<EnteColorScheme> {
           Color.fromRGBO(52, 152, 255, 1),
         ],
       ),
+      // PHOTOVAULT: theme. Encore gold accent (readable in light and dark)
+      // and Encore's charcoal-to-gold primary button gradient.
       EnteApp.photos => (
-        primary700: const Color.fromRGBO(8, 194, 37, 1),
-        primary500: const Color.fromRGBO(8, 194, 37, 1),
-        primary400: const Color.fromRGBO(6, 157, 30, 1),
-        primary300: const Color.fromRGBO(5, 124, 24, 1),
-        gradientButtonBgColor: const Color.fromRGBO(8, 194, 37, 1),
-        gradientButtonBgColors: const [
-          Color.fromRGBO(8, 194, 37, 1),
-          Color.fromRGBO(6, 157, 30, 1),
-        ],
+        primary700: encoreLightAccentDarker,
+        primary500: encoreLightAccent2,
+        primary400: encoreLightAccent2,
+        primary300: encoreDarkAccent2,
+        gradientButtonBgColor: encoreLightAccent,
+        gradientButtonBgColors: const [encoreLightAccent, encoreLightAccent2],
       ),
     };
 
