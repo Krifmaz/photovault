@@ -1,0 +1,17 @@
+[workspace]
+resolver = "3"
+members = ["server"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+repository = "https://github.com/Krifmaz/photovault"
+rust-version = "1.90"
+
+[profile.release]
+opt-level = "s"
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
