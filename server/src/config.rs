@@ -32,6 +32,8 @@ pub struct Config {
     pub hardcoded_ott: std::collections::BTreeMap<String, String>,
     /// Log output format: `json` (default) or `pretty`.
     pub log_format: String,
+    /// Companion web-app URLs and WebAuthn relying party (`[accounts]`).
+    pub accounts: crate::users::settings::AccountsSettings,
 }
 
 /// Which object store backs the server.
@@ -46,25 +48,59 @@ pub enum StorageConfig {
         public_url: Option<String>,
     },
     /// Any S3-compatible service.
-    S3 {
-        /// Endpoint, e.g. `https://s3.eu-central-003.backblazeb2.com`.
-        endpoint: String,
-        /// Region, e.g. `eu-central-003`.
-        region: String,
-        /// Bucket name.
-        bucket: String,
-        /// Access key id.
-        access_key: String,
-        /// Secret access key.
-        secret_key: String,
-        /// Use path-style URLs (`endpoint/bucket/key`) instead of virtual-host style.
-        #[serde(default = "default_true")]
-        path_style: bool,
-    },
+    S3(S3Config),
+}
+
+/// `[storage] kind = "s3"` settings.
+#[derive(Clone, Deserialize)]
+pub struct S3Config {
+    /// Endpoint the server uses, e.g. `https://s3.eu-central-003.backblazeb2.com`
+    /// or `http://garage:3900` on a Docker network.
+    pub endpoint: String,
+    /// Endpoint put into presigned URLs handed to the apps, when it differs
+    /// from `endpoint` (e.g. internal `http://garage:3900` vs public
+    /// `https://s3.example.com`). Defaults to `endpoint`.
+    #[serde(default)]
+    pub public_endpoint: Option<String>,
+    /// Region, e.g. `eu-central-003` (`us-east-1` for MinIO, `garage` for Garage).
+    #[serde(default = "default_region")]
+    pub region: String,
+    /// Bucket name.
+    pub bucket: String,
+    /// Access key id.
+    pub access_key: String,
+    /// Secret access key.
+    #[serde(default)]
+    pub secret_key: String,
+    /// Read the secret access key from this file instead (Docker secrets).
+    #[serde(default)]
+    pub secret_key_file: Option<PathBuf>,
+    /// Use path-style URLs (`endpoint/bucket/key`, default) instead of
+    /// virtual-host style (`bucket.endpoint/key`).
+    #[serde(default = "default_true")]
+    pub path_style: bool,
+}
+
+impl std::fmt::Debug for S3Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("S3Config")
+            .field("endpoint", &self.endpoint)
+            .field("public_endpoint", &self.public_endpoint)
+            .field("region", &self.region)
+            .field("bucket", &self.bucket)
+            .field("access_key", &self.access_key)
+            .field("secret_key", &"<redacted>")
+            .field("path_style", &self.path_style)
+            .finish()
+    }
 }
 
 fn default_true() -> bool {
     true
+}
+
+fn default_region() -> String {
+    "us-east-1".into()
 }
 
 /// Secrets. All are base64 strings; generated and printed on first start if empty.
@@ -111,6 +147,7 @@ impl Default for Config {
             allow_signups: true,
             hardcoded_ott: Default::default(),
             log_format: "json".into(),
+            accounts: Default::default(),
         }
     }
 }
@@ -138,12 +175,7 @@ impl Config {
         if let Some(v) = env("PHOTOVAULT_DATABASE_URL") {
             self.database_url = v;
         }
-        if let Some(v) = env("PHOTOVAULT_STORAGE_PATH") {
-            self.storage = StorageConfig::Local {
-                path: v.into(),
-                public_url: env("PHOTOVAULT_STORAGE_PUBLIC_URL"),
-            };
-        }
+        self.apply_storage_env(&env);
         if let Some(v) = env("PHOTOVAULT_JWT_SECRET") {
             self.secrets.jwt = v;
         }
@@ -159,8 +191,130 @@ impl Config {
         if let Some(v) = env("PHOTOVAULT_ALLOW_SIGNUPS") {
             self.allow_signups = v == "true" || v == "1";
         }
+        self.accounts.apply_env();
         if let Some(v) = env("PHOTOVAULT_ADMINS") {
             self.admins = v.split(',').filter_map(|s| s.trim().parse().ok()).collect();
         }
+    }
+
+    /// Storage overrides. `PHOTOVAULT_STORAGE_KIND` (`local`/`s3`) switches
+    /// backend; otherwise the individual variables patch the configured one.
+    /// Local: `PHOTOVAULT_STORAGE_PATH`, `PHOTOVAULT_STORAGE_PUBLIC_URL`.
+    /// S3: `PHOTOVAULT_S3_ENDPOINT`, `PHOTOVAULT_S3_PUBLIC_ENDPOINT`,
+    /// `PHOTOVAULT_S3_REGION`, `PHOTOVAULT_S3_BUCKET`, `PHOTOVAULT_S3_ACCESS_KEY`,
+    /// `PHOTOVAULT_S3_SECRET_KEY`, `PHOTOVAULT_S3_SECRET_KEY_FILE`,
+    /// `PHOTOVAULT_S3_PATH_STYLE`.
+    fn apply_storage_env(&mut self, env: &dyn Fn(&str) -> Option<String>) {
+        let kind = env("PHOTOVAULT_STORAGE_KIND").map(|k| k.to_ascii_lowercase());
+        let want_s3 = match kind.as_deref() {
+            Some("s3") => true,
+            Some(_) => false,
+            None => matches!(self.storage, StorageConfig::S3(_)),
+        };
+        if want_s3 {
+            let mut c = match &self.storage {
+                StorageConfig::S3(c) => c.clone(),
+                StorageConfig::Local { .. } => S3Config {
+                    endpoint: String::new(),
+                    public_endpoint: None,
+                    region: default_region(),
+                    bucket: String::new(),
+                    access_key: String::new(),
+                    secret_key: String::new(),
+                    secret_key_file: None,
+                    path_style: true,
+                },
+            };
+            if let Some(v) = env("PHOTOVAULT_S3_ENDPOINT") {
+                c.endpoint = v;
+            }
+            if let Some(v) = env("PHOTOVAULT_S3_PUBLIC_ENDPOINT") {
+                c.public_endpoint = Some(v);
+            }
+            if let Some(v) = env("PHOTOVAULT_S3_REGION") {
+                c.region = v;
+            }
+            if let Some(v) = env("PHOTOVAULT_S3_BUCKET") {
+                c.bucket = v;
+            }
+            if let Some(v) = env("PHOTOVAULT_S3_ACCESS_KEY") {
+                c.access_key = v;
+            }
+            if let Some(v) = env("PHOTOVAULT_S3_SECRET_KEY") {
+                c.secret_key = v;
+            }
+            if let Some(v) = env("PHOTOVAULT_S3_SECRET_KEY_FILE") {
+                c.secret_key_file = Some(v.into());
+            }
+            if let Some(v) = env("PHOTOVAULT_S3_PATH_STYLE") {
+                c.path_style = !(v == "false" || v == "0");
+            }
+            self.storage = StorageConfig::S3(c);
+        } else {
+            let (mut path, mut public_url) = match &self.storage {
+                StorageConfig::Local { path, public_url } => (path.clone(), public_url.clone()),
+                StorageConfig::S3(_) => (PathBuf::from("data"), None),
+            };
+            if let Some(v) = env("PHOTOVAULT_STORAGE_PATH") {
+                path = v.into();
+            }
+            if let Some(v) = env("PHOTOVAULT_STORAGE_PUBLIC_URL") {
+                public_url = Some(v);
+            }
+            self.storage = StorageConfig::Local { path, public_url };
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn storage_toml_and_env() {
+        let cfg: Config = toml::from_str(
+            r#"
+            [storage]
+            kind = "s3"
+            endpoint = "http://garage:3900"
+            public_endpoint = "https://s3.example.com"
+            region = "garage"
+            bucket = "photos"
+            access_key = "GK1"
+            secret_key = "s3cr3t"
+            "#,
+        )
+        .expect("toml");
+        let StorageConfig::S3(c) = &cfg.storage else {
+            panic!("expected s3")
+        };
+        assert!(c.path_style);
+        assert_eq!(c.public_endpoint.as_deref(), Some("https://s3.example.com"));
+        assert!(!format!("{cfg:?}").contains("s3cr3t"));
+
+        let mut cfg = Config::default();
+        let vars: std::collections::HashMap<&str, &str> = [
+            ("PHOTOVAULT_STORAGE_KIND", "s3"),
+            (
+                "PHOTOVAULT_S3_ENDPOINT",
+                "https://s3.eu-central-003.backblazeb2.com",
+            ),
+            ("PHOTOVAULT_S3_BUCKET", "b"),
+            ("PHOTOVAULT_S3_PATH_STYLE", "false"),
+        ]
+        .into_iter()
+        .collect();
+        cfg.apply_storage_env(&|k| vars.get(k).map(|v| v.to_string()));
+        let StorageConfig::S3(c) = &cfg.storage else {
+            panic!("expected s3")
+        };
+        assert_eq!((c.bucket.as_str(), c.path_style), ("b", false));
+        assert_eq!(c.region, "us-east-1");
+
+        let mut cfg = Config::default();
+        cfg.apply_storage_env(&|k| (k == "PHOTOVAULT_STORAGE_PATH").then(|| "/data".into()));
+        assert!(
+            matches!(&cfg.storage, StorageConfig::Local { path, .. } if path == std::path::Path::new("/data"))
+        );
     }
 }

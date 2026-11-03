@@ -1,0 +1,82 @@
+{
+  "description": "libsodium outputs produced by the Ente web client's own crypto module. Every field is standard base64 unless noted. The server only ever stores these ciphertexts.",
+  "provenance": {
+    "generator": "server/tests/vectors/generator/libsodium-vectors.mts",
+    "upstream": "https://github.com/ente-io/ente",
+    "upstreamCommit": "b2ed3dc93e49d6ac9831bf3550957816d3a0735d",
+    "clientCode": "web/packages/base/crypto/libsodium.ts (+ types.ts)",
+    "library": "libsodium-wrappers-sumo 0.7.15",
+    "node": "v22.23.4"
+  },
+  "srpCrossCheck": "ok: kek and loginSubKey in srp.json match libsodium",
+  "secretbox": {
+    "what": "encryptBox: crypto_secretbox_easy, random 24-byte nonce (collection key under master key)",
+    "key": "b/AvyB21JISCysjgqJRV+4zNRpq+BVupMfas2XudniY=",
+    "plaintext": "A7eOHnbLelQ1uIO5l/TQH7GFWIrZm9VCXD2thyur5OU=",
+    "encryptedData": "w7ze99JRMo9HIUj2UpdosAzCFMvPuaSD6u6pbWj145327JJVpPy4sFundAeOeQnR",
+    "nonce": "wpcDppwBQHXX14Mw3nEjdFTH4LiHYOmH"
+  },
+  "fileKey": {
+    "what": "file key (crypto_secretstream key) encrypted with the collection key, as sent in POST /files",
+    "collectionKey": "A7eOHnbLelQ1uIO5l/TQH7GFWIrZm9VCXD2thyur5OU=",
+    "fileKey": "EeRsnvM54ke3HcmZbDBoxUMK1qoTEilF0sCoSa7AA6s=",
+    "encryptedKey": "V4bujWEYNcBEcVc5v48n9+L1NKSgTXQCo/yWtwNbhWeiY0vlWNIWzUbldBY/vgmK",
+    "keyDecryptionNonce": "ZumXd91jiNYlfxenIGARVp2ziQW8P9S1"
+  },
+  "metadata": {
+    "what": "encryptMetadataJSON: JSON.stringify -> UTF-8 -> secretstream xchacha20poly1305, one TAG_FINAL chunk",
+    "key": "EeRsnvM54ke3HcmZbDBoxUMK1qoTEilF0sCoSa7AA6s=",
+    "json": "{\"title\":\"IMG_0001.jpg\",\"creationTime\":1730000000000000,\"modificationTime\":1730000000000000,\"fileType\":0,\"hash\":\"placeholder-hash\"}",
+    "encryptedData": "F3QCusmzzlfOLl0b+r9+FWscj3Pj4aXe/v2sRCYvqYju4MHjigaubd4HZZ/zmm5oh30myUHBjuul5Ba1xANYkYg2oVMOn5q/Egb6JrcCbLWT4hfFnu7oXk2ixqkanvfGE9n9E+12/7CWCII63Qt9vFN6/cM6aPcER+lGXFpbHNylx0AFVNHtvq0rMpi4Z/1tJ/TdBg==",
+    "decryptionHeader": "BZLOYa2GSp12LQD1NwnztZ43IKohRwwd"
+  },
+  "thumbnail": {
+    "what": "encryptBlobBytes: secretstream, one TAG_FINAL chunk",
+    "key": "EeRsnvM54ke3HcmZbDBoxUMK1qoTEilF0sCoSa7AA6s=",
+    "plaintext": "otELSRum5FC94TrqNXoK0eXDsbYnQ76zYY1rNFTZqhogQW66DMWMPRo5xqeSvEUTvcv5DmaDFE4wMPOswrNLazltZknJENuLBPFuX25CBD6//9/cfz5jV9yDNbXhey37AWyzXGj72Vc+l5PrWiBbu8FOA7h1U1oUnYz1UNiT2Y47tdWCrsMScokLHIbyvWRfurl9xFfZsEZzIfvfmXh6jMrJRXkUMXDroTJCjmZw1G95vzvWk/AW5q3OucVmquJ8IqcYUIlq+TqMhNGLgrO/2u+9kngR30eZPOCxxqSaa42t48Dd+vhH2W2C5Xn9PLi6zzpjS0w5d6DUpCnrsC4km8FXKLyBxrm2Fio8HE4/YaHjwH1C9XbpTws0/rlpn9+z0t7YqCOgyRbNM3Sd",
+    "encryptedData": "M9JJpdtehVbpgXe+4Dt5CP71zHoL2UNiPmuJbZQiry6LQdP6P18xA1bvqQ/ZYtYMy+59xPBd5bjSvkp6gqhGPwkksdJkkOeuOdwWe99kjYMgolQDKT2Bx8iM3jMk6AJIJK46Td8n6m8Sk6fIqOPf5Hru9KE3jtNAy8kyYpIRgmhkoOap9logbr6Dv335qKSbPqcmh5YXNBjxlMdwGspN7GN4E//gH8VWR0aFVyPHmvP2gfxArYhJGZOxns25oYFmzMFvbKUxJrcCuCqQQnjWNvIy9MhX7gvWffjVNDR2ASl/TVMCyOR818iUqeJ9lEwun05ESYz1AoVRQUqmbaaVIYWNrsJWL9TswqPrRuiWZ/J+/aDDO5nODfHh2gipKGZdFb8FeNUHhWqMWV0VQyVmxVlKaBzGbRHd19Jdx1k=",
+    "decryptionHeader": "jEnhviZamePwplJJbMeZOvkG0LrlFRzI"
+  },
+  "file": {
+    "what": "encryptStreamBytes (<= 4 MiB: one TAG_FINAL chunk)",
+    "key": "EeRsnvM54ke3HcmZbDBoxUMK1qoTEilF0sCoSa7AA6s=",
+    "plaintext": "qB4SPSzYKaC2kw7cwoSA0EWNWKfrSpvcIgJEXXzR6uoMsnxkQBlHfLvc2TOw8cw8WM4d7/YKit+A+fjXEDuKWiLDzaSj0oja+PnDvkJw6qDVGacwAS/wY5PeH+E6D+lXg73u+BSrN7XH5H4/vWwwfI7blZ09icyqj5/NLJU4nObbsK2Tbechhcqv9S61RzvMYHxtg5jiCGGb986rLUBj6XLdiOUo4Fz4HPeVnWW32zRPw1mn05MpC9WVAEIWLWE236BnUNWzIx+s74tnmKoC1toQ5oIO5hvA/dzTW0RRiS8O4LaLgoyybaopg5W+FAOv9jwk5yQvqknQZ1X5iWFXdHF3LMfXX4pCMjD7RH2sWnNUr17WAlsQkEMuCkxZ0lsd5vtiwOrUaUHHY628AVuvHzBp45RPILt051arM7tvKfoqZ24fEUL0KK6/8i/AuDfVfIYp54x3NC9Wkc5O5oyivsqU6Y2CUFwV9hn5TCntHYsFqGrsmh6DdisRtx9iqp5WBp106LCLoFGFaDSWPETPtbYHb/EDjYgNT3tZqPfaCCEK+KeqzGFF1Jsidp7RfpFGWwxwymOHdJzfXTGBQlngTY3LHHBKGny+lmN2pYdhLA5XN0lk7S1d1hsYI0ajY9ti2yLQ/HgTJaICbHo7SuO+Z4D9wJGYXOdBFZBYrDsozrYewn53y7wiDTo/RpG4CC3KHPkXpS1iJRzWygsIiVcZwVeRbQQUA5vAV1C0ZfvfEmCrmHiGmghyiZT+aYZrSc9uTSzGlm8ht4Op6/pmYMZMrFlD/2zu+Rw8ekbQseNMuv9KuCenK68LRgxxD4mz/fwuWQOrZAOR0IAZRPvVCY1yK01BhM1YcHpPHGLLgKWzMeNF0ULX+ZmnFcjWaijaOpYMx3zo5jsRqoj2mJXrag3nYwa4yEXX07DySVyFwxJ7TBXeARCkm2haX4/E58IDs77Yfyhs0aqGEh8eTAW/hPc33IH/fysLGJHaGpgCGjfGuN9CfOglJKKjx2D1zDixyttyP63chJ/Q9+lOqIBXdMjU7SXfpKeBzMDPXKcwhMNcvgHuj7ZuwPz8Za3o1XWJZQBH9HtP+khwwHYjVRIMc/ilhfnJxvlpQGHZpU2bs1ZxjSG3jZnW5kmAiA+wd4b/9czNY7rgG+FXfSj6N1YgSg29WpUfSRcwQdO/Vqx+SvUfoG+hmD2JK4/kFqIFXG+ab0uvf5QqfowB3mzZxIvhfei3A8sH3XWkcA/hq/OJjwFeYzAfl9vF2ipvL3bYLSIwI7rLo/E6J0ISIyylxE6RlmYaFVDSDlzofvm0Ojk6JAAWXwamqyUevsWIag==",
+    "encryptedData": "d+OaQkFjSkMg7nqS0H0ZI2UKpKz2DBaLT34l454UZEB1MdovYkuZ1KJ+vCF/kZzNdp5UTKEZMMhXvIJhC6PYmusrXNjNdC7I85AWMPIU5A3qg3Ysdvi21wQseCistrIzurlAIKapmkLCmakg+OAms5hNoU5GOTMMP2QhhflpN5JFLO6JfIH3+5OJlrVe+1o75eSDl/NeNnkdr4mFX59qmOF75Azqt7lafbppJOTcPZy1v8emsIL++3TVCCFymnvQJ+yS9O22DzU7W7+tGVq8vNiwEDh40IbWZgG464EsuO2q0v511oi0/LWVPnZcwbEJSjBlf+JdTipNl1UZSaduCAeSQY2gCR8aRaVHlr8tGJ8U9tJUqb0FXz4GCndQTViKBfdeBlbUkNEWUul/j+QTvxDrJZpprxtWssHzJ5gGh5OVWFhlJcBmucMr0P3aECkEXBE9H4s36XgJwVnK1Ydcg1vsN/N6xolE8rCKVJ9OTGGDtCyOrmTdl9KHnLeMeOTPvywJMhxja+K6+I8ioO1Mo2iFaJa1WcbB2OYEd9D8XCBO0tlei1kgJoLeaIj2ACw4vWrckrUft4ij/pHq6MyLu7Bbp3EzalvuNG68x2bspUgp/BZ5dhT3MCMcr5wwyFqFr5gpJnSC+UxsJW+y85DqYcmhPteWsjV6sqZk0Ct40DC41STLeTrahhYtCfRM8m4LMc7NOLCTxqcahfW0DQp42U2YKxIbqWE+4AiyLe96s8t6eGLDkE2hlgMCrUz1mNzf0GkkdYDOfEx4/bhBBh1cIWjyVGxc84Yklj4lkhmKL4f+mV5HqnZXCfcSpRMex/ef4P5Q8Jow3JHoZcK0S2JIylRs+b98gj++Us/t2rLvgyuUfr/LZtzhfEUXndHVTKmD1hEmLrQZLFDABInw9out+Gi13hNu7r2kaX9+61HtoOWXdbBKMqUGQTPaYi11I4L8UU7be7l9QhmwJJyQ1S1wXq3KiRc8IXZ3d/dkx18q3IRG8+mI/extrAADu++MX1fi5yUBYuXpnJbROzz0loe87iOIbt4r6U3vnr69vns9EVkMFTnSM2Z7FHKGZc3roWsATcF7bF5C642/2YdNbPVasK9ioSA1M3aRiZ6mvuVloz0aRJFcBBWypUR0YAachbuFYST5JPblyctX5SVJ4/uNoDX/xfLRAVgCB6OL9ZyHCM1N6ypC28FEVqFuEvf4qnZ1xZprwVFiextHlv+npql0TrGi9sI7mbw5xvfwNpHwJ/XBUS/S5JdgPPDoNoPfR9yyUSuQrhno8hAvGyHV3uByMOG3UP/WNK+2qKN5i0oqc9MtQ4UnLAZyw+hJNzX0gInSBHCszL/XCpCB",
+    "decryptionHeader": "COiQYC+QM8JJu2ORvjOvidwzxnVEYg1n",
+    "blake2b512": "8ikAo7ZkdfLckQ7lUBYoLTduY1cxnLcSgaagVfyARSALLGPtD4MyVzblGltFvC0z7Y/f6eHcbHRMs71/vrgOAA=="
+  },
+  "fileStream": {
+    "what": "initChunkEncryption + encryptStreamChunk: chunk 1 TAG_MESSAGE (1000 B), chunk 2 TAG_FINAL (24 B)",
+    "key": "EeRsnvM54ke3HcmZbDBoxUMK1qoTEilF0sCoSa7AA6s=",
+    "decryptionHeader": "qAoXc6MaQSjd46kG9sx4Clq8j2lr7qoC",
+    "chunks": [
+      "1bCdxAZu0YdD4ZsNxqnzmEhrcpHxiAEhgfkCEl6zsI/bVUSXcv/emY0UunQuOePeOfJLNBmZdmmcqsARM1aYWt5Y4TbgII5llQUBlLLsvVDAez7OXRPTxaYZJW0CVEmxDlQD3jsBgnnCyNPPMFFffES61jtgoYBJYju2cd+Ec8Ouf26sGBvcZquNX364MFyOLsP06HZeIigFyrxaxE8200im7PBmqOogFQhFY3qvn0RFIGxvA4wHWYt7/NIb2OR2YviCSYb6EzyZvpZcIrv06rPjYk9boUtOshOlTLq30lQMEBIpGGCHpfOzFYC3cf7DKb/oY3V65NNK9wjTea8zo8N9jA3zkc7NU9dT1IMX/XLPC+SVsYpyB42XnBo7wshyz8vt05HFm3BIYrdUsH9cjY/4vwwmZ/p/D/7iKtzPsea785m4vZNUkuHEvKNv74nH7cgKtCF6CjBHPtFzA7GNzLt7EQ4RbZdWgy0rK5UTYcDoIQGS6G2xtFrvPMd9T4m2LAI0whZKr3KFzdXnS2hf/c7lXUlz5w8CZedYBnvgJZRi9sfttmY/+z4fo3uNfOtIy0+mSv1WWXL8IaznT1ey3Msrktxd7FUC18FPkU57uc4kW2cRH3PwtxrbmaoW/aGLOo/AVfE9ZBW79ayBWVkZWD9uzvVmIdzuZIVUGKxKr6eYMDXG6FCH2amuVKqPgIsqT8P4UT9ZFfUYAyzsy4QVduUG/4ahWY8eDfIIPsIz0myzBrhN0srdVmpEouwC12gfsay/p452sWpGT2CrTLCMq5QhmP9XTTSScTPmt6a/IuYZpwzkiVX6UGC/2lBdwjNyk8X0YuuWU38G8yVoH88qCneP5WbokgUv6pRV0HD//LtBpqzyodtYgkXIo0yQVAAA/4q7dLEPqxr33+PViqepJXQfZhrQ+ARAwGskXzRoUFq9nXi19GhiB0GjH5JRkRykMlgnLSU0j+wZ86FWCzVVXoU1yCBF40CZI1H8l+RO3A2AzKry3yS0QcDbNYpHuO4Y9N0jJmJoXXfP8n/i6ERyksTI0BNEZAHahgj8Gz20OIx5PaVun8FHXcIv3ADj6lZBpZEvKpztUiRB+iyeX+zCBxzk50ei0U2cmSEZDkBABuQ2dOzwpWcXokWZkbfJtETcsxcXjTZ7CyjwryoY8NWhS/EUCrXxPJLoNIGjszJL/8rGwiwJEOTGlAYHz7HoORjhTzQZbbUogv1IR/VH4qO9WJV0X47HyEqy+5OSS7uE3ZF81fysezg4fusD+9sdH8n5C4mwZ50wJ5byEGY59gCX9PrsnR1ww9JUZGsF8lHY0PDmCzadi3EJetnkJR1+VQ+ahEnBxhO5YG7j",
+      "R2HWBWRGWaM4iLPVrXL6X1Qndj1zmaq4xkVqhkGqEGiL98oWBSnu0Mc="
+    ],
+    "plaintexts": [
+      "qB4SPSzYKaC2kw7cwoSA0EWNWKfrSpvcIgJEXXzR6uoMsnxkQBlHfLvc2TOw8cw8WM4d7/YKit+A+fjXEDuKWiLDzaSj0oja+PnDvkJw6qDVGacwAS/wY5PeH+E6D+lXg73u+BSrN7XH5H4/vWwwfI7blZ09icyqj5/NLJU4nObbsK2Tbechhcqv9S61RzvMYHxtg5jiCGGb986rLUBj6XLdiOUo4Fz4HPeVnWW32zRPw1mn05MpC9WVAEIWLWE236BnUNWzIx+s74tnmKoC1toQ5oIO5hvA/dzTW0RRiS8O4LaLgoyybaopg5W+FAOv9jwk5yQvqknQZ1X5iWFXdHF3LMfXX4pCMjD7RH2sWnNUr17WAlsQkEMuCkxZ0lsd5vtiwOrUaUHHY628AVuvHzBp45RPILt051arM7tvKfoqZ24fEUL0KK6/8i/AuDfVfIYp54x3NC9Wkc5O5oyivsqU6Y2CUFwV9hn5TCntHYsFqGrsmh6DdisRtx9iqp5WBp106LCLoFGFaDSWPETPtbYHb/EDjYgNT3tZqPfaCCEK+KeqzGFF1Jsidp7RfpFGWwxwymOHdJzfXTGBQlngTY3LHHBKGny+lmN2pYdhLA5XN0lk7S1d1hsYI0ajY9ti2yLQ/HgTJaICbHo7SuO+Z4D9wJGYXOdBFZBYrDsozrYewn53y7wiDTo/RpG4CC3KHPkXpS1iJRzWygsIiVcZwVeRbQQUA5vAV1C0ZfvfEmCrmHiGmghyiZT+aYZrSc9uTSzGlm8ht4Op6/pmYMZMrFlD/2zu+Rw8ekbQseNMuv9KuCenK68LRgxxD4mz/fwuWQOrZAOR0IAZRPvVCY1yK01BhM1YcHpPHGLLgKWzMeNF0ULX+ZmnFcjWaijaOpYMx3zo5jsRqoj2mJXrag3nYwa4yEXX07DySVyFwxJ7TBXeARCkm2haX4/E58IDs77Yfyhs0aqGEh8eTAW/hPc33IH/fysLGJHaGpgCGjfGuN9CfOglJKKjx2D1zDixyttyP63chJ/Q9+lOqIBXdMjU7SXfpKeBzMDPXKcwhMNcvgHuj7ZuwPz8Za3o1XWJZQBH9HtP+khwwHYjVRIMc/ilhfnJxvlpQGHZpU2bs1ZxjSG3jZnW5kmAiA+wd4b/9czNY7rgG+FXfSj6N1YgSg29WpUfSRcwQdO/Vqx+SvUfoG+hmD2JK4/kFqIFXG+ab0uvf5QqfowB3mzZxIvhfei3A8sH3XWkcA/hq/OJjwFeYzAfl9vF2ipvL3bYLSIwI7rLo/E6J0ISIyylxE6RlmYaFVDSDlzofvm0Ojk6JAAWXwamqyUevsWIag==",
+      "qB4SPSzYKaC2kw7cwoSA0EWNWKfrSpvc"
+    ]
+  },
+  "sealedBox": {
+    "what": "boxSeal: crypto_box_seal",
+    "publicKey": "AAFApH+tHKWbiaKaZ3X/8OHCvm6TAJGTpWHHs/T3pEc=",
+    "secretKey": "R2KbmVinfnGzH26DiVxopKvP+yPUYtGABL7VTRVVErk=",
+    "plaintext": "Al3czVYVWEJt3tL2JWp+yhGVW6BwpXkLeABm183ZXO8=",
+    "sealed": "5YKgocEIHFaJWb8zU5hkmAx5LWDYeEIYTf1IkSvaMghiAZ+WxJGbOdc6ZUc1C4V+VhBuKJmr8akY0VDrW8sLQyMmCQaHxNbpXR4xbbDDt/U="
+  },
+  "generichash": {
+    "what": "crypto_generichash(32, email, key): the server's keyed email hash primitive",
+    "key": "bnyDxIGMgF3zpLCbgeBR1VM5eyzfasotyZVmc50dJZY=",
+    "message": "vectors@example.com",
+    "hash": "W+F8jI67HGUeAuw8o64dAvAmt2nKx6IXXQmupcE6n3w="
+  },
+  "argon2id": {
+    "what": "deriveInteractiveKey: crypto_pwhash ARGON2ID13, interactive limits",
+    "password": "public link password",
+    "salt": "xs4DTEz4UUL3eaMuEx8FXA==",
+    "opsLimit": 2,
+    "memLimit": 67108864,
+    "key": "fCxmg83KVkfU009Z9es9FyQ4Dozqvvdo4NvUKfPM0vY="
+  }
+}

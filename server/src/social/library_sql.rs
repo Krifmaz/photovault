@@ -1,21 +1,14 @@
 //! Every query this workstream makes against tables owned by other workstreams.
 //!
-//! Kept in one module so the integrator can replace these bodies with the real
-//! collections/files helpers. Tables and columns relied on (museum's names):
-//!
-//! * `collections(collection_id BIGINT, owner_id BIGINT, app TEXT NULL, is_deleted BOOLEAN NULL)`
-//! * `collection_shares(collection_id BIGINT, to_user_id BIGINT, role_type TEXT, is_deleted BOOLEAN NULL)`
-//!   with `role_type` in `VIEWER | COLLABORATOR | ADMIN` (museum `CollectionParticipantRole`).
-//! * `collection_files(collection_id BIGINT, file_id BIGINT, is_deleted BOOLEAN NULL)`.
-//!   museum also treats rows whose `action = 'REMOVE'` as not active; that column is not
-//!   assumed here (see [`require_file_in_collection`]).
-//! * `users(user_id, encrypted_email TEXT, email_decryption_nonce TEXT)` (0001_core):
-//!   both base64 (standard), secretbox under `keys.encryption`.
+//! Access checks go through [`crate::library::collections::access`]; the remaining queries
+//! read the library's tables (migration `0200_library`) directly, with its portable
+//! boolean getters. Emails come from `users` (0001_core).
 
-use super::{not_found, permission_denied};
+use super::permission_denied;
 use crate::auth::App;
 use crate::db::Db;
 use crate::error::ApiResult;
+use crate::library::collections;
 use crate::state::AppState;
 
 /// The caller's role on a collection.
@@ -42,65 +35,30 @@ impl Role {
     }
 }
 
-/// museum `access.Controller.GetCollection`: the caller must own the collection or be an
-/// active sharee, the collection must belong to the calling app and not be deleted.
-/// Missing collection / not shared / deleted → 404, app mismatch → 403.
+/// museum `access.Controller.GetCollection` ([`collections::access`]): the caller must own
+/// the collection or be an active sharee, the collection must belong to the calling app
+/// and not be deleted. Missing collection / not shared / deleted → 404, app mismatch → 403.
 pub async fn collection_role(
-    db: &Db,
+    state: &AppState,
     collection_id: i64,
     user_id: i64,
     app: App,
 ) -> ApiResult<Role> {
-    let row: Option<(i64, Option<String>, i64)> = sqlx::query_as(
-        "SELECT owner_id, app, CAST(CASE WHEN COALESCE(is_deleted, FALSE) THEN 1 ELSE 0 END AS BIGINT) \
-         FROM collections WHERE collection_id = $1",
-    )
-    .bind(collection_id)
-    .fetch_optional(&db.pool)
-    .await?;
-    let (owner_id, coll_app, is_deleted) = row.ok_or_else(not_found)?;
-    let role = if owner_id == user_id {
-        Role::Owner
-    } else {
-        let share: Option<(Option<String>,)> = sqlx::query_as(
-            "SELECT role_type FROM collection_shares \
-             WHERE collection_id = $1 AND to_user_id = $2 AND COALESCE(is_deleted, FALSE) = FALSE",
-        )
-        .bind(collection_id)
-        .bind(user_id)
-        .fetch_optional(&db.pool)
-        .await?;
-        let (role_type,) = share.ok_or_else(not_found)?;
-        Role::parse(role_type.as_deref().unwrap_or("VIEWER"))
-    };
-    let coll_app = coll_app.filter(|a| !a.is_empty());
-    if coll_app.as_deref().unwrap_or("photos") != app.as_str() {
-        return Err(permission_denied());
-    }
-    if is_deleted != 0 {
-        return Err(not_found());
-    }
-    Ok(role)
+    let a = collections::access(state, collection_id, user_id, app, false, false).await?;
+    Ok(Role::parse(a.role))
 }
 
-/// museum `validateFileInCollection`: the file must be actively in the collection,
-/// otherwise 403.
+/// museum `validateFileInCollection`: the file must be actively in the collection (present,
+/// not deleted, and not pending removal via `action = 'REMOVE'`), otherwise 403.
 pub async fn require_file_in_collection(
-    db: &Db,
+    state: &AppState,
     collection_id: i64,
     file_id: i64,
 ) -> ApiResult<()> {
-    let row: Option<(i64,)> = sqlx::query_as(
-        "SELECT CAST(CASE WHEN COALESCE(is_deleted, FALSE) THEN 1 ELSE 0 END AS BIGINT) \
-         FROM collection_files WHERE collection_id = $1 AND file_id = $2",
-    )
-    .bind(collection_id)
-    .bind(file_id)
-    .fetch_optional(&db.pool)
-    .await?;
-    match row {
-        Some((0,)) => Ok(()),
-        _ => Err(permission_denied()),
+    if collections::is_active_member(state, collection_id, file_id).await? {
+        Ok(())
+    } else {
+        Err(permission_denied())
     }
 }
 
@@ -111,9 +69,8 @@ pub async fn accessible_collection_ids(db: &Db, user_id: i64, app: App) -> ApiRe
     let rows: Vec<(i64,)> = sqlx::query_as(
         "SELECT collection_id FROM collections \
          WHERE (owner_id = $1 OR collection_id IN \
-               (SELECT collection_id FROM collection_shares WHERE to_user_id = $1 AND COALESCE(is_deleted, FALSE) = FALSE)) \
-           AND COALESCE(is_deleted, FALSE) = FALSE \
-           AND COALESCE(NULLIF(app, ''), 'photos') = $2 \
+               (SELECT collection_id FROM collection_shares WHERE to_user_id = $1 AND is_deleted = FALSE)) \
+           AND is_deleted = FALSE AND app = $2 \
          ORDER BY collection_id",
     )
     .bind(user_id)

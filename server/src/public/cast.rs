@@ -2,8 +2,9 @@
 //! `X-Cast-Access-Token` extractor (museum `CastAuthMiddleware`).
 
 use super::http::{header_or_query, json_response, random_string};
-use super::library_sql;
+use crate::auth::App;
 use crate::db::now_micros;
+use crate::library::collections;
 use crate::state::AppState;
 use axum::extract::FromRequestParts;
 use axum::http::StatusCode;
@@ -300,9 +301,19 @@ impl FromRequestParts<AppState> for CastSession {
         let Some((Some(collection_id), Some(user_id))) = row else {
             return Err(invalid());
         };
-        match library_sql::can_view_collection(db, collection_id, user_id).await {
-            Ok(true) => {}
-            _ => return Err(invalid()),
+        // museum verifies the caster still has access (`AccessCtrl.GetCollection`).
+        if collections::access(
+            state,
+            collection_id,
+            user_id,
+            App::from_parts(parts),
+            false,
+            false,
+        )
+        .await
+        .is_err()
+        {
+            return Err(invalid());
         }
         let db = db.clone();
         tokio::spawn(async move {
