@@ -60,9 +60,9 @@ class _SharingProgressSheetState extends State<_SharingProgressSheet> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox.square(
+          const SizedBox.square(
             dimension: 143,
-            child: const ExcludeSemantics(
+            child: ExcludeSemantics(
               child: PhotovaultGlyph(width: 143, height: 143),
             ),
           ),

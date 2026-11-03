@@ -879,7 +879,7 @@
   },
   "notifications": "התראות",
   "offlineModeWarning": "בחרת להמשיך ללא גיבויים. אנא בצע גיבויים ידניים כדי לוודא שהקודים שלך בטוחים.",
-  "onEnte": "ב<branding>אנטע</branding>",
+  "onEnte": "ב<branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"

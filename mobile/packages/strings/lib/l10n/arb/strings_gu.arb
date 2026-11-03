@@ -160,7 +160,7 @@
       }
     }
   },
-  "applePhotosUnsupportedResource": "આ ફાઇલને એપલ ફોટોઝમાં સેવ કરી શકાઈ નથી. તમે તેને હજુ પણ એન્ટેમાં જોઈ શકો છો.",
+  "applePhotosUnsupportedResource": "આ ફાઇલને એપલ ફોટોઝમાં સેવ કરી શકાઈ નથી. તમે તેને હજુ પણ Photovaultમાં જોઈ શકો છો.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -663,7 +663,7 @@
       }
     }
   },
-  "importTypeEnteEncrypted": "એન્ટે એન્ક્રિપ્ટેડ નિકાસ",
+  "importTypeEnteEncrypted": "Photovault એન્ક્રિપ્ટેડ નિકાસ",
   "incorrectDetails": "ખોટી વિગતો",
   "incorrectPasswordTitle": "ખોટો પાસવર્ડ",
   "@incorrectPasswordTitle": {
