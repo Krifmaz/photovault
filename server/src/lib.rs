@@ -13,6 +13,7 @@ pub mod crypto;
 pub mod db;
 pub mod error;
 pub mod jwt;
+pub mod library;
 pub mod mail;
 pub mod metrics;
 pub mod routes;
