@@ -1,0 +1,15 @@
+[book]
+title = "Photovault"
+description = "Self-hosted, end-to-end encrypted photo server for the Ente Photos apps. Based on Ente (ente.com)."
+authors = ["Photovault contributors"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+git-repository-url = "https://github.com/Krifmaz/photovault"
+edit-url-template = "https://github.com/Krifmaz/photovault/edit/main/docs/{path}"
+no-section-label = true

@@ -24,7 +24,11 @@ enum Cmd {
     /// Probe `/healthz` on the local server (for Docker HEALTHCHECK; no shell or curl needed).
     Healthcheck {
         /// URL to probe.
-        #[arg(long, default_value = "http://127.0.0.1:8080/healthz")]
+        #[arg(
+            long,
+            env = "PHOTOVAULT_HEALTHCHECK_URL",
+            default_value = "http://127.0.0.1:8080/healthz"
+        )]
         url: String,
     },
     /// Administration commands.

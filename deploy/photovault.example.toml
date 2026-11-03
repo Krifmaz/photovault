@@ -1,0 +1,40 @@
+# Photovault configuration. Every key is optional; PHOTOVAULT_* environment
+# variables override the file. See docs/src/configuration.md.
+
+listen = "0.0.0.0:8080"
+# What you type into the apps as the server endpoint.
+public_url = "https://photos.example.com"
+# PostgreSQL: "postgres://photovault:password@db:5432/photovault"
+database_url = "sqlite:///db/photovault.sqlite?mode=rwc"
+allow_signups = false
+admins = []
+log_format = "json"
+
+[secrets]
+# head -c 32 /dev/urandom | base64   (one per key; keep them safe and stable)
+jwt = ""
+encryption = ""
+hashing = ""
+
+[storage]
+kind = "local"
+path = "/data"
+# Hostname used in signed upload/download URLs (defaults to public_url).
+public_url = "https://storage.photos.example.com"
+
+# [storage]
+# kind = "s3"
+# endpoint = "https://s3.eu-central-003.backblazeb2.com"
+# public_endpoint = "https://s3.eu-central-003.backblazeb2.com"
+# region = "eu-central-003"
+# bucket = "my-photovault"
+# access_key = "..."
+# secret_key_file = "/run/secrets/s3_secret"
+# path_style = true
+
+# [smtp]
+# host = "smtp.example.com"
+# port = 587
+# username = "photos@example.com"
+# password = "..."
+# from = "Photovault <photos@example.com>"
