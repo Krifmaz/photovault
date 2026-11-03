@@ -19,6 +19,7 @@ pub mod memory_share;
 pub mod misc;
 pub mod objects;
 pub mod passkeys;
+pub mod photovault;
 pub mod public_collection;
 pub mod push;
 pub mod remote_store;
@@ -54,6 +55,7 @@ pub fn api(state: &AppState) -> Router<AppState> {
         .merge(misc::router())
         .merge(objects::router())
         .merge(passkeys::router())
+        .merge(photovault::router())
         .merge(public_collection::router())
         .merge(push::router())
         .merge(remote_store::router())

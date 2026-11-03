@@ -31,7 +31,7 @@ async fn mark_admin(srv: &photovault_server::testing::TestServer, user_id: i64) 
 #[tokio::test]
 async fn admin_billing_and_family() {
     let (a, b, c3) = ("admin@example.org", "bob@example.org", "carol@example.org");
-    let srv = server(&[a, b, c3]).await;
+    let srv = server_with(&[a, b, c3], |c| c.free_space_override = Some(1 << 50)).await;
     let c = Client::new(&srv);
     let admin = signup(&c, a).await;
     mark_admin(&srv, admin.id).await;
@@ -280,7 +280,7 @@ async fn admin_billing_and_family() {
 #[tokio::test]
 async fn referrals_remote_store_and_misc() {
     let (a, b) = ("rita@example.org", "sam@example.org");
-    let srv = server(&[a, b]).await;
+    let srv = server_with(&[a, b], |c| c.free_space_override = Some(1 << 50)).await;
     let c = Client::new(&srv);
     let rita = signup(&c, a).await;
     mark_admin(&srv, rita.id).await;

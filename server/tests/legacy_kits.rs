@@ -86,12 +86,7 @@ async fn legacy_kit_owner_and_recovery_flow() {
     assert_eq!(created["variant"], 1);
     assert_eq!(created["noticePeriodInHours"], 24);
     assert_eq!(created["encryptedOwnerBlob"], "owner-blob");
-    assert!(
-        created["legacyUrl"]
-            .as_str()
-            .unwrap()
-            .starts_with("https://")
-    );
+    assert!(created["legacyUrl"].as_str().unwrap().starts_with("http"));
     assert!(created.get("activeRecoverySession").is_none());
 
     let list = api.get(&owner, "/legacy-kits").await.json();

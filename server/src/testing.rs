@@ -66,6 +66,8 @@ impl TestServer {
                 public_url: None,
             },
             log_format: "pretty".into(),
+            allow_signups: true,
+            config_dir: dir.0.join("config"),
             ..Config::default()
         };
         tweak(&mut config);

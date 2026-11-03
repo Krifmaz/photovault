@@ -43,7 +43,7 @@ pub fn router() -> Router<AppState> {
 /// Museum `billing.GetFreePlan` with this instance's default quota.
 fn free_plan(state: &AppState) -> Value {
     json!({
-        "storage": state.config.default_storage_bytes,
+        "storage": if state.config.default_storage_bytes > 0 { state.config.default_storage_bytes } else { crate::capacity::UNLIMITED },
         "duration": FREE_PLAN_YEARS,
         "period": "year",
     })
@@ -58,7 +58,7 @@ async fn user_plans(State(state): State<AppState>, _user: AuthUser) -> Json<Valu
 }
 
 async fn subscription(State(state): State<AppState>, user: AuthUser) -> ApiResult<Json<Value>> {
-    let sub = users::subscription(&state.db, user.user_id).await?;
+    let sub = crate::capacity::subscription(&state, user.user_id).await?;
     Ok(Json(json!({ "subscription": sub })))
 }
 
@@ -79,7 +79,7 @@ async fn verify_subscription(
     Body(req): Body<VerifyRequest>,
 ) -> ApiResult<Json<Value>> {
     if req.product_id == "free" {
-        let sub = users::subscription(&state.db, user.user_id).await?;
+        let sub = crate::capacity::subscription(&state, user.user_id).await?;
         return Ok(Json(json!({ "subscription": sub })));
     }
     // No app store / play store verification on a self-hosted server.

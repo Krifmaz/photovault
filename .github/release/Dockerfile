@@ -14,11 +14,12 @@ COPY --chmod=0755 bin/${TARGETARCH}/photovault /usr/local/bin/photovault
 COPY --chown=65532:65532 rootfs/ /
 ENV PHOTOVAULT_LISTEN=0.0.0.0:8080 \
     PHOTOVAULT_STORAGE_PATH=/data \
-    PHOTOVAULT_DATABASE_URL=sqlite:///db/photovault.sqlite?mode=rwc \
+    PHOTOVAULT_CONFIG_DIR=/config \
+    PHOTOVAULT_WEB_DIR=/app/web \
     PHOTOVAULT_HEALTHCHECK_URL=http://127.0.0.1:8080/healthz
 USER 65532:65532
 EXPOSE 8080
-VOLUME ["/data", "/db"]
+VOLUME ["/data", "/config"]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD ["/usr/local/bin/photovault", "healthcheck"]
 ENTRYPOINT ["/usr/local/bin/photovault"]

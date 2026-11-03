@@ -53,9 +53,15 @@ pub fn app_host(state: &AppState, configured: &str) -> String {
     .to_string()
 }
 
-/// Base URL of the public albums web app (`accounts.public_albums_url`).
+/// Base URL of the public albums web app (`accounts.public_albums_url`, else the
+/// albums export served at `<public_url>/albums`).
 pub fn albums_host(state: &AppState) -> String {
-    app_host(state, &state.config.accounts.public_albums_url)
+    let configured = &state.config.accounts.public_albums_url;
+    if configured.is_empty() {
+        format!("{}/albums", state.config.public_url.trim_end_matches('/'))
+    } else {
+        configured.trim_end_matches('/').to_string()
+    }
 }
 
 /// Base URL of the public Locker share web app (`accounts.public_locker_url`).

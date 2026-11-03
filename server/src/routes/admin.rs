@@ -267,7 +267,7 @@ async fn get_user(
         }
         Err(_) => out["storageConsumedStatus"] = json!("unavailable"),
     }
-    if let Ok(sub) = users::subscription(&state.db, id).await {
+    if let Ok(sub) = crate::capacity::subscription(&state, id).await {
         out["subscription"] = json!(sub);
     }
     if let Ok(d) = crate::routes::users::details_v2(&state, id, App::Photos, false).await {

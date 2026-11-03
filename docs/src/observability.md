@@ -28,8 +28,10 @@ the reverse proxy and scrape it from inside the Docker network
 
 ## Logs
 
-Logs are JSON lines on stdout (`log_format = "pretty"` for humans), filtered
-with `RUST_LOG` (default `info`). Each request produces one `access` event
+Logs are one line per event on stderr: plain text by default, JSON with
+`PHOTOVAULT_LOG_FORMAT=json`. Filter them with `RUST_LOG` (default `info`).
+Startup check failures are a single `photovault: … fix: …` line (see
+[Deployment](deployment.md#first-start)). Each request produces one `access` event
 with method, route template, status, latency and `req_id` (also returned as
 the `X-Request-Id` response header).
 
