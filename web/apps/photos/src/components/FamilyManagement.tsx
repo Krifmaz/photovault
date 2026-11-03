@@ -55,7 +55,6 @@ import { useUserDetailsSnapshot } from "ente-new/photos/components/utils/use-sna
 import {
     familyUsage,
     isFamilyAdmin,
-    isSubscriptionActivePaid,
     leaveFamily,
     pullUserDetails,
     type FamilyMember,
@@ -179,9 +178,8 @@ export const FamilyManagement: React.FC<FamilyManagementProps> = ({
                 />
             ) : (
                 <FamilyIntroduction
-                    canCreate={isSubscriptionActivePaid(
-                        userDetails.subscription,
-                    )}
+                    // PHOTOVAULT: strip - no paid plans; the server decides.
+                    canCreate={true}
                     onContinue={() => setInviteOpen(true)}
                     onShowPlans={showPlans}
                 />

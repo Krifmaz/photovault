@@ -539,23 +539,8 @@ export function MemoryViewer({
         />
     );
 
-    const joinEnteButton = (
-        <JoinNowButton
-            variant="contained"
-            color="accent"
-            disableElevation
-            href="https://ente.com/try"
-            target="_blank"
-            rel="noopener"
-            sx={
-                isTabletShareLayout
-                    ? compactShareHeaderJoinNowButtonSx
-                    : shareHeaderJoinNowButtonSx
-            }
-        >
-            Join Ente
-        </JoinNowButton>
-    );
+    // PHOTOVAULT: strip - no "Join Ente" button.
+    const joinEnteButton = null;
 
     const mediaLayers = (
         <>
@@ -635,9 +620,7 @@ export function MemoryViewer({
                 ) : (
                     <TopControls>
                         <TopLeftBrandLink
-                            href="https://ente.com"
-                            target="_blank"
-                            rel="noopener"
+                            // PHOTOVAULT: strip - brand tag without a link to Ente.
                             data-memory-control="true"
                         >
                             <EnteBrandTagImage
@@ -685,9 +668,7 @@ export function MemoryViewer({
                 {isMobileLayout && (
                     <ViewerFooterBar style={{ gap: "24px" }}>
                         <BrandLink
-                            href="https://ente.com"
-                            target="_blank"
-                            rel="noopener"
+                            // PHOTOVAULT: strip - brand tag without a link to Ente.
                             data-memory-control="true"
                         >
                             <EnteBrandTagImage

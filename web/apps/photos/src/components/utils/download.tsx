@@ -2,16 +2,15 @@ import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import type { MiniDialogAttributes } from "ente-base/components/MiniDialog";
 import { ensureElectron } from "ente-base/electron";
 import type { AppUpdate } from "ente-base/types/ipc";
-import { openURL } from "ente-new/photos/utils/web";
 import { t } from "i18next";
 
+// PHOTOVAULT: strip - no link to Ente's download page; the dialog only says
+// that the operation needs the desktop app.
 export const downloadAppDialogAttributes = (): MiniDialogAttributes => ({
     title: t("download_app"),
     message: t("download_app_message"),
-    continue: { text: t("download"), action: downloadApp },
+    cancel: t("ok"),
 });
-
-const downloadApp = () => openURL("https://ente.com/download/desktop");
 
 export const updateReadyToInstallDialogAttributes = ({
     version,
@@ -36,7 +35,7 @@ export const updateAvailableForDownloadDialogAttributes = ({
     title: t("update_available"),
     message: t("update_available_message"),
     icon: <AutoAwesomeOutlinedIcon />,
-    continue: { text: t("download_and_install"), action: downloadApp },
+    // PHOTOVAULT: strip - no "Download and install" link to Ente's site.
     cancel: {
         text: t("ignore_this_version"),
         action: () => ensureElectron().skipAppUpdate(version),

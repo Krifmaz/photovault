@@ -1,6 +1,5 @@
 import { Export } from "@/components/Export";
 import { FamilyManagement } from "@/components/FamilyManagement";
-import { PlanSelector } from "@/components/PlanSelector";
 import { downloadAppDialogAttributes } from "@/components/utils/download";
 import exportService from "@/services/export";
 import { performSidebarAction as performSidebarRegistryAction } from "@/services/search/sidebar-search-registry";
@@ -17,7 +16,6 @@ import {
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { isDesktop } from "ente-base/app";
-import { LinkButton } from "ente-base/components/LinkButton";
 import { AttributedMiniDialog } from "ente-base/components/MiniDialog";
 import { RowButtonEndActivityIndicator } from "ente-base/components/RowButton";
 import { SpacedRow } from "ente-base/components/containers";
@@ -36,19 +34,9 @@ import { customAPIHost } from "ente-base/origins";
 import { useUserDetailsSnapshot } from "ente-new/photos/components/utils/use-snapshot";
 import type { SidebarActionID } from "ente-new/photos/services/search/types";
 import {
-    hasExceededStorageQuota,
     isFamilyAdmin,
     isPartOfFamily,
-    isSubscriptionActive,
-    isSubscriptionActivePaid,
-    isSubscriptionCancelled,
-    isSubscriptionFree,
-    isSubscriptionPastDue,
-    isSubscriptionStripe,
     pullUserDetails,
-    redirectToCustomerPortal,
-    userDetailsAddOnBonuses,
-    type UserDetails,
 } from "ente-new/photos/services/user-details";
 import { usePhotosAppContext } from "ente-new/photos/types/context";
 import { t } from "i18next";
@@ -58,12 +46,9 @@ import React, {
     useMemo,
     useRef,
     useState,
-    type MouseEventHandler,
 } from "react";
-import { Trans } from "react-i18next";
 import { FreeUpSpace, type FreeUpSpaceAction } from "./FreeUpSpace";
 import { Help, type HelpAction } from "./Help";
-import { ReferralSettings } from "./ReferralSettings";
 import { SettingsSearch } from "./SettingsSearch";
 import { WatchFolder } from "./WatchFolder";
 import { SubscriptionCard } from "./account/SubscriptionCard";
@@ -88,25 +73,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onClose: closeRoot,
     pendingAction,
     onActionHandled,
-    setLoading,
+    // PHOTOVAULT: strip - setLoading was only used by the (removed) plan selector.
     onShowLargeFiles,
     onShowDuplicates,
     collectionNameByID,
     onAuthenticateUser,
 }) => {
-    const { show: onShowPlanSelector, props: planSelectorVisibilityProps } =
-        useModalVisibility();
+    // PHOTOVAULT: strip - no plans or payments. Where Ente opened the plan
+    // selector (whose "Manage family" button led to family management), we
+    // open family management directly, so family stays reachable.
     const {
         show: showFamilyManagement,
         props: familyManagementVisibilityProps,
     } = useModalVisibility();
-    const { onClose: closePlanSelector } = planSelectorVisibilityProps;
+    const onShowPlanSelector = showFamilyManagement;
     const { onClose: closeFamilyManagement } = familyManagementVisibilityProps;
     const { show: showHelp, props: helpVisibilityProps } = useModalVisibility();
     const { show: showAccount, props: accountVisibilityProps } =
         useModalVisibility();
-    const { show: showReferrals, props: referralsVisibilityProps } =
-        useModalVisibility();
+    // PHOTOVAULT: strip - referrals removed.
     const { show: showPreferences, props: preferencesVisibilityProps } =
         useModalVisibility();
     const { show: showFreeUpSpace, props: freeUpSpaceVisibilityProps } =
@@ -134,7 +119,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             closeExport();
             closeMemberSubscription();
             closeDownloadAppDialog();
-            closePlanSelector();
             closeFamilyManagement();
         }
     }, [
@@ -142,7 +126,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         closeExport,
         closeMemberSubscription,
         closeDownloadAppDialog,
-        closePlanSelector,
         closeFamilyManagement,
     ]);
 
@@ -156,7 +139,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     const closeSections = useCallback(() => {
         accountVisibilityProps.onClose();
-        referralsVisibilityProps.onClose();
         preferencesVisibilityProps.onClose();
         helpVisibilityProps.onClose();
         freeUpSpaceVisibilityProps.onClose();
@@ -164,11 +146,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         closeMemberSubscription();
         closeDownloadAppDialog();
         setWatchFolderView(false);
-        closePlanSelector();
         closeFamilyManagement();
     }, [
         accountVisibilityProps,
-        referralsVisibilityProps,
         preferencesVisibilityProps,
         helpVisibilityProps,
         freeUpSpaceVisibilityProps,
@@ -176,7 +156,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         closeMemberSubscription,
         closeDownloadAppDialog,
         setWatchFolderView,
-        closePlanSelector,
         closeFamilyManagement,
     ]);
 
@@ -251,7 +230,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClose,
                 onShowPlanSelector,
                 showAccount,
-                showReferrals,
+                showReferrals: () => undefined, // PHOTOVAULT: strip
                 showPreferences,
                 showHelp,
                 showFreeUpSpace,
@@ -283,7 +262,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             showFreeUpSpace,
             showHelp,
             showPreferences,
-            showReferrals,
         ],
     );
 
@@ -305,13 +283,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     const hasOpenSection =
         accountVisibilityProps.open ||
-        referralsVisibilityProps.open ||
         preferencesVisibilityProps.open ||
         helpVisibilityProps.open ||
         freeUpSpaceVisibilityProps.open ||
         exportVisibilityProps.open ||
         watchFolderView ||
-        planSelectorVisibilityProps.open ||
         familyManagementVisibilityProps.open;
 
     return (
@@ -349,7 +325,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             {...{
                                 showExport: handleShowExport,
                                 showAccount: selectSection(showAccount),
-                                showReferrals: selectSection(showReferrals),
                                 showPreferences: selectSection(showPreferences),
                                 showHelp: selectSection(showHelp),
                                 showFreeUpSpace: selectSection(showFreeUpSpace),
@@ -400,12 +375,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {...{ onAuthenticateUser, onShowPlanSelector }}
                 />
             )}
-            {referralsVisibilityProps.open && (
-                <ReferralSettings
-                    {...referralsVisibilityProps}
-                    onRootClose={onClose}
-                />
-            )}
             {preferencesVisibilityProps.open && (
                 <Preferences
                     {...preferencesVisibilityProps}
@@ -425,11 +394,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onActionHandled={setPendingFreeUpSpaceAction}
                 />
             )}
-            <PlanSelector
-                {...planSelectorVisibilityProps}
-                setLoading={setLoading}
-                onManageFamily={showFamilyManagement}
-            />
             {familyManagementVisibilityProps.open && (
                 <FamilyManagement
                     {...familyManagementVisibilityProps}
@@ -681,11 +645,7 @@ const UserDetailsSection: React.FC<UserDetailsSectionProps> = ({
                         />
                     </Box>
                 </ThemeProvider>
-                {userDetails && (
-                    <SubscriptionStatus
-                        {...{ userDetails, onShowPlanSelector }}
-                    />
-                )}
+                {/* PHOTOVAULT: strip - no plan/renewal/upgrade status line. */}
             </Box>
             {isNonAdminFamilyMember && userDetails && (
                 <ManageMemberSubscription
@@ -697,105 +657,9 @@ const UserDetailsSection: React.FC<UserDetailsSectionProps> = ({
     );
 };
 
-interface SubscriptionStatusProps {
-    onShowPlanSelector: () => void;
-    userDetails: UserDetails;
-}
-
-const SubscriptionStatus: React.FC<SubscriptionStatusProps> = ({
-    userDetails,
-    onShowPlanSelector,
-}) => {
-    const hasAMessage = useMemo(() => {
-        if (isPartOfFamily(userDetails) && !isFamilyAdmin(userDetails)) {
-            return false;
-        }
-        if (
-            isSubscriptionActivePaid(userDetails.subscription) &&
-            !isSubscriptionCancelled(userDetails.subscription)
-        ) {
-            return false;
-        }
-        return true;
-    }, [userDetails]);
-
-    const handleClick: MouseEventHandler<HTMLSpanElement> = useCallback(
-        (e) => {
-            e.stopPropagation();
-
-            if (isSubscriptionActive(userDetails.subscription)) {
-                if (hasExceededStorageQuota(userDetails)) {
-                    onShowPlanSelector();
-                }
-            } else {
-                if (
-                    isSubscriptionStripe(userDetails.subscription) &&
-                    isSubscriptionPastDue(userDetails.subscription)
-                ) {
-                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                    redirectToCustomerPortal();
-                } else {
-                    onShowPlanSelector();
-                }
-            }
-        },
-        [onShowPlanSelector, userDetails],
-    );
-
-    if (!hasAMessage) {
-        return <></>;
-    }
-
-    const hasAddOnBonus = userDetailsAddOnBonuses(userDetails).length > 0;
-
-    let message: React.ReactNode;
-    if (!hasAddOnBonus) {
-        if (isSubscriptionActive(userDetails.subscription)) {
-            if (isSubscriptionFree(userDetails.subscription)) {
-                message = t("subscription_info_free");
-            } else if (isSubscriptionCancelled(userDetails.subscription)) {
-                message = t("subscription_info_renewal_cancelled", {
-                    date: userDetails.subscription.expiryTime,
-                });
-            }
-        } else {
-            message = (
-                <Trans
-                    i18nKey={"subscription_info_expired"}
-                    components={{ a: <LinkButton onClick={handleClick} /> }}
-                />
-            );
-        }
-    }
-
-    if (!message && hasExceededStorageQuota(userDetails)) {
-        message = (
-            <Trans
-                i18nKey={"subscription_info_storage_quota_exceeded"}
-                components={{ a: <LinkButton onClick={handleClick} /> }}
-            />
-        );
-    }
-
-    if (!message) return <></>;
-
-    return (
-        <Box sx={{ px: 1, pt: 0.5 }}>
-            <Typography
-                variant="small"
-                onClick={handleClick}
-                sx={{ color: "text.muted" }}
-            >
-                {message}
-            </Typography>
-        </Box>
-    );
-};
-
 interface UtilitySectionProps {
     showExport: () => void;
     showAccount: () => void;
-    showReferrals: () => void;
     showPreferences: () => void;
     showHelp: () => void;
     showFreeUpSpace: () => void;
@@ -805,7 +669,6 @@ interface UtilitySectionProps {
 const UtilitySection: React.FC<UtilitySectionProps> = ({
     showExport,
     showAccount,
-    showReferrals,
     showPreferences,
     showHelp,
     showFreeUpSpace,
@@ -818,11 +681,7 @@ const UtilitySection: React.FC<UtilitySectionProps> = ({
                 title={t("account")}
                 onClick={showAccount}
             />
-            <RowCard
-                variant="parent"
-                title={t("referrals")}
-                onClick={showReferrals}
-            />
+            {/* PHOTOVAULT: strip - referrals removed. */}
             {isDesktop && (
                 <RowCard
                     variant="parent"

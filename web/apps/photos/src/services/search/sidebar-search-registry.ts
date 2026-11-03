@@ -41,12 +41,7 @@ const sidebarActions = (): SidebarAction[] => {
     const helpCategory = t("help");
 
     return [
-        {
-            id: "account.subscription",
-            label: t("manage_plan"),
-            path: [accountCategory, t("manage_plan")],
-            keywords: ["subscription", "plan", "upgrade", "billing", "pricing"],
-        },
+        // PHOTOVAULT: strip - "account.subscription" removed (plans, referrals, Ente help).
         {
             id: "shortcuts.uncategorized",
             label: t("section_uncategorized"),
@@ -77,18 +72,7 @@ const sidebarActions = (): SidebarAction[] => {
             path: [preferencesCategory, t("account")],
             keywords: ["profile", "user"],
         },
-        {
-            id: "utility.referrals",
-            label: t("referrals"),
-            path: [preferencesCategory, t("referrals")],
-            keywords: [
-                "referral",
-                "invite",
-                "code",
-                "free storage",
-                "earn storage",
-            ],
-        },
+        // PHOTOVAULT: strip - "utility.referrals" removed (plans, referrals, Ente help).
         {
             id: "utility.watchFolders",
             label: t("watch_folders"),
@@ -257,30 +241,10 @@ const sidebarActions = (): SidebarAction[] => {
             keywords: ["hls", "video", "stream"],
             available: () => isHLSGenerationSupported,
         },
-        {
-            id: "help.helpCenter",
-            label: t("ente_help"),
-            path: [helpCategory, t("ente_help")],
-            keywords: ["help", "docs"],
-        },
-        {
-            id: "help.blog",
-            label: t("blog"),
-            path: [helpCategory, t("blog")],
-            keywords: ["news"],
-        },
-        {
-            id: "help.requestFeature",
-            label: t("request_feature"),
-            path: [helpCategory, t("request_feature")],
-            keywords: ["feature", "feedback"],
-        },
-        {
-            id: "help.support",
-            label: t("support"),
-            path: [helpCategory, t("support")],
-            keywords: ["contact", "support"],
-        },
+        // PHOTOVAULT: strip - "help.helpCenter" removed (plans, referrals, Ente help).
+        // PHOTOVAULT: strip - "help.blog" removed (plans, referrals, Ente help).
+        // PHOTOVAULT: strip - "help.requestFeature" removed (plans, referrals, Ente help).
+        // PHOTOVAULT: strip - "help.support" removed (plans, referrals, Ente help).
         {
             id: "help.viewLogs",
             label: t("view_logs"),

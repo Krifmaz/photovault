@@ -31,15 +31,16 @@ const Page: React.FC = () => {
         const nextShareView = detectShareView(pathname);
         setShareView(nextShareView);
 
+        // PHOTOVAULT: strip - no redirect to Ente's site; the bare page is
+        // left empty.
         if (nextShareView === null) {
             setHideContent(true);
-            window.location.href = "https://ente.com/locker";
         }
     }, []);
 
     return (
         <>
-            <CustomHeadShare title="Ente Locker" />
+            <CustomHeadShare title="Photovault" /> {/* PHOTOVAULT: strip */}
             <Head>
                 <meta name="robots" content="noindex, nofollow" />
             </Head>

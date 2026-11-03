@@ -11,11 +11,11 @@ import type { AppName } from "ente-base/app";
 /** Display name of the product. */
 export const pvBrandName = "Photovault";
 
-/** Credit line required by the licence notice; shown in the apps. */
-export const pvCredit = "Based on Ente (ente.com)";
-
-/** Link target for {@link pvCredit}. */
-export const pvCreditURL = "https://ente.com";
+/**
+ * Credit line required by the licence notice; shown as plain text (no link,
+ * no logo) in Settings → Help → About. The only user-visible mention of Ente.
+ */
+export const pvCredit = "Based on Ente";
 
 /** Font stacks. Inter is bundled via `@fontsource-variable/inter`. */
 export const pvFont = {

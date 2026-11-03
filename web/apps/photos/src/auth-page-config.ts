@@ -10,6 +10,6 @@ export const authPageConfig: AuthPageConfig = {
         return recoveryKeyMnemonic();
     },
     Shell: PhotosAuthShell,
-    recoveryKeyCloseDestination: "/plan",
+    recoveryKeyCloseDestination: "/gallery", // PHOTOVAULT: strip - no plan page
     passkeyPresentation: PasskeyVerificationPresentation,
 };

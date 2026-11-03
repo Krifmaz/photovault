@@ -689,9 +689,7 @@ export function LaneMemoryViewer({
                 <LaneTopBar>
                     <LaneTopBrandSection>
                         <LaneHeaderBrandLink
-                            href="https://ente.com"
-                            target="_blank"
-                            rel="noopener"
+                            // PHOTOVAULT: strip - brand tag without a link to Ente.
                             data-memory-control="true"
                         >
                             <EnteBrandTagImage
@@ -701,17 +699,7 @@ export function LaneMemoryViewer({
                         </LaneHeaderBrandLink>
                     </LaneTopBrandSection>
                     <LaneTopActionSection>
-                        <JoinNowButton
-                            variant="contained"
-                            color="accent"
-                            disableElevation
-                            href="https://ente.com/try"
-                            target="_blank"
-                            rel="noopener"
-                            sx={laneHeaderJoinNowButtonSx}
-                        >
-                            Get Ente Photos
-                        </JoinNowButton>
+                        {/* PHOTOVAULT: strip - no "Get Ente Photos" button. */}
                     </LaneTopActionSection>
                 </LaneTopBar>
 

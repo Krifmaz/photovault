@@ -1,11 +1,11 @@
 import type { RemotePullOpts } from "@/components/gallery";
-import { useSubscriptionCompletionRedirect } from "@/components/gallery/hooks/use-subscription-completion-redirect";
 import { useGalleryReducer } from "@/components/gallery/reducer";
 import exportService from "@/services/export";
 import { processPendingAlbumJoin } from "@/services/join-album";
 import { sessionExpiredDialogAttributes } from "ente-accounts/components/utils/dialog";
 import {
     getAndClearIsFirstLogin,
+    getAndClearJustSignedUp,
     savedJustSignedUp,
 } from "ente-accounts/services/accounts-db";
 import { stashRedirect } from "ente-accounts/services/redirect";
@@ -150,10 +150,9 @@ export const useGalleryLibrary = () => {
                 return;
             }
 
-            if (savedJustSignedUp()) {
-                void router.replace("/plan");
-                return;
-            }
+            // PHOTOVAULT: strip - no plan picker after sign-up; clear the
+            // flag the way Ente's plan page did on "continue".
+            if (savedJustSignedUp()) getAndClearJustSignedUp();
 
             try {
                 await ensureAuthenticatedSession();
@@ -264,7 +263,7 @@ export const useGalleryLibrary = () => {
         dispatch({ type: "setPeopleState", peopleState });
     }, [peopleState]);
 
-    useSubscriptionCompletionRedirect();
+    // PHOTOVAULT: strip - no payments, so no Stripe completion redirect.
     return {
         joinedCollectionID,
         state,

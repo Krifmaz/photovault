@@ -37,7 +37,11 @@ export const loadPublicMemoryPage = async (
         const accessToken = extractAccessTokenFromURL(currentURL);
 
         if (!accessToken) {
-            return { kind: "redirect", redirectURL: "https://ente.com" };
+            // PHOTOVAULT: strip - no redirect to Ente's site.
+            return {
+                kind: "error",
+                errorMessage: "Invalid memory link. Missing access token.",
+            };
         }
 
         const shareKey = await extractMemoryShareKeyFromURL(currentURL);

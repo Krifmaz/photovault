@@ -1,6 +1,9 @@
+// PHOTOVAULT: strip - Ente's Auth and Locker logos are replaced by plain icons.
+import KeyOutlinedIcon from "@mui/icons-material/KeyOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import type React from "react";
 
-type EnteApp = "photos" | "auth" | "locker";
+type EnteApp = "photos"; // PHOTOVAULT: strip
 
 interface EnteAppIconProps {
     size?: number;
@@ -27,10 +30,14 @@ export const EntePhotosIcon: React.FC<EnteAppIconProps> = (props) => (
     <AppIcon app="photos" {...props} />
 );
 
-export const EnteAuthIcon: React.FC<EnteAppIconProps> = (props) => (
-    <AppIcon app="auth" {...props} />
+// PHOTOVAULT: strip - plain icons instead of Ente's Auth and Locker logos.
+export const EnteAuthIcon: React.FC<EnteAppIconProps> = ({ size = 24 }) => (
+    <KeyOutlinedIcon aria-hidden sx={{ fontSize: size, color: "text.muted" }} />
 );
 
-export const EnteLockerIcon: React.FC<EnteAppIconProps> = (props) => (
-    <AppIcon app="locker" {...props} />
+export const EnteLockerIcon: React.FC<EnteAppIconProps> = ({ size = 24 }) => (
+    <LockOutlinedIcon
+        aria-hidden
+        sx={{ fontSize: size, color: "text.muted" }}
+    />
 );
