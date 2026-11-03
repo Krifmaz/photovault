@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "photovault/contracts/storage-usage.schema.json",
+  "title": "GET /photovault/usage",
+  "type": "object",
+  "required": ["usedBytes", "limitBytes", "unlimited", "limitSource"],
+  "properties": {
+    "usedBytes": { "type": "integer", "minimum": 0 },
+    "limitBytes": { "type": ["integer", "null"], "minimum": 0 },
+    "freeBytes": { "type": ["integer", "null"], "minimum": 0 },
+    "unlimited": { "type": "boolean" },
+    "limitSource": { "enum": ["quota", "default-quota", "disk", "storage-limit", "unlimited"] },
+    "quotaBytes": { "type": ["integer", "null"], "minimum": 0 }
+  },
+  "additionalProperties": true
+}

@@ -1,25 +1,9 @@
 -- Public links, memory shares and cast (mirrors museum migrations 37, 78, 84, 103, 119, 125, 131).
--- Tables referenced here but owned elsewhere (public_collection_tokens, public_file_tokens,
--- collections, files) are deliberately not foreign-keyed so migration order does not matter.
+-- The link tables themselves and their device histories (public_collection_tokens,
+-- public_file_tokens, public_collection_access_history, public_file_tokens_access_history)
+-- are created by 0200_library.
 
--- Devices (ip + user agent) that opened a public album link; drives the link's device limit.
-CREATE TABLE IF NOT EXISTS public_collection_access_history (
-    share_id BIGINT NOT NULL,
-    ip TEXT NOT NULL,
-    user_agent TEXT NOT NULL,
-    created_at BIGINT NOT NULL,
-    CONSTRAINT unique_access_sid_ip_ua UNIQUE (share_id, ip, user_agent)
-);
-CREATE INDEX IF NOT EXISTS public_access_share_id_idx ON public_collection_access_history (share_id);
-
--- Same for single-file links (`id` is public_file_tokens.id).
-CREATE TABLE IF NOT EXISTS public_file_tokens_access_history (
-    id TEXT NOT NULL,
-    ip TEXT NOT NULL,
-    user_agent TEXT NOT NULL,
-    created_at BIGINT NOT NULL,
-    CONSTRAINT unique_access_id_ip_ua UNIQUE (id, ip, user_agent)
-);
+CREATE INDEX public_access_share_id_idx ON public_collection_access_history (share_id);
 
 -- Cast sessions ("casting" because CAST is reserved in Postgres).
 CREATE TABLE casting (

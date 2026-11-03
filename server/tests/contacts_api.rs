@@ -15,18 +15,27 @@ fn card(contact_user_id: i64, data: &[u8]) -> Value {
 }
 
 async fn upload_picture(api: &Api<'_>, u: &User, contact_id: &str, bytes: &[u8]) -> String {
+    use base64::Engine;
+    use md5::Digest;
+    let md5 = base64::engine::general_purpose::STANDARD.encode(md5::Md5::digest(bytes));
     let r = api
         .post(
             u,
             &format!("/contacts/{contact_id}/profile-picture/upload-url"),
-            json!({"contentLength": bytes.len(), "contentMD5": "bWQ1"}),
+            json!({"contentLength": bytes.len(), "contentMD5": md5}),
         )
         .await;
     assert_eq!(r.status, 200, "{}", String::from_utf8_lossy(&r.body));
     let j = r.json();
     let attachment_id = j["attachmentID"].as_str().unwrap().to_string();
     assert!(attachment_id.starts_with("ua_"));
-    let put = raw("PUT", j["url"].as_str().unwrap(), &[], bytes.to_vec()).await;
+    let put = raw(
+        "PUT",
+        j["url"].as_str().unwrap(),
+        &[("Content-MD5", md5.as_str())],
+        bytes.to_vec(),
+    )
+    .await;
     assert!(put.status == 200 || put.status == 204, "PUT {}", put.status);
     attachment_id
 }
@@ -34,7 +43,6 @@ async fn upload_picture(api: &Api<'_>, u: &User, contact_id: &str, bytes: &[u8])
 #[tokio::test]
 async fn contacts_crud_diff_and_profile_pictures() {
     let srv = TestServer::start().await.unwrap();
-    ensure_user_auth_tables(&srv).await;
     let api = Api::new(&srv);
     let u = create_user(&srv, "card-owner@example.com", PHOTOS).await;
     let friend = create_user(&srv, "Friend@Example.com", PHOTOS).await;

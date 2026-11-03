@@ -113,9 +113,9 @@ async fn create_comment(
     if b.collection_id == 0 || !comment_cipher_ok(&b.cipher, &b.nonce) {
         return Err(bad_request());
     }
-    library_sql::collection_role(&st.db, b.collection_id, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, b.collection_id, u.user_id, u.app).await?;
     let id = social::create_comment(
-        &st.db,
+        &st,
         &Actor::User(u.user_id),
         NewComment {
             id: b.id,
@@ -140,7 +140,7 @@ async fn comments_diff(
     let since = parse_since(opt(&q, "sinceTime").as_deref())?;
     let limit = parse_limit(opt(&q, "limit").as_deref())?;
     let file_id = parse_opt_i64(opt(&q, "fileID").as_deref())?;
-    library_sql::collection_role(&st.db, cid, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, cid, u.user_id, u.app).await?;
     let (comments, has_more) = repo::comment_diff(&st.db, cid, since, limit, file_id).await?;
     Ok(Json(json!({ "comments": comments, "hasMore": has_more })))
 }
@@ -156,7 +156,7 @@ async fn update_comment(
         return Err(bad_request());
     }
     let c = social::comment_by_author(&st.db, &Actor::User(u.user_id), &comment_id).await?;
-    library_sql::collection_role(&st.db, c.collection_id, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, c.collection_id, u.user_id, u.app).await?;
     if !repo::update_comment_cipher(&st.db, &comment_id, c.collection_id, &b.cipher, &b.nonce)
         .await?
     {
@@ -175,7 +175,7 @@ async fn delete_comment(
         .ok_or_else(not_found)?;
     if c.user_id != u.user_id || c.anon_user_id.is_some() {
         // Moderation: the owner or an admin of the collection may delete anyone's comment.
-        let role = library_sql::collection_role(&st.db, c.collection_id, u.user_id, u.app).await?;
+        let role = library_sql::collection_role(&st, c.collection_id, u.user_id, u.app).await?;
         if role < Role::Admin {
             return Err(permission_denied());
         }
@@ -195,9 +195,9 @@ async fn upsert_reaction(
     if b.collection_id == 0 || b.cipher.len() != REACTION_CIPHER_LEN || b.nonce.is_empty() {
         return Err(bad_request());
     }
-    library_sql::collection_role(&st.db, b.collection_id, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, b.collection_id, u.user_id, u.app).await?;
     let id = social::upsert_reaction(
-        &st.db,
+        &st,
         &Actor::User(u.user_id),
         NewReaction {
             id: b.id,
@@ -223,7 +223,7 @@ async fn reactions_diff(
     let limit = parse_limit(opt(&q, "limit").as_deref())?;
     let file_id = parse_opt_i64(opt(&q, "fileID").as_deref())?;
     let comment_id = opt(&q, "commentID").filter(|s| !s.is_empty());
-    library_sql::collection_role(&st.db, cid, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, cid, u.user_id, u.app).await?;
     let (reactions, has_more) =
         repo::reaction_diff(&st.db, cid, since, limit, file_id, comment_id.as_deref()).await?;
     Ok(Json(json!({ "reactions": reactions, "hasMore": has_more })))
@@ -236,7 +236,7 @@ async fn delete_reaction(
 ) -> ApiResult<impl IntoResponse> {
     let actor = Actor::User(u.user_id);
     let r = social::reaction_by_actor(&st.db, &actor, &reaction_id).await?;
-    library_sql::collection_role(&st.db, r.collection_id, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, r.collection_id, u.user_id, u.app).await?;
     if !repo::soft_delete_reaction(&st.db, &reaction_id, &actor).await? {
         return Err(not_found());
     }
@@ -261,7 +261,7 @@ async fn social_diff(
     let reactions_since = since_or_base("reactionsSinceTime")?;
     let limit = parse_limit(opt(&q, "limit").as_deref())?;
     let file_id = parse_opt_i64(opt(&q, "fileID").as_deref())?;
-    library_sql::collection_role(&st.db, cid, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, cid, u.user_id, u.app).await?;
     let (comments, more_c) =
         repo::comment_diff(&st.db, cid, comments_since, limit, file_id).await?;
     let (reactions, more_r) =
@@ -281,7 +281,7 @@ async fn anon_profiles(
 ) -> ApiResult<impl IntoResponse> {
     let q = query_map(raw);
     let cid = collection_id_param(&q)?;
-    library_sql::collection_role(&st.db, cid, u.user_id, u.app).await?;
+    library_sql::collection_role(&st, cid, u.user_id, u.app).await?;
     let profiles = repo::list_anon_users(&st.db, cid).await?;
     Ok(Json(json!({ "profiles": profiles })))
 }

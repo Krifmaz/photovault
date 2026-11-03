@@ -1,0 +1,55 @@
+# museum.yaml used to validate this harness against Ente's reference server
+# ("museum", Go) at the pinned commit. Not used by run.sh. See ../README.md.
+# Secrets below are throwaway test values.
+http:
+    port: 18080
+apps:
+    public-albums: http://localhost:13002
+db:
+    host: localhost
+    port: 5432
+    name: e2e_museum
+    sslmode: disable
+    user: pv
+    password: pv
+key:
+    encryption: yvmG/RnzKrbCb9L3mgsmoxXr9H7i2Z4qlbT0mL3ln4w=
+    hash: KXYiG07wC7GIgvCSdg+WmyWdXDAn6XKYJtp/wkEU7x573+byBRAYtpTP0wwvi8i/4l37uicX1dVTUzwH3sLZyw==
+jwt:
+    secret: i2DecQmfGreG6q1vBj5tCokhlN41gcfS2cjOs9Po-u8=
+internal:
+    hardcoded-ott:
+        emails:
+            - "e2e@example.com,123456"
+            - "e2e2@example.com,123456"
+            - "e2e3@example.com,123456"
+# Any S3 API works; validation used moto_server on :19000 with the four
+# buckets created and a permissive CORS rule (browser PUT/GET from :13000).
+s3:
+    are_local_buckets: true
+    use_path_style_urls: true
+    b2-eu-cen:
+        key: test
+        secret: test
+        endpoint: localhost:19000
+        region: eu-central-2
+        bucket: b2-eu-cen
+    wasabi-eu-central-2-v3:
+        key: test
+        secret: test
+        endpoint: localhost:19000
+        region: eu-central-2
+        bucket: wasabi-eu-central-2-v3
+        compliance: false
+    scw-eu-fr-v3:
+        key: test
+        secret: test
+        endpoint: localhost:19000
+        region: eu-central-2
+        bucket: scw-eu-fr-v3
+    wasabi-eu-central-2-derived:
+        key: test
+        secret: test
+        endpoint: localhost:19000
+        region: eu-central-2
+        bucket: wasabi-eu-central-2-derived

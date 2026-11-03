@@ -1,5 +1,4 @@
-//! Test-only fixtures for the social tests: the foreign library tables (owned by the
-//! files/collections workstream, created here with `IF NOT EXISTS` in museum's shape),
+//! Test-only fixtures for the social tests: rows in the real library schema,
 //! users/tokens, a tiny HTTP client, and a stand-in `/public-collection` middleware.
 #![allow(dead_code)]
 
@@ -9,61 +8,13 @@ use photovault_server::state::AppState;
 use photovault_server::testing::TestServer;
 use serde_json::Value;
 
-/// museum's collections / collection_shares / collection_files, translated to BIGINT/TEXT/BOOLEAN.
-pub async fn create_library_tables(st: &AppState) {
-    for sql in [
-        "CREATE TABLE IF NOT EXISTS collections (
-            collection_id BIGINT PRIMARY KEY,
-            owner_id BIGINT NOT NULL,
-            encrypted_key TEXT NOT NULL DEFAULT '',
-            key_decryption_nonce TEXT NOT NULL DEFAULT '',
-            name TEXT,
-            encrypted_name TEXT,
-            name_decryption_nonce TEXT,
-            type TEXT NOT NULL DEFAULT 'album',
-            attributes TEXT NOT NULL DEFAULT '{}',
-            updation_time BIGINT NOT NULL DEFAULT 0,
-            is_deleted BOOLEAN DEFAULT FALSE,
-            magic_metadata TEXT,
-            pub_magic_metadata TEXT,
-            app TEXT DEFAULT 'photos')",
-        "CREATE TABLE IF NOT EXISTS collection_shares (
-            collection_id BIGINT NOT NULL,
-            from_user_id BIGINT NOT NULL,
-            to_user_id BIGINT NOT NULL,
-            encrypted_key TEXT NOT NULL DEFAULT '',
-            updation_time BIGINT NOT NULL DEFAULT 0,
-            is_deleted BOOLEAN DEFAULT FALSE,
-            role_type TEXT DEFAULT 'VIEWER',
-            shared_at BIGINT,
-            UNIQUE (collection_id, from_user_id, to_user_id))",
-        "CREATE TABLE IF NOT EXISTS collection_files (
-            file_id BIGINT NOT NULL,
-            collection_id BIGINT NOT NULL,
-            encrypted_key TEXT NOT NULL DEFAULT '',
-            key_decryption_nonce TEXT NOT NULL DEFAULT '',
-            is_deleted BOOLEAN DEFAULT FALSE,
-            updation_time BIGINT NOT NULL DEFAULT 0,
-            c_owner_id BIGINT,
-            f_owner_id BIGINT,
-            created_at BIGINT,
-            action_user BIGINT,
-            action TEXT,
-            UNIQUE (collection_id, file_id))",
-    ] {
-        sqlx::query(sql).execute(&st.db.pool).await.unwrap();
-    }
-}
-
-/// Start a server with the library tables in place.
+/// Start a server (real migrations, fresh database).
 pub async fn start() -> TestServer {
     let _ = tracing_subscriber::fmt()
         .with_env_filter("warn")
         .with_test_writer()
         .try_init();
-    let srv = TestServer::start().await.unwrap();
-    create_library_tables(&srv.state).await;
-    srv
+    TestServer::start().await.unwrap()
 }
 
 /// Insert a user with an encrypted email and a Photos token; returns (user_id, token).
@@ -95,39 +46,67 @@ pub async fn user(st: &AppState, email: &str) -> (i64, String) {
     (id, token)
 }
 
-/// Insert a collection.
+/// Insert a collection with a fixed id (rows in the real `0200_library` schema).
 pub async fn collection(st: &AppState, id: i64, owner: i64, app: &str) {
-    sqlx::query("INSERT INTO collections (collection_id, owner_id, app) VALUES ($1, $2, $3)")
-        .bind(id)
-        .bind(owner)
-        .bind(app)
-        .execute(&st.db.pool)
-        .await
-        .unwrap();
+    sqlx::query(
+        "INSERT INTO collections (collection_id, owner_id, encrypted_key, key_decryption_nonce, \
+         encrypted_name, name_decryption_nonce, type, updation_time, app) \
+         VALUES ($1, $2, 'ck', 'cn', 'en', 'nn', 'album', $3, $4)",
+    )
+    .bind(id)
+    .bind(owner)
+    .bind(photovault_server::db::now_micros())
+    .bind(app)
+    .execute(&st.db.pool)
+    .await
+    .unwrap();
 }
 
 /// Share a collection.
 pub async fn share(st: &AppState, cid: i64, from: i64, to: i64, role: &str) {
     sqlx::query(
-        "INSERT INTO collection_shares (collection_id, from_user_id, to_user_id, role_type) VALUES ($1, $2, $3, $4)",
+        "INSERT INTO collection_shares (collection_id, from_user_id, to_user_id, encrypted_key, \
+         updation_time, role_type, shared_at) VALUES ($1, $2, $3, 'sk', $4, $5, $4)",
     )
     .bind(cid)
     .bind(from)
     .bind(to)
+    .bind(photovault_server::db::now_micros())
     .bind(role)
     .execute(&st.db.pool)
     .await
     .unwrap();
 }
 
-/// Put a file in a collection.
+/// Create file `fid` (owned by `owner`) if needed and put it in a collection.
 pub async fn add_file(st: &AppState, cid: i64, fid: i64, owner: i64) {
+    let now = photovault_server::db::now_micros();
+    let exists: Option<(i64,)> = sqlx::query_as("SELECT file_id FROM files WHERE file_id = $1")
+        .bind(fid)
+        .fetch_optional(&st.db.pool)
+        .await
+        .unwrap();
+    if exists.is_none() {
+        sqlx::query(
+            "INSERT INTO files (file_id, owner_id, app, encrypted_metadata, file_decryption_header, \
+             thumbnail_decryption_header, metadata_decryption_header, updation_time) \
+             VALUES ($1, $2, 'photos', 'meta', 'fh', 'th', 'mh', $3)",
+        )
+        .bind(fid)
+        .bind(owner)
+        .bind(now)
+        .execute(&st.db.pool)
+        .await
+        .unwrap();
+    }
     sqlx::query(
-        "INSERT INTO collection_files (file_id, collection_id, f_owner_id, c_owner_id) VALUES ($1, $2, $3, $3)",
+        "INSERT INTO collection_files (file_id, collection_id, encrypted_key, key_decryption_nonce, \
+         updation_time, f_owner_id, c_owner_id, created_at) VALUES ($1, $2, 'ek', 'kn', $4, $3, $3, $4)",
     )
     .bind(fid)
     .bind(cid)
     .bind(owner)
+    .bind(now)
     .execute(&st.db.pool)
     .await
     .unwrap();

@@ -1,6 +1,6 @@
 //! Shared helpers for the legacy / entity / contacts integration tests:
-//! a tiny HTTP client, users with tokens, and test-only stand-ins for the
-//! users workstream's `key_attributes` / SRP tables (museum column names).
+//! a tiny HTTP client, users with tokens, and rows in the users schema
+//! (`key_attributes`, SRP) inserted directly.
 
 #![allow(dead_code)]
 
@@ -190,68 +190,14 @@ pub async fn add_token(srv: &TestServer, user_id: i64, package: &str) -> String 
     token
 }
 
-/// Test-only stand-ins for tables the users workstream owns, with museum's
-/// column names. `IF NOT EXISTS`, so real migrations take precedence.
-pub async fn ensure_user_auth_tables(srv: &TestServer) {
-    let stmts = [
-        "CREATE TABLE IF NOT EXISTS key_attributes (
-            user_id BIGINT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
-            kek_salt TEXT NOT NULL,
-            encrypted_key TEXT NOT NULL,
-            key_decryption_nonce TEXT NOT NULL,
-            public_key TEXT NOT NULL,
-            encrypted_secret_key TEXT NOT NULL,
-            secret_key_decryption_nonce TEXT NOT NULL,
-            mem_limit BIGINT NOT NULL,
-            ops_limit BIGINT NOT NULL,
-            master_key_encrypted_with_recovery_key TEXT,
-            master_key_decryption_nonce TEXT,
-            recovery_key_encrypted_with_master_key TEXT,
-            recovery_key_decryption_nonce TEXT,
-            created_at BIGINT NOT NULL DEFAULT 0
-        )",
-        "CREATE TABLE IF NOT EXISTS srp_auth (
-            user_id BIGINT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
-            srp_user_id TEXT NOT NULL UNIQUE,
-            salt TEXT NOT NULL,
-            verifier TEXT NOT NULL,
-            created_at BIGINT NOT NULL,
-            updated_at BIGINT NOT NULL
-        )",
-        "CREATE TABLE IF NOT EXISTS temp_srp_setup (
-            id TEXT PRIMARY KEY,
-            session_id TEXT NOT NULL,
-            srp_user_id TEXT NOT NULL,
-            user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-            salt TEXT NOT NULL,
-            verifier TEXT NOT NULL,
-            created_at BIGINT NOT NULL
-        )",
-        "CREATE TABLE IF NOT EXISTS srp_sessions (
-            id TEXT PRIMARY KEY,
-            srp_user_id TEXT NOT NULL,
-            server_key TEXT NOT NULL,
-            srp_a TEXT NOT NULL,
-            has_verified BOOLEAN NOT NULL DEFAULT FALSE,
-            attempt_count BIGINT NOT NULL DEFAULT 0,
-            is_fake BOOLEAN NOT NULL DEFAULT FALSE,
-            created_at BIGINT NOT NULL,
-            updated_at BIGINT NOT NULL
-        )",
-    ];
-    for s in stmts {
-        sqlx::query(s).execute(&srv.state.db.pool).await.unwrap();
-    }
-}
-
 /// Insert key attributes for a user (museum columns); returns the `kek_salt` used.
 pub async fn set_key_attributes(srv: &TestServer, user_id: i64) {
     let b = |n: usize| photovault_server::crypto::b64(&photovault_server::crypto::random_bytes(n));
     sqlx::query(
         "INSERT INTO key_attributes(user_id, kek_salt, encrypted_key, key_decryption_nonce, public_key, encrypted_secret_key, \
          secret_key_decryption_nonce, mem_limit, ops_limit, master_key_encrypted_with_recovery_key, master_key_decryption_nonce, \
-         recovery_key_encrypted_with_master_key, recovery_key_decryption_nonce) \
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+         recovery_key_encrypted_with_master_key, recovery_key_decryption_nonce, creation_time) \
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 1)",
     )
     .bind(user_id)
     .bind(b(16))

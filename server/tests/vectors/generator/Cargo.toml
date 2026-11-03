@@ -1,0 +1,25 @@
+# Test-vector generator. NOT part of the photovault workspace and never run by
+# `cargo test`: it links the upstream Ente client crates (ente-core,
+# ente-accounts) from a checkout at <repo>/.upstream/ente (gitignored), pinned
+# to the commit in tests/e2e/UPSTREAM_COMMIT. See ../README.md.
+[package]
+name = "photovault-vecgen"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "AGPL-3.0-only"
+
+[workspace]
+
+[dependencies]
+ente-core = { path = "../../../../.upstream/ente/rust/crates/core" }
+ente-accounts = { path = "../../../../.upstream/ente/rust/crates/accounts" }
+srp = { version = "=0.7.0-rc.3", default-features = false }
+sha2 = "0.11"
+num-bigint = "0.4"
+hex = "0.4"
+serde_json = { version = "1", features = ["preserve_order"] }
+base64 = "0.22"
+
+[profile.dev.package."*"]
+opt-level = 3
