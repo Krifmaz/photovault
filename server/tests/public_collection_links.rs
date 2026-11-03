@@ -375,8 +375,12 @@ async fn collect_uploads_into_owner_album() {
 
     let mut keys = Vec::new();
     for body in [&b"hello"[..], &b"thm"[..]] {
-        // Any 16-byte base64 digest passes validation; the local store doesn't verify it.
-        let md5 = "XUFAKrxLKna5cZ2REBfFkg==".to_string();
+        // The local store enforces the bound Content-MD5, like S3.
+        let md5 = {
+            use base64::Engine;
+            use md5::Digest;
+            base64::engine::general_purpose::STANDARD.encode(md5::Md5::digest(body))
+        };
         let r = post_json(
             &format!("{}/public-collection/upload-url", srv.url),
             &h,

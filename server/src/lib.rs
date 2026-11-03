@@ -37,11 +37,14 @@ use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetReques
 /// Build the full HTTP application with global middleware.
 pub fn app(state: AppState) -> Router {
     let x_request_id = HeaderName::from_static("x-request-id");
-    // museum's CORS: any origin, the headers the apps send, and ETag exposed for multipart uploads.
+    // museum's CORS: any origin, any request headers (the apps send X-Auth-Token,
+    // X-Client-Package, Content-MD5, …), and ETag exposed so the web app can read
+    // multipart part ETags from `/storage/*` PUTs. No credentials: auth is a header.
     let cors = CorsLayer::new()
         .allow_origin(AllowOrigin::mirror_request())
         .allow_methods([
             Method::GET,
+            Method::HEAD,
             Method::POST,
             Method::PUT,
             Method::PATCH,
@@ -51,6 +54,9 @@ pub fn app(state: AppState) -> Router {
         .allow_headers(AllowHeaders::mirror_request())
         .expose_headers([
             HeaderName::from_static("etag"),
+            HeaderName::from_static("content-length"),
+            HeaderName::from_static("content-range"),
+            HeaderName::from_static("accept-ranges"),
             x_request_id.clone(),
             // Public links hand device tokens back in this header (museum's CORS exposes it).
             HeaderName::from_static("x-link-device-token"),

@@ -24,7 +24,11 @@ enum Cmd {
     /// Probe `/healthz` on the local server (for Docker HEALTHCHECK; no shell or curl needed).
     Healthcheck {
         /// URL to probe.
-        #[arg(long, default_value = "http://127.0.0.1:8080/healthz")]
+        #[arg(
+            long,
+            env = "PHOTOVAULT_HEALTHCHECK_URL",
+            default_value = "http://127.0.0.1:8080/healthz"
+        )]
         url: String,
     },
     /// Administration commands.
@@ -46,6 +50,29 @@ fn init_logging(format: &str) {
     }
 }
 
+/// Resolve on Ctrl-C or SIGTERM (what `docker stop` sends).
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        let _ = tokio::signal::ctrl_c().await;
+    };
+    #[cfg(unix)]
+    let term = async {
+        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+            Ok(mut s) => {
+                s.recv().await;
+            }
+            Err(_) => std::future::pending::<()>().await,
+        }
+    };
+    #[cfg(not(unix))]
+    let term = std::future::pending::<()>();
+    tokio::select! {
+        () = ctrl_c => {},
+        () = term => {},
+    }
+    tracing::info!("shutdown signal received, draining connections");
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
@@ -56,12 +83,12 @@ async fn main() -> anyhow::Result<()> {
             let listen = config.listen.clone();
             let state = build_state(config).await?;
             let listener = tokio::net::TcpListener::bind(&listen).await?;
-            tracing::info!(%listen, "photovault listening");
+            tracing::info!(%listen, storage = state.store.name(), "photovault listening");
+            photovault_server::storage::spawn_maintenance(&state);
             axum::serve(listener, photovault_server::app(state))
-                .with_graceful_shutdown(async {
-                    let _ = tokio::signal::ctrl_c().await;
-                })
+                .with_graceful_shutdown(shutdown_signal())
                 .await?;
+            tracing::info!("photovault stopped");
         }
         Cmd::Migrate => {
             let db = photovault_server::db::Db::connect(&config.database_url).await?;

@@ -1,0 +1,14 @@
+target
+**/target
+.git
+.upstream
+.claude
+data
+*.sqlite
+*.sqlite-*
+**/node_modules
+web
+mobile
+desktop
+docs
+deploy
