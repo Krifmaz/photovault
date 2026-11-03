@@ -1,3 +1,3 @@
-# node
+# photovault-node
 
-Placeholder. Planned in a later section of the Photovault roadmap; see the top-level README.
+The optional Photovault compute node. Work in progress (section 3).
