@@ -335,7 +335,7 @@
     "logout": "Cerrar sesión",
     "logout_message": "Seguro que quiere cerrar la sesión?",
     "delete_account": "Eliminar cuenta",
-    "delete_account_multi_app_warning": "Esto eliminará su cuenta de Ente Auth, Photovault Fotos y Ente Locker.",
+    "delete_account_multi_app_warning": "Esto eliminará su cuenta de Ente Auth, Photovault y Ente Locker.",
     "change_email": "Cambiar correo electrónico",
     "active_sessions": "Sesiones activas",
     "active_sessions_hint": "Estos son los dispositivos en los que estás conectado actualmente",
