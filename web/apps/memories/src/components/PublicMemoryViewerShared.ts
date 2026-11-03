@@ -4,6 +4,12 @@ import type {
     PublicMemoryShareFrame,
     PublicMemoryShareMetadata,
 } from "../services/public-memory";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 interface PublicMemoryViewerBaseProps {
     files: EnteFile[];
@@ -78,11 +84,12 @@ export const EnteBrandTagImage = styled("img")({
 });
 
 const joinNowButtonStyles = {
-    backgroundColor: "#08C225",
+    backgroundColor: pvGold, // PHOTOVAULT: theme
+    color: pvOnGold, // PHOTOVAULT: theme
     borderRadius: "16px",
     paddingBlock: "11px",
     paddingInline: "20px",
-    "&:hover": { backgroundColor: "#07A820" },
+    "&:hover": { backgroundColor: pvGoldHover }, // PHOTOVAULT: theme
 };
 
 const JoinNowButtonRoot = styled(Button)({

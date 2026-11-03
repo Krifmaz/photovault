@@ -10,6 +10,12 @@ import {
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
 import { t } from "i18next";
 import React from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 const CommentIllustration: React.FC = () => (
     <svg
@@ -21,7 +27,7 @@ const CommentIllustration: React.FC = () => (
     >
         <path
             d="M62.4161 23.9825C69.5416 21.6377 77.2027 21.4587 84.4301 23.4677C91.6577 25.4768 98.1278 29.5846 103.021 35.2705C107.914 40.9564 111.011 47.9656 111.921 55.4117C112.83 62.8579 111.511 70.4066 108.131 77.1033C104.75 83.8 99.4603 89.3444 92.929 93.0344C86.3977 96.7244 78.9186 98.3952 71.438 97.8347C65.5124 97.3907 59.9955 95.6061 55.1766 92.7912L36.6137 95.1736C35.7803 95.2805 34.9485 94.962 34.4004 94.3252C33.8523 93.6882 33.6604 92.8183 33.8903 92.0101L39.0115 74.0065C36.9468 68.823 36.0051 63.1057 36.4493 57.1772C37.0098 49.6966 39.7764 42.5499 44.3984 36.6414C49.0204 30.733 55.2905 26.3274 62.4161 23.9825Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
             stroke="#232323"
             strokeWidth="5"
             strokeLinecap="round"
@@ -38,7 +44,7 @@ const CommentIllustration: React.FC = () => (
         >
             <path
                 d="M71.6249 95.341C78.6125 95.8645 85.5985 94.3043 91.6993 90.8575C97.8002 87.4107 102.742 82.2321 105.899 75.9768C109.057 69.7214 110.289 62.6702 109.439 55.7147C108.59 48.7592 105.696 42.2119 101.126 36.9007C96.5551 31.5895 90.512 27.753 83.7608 25.8763C77.0096 23.9996 69.8535 24.167 63.1974 26.3573C56.5414 28.5477 50.6843 32.6626 46.3669 38.1817C42.0494 43.7008 39.4656 50.3762 38.942 57.3639C38.5044 63.2051 39.5049 68.8185 41.6537 73.8587L36.2949 92.6938L55.7183 90.2015C60.382 93.0774 65.7876 94.9037 71.6249 95.341Z"
-                fill="#08C225"
+                fill={pvGold} // PHOTOVAULT: theme
             />
         </mask>
         <g mask="url(#mask0_737_21326)">
@@ -73,15 +79,15 @@ const CommentIllustration: React.FC = () => (
         </g>
         <path
             d="M20.1099 75.4512C14.3314 77.6905 10.4661 82.396 10.8043 87.5689C10.4661 82.396 6.02735 78.2395 0 76.7661C5.77852 74.5268 9.64385 69.8213 9.30562 64.6484C9.64385 69.8213 14.0826 73.9778 20.1099 75.4512Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
         />
         <path
             d="M145.699 62.5334C138.037 63.2295 131.824 67.5164 130.457 73.8026C131.824 67.5164 127.951 61.0368 121.27 57.2223C128.932 56.5261 135.145 52.2393 136.512 45.9531C135.145 52.2393 139.017 58.7188 145.699 62.5334Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
         />
         <path
             d="M51.1361 8.83653C46.9208 9.50979 43.6377 12.1205 43.1181 15.6532C43.6377 12.1205 41.2488 8.67983 37.4023 6.81669C41.6176 6.14343 44.9007 3.53273 45.4202 0C44.9007 3.53273 47.2896 6.97339 51.1361 8.83653Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
         />
     </svg>
 );
@@ -269,10 +275,10 @@ const SignInButton = styled(Button)(() => ({
     gap: 8,
     flex: "1 0 0",
     borderRadius: 20,
-    backgroundColor: "#08C225",
+    backgroundColor: pvGold, // PHOTOVAULT: theme
     fontSize: 16,
     fontWeight: 500,
     textTransform: "none",
-    color: "#fff",
-    "&:hover": { backgroundColor: "#07A820" },
+    color: pvOnGold, // PHOTOVAULT: theme
+    "&:hover": { backgroundColor: pvGoldHover },
 }));

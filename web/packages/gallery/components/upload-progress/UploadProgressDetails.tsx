@@ -26,6 +26,11 @@ import {
     UploadProgressRow,
     type ListedFile,
 } from "./UploadFileList";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvAlpha,
+    pvGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 export function UploadProgressDetails() {
     const {
@@ -355,8 +360,7 @@ const statTileSx = (theme: Theme): SystemStyleObject<Theme> => ({
     }),
 });
 const activeStatTileSx = {
-    background:
-        "linear-gradient(0deg, rgba(8, 194, 37, 0.16) 1.57%, rgba(8, 194, 37, 0) 49.33%)",
+    background: `linear-gradient(0deg, ${pvAlpha(pvGold, 0.16)} 1.57%, ${pvAlpha(pvGold, 0)} 49.33%)`, // PHOTOVAULT: theme
     "&:hover .stat-underline": { backgroundColor: progressGreen },
 };
 const statDotSx = { width: 6, height: 6, borderRadius: "50%", flexShrink: 0 };

@@ -63,6 +63,8 @@ import {
 } from "ente-new/photos/services/user-details";
 import { t } from "i18next";
 import React, { useContext, useEffect, useId, useRef, useState } from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 type FamilyManagementProps = NestedSidebarDrawerVisibilityProps & {
     onShowPlanSelector: () => void;
@@ -347,13 +349,13 @@ interface FamilyDashboardProps {
 const familyMemberColors = [
     "#df61bb",
     "#f24822",
-    "#08c225",
+    pvGold, // PHOTOVAULT: theme
     "#9610d6",
     "#087aff",
     "#f0a01e",
 ];
 const familyStorageColors = [
-    "#08c225",
+    pvGold, // PHOTOVAULT: theme
     "#f08a1e",
     "#9610d6",
     "#087aff",

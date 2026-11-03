@@ -1,4 +1,10 @@
 import type { SxProps, Theme } from "@mui/material";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 const surfaceStroke = "#e0e0e0";
 const surfaceStrokeDark = "rgba(255 255 255 / 0.12)";
@@ -49,8 +55,8 @@ export const v2CloseButtonSx = (theme: Theme) => ({
     }),
 });
 
-const greenAccent = "#08c225";
-const greenAccentHover = "#07ad21";
+const greenAccent = pvGold; // PHOTOVAULT: theme
+const greenAccentHover = pvGoldHover;
 const errorColor = "#fa1336";
 
 export const v2LabelSx = {
@@ -111,11 +117,11 @@ export const v2CancelButtonSx = (theme: Theme) => ({
 });
 export const v2SubmitButtonSx = {
     ...v2BaseActionSx,
-    color: "#fff",
+    color: pvOnGold, // PHOTOVAULT: theme
     backgroundColor: greenAccent,
     "&:hover": { backgroundColor: greenAccentHover },
     "&.Mui-disabled": {
-        color: "#fff",
+        color: pvOnGold, // PHOTOVAULT: theme
         backgroundColor: greenAccent,
         opacity: 0.7,
     },

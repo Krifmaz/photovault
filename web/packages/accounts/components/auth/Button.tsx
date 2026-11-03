@@ -76,11 +76,19 @@ const ButtonRoot = styled(
     position: "relative",
     boxSizing: "border-box",
     fontFamily: "inherit",
-    color: $variant === "primary" ? "#fff" : "var(--auth-ui-text)",
+    // PHOTOVAULT: theme - optional on-primary colour and gradient.
+    color:
+        $variant === "primary"
+            ? "var(--auth-ui-on-primary, #fff)"
+            : "var(--auth-ui-text)",
     backgroundColor:
         $variant === "primary"
             ? "var(--auth-ui-primary)"
             : "var(--auth-ui-button-secondary)",
+    backgroundImage:
+        $variant === "primary"
+            ? "var(--auth-ui-primary-gradient, none)"
+            : "none",
     boxShadow:
         $variant === "primary"
             ? "inset 0 0 0 1px var(--auth-ui-button-primary-stroke)"
@@ -116,6 +124,7 @@ const ButtonRoot = styled(
         : {
               color: "var(--auth-ui-text-disabled)",
               backgroundColor: "var(--auth-ui-fill-hover)",
+              backgroundImage: "none", // PHOTOVAULT: theme
               boxShadow: "none",
               cursor: "not-allowed",
           },

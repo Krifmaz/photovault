@@ -97,6 +97,12 @@ import {
     type PropsWithChildren,
 } from "react";
 import type { FileWithPath } from "react-dropzone";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 const LazyPublicAlbumSingleFileViewer =
     dynamic<PublicAlbumSingleFileViewerProps>(
@@ -1002,11 +1008,12 @@ const EnteLogoLink = styled("a")(({ theme }) => ({
 }));
 
 const GreenButton = styled(Button)(() => ({
-    backgroundColor: "#08C225",
+    backgroundColor: pvGold, // PHOTOVAULT: theme
+    color: pvOnGold, // PHOTOVAULT: theme
     borderRadius: "16px",
     paddingBlock: "11px",
     paddingInline: "20px",
-    "&:hover": { backgroundColor: "#07A820" },
+    "&:hover": { backgroundColor: pvGoldHover }, // PHOTOVAULT: theme
 }));
 
 const navbarActionButtonSx = { borderRadius: "16px", paddingBlock: "11px" };

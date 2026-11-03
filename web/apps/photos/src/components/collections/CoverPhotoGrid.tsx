@@ -12,6 +12,8 @@ import { BaseTileButton } from "ente-new/photos/components/Tiles";
 import { t } from "i18next";
 import { memo, useEffect, useId, useState } from "react";
 import { FixedSizeList, type ListChildComponentProps } from "react-window";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 interface CoverPhotoGridProps {
     width: number;
@@ -170,7 +172,7 @@ const CoverPhotoCard = memo(
                         sx={{
                             position: "absolute",
                             inset: 0,
-                            border: "3px solid #08c225",
+                            border: `3px solid ${pvGold}`, // PHOTOVAULT: theme
                             borderRadius: "inherit",
                             pointerEvents: "none",
                         }}
@@ -184,7 +186,7 @@ const CoverPhotoCard = memo(
                                 height: 26,
                                 boxSizing: "border-box",
                                 borderRadius: "50%",
-                                bgcolor: "#08c225",
+                                bgcolor: pvGold, // PHOTOVAULT: theme
                                 border: "2px solid #fff",
                                 display: "grid",
                                 placeItems: "center",

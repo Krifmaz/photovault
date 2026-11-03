@@ -35,6 +35,12 @@ import { FileType } from "ente-media/file-type";
 import { t } from "i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FileViewer } from "./FileViewer";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 export interface PublicAlbumSingleFileViewerProps {
     file: EnteFile;
@@ -754,11 +760,11 @@ export const PublicAlbumSingleFileViewer: React.FC<
                                         minHeight: "unset",
                                         textTransform: "none",
                                         fontWeight: "medium",
-                                        color: "#fff",
-                                        backgroundColor: "#08C225",
+                                        color: pvOnGold, // PHOTOVAULT: theme
+                                        backgroundColor: pvGold,
                                         "&:hover": {
-                                            color: "#fff",
-                                            backgroundColor: "#07A820",
+                                            color: pvOnGold, // PHOTOVAULT: theme
+                                            backgroundColor: pvGoldHover,
                                         },
                                     }}
                                 >

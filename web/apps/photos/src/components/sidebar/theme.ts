@@ -1,4 +1,15 @@
 import type { CSSObject, Theme } from "@mui/material/styles";
+// PHOTOVAULT: theme
+import {
+    pvDark as D,
+    pvLight as L,
+} from "ente-base/components/utils/photovault/encore-tokens";
+
+// PHOTOVAULT: theme - "#rrggbb" to MUI's "r g b" channel format.
+const channel = (hex: string) => {
+    const n = parseInt(hex.slice(1), 16);
+    return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+};
 
 const inter =
     '"Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
@@ -8,51 +19,61 @@ const sidebarHeadingFont = '"Outfit Variable", Outfit, sans-serif';
 // Keep the settings palette local, including drawers and portalled menus.
 export const sidebarStyles = (theme: Theme): CSSObject => {
     return {
-        "--mui-palette-background-default": "#F4F4F4",
-        "--mui-palette-background-paper": "#FFFFFF",
-        "--mui-palette-background-paper2": "#FFFFFF",
-        "--mui-palette-text-muted": "#666666",
-        "--mui-palette-text-secondary": "#666666",
-        "--mui-palette-text-faint": "#969696",
-        "--mui-palette-fill-faint": "#F4F4F4",
-        "--mui-palette-fill-fainter": "#F4F4F4",
-        "--mui-palette-fill-muted": "#D2D2D2",
-        "--mui-palette-fill-faintHover": "#F4F4F4",
-        "--mui-palette-stroke-muted": "#E0E0E0",
-        "--mui-palette-stroke-faint": "#EBEBEB",
-        "--mui-palette-divider": "#EBEBEB",
-        "--mui-palette-secondary-main": "#F4F4F4",
-        "--mui-palette-secondary-dark": "#EAEAEA",
-        "--mui-palette-primary-main": "#08C225",
-        "--mui-palette-primary-mainChannel": "8 194 37",
-        "--mui-palette-primary-dark": "#069D1E",
-        "--mui-palette-primary-contrastText": "#FFFFFF",
-        "--mui-palette-accent-main": "#08C225",
-        "--mui-palette-accent-mainChannel": "8 194 37",
-        "--mui-palette-accent-dark": "#069D1E",
-        "--mui-palette-critical-main": "#F63A3A",
-        "--mui-palette-critical-mainChannel": "246 58 58",
-        "--mui-palette-critical-dark": "#DD3434",
-        "--mui-palette-error-main": "#F63A3A",
+        // PHOTOVAULT: theme - Encore colours (from the tokens) instead of
+        // Ente's greys and green.
+        "--mui-palette-background-default": L.panel2,
+        "--mui-palette-background-paper": L.panel,
+        "--mui-palette-background-paper2": L.panel,
+        "--mui-palette-text-muted": L.muted,
+        "--mui-palette-text-secondary": L.muted,
+        "--mui-palette-text-faint": L.faint,
+        "--mui-palette-fill-faint": L.panel2,
+        "--mui-palette-fill-fainter": L.panel2,
+        "--mui-palette-fill-muted": L.border,
+        "--mui-palette-fill-faintHover": L.panel2,
+        "--mui-palette-stroke-muted": L.border,
+        "--mui-palette-stroke-faint": L.border,
+        "--mui-palette-divider": L.border,
+        "--mui-palette-secondary-main": L.panel2,
+        "--mui-palette-secondary-dark": L.border,
+        "--mui-palette-primary-main": L.accent,
+        "--mui-palette-primary-mainChannel": channel(L.accent),
+        "--mui-palette-primary-dark": L.accent2,
+        "--mui-palette-primary-contrastText": L.onAccent,
+        "--mui-palette-accent-main": L.accent,
+        "--mui-palette-accent-mainChannel": channel(L.accent),
+        "--mui-palette-accent-dark": L.accent2,
+        "--mui-palette-critical-main": L.err,
+        "--mui-palette-critical-mainChannel": channel(L.err),
+        "--mui-palette-critical-dark": "#dc2626",
+        "--mui-palette-error-main": L.err,
         "--mui-palette-FilledInput-bg": "var(--mui-palette-background-default)",
         "--mui-palette-FilledInput-hoverBg":
             "var(--mui-palette-background-default)",
         "--mui-palette-backdrop-muted": "rgba(0, 0, 0, 0.4)",
         ...theme.applyStyles("dark", {
-            "--mui-palette-background-default": "#161616",
-            "--mui-palette-background-paper": "#212121",
-            "--mui-palette-background-paper2": "#212121",
-            "--mui-palette-text-muted": "#999999",
-            "--mui-palette-text-secondary": "#999999",
-            "--mui-palette-fill-faint": "#161616",
-            "--mui-palette-fill-fainter": "#161616",
-            "--mui-palette-fill-muted": "#292929",
-            "--mui-palette-fill-faintHover": "#161616",
-            "--mui-palette-stroke-muted": "#3E3E3E",
-            "--mui-palette-stroke-faint": "#2A2A2A",
-            "--mui-palette-divider": "#2A2A2A",
-            "--mui-palette-secondary-main": "#161616",
-            "--mui-palette-secondary-dark": "#0A0A0A",
+            "--mui-palette-background-default": D.bg2,
+            "--mui-palette-background-paper": D.panel,
+            "--mui-palette-background-paper2": D.panel,
+            "--mui-palette-text-muted": D.muted,
+            "--mui-palette-text-secondary": D.muted,
+            "--mui-palette-text-faint": D.faint,
+            "--mui-palette-fill-faint": D.bg2,
+            "--mui-palette-fill-fainter": D.bg2,
+            "--mui-palette-fill-muted": D.panel2,
+            "--mui-palette-fill-faintHover": D.bg2,
+            "--mui-palette-stroke-muted": D.border,
+            "--mui-palette-stroke-faint": D.panel2,
+            "--mui-palette-divider": D.panel2,
+            "--mui-palette-secondary-main": D.bg2,
+            "--mui-palette-secondary-dark": D.bg,
+            "--mui-palette-primary-main": D.accent,
+            "--mui-palette-primary-mainChannel": channel(D.accent),
+            "--mui-palette-primary-dark": D.accent2,
+            "--mui-palette-primary-contrastText": D.onAccent,
+            "--mui-palette-accent-main": D.accent,
+            "--mui-palette-accent-mainChannel": channel(D.accent),
+            "--mui-palette-accent-dark": D.accent2,
         }),
         fontFamily: inter,
         "& .MuiTypography-h3:not([data-sidebar-subscription] *)": {
@@ -69,7 +90,10 @@ export const sidebarStyles = (theme: Theme): CSSObject => {
             backgroundColor: "var(--mui-palette-background-default)",
         },
         "& .MuiInputBase-root": { fontSize: "14px" },
-        "& .MuiInputBase-input::placeholder": { color: "#969696", opacity: 1 },
+        "& .MuiInputBase-input::placeholder": {
+            color: "var(--mui-palette-text-faint)", // PHOTOVAULT: theme
+            opacity: 1,
+        },
         "& .MuiIconButton-root:hover": {
             backgroundColor:
                 "color-mix(in srgb, var(--mui-palette-text-base) 8%, var(--mui-palette-background-paper))",
@@ -95,7 +119,7 @@ export const sidebarStyles = (theme: Theme): CSSObject => {
             }),
         },
         "& .ente-chevron-right:not([data-sidebar-subscription] *)": {
-            color: "#969696",
+            color: "var(--mui-palette-text-faint)", // PHOTOVAULT: theme
         },
     };
 };

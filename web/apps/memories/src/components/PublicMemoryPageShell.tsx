@@ -2,6 +2,8 @@ import { CircularProgress, Typography } from "@mui/material";
 import { Stack100vhCenter } from "ente-base/components/containers";
 import Head from "next/head";
 import type { PropsWithChildren } from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 function PublicMemoryDocumentHead() {
     return (
@@ -23,7 +25,8 @@ export function PublicMemoryPageShell({ children }: PropsWithChildren) {
 export function PublicMemoryLoadingContent() {
     return (
         <Stack100vhCenter sx={{ minHeight: "100dvh" }}>
-            <CircularProgress sx={{ color: "#08c225" }} size={32} />
+            {/* PHOTOVAULT: theme */}
+            <CircularProgress sx={{ color: pvGold }} size={32} />
         </Stack100vhCenter>
     );
 }

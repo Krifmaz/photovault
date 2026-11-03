@@ -35,6 +35,8 @@ import React, {
     useRef,
     useState,
 } from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 const LikedPhotoIcon: React.FC = () => (
     <svg
@@ -46,8 +48,8 @@ const LikedPhotoIcon: React.FC = () => (
     >
         <path
             d="M6.99906 13.1537C4.84391 11.5421 0.574219 7.85775 0.574219 4.54219C0.574219 2.35074 2.1824 0.574219 4.39366 0.574219C5.5395 0.574219 6.68533 0.956163 8.21311 2.48394C9.74089 0.956163 10.8867 0.574219 12.0326 0.574219C14.2438 0.574219 15.852 2.35074 15.852 4.54219C15.852 7.85775 11.5823 11.5421 9.42716 13.1537C8.70192 13.696 7.7243 13.696 6.99906 13.1537Z"
-            fill="#08C225"
-            stroke="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
+            stroke={pvGold}
             strokeWidth="1.14583"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -116,8 +118,8 @@ const LikedCommentIcon: React.FC<{ heartStroke?: string }> = ({
         />
         <path
             d="M14.2513 18.1992C12.9222 17.2053 10.2891 14.9332 10.2891 12.8885C10.2891 11.537 11.2808 10.4414 12.6445 10.4414C13.3511 10.4414 14.0578 10.677 15 11.6191C15.9421 10.677 16.6488 10.4414 17.3554 10.4414C18.7191 10.4414 19.7109 11.537 19.7109 12.8885C19.7109 14.9332 17.0777 17.2053 15.7487 18.1992C15.3014 18.5336 14.6985 18.5336 14.2513 18.1992Z"
-            fill="#08C225"
-            stroke="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
+            stroke={pvGold}
             strokeWidth="0.685221"
             strokeLinecap="round"
             strokeLinejoin="round"

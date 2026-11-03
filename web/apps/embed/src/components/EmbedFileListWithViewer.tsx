@@ -18,6 +18,8 @@ import {
     EmbedFileList,
     type EmbedFileListAnnotatedFile,
 } from "./EmbedFileList";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 export interface EmbedFileListWithViewerProps {
     files: EnteFile[];
@@ -90,7 +92,7 @@ export const EmbedFileListWithViewer: React.FC<
                                 color: "inherit",
                                 textDecoration: "none",
                                 "&:visited": { color: "inherit" },
-                                "&:hover": { color: "#1db954" },
+                                "&:hover": { color: pvGold }, // PHOTOVAULT: theme
                             }}
                         >
                             <EnteLogo height={14} />

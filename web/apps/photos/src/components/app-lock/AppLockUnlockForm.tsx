@@ -23,6 +23,12 @@ import { AppLockCard } from "./AppLockCard";
 import { CooldownScreen, ErrorMessage } from "./AppLockFeedback";
 import { LockIllustration } from "./AppLockIllustrations";
 import { LOGOUT_MODAL_WIDTH, subtitleTextSx, titleTextSx } from "./styles";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 type AppLockSnapshot = ReturnType<typeof useAppLockSnapshot>;
 
@@ -46,8 +52,8 @@ interface AppLockFormHeaderProps {
 
 type UnlockInputError = string | null | undefined;
 
-const ENTE_GREEN = "#08C225";
-const ENTE_GREEN_HOVER = "#07A820";
+const ENTE_GREEN = pvGold; // PHOTOVAULT: theme
+const ENTE_GREEN_HOVER = pvGoldHover;
 const appLockModalContentSx = { width: 408 - 32, maxWidth: "100%" } as const;
 
 const useCooldownState = (
@@ -112,7 +118,7 @@ const primaryActionButtonSx = (theme: Parameters<typeof titleTextSx>[0]) => ({
     fontWeight: 500,
     lineHeight: "20px",
     textTransform: "none" as const,
-    color: "#fff",
+    color: pvOnGold, // PHOTOVAULT: theme
     boxShadow: "none",
     "&:hover": { backgroundColor: ENTE_GREEN_HOVER, boxShadow: "none" },
     "&.Mui-disabled": {
@@ -701,6 +707,7 @@ const DeviceLockUnlockContent = ({
                         sx={(theme) => ({
                             ...primaryActionButtonSx(theme),
                             backgroundColor: ENTE_GREEN,
+                            color: pvOnGold, // PHOTOVAULT: theme
                             "&:hover": { backgroundColor: ENTE_GREEN_HOVER },
                             fontWeight: 600,
                             mt: 2,

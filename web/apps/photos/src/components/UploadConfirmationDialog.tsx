@@ -25,6 +25,13 @@ import {
 import { SlideUpTransition } from "ente-new/photos/components/mui/SlideUpTransition";
 import { t } from "i18next";
 import type { ChangeEvent, ReactElement } from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvAlpha,
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 interface UploadConfirmationDialogProps {
     open: boolean;
@@ -273,7 +280,7 @@ function StatCard({
     );
 }
 
-const green = "#08c225";
+const green = pvGold; // PHOTOVAULT: theme
 
 const paperSx = (theme: Theme) => ({
     width: "min(607px, calc(100svw - 32px))",
@@ -344,7 +351,7 @@ const successIllustrationSx = (theme: Theme) => ({
     justifyContent: "center",
     borderRadius: "50%",
     backgroundColor: "#ddeedf",
-    ...theme.applyStyles("dark", { backgroundColor: "rgba(8 194 37 / 0.16)" }),
+    ...theme.applyStyles("dark", { backgroundColor: pvAlpha(pvGold, 0.16) }), // PHOTOVAULT: theme
 });
 
 const calculatingDescriptionSx = {
@@ -362,7 +369,7 @@ const successIconSx = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "50%",
-    color: "#fff",
+    color: pvOnGold, // PHOTOVAULT: theme
     backgroundColor: green,
 };
 
@@ -456,14 +463,14 @@ const confirmButtonSx = (theme: Theme) => ({
     py: "14px",
     gap: "10px",
     borderRadius: "20px",
-    color: "#fff",
+    color: pvOnGold, // PHOTOVAULT: theme
     backgroundColor: green,
     boxShadow: "none",
     fontSize: 14,
     fontWeight: 500,
     lineHeight: "20px",
     textTransform: "none",
-    "&:hover": { backgroundColor: "#07ad21", boxShadow: "none" },
+    "&:hover": { backgroundColor: pvGoldHover, boxShadow: "none" }, // PHOTOVAULT: theme
     "&.Mui-disabled": {
         color: "rgba(0 0 0 / 0.6)",
         backgroundColor: "rgba(0 0 0 / 0.12)",

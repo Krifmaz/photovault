@@ -175,8 +175,11 @@ const PageRoot = styled("main", {
     position: "relative",
     overflow: "hidden",
     boxSizing: "border-box",
-    backgroundColor: "#f4f4f4",
-    ...theme.applyStyles("dark", { backgroundColor: "#0a0a0a" }),
+    // PHOTOVAULT: theme - optional page colour.
+    backgroundColor: "var(--auth-ui-page, #f4f4f4)",
+    ...theme.applyStyles("dark", {
+        backgroundColor: "var(--auth-ui-page, #0a0a0a)",
+    }),
     [authAboveMobileMediaQuery]: { padding: "40px" },
     "@media (min-width: 1024px)": {
         padding: 0,
@@ -209,9 +212,12 @@ const PageCard = styled("div")(({ theme }) => ({
     flexDirection: "column",
     position: "relative",
     overflow: "hidden",
-    backgroundColor: "#fff",
+    // PHOTOVAULT: theme - optional card colour.
+    backgroundColor: "var(--auth-ui-card, #fff)",
     animation: `${shellReveal} 620ms cubic-bezier(0.22, 1, 0.36, 1) both`,
-    ...theme.applyStyles("dark", { backgroundColor: "#252525" }),
+    ...theme.applyStyles("dark", {
+        backgroundColor: "var(--auth-ui-card, #252525)",
+    }),
     "@media (prefers-reduced-motion: reduce)": { animation: "none" },
     [authAboveMobileMediaQuery]: { borderRadius: "24px" },
     "@media (min-width: 1024px)": {
@@ -271,8 +277,11 @@ const ContentSheet = styled("section")(({ theme }) => ({
     overflowY: "auto",
     boxSizing: "border-box",
     borderRadius: "24px 24px 0 0",
-    backgroundColor: "#fff",
-    ...theme.applyStyles("dark", { backgroundColor: "#252525" }),
+    // PHOTOVAULT: theme - optional card colour.
+    backgroundColor: "var(--auth-ui-card, #fff)",
+    ...theme.applyStyles("dark", {
+        backgroundColor: "var(--auth-ui-card, #252525)",
+    }),
     [authAboveMobileMediaQuery]: {
         marginTop: "-32px",
         padding: "16px 48px 48px",
@@ -338,8 +347,9 @@ const BrandPanelRoot = styled("div", {
         position: "relative",
         overflow: "hidden",
         boxSizing: "border-box",
-        color: "#fff",
-        backgroundColor: "var(--auth-ui-primary)",
+        // PHOTOVAULT: theme - optional brand panel colours.
+        color: "var(--auth-ui-brand-text, #fff)",
+        backgroundColor: "var(--auth-ui-brand, var(--auth-ui-primary))",
         backgroundImage: 'url("/images/auth-surface-noise.svg")',
         backgroundRepeat: "repeat",
         backgroundPosition: "0 0",
@@ -373,14 +383,15 @@ const BrandPanelRoot = styled("div", {
 const Wordmark = styled("div", {
     shouldForwardProp: (prop) => prop !== "size",
 })<{ size: BrandPanelProps["size"] }>(({ size }) => ({
-    width: size === "desktop" ? "83px" : size === "tablet" ? "77px" : "64px",
+    // PHOTOVAULT: branding - width follows the logo's aspect ratio.
+    width: "auto",
     height: size === "desktop" ? "26px" : size === "tablet" ? "24px" : "20px",
     flexShrink: 0,
     margin: size === "mobile" ? "8px 0 0 8px" : 0,
     lineHeight: 0,
     position: "relative",
     zIndex: 1,
-    "& > svg": { width: "100%", height: "100%" },
+    "& > svg": { width: "auto", height: "100%" }, // PHOTOVAULT: branding
 }));
 
 const PanelCopy = styled("div", {
@@ -420,7 +431,8 @@ const PanelSubtitle = styled("p", {
     fontSize: size === "desktop" ? "20px" : "17px",
     fontWeight: 500,
     lineHeight: size === "desktop" ? "28px" : "24px",
-    color: "rgba(255, 255, 255, 0.88)",
+    // PHOTOVAULT: theme
+    color: "var(--auth-ui-brand-text-muted, rgba(255, 255, 255, 0.88))",
     ...brandCopyAnimation,
     animationDelay: "170ms",
 }));

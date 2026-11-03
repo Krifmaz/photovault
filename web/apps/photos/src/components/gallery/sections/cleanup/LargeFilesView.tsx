@@ -861,7 +861,8 @@ const Check = styled("input")(
         left: 50%;
         width: 4px;
         height: 8px;
-        border: solid white;
+        /* PHOTOVAULT: theme - tick on the (cream) accent. */
+        border: solid ${theme.vars.palette.accent.contrastText};
         border-width: 0 1.5px 1.5px 0;
         transform: translate(-50%, -60%) rotate(45deg);
     }

@@ -18,6 +18,8 @@ import {
 } from "react";
 import type { PublicMemoryShareFrameCrop } from "../services/public-memory";
 import { computeMediaCropStyle } from "../utils/lane";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 const DEFAULT_MEDIA_MAX_WIDTH_CSS = "min(1360px, calc(100vw - 32px))";
 const DEFAULT_MEDIA_MAX_HEIGHT_CSS = "calc(100dvh - 184px)";
@@ -69,7 +71,8 @@ function MediaLoadingOverlay() {
                 zIndex: 2,
             }}
         >
-            <CircularProgress sx={{ color: "#08c225" }} size={32} />
+            {/* PHOTOVAULT: theme */}
+            <CircularProgress sx={{ color: pvGold }} size={32} />
         </Box>
     );
 }

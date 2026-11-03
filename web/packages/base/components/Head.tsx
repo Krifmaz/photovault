@@ -21,7 +21,8 @@ const AlbumsFontPreloads: React.FC = () => (
 );
 
 const albumsPreviewTitle = "Photos, shared with you";
-const albumsPreviewDescription = "Tap to view on Ente";
+// PHOTOVAULT: branding
+const albumsPreviewDescription = "Tap to view on Photovault";
 const albumsPreviewImage = "https://albums.ente.com/images/preview.png";
 const albumsPreviewVideo = "https://albums.ente.com/videos/preview.mp4";
 const photosPreviewDescription =
@@ -31,7 +32,8 @@ const photosPreviewImage = "https://photos.ente.com/images/preview.png";
 export const CustomHead: React.FC<React.PropsWithChildren<CustomHeadProps>> = ({
     title,
     children,
-    description = "Ente - end-to-end encrypted cloud with open-source apps",
+    // PHOTOVAULT: branding
+    description = "Photovault - end-to-end encrypted photos, based on Ente",
     viewportContent = "width=device-width, initial-scale=1",
 }) => (
     <Head>
@@ -71,7 +73,7 @@ export const CustomHeadPhotos: React.FC<CustomHeadProps> = ({ title }) =>
 const CustomHeadAlbumsStatic: React.FC = () => (
     <Head>
         <AlbumsFontPreloads />
-        <title>Ente Photos</title>
+        <title>Photovault</title> {/* PHOTOVAULT: branding */}
         <link rel="icon" href="/images/favicon.png" type="image/png" />
         <meta name="description" content={albumsPreviewDescription} />
         <meta property="og:type" content="website" />

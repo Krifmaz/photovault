@@ -60,7 +60,8 @@ export default function App({ Component, pageProps }: AppProps) {
 
     return (
         <>
-            <CustomHead title="Ente Photos" />
+            {/* PHOTOVAULT: branding */}
+            <CustomHead title="Photovault" />
             <ThemeProvider theme={photosTheme}>
                 <CssBaseline enableColorScheme />
                 <BaseContext.Provider value={baseContext}>

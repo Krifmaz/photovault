@@ -31,15 +31,16 @@ export const isDesktop = buildEnvIsDesktop;
 
 export const desktopAppVersion = buildEnvDesktopAppVersion;
 
+// PHOTOVAULT: branding - Photovault titles for the Photos apps.
 export const staticAppTitle = {
-    accounts: "Ente Accounts",
-    albums: "Ente Photos",
+    accounts: "Photovault Accounts",
+    albums: "Photovault",
     auth: "Ente Auth",
-    cast: "Ente Photos",
-    embed: "Ente Photos",
+    cast: "Photovault",
+    embed: "Photovault",
     share: "Ente Locker",
-    photos: "Ente Photos",
-    photobook: "Ente Photobook",
+    photos: "Photovault",
+    photobook: "Photovault Photobook",
     ensu: "Ensu",
     locker: "Ente Locker",
     legacy: "Ente Legacy Kit",

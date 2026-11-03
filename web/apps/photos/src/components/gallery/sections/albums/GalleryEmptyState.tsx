@@ -9,6 +9,11 @@ import type { UploadTypeSelectorIntent } from "ente-gallery/components/Upload";
 import { t } from "i18next";
 import React, { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 interface GalleryEmptyStateProps {
     isUploadInProgress: boolean;
@@ -358,8 +363,9 @@ const GalleryEmptyStateButton = styled(FocusVisibleButton)(({ theme }) => ({
     lineHeight: "20px",
     fontWeight: 500,
     "&.MuiButton-containedAccent:not(.Mui-disabled)": {
-        backgroundColor: "#08C225",
-        "&:hover": { backgroundColor: "#08C225" },
+        backgroundColor: pvGold, // PHOTOVAULT: theme
+        color: pvOnGold, // PHOTOVAULT: theme
+        "&:hover": { backgroundColor: pvGold },
     },
     "& .MuiButton-startIcon": { marginRight: 14, "& > svg": { fontSize: 20 } },
 }));

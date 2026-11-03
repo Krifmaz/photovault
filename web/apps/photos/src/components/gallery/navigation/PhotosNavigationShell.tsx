@@ -385,7 +385,8 @@ const NormalNavigationRail = ({
                             borderRadius: "12px",
                             color: "text.base",
                             '&[aria-pressed="true"]': {
-                                color: "#FFFFFF",
+                                // PHOTOVAULT: theme - text on the (cream) accent.
+                                color: "accent.contrastText",
                                 bgcolor: "accent.main",
                                 "&:hover": { bgcolor: "accent.main" },
                             },
@@ -444,7 +445,8 @@ const HomeButton: React.FC<{ selected: boolean }> = ({ selected }) => {
                     borderRadius: "12px",
                     color: "text.base",
                     '&[aria-pressed="true"]': {
-                        color: "#FFFFFF",
+                        // PHOTOVAULT: theme - text on the (cream) accent.
+                        color: "accent.contrastText",
                         bgcolor: "accent.main",
                         "&:hover": { bgcolor: "accent.main" },
                     },

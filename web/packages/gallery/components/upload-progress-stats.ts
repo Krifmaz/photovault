@@ -1,5 +1,7 @@
 import type { PreUploadSkippedFile } from "ente-base/types/ipc";
 import type { UploadPhase, UploadResult } from "ente-gallery/services/upload";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 export interface UploadCounter {
     finished: number;
@@ -26,7 +28,7 @@ export type FinishedStatKind = (typeof finishedStatKinds)[number];
 export type UploadStatKind = "inProgress" | FinishedStatKind;
 
 export const uploadStatColors: Record<FinishedStatKind, string> = {
-    completed: "#08c225",
+    completed: pvGold, // PHOTOVAULT: theme
     skipped: "#2c83ff",
     failed: "var(--mui-palette-critical-main)",
 };

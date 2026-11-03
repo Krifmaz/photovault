@@ -2,23 +2,42 @@ import type { Theme, TypographyVariantsOptions } from "@mui/material";
 import { createTheme } from "@mui/material";
 import type { Components } from "@mui/material/styles";
 import type { AppName } from "ente-base/app";
+// PHOTOVAULT: theme - Encore tokens for the Photovault apps.
+import {
+    encoreColorSchemes,
+    encoreColors,
+    encoreComponents,
+} from "./photovault/encore-theme";
+import { isPhotovaultApp, pvFont } from "./photovault/encore-tokens";
 
 const getTheme = (appName: AppName): Theme => {
     const colors = getColors(appName);
-    const cs = getColorSchemes(colors);
+    // PHOTOVAULT: theme - per-scheme Encore accent/primary/status colours.
+    const cs = isPhotovaultApp(appName)
+        ? encoreColorSchemes(getColorSchemes(colors))
+        : getColorSchemes(colors);
     const colorSchemes =
         appName == "cast" ? { ...cs, light: cs.dark } : { ...cs };
     return createTheme({
         cssVariables: { colorSchemeSelector: "class" },
         colorSchemes,
         typography: getTypography(appName),
-        components: getComponents(appName),
+        // PHOTOVAULT: theme - Encore component overrides (radii, buttons).
+        components: isPhotovaultApp(appName)
+            ? encoreComponents(getComponents(appName))
+            : getComponents(appName),
         shape: { borderRadius: 8 },
         transitions: { duration: { leavingScreen: 300 } },
     });
 };
 
-const getColors = (appName: AppName) => ({
+// PHOTOVAULT: theme - the Photovault apps take their colours from Encore.
+const getColors = (appName: AppName) =>
+    isPhotovaultApp(appName)
+        ? encoreColors(_getColors(appName))
+        : _getColors(appName);
+
+const _getColors = (appName: AppName) => ({
     ..._colors,
     fixed: {
         ..._colors.fixed,
@@ -429,6 +448,10 @@ const baseTypography: TypographyVariantsOptions = {
 };
 
 const getTypography = (appName: AppName): TypographyVariantsOptions => {
+    // PHOTOVAULT: theme - Encore font stack.
+    if (isPhotovaultApp(appName)) {
+        return { ...baseTypography, fontFamily: pvFont.family };
+    }
     if (appName === "ensu") {
         return {
             ...baseTypography,
