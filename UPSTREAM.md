@@ -65,7 +65,7 @@ Options:
 | --- | --- |
 | `--ref REF` | Upstream branch, tag or commit (default `main`). |
 | `--repo URL` | Upstream repository (default `https://github.com/ente-io/ente`; `file://` for testing). |
-| `--dirs "mobile web desktop"` | Directories to track. |
+| `--dirs "mobile web desktop rust"` | Directories to track. |
 | `--no-merge` | Only update `upstream/ente`; merge it yourself later. |
 | `--abort-on-conflict` | Report conflicts, then abort the merge (CI use). |
 
@@ -94,3 +94,15 @@ repositories and checks the first import, a clean update (including upstream
 deletions), the up-to-date no-op, the per-directory conflict report and exit
 status, conflict resolution, and input validation. It touches nothing
 outside a temporary directory.
+
+## Tracked paths and merge base
+
+`rust/` is tracked too: Ente's web wasm packages and the Flutter Rust bridge
+build against `../../../../rust`, so it must stay at the repository root next
+to the apps (it has its own Cargo workspace and does not affect ours).
+
+The first import is ente-io/ente@b2ed3dc93e49d6ac9831bf3550957816d3a0735d
+(2026-11-03), committed unmodified; all Photovault patches follow as separate
+commits marked with `PHOTOVAULT` comments and are listed in each app's
+`PHOTOVAULT.md`. Use b2ed3dc as the merge base for `mobile/`, `web/`,
+`desktop/` and `rust/` (record it in `UPSTREAM.lock` before the first run).

@@ -21,7 +21,6 @@ async fn recovery_status(srv: &TestServer, id: &str) -> String {
 #[tokio::test]
 async fn trusted_contact_full_recovery_flow() {
     let srv = TestServer::start().await.unwrap();
-    ensure_user_auth_tables(&srv).await;
     let api = Api::new(&srv);
     let owner = create_user(&srv, "Owner@Example.com", PHOTOS).await;
     let trusted = create_user(&srv, "trusted@example.com", PHOTOS).await;
@@ -322,7 +321,6 @@ async fn trusted_contact_full_recovery_flow() {
 #[tokio::test]
 async fn reject_approve_stop_and_revoke() {
     let srv = TestServer::start().await.unwrap();
-    ensure_user_auth_tables(&srv).await;
     let api = Api::new(&srv);
     let owner = create_user(&srv, "a@example.com", PHOTOS).await;
     let trusted = create_user(&srv, "b@example.com", PHOTOS).await;

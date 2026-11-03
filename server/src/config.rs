@@ -32,6 +32,8 @@ pub struct Config {
     pub hardcoded_ott: std::collections::BTreeMap<String, String>,
     /// Log output format: `json` (default) or `pretty`.
     pub log_format: String,
+    /// Companion web-app URLs and WebAuthn relying party (`[accounts]`).
+    pub accounts: crate::users::settings::AccountsSettings,
 }
 
 /// Which object store backs the server.
@@ -145,6 +147,7 @@ impl Default for Config {
             allow_signups: true,
             hardcoded_ott: Default::default(),
             log_format: "json".into(),
+            accounts: Default::default(),
         }
     }
 }
@@ -188,6 +191,7 @@ impl Config {
         if let Some(v) = env("PHOTOVAULT_ALLOW_SIGNUPS") {
             self.allow_signups = v == "true" || v == "1";
         }
+        self.accounts.apply_env();
         if let Some(v) = env("PHOTOVAULT_ADMINS") {
             self.admins = v.split(',').filter_map(|s| s.trim().parse().ok()).collect();
         }

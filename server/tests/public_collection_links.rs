@@ -364,11 +364,11 @@ async fn collect_uploads_into_owner_album() {
     )
     .await;
     assert_eq!(r.status, 400);
-    // Over the owner's quota (100 bytes).
+    // Over the owner's quota (100 bytes) plus museum's 50 MB upload overflow.
     let r = post_json(
         &format!("{}/public-collection/upload-url", srv.url),
         &h,
-        json!({"contentLength": 500, "contentMD5": "XUFAKrxLKna5cZ2REBfFkg=="}),
+        json!({"contentLength": 100 * 1024 * 1024, "contentMD5": "XUFAKrxLKna5cZ2REBfFkg=="}),
     )
     .await;
     assert_eq!(r.status, 426);
@@ -420,6 +420,29 @@ async fn collect_uploads_into_owner_album() {
     let v = r.json();
     assert_eq!(v["partURLs"].as_array().unwrap().len(), 1);
     assert!(v["completeURL"].is_string());
+    // Each part URL binds its length and MD5, and the upload id is staged for cleanup.
+    let r = post_json(
+        &format!("{}/public-collection/multipart-upload-url", srv.url),
+        &h,
+        json!({"contentLength": 5, "partLength": 5, "partMd5s": ["XUFAKrxLKna5cZ2REBfFkg=="]}),
+    )
+    .await;
+    assert_eq!(r.status, 200);
+    let v = r.json();
+    let part = v["partURLs"][0].as_str().unwrap().to_string();
+    let md5h = [("Content-MD5", "XUFAKrxLKna5cZ2REBfFkg==")];
+    // Body not matching the bound MD5 → S3's 400 BadDigest; a different MD5 → 403.
+    assert_eq!(http("PUT", &part, &md5h, b"hellO").await.status, 400);
+    let other = [("Content-MD5", "/2zlNuvykYDBdmKfFGZlGg==")];
+    assert_eq!(http("PUT", &part, &other, b"hellO").await.status, 403);
+    assert_eq!(http("PUT", &part, &md5h, b"hello").await.status, 200);
+    let (upload_id,): (Option<String>,) =
+        sqlx::query_as("SELECT upload_id FROM temp_objects WHERE object_key = $1")
+            .bind(v["objectKey"].as_str().unwrap())
+            .fetch_one(db)
+            .await
+            .unwrap();
+    assert!(upload_id.is_some_and(|u| !u.is_empty()));
 
     let new_file = json!({
         "collectionID": cid,
@@ -464,9 +487,16 @@ async fn collect_uploads_into_owner_album() {
         .await
         .unwrap();
     assert_eq!(used, 8);
-    // Reusing the objects is refused.
+    // Repeating the identical request returns the existing file (museum's duplicate
+    // handling); reusing the objects for different content is a conflict.
+    let mut changed = new_file.clone();
     let r = post_json(&format!("{}/public-collection/file", srv.url), &h, new_file).await;
+    assert_eq!(r.status, 200, "{}", String::from_utf8_lossy(&r.body));
+    assert_eq!(r.json()["id"], fid);
+    changed["metadata"]["encryptedData"] = json!("other");
+    let r = post_json(&format!("{}/public-collection/file", srv.url), &h, changed).await;
     assert_eq!(r.status, 400);
+    assert_eq!(r.json()["code"], "FILE_UPLOAD_CONFLICT");
     // Visible through the link.
     let r = get(
         &format!("{}/public-collection/diff?sinceTime=0", srv.url),
@@ -525,7 +555,7 @@ async fn file_data_and_previews() {
     assert_eq!(r.status, 403);
 
     sqlx::query(
-        "INSERT INTO file_data (file_id, user_id, data_type, size, obj_id, updated_at) VALUES ($1, $2, $3, $4, $5, $6)",
+        "INSERT INTO file_data (file_id, user_id, data_type, size, obj_id, updated_at, latest_bucket, created_at) VALUES ($1, $2, $3, $4, $5, $6, 'local', $6)",
     )
     .bind(fid)
     .bind(owner)

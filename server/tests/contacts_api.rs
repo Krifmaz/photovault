@@ -43,7 +43,6 @@ async fn upload_picture(api: &Api<'_>, u: &User, contact_id: &str, bytes: &[u8])
 #[tokio::test]
 async fn contacts_crud_diff_and_profile_pictures() {
     let srv = TestServer::start().await.unwrap();
-    ensure_user_auth_tables(&srv).await;
     let api = Api::new(&srv);
     let u = create_user(&srv, "card-owner@example.com", PHOTOS).await;
     let friend = create_user(&srv, "Friend@Example.com", PHOTOS).await;

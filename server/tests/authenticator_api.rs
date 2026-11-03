@@ -11,7 +11,6 @@ use support::*;
 #[tokio::test]
 async fn authenticator_key_entities_and_diff() {
     let srv = TestServer::start().await.unwrap();
-    ensure_user_auth_tables(&srv).await;
     let api = Api::new(&srv);
     let u = create_user(&srv, "totp@example.com", AUTH).await;
     let other = create_user(&srv, "totp2@example.com", AUTH).await;

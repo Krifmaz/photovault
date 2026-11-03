@@ -398,3 +398,48 @@ async fn comments_reactions_and_access() {
         404
     );
 }
+
+#[tokio::test]
+async fn leaving_a_collection_removes_social_activity_and_cast() {
+    let srv = start().await;
+    let st = &srv.state;
+    let (owner, _) = user(st, "owner@example.org").await;
+    let (sharee, sharee_tok) = user(st, "sharee@example.org").await;
+    collection(st, 30, owner, "photos").await;
+    share(st, 30, owner, sharee, "COLLABORATOR").await;
+    add_file(st, 30, 300, owner).await;
+    let base = &srv.url;
+    let h = [("X-Auth-Token", sharee_tok.as_str())];
+    let (s, _) = http(
+        "POST",
+        &format!("{base}/comments"),
+        &h,
+        Some(json!({"collectionID": 30, "fileID": 300, "cipher": cipher(40), "nonce": "n"})),
+    )
+    .await;
+    assert_eq!(s, 201);
+    sqlx::query(
+        "INSERT INTO casting (id, code, public_key, collection_id, cast_user, token, is_deleted, created_at, last_used_at, ip) \
+         VALUES ('c1', 'ABCDEF', 'pk', 30, $1, 'ct', FALSE, 0, 0, '')",
+    )
+    .bind(sharee)
+    .execute(&st.db.pool)
+    .await
+    .unwrap();
+
+    let (s, _) = http("POST", &format!("{base}/collections/leave/30"), &h, None).await;
+    assert_eq!(s, 200);
+    let (live,): (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM comments WHERE collection_id = 30 AND is_deleted = FALSE",
+    )
+    .fetch_one(&st.db.pool)
+    .await
+    .unwrap();
+    assert_eq!(live, 0);
+    let (cast,): (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM casting WHERE id = 'c1' AND is_deleted = FALSE")
+            .fetch_one(&st.db.pool)
+            .await
+            .unwrap();
+    assert_eq!(cast, 0);
+}

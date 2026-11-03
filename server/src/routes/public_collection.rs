@@ -5,14 +5,18 @@
 //! The social endpoints under this prefix (comments, reactions, anon identity) belong to
 //! the social routes, which can authenticate with [`CollectionLink`].
 
+use crate::auth::App;
 use crate::error::{ApiError, ApiResult};
-use crate::public::collect::{self, MultipartUploadUrlRequest, UploadUrlRequest};
+use crate::library::objects::{
+    self, MultipartUploadUrlRequest, MultipartUploadUrls, UploadUrl, UploadUrlRequest,
+};
+use crate::library::{collections, links};
+use crate::public::collect;
 use crate::public::files::{self, ObjectType, parse_file_id};
 use crate::public::http::{PJson, bad_request_msg, url_redirect, url_v3};
 use crate::public::jwt;
-use crate::public::library_sql;
 use crate::public::links::CollectionLink;
-use crate::public::models::{Collection, File};
+use crate::public::models::{Collection, File, limited_public_urls};
 use crate::state::AppState;
 use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, HeaderValue, StatusCode};
@@ -56,14 +60,13 @@ pub async fn public_collection(
     link: &CollectionLink,
     must_allow_collect: bool,
 ) -> ApiResult<Collection> {
-    let mut c = library_sql::collection(&state.db.pool, link.collection_id)
-        .await?
-        .ok_or_else(|| ApiError::status(StatusCode::NOT_FOUND))?;
+    let (_, mut c) = collections::get(state, link.collection_id).await?;
     if c.is_deleted {
         return Err(ApiError::status(StatusCode::NOT_FOUND));
     }
     c.sharees = None;
     c.magic_metadata = None;
+    c.public_urls = Some(limited_public_urls(c.public_urls.take()));
     if must_allow_collect {
         let urls = c.public_urls.as_deref().unwrap_or_default();
         if urls.len() != 1 {
@@ -128,7 +131,7 @@ async fn download_v3(
 
 /// museum `getCollectionOwnerAndVerifyAccess`.
 async fn owner_for_file(state: &AppState, link: &CollectionLink, file_id: i64) -> ApiResult<i64> {
-    if !library_sql::file_active_in_collection(&state.db.pool, link.collection_id, file_id).await? {
+    if !collections::is_active_member(state, link.collection_id, file_id).await? {
         return Err(ApiError::status(StatusCode::FORBIDDEN));
     }
     Ok(public_collection(state, link, false).await?.owner.id)
@@ -190,41 +193,48 @@ async fn info(State(state): State<AppState>, link: CollectionLink) -> ApiResult<
     Ok(res)
 }
 
-fn app_name(headers: &HeaderMap) -> &'static str {
+/// museum `auth.GetApp`: the app named by `X-Client-Package` (Photos by default).
+fn app_of(headers: &HeaderMap) -> App {
     let pkg = headers
         .get("X-Client-Package")
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
     if pkg.starts_with("io.ente.auth") {
-        "auth"
+        App::Auth
     } else if pkg.starts_with("io.ente.locker") {
-        "locker"
+        App::Locker
     } else {
-        "photos"
+        App::Photos
     }
 }
 
 async fn upload_url(
     State(state): State<AppState>,
+    headers: HeaderMap,
     link: CollectionLink,
     PJson(req): PJson<UploadUrlRequest>,
-) -> ApiResult<Json<Value>> {
+) -> ApiResult<Json<UploadUrl>> {
     let c = public_collection(&state, &link, true).await?;
-    Ok(Json(collect::upload_url(&state, c.owner.id, &req).await?))
+    let client = objects::client_info(&headers);
+    Ok(Json(
+        collect::upload_url(&state, c.owner.id, app_of(&headers), &client, &req).await?,
+    ))
 }
 
 async fn multipart_upload_url(
     State(state): State<AppState>,
+    headers: HeaderMap,
     link: CollectionLink,
     PJson(req): PJson<MultipartUploadUrlRequest>,
-) -> ApiResult<Json<Value>> {
+) -> ApiResult<Json<MultipartUploadUrls>> {
     // museum requires part checksums on public uploads.
     if req.part_md5s.as_ref().is_none_or(|m| m.is_empty()) {
         return Err(ApiError::status(StatusCode::BAD_REQUEST));
     }
     let c = public_collection(&state, &link, true).await?;
+    let client = objects::client_info(&headers);
     Ok(Json(
-        collect::multipart_upload_url(&state, c.owner.id, &req).await?,
+        collect::multipart_upload_url(&state, c.owner.id, app_of(&headers), &client, &req).await?,
     ))
 }
 
@@ -244,9 +254,8 @@ async fn create_file(
         return Err(bad_request_msg("can only update to associated collection"));
     }
     let c = public_collection(&state, &link, true).await?;
-    let app = app_name(&headers);
     Ok(Json(
-        collect::create_file(&state, c.owner.id, &c.app, app, file).await?,
+        collect::create_file(&state, c.owner.id, app_of(&headers), file).await?,
     ))
 }
 
@@ -266,12 +275,8 @@ async fn verify_password(
     if req.pass_hash.is_empty() {
         return Err(ApiError::status(StatusCode::BAD_REQUEST));
     }
-    let row = library_sql::active_collection_links(&state.db.pool, link.collection_id)
-        .await?
-        .into_iter()
-        .next()
-        .ok_or_else(|| ApiError::status(StatusCode::NOT_FOUND))?;
-    verify_link_password(&state, row.pw_hash.as_deref(), &req.pass_hash)
+    let row = links::active_collection_link(&state, link.collection_id).await?;
+    verify_link_password(&state, row.pass_hash.as_deref(), &req.pass_hash)
 }
 
 /// museum `verifyPassword`: 400 when the link has no password, 401 when wrong,
@@ -319,10 +324,10 @@ async fn attach_social_ctx(
         Ok(l) => l,
         Err(rejection) => return rejection,
     };
-    let owner_id = match library_sql::collection(&state.db.pool, link.collection_id).await {
-        Ok(Some(c)) if !c.is_deleted => c.owner.id,
+    let owner_id = match collections::get_row(&state, link.collection_id).await {
+        Ok(c) if !c.is_deleted => c.owner_id,
         Ok(_) => return ApiError::status(StatusCode::NOT_FOUND).into_response(),
-        Err(e) => return ApiError::from(e).into_response(),
+        Err(e) => return e.into_response(),
     };
     let mut req = axum::extract::Request::from_parts(parts, body);
     req.extensions_mut()

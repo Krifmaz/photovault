@@ -56,7 +56,6 @@ async fn solve(api: &Api<'_>, kit: &Kit) -> String {
 #[tokio::test]
 async fn legacy_kit_owner_and_recovery_flow() {
     let srv = TestServer::start().await.unwrap();
-    ensure_user_auth_tables(&srv).await;
     let api = Api::new(&srv);
     let owner = create_user(&srv, "owner@example.com", PHOTOS).await;
     let stranger = create_user(&srv, "stranger@example.com", PHOTOS).await;
@@ -320,7 +319,6 @@ async fn legacy_kit_owner_and_recovery_flow() {
 #[tokio::test]
 async fn legacy_kit_block_delete_limit_and_expiry() {
     let srv = TestServer::start().await.unwrap();
-    ensure_user_auth_tables(&srv).await;
     let api = Api::new(&srv);
     let owner = create_user(&srv, "o@example.com", PHOTOS).await;
     set_key_attributes(&srv, owner.id).await;
