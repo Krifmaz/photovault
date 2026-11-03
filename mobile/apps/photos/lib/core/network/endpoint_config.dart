@@ -20,9 +20,11 @@ class EndpointConfig {
     );
   }
 
-  bool get isProduction {
-    return endpoint == kDefaultProductionEndpoint;
-  }
+  // PHOTOVAULT: never Ente's production service. Upstream gates Ente-only
+  // behaviour on this (Cloudflare upload proxy and "faster uploads" toggle,
+  // free-plan family upsell, strict logout); Photovault always talks to a
+  // self-hosted server.
+  bool get isProduction => false;
 
   Future<void> setEndpoint(String endpoint) async {
     await _preferences.setString(preferencesKey, endpoint);
