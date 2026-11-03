@@ -1,0 +1,208 @@
+# Tags and publishes a GitHub Release on every push to the default branch.
+#
+#   1. test     cargo test for the whole workspace
+#   2. version  next tag from .github/release/next-version.sh
+#   3. build    every workspace binary for Linux x86_64/arm64 and macOS arm64
+#   4. image    ghcr.io/<owner>/photovault:<version> and :latest (amd64 + arm64)
+#   5. release  creates the tag and the GitHub Release with archives + SHA256SUMS
+#
+# The tag is only pushed once everything above succeeded. Pushes that only
+# touch docs are ignored; put [skip ci] in a commit message to skip one.
+# Run it by hand (Actions > Release > Run workflow) for a minor/major bump.
+# New crates (node/, importers/) are picked up once they join the workspace.
+name: Release
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "deploy/**"
+      - "LICENSE"
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  IMAGE: ghcr.io/${{ github.repository_owner }}/photovault
+
+jobs:
+  test:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup toolchain install stable --profile minimal && rustup default stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --locked --workspace --no-fail-fast
+
+  version:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.next.outputs.tag }}
+      version: ${{ steps.next.outputs.version }}
+      skip: ${{ steps.next.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: next
+        run: |
+          if [ -n "$(git tag --points-at HEAD 'v*')" ]; then
+            echo "HEAD is already released as $(git tag --points-at HEAD 'v*')"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          tag=$(.github/release/next-version.sh "${{ inputs.bump || 'patch' }}")
+          echo "Next release: $tag"
+          {
+            echo "tag=$tag"
+            echo "version=${tag#v}"
+            echo "skip=false"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: version
+    if: needs.version.outputs.skip == 'false'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Built in bookworm so the binaries run on distroless/cc-debian12
+          # and any distro with glibc >= 2.36.
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-24.04
+            container: rust:1-bookworm
+            arch: amd64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-24.04
+            container: rust:1-bookworm
+            arch: arm64
+          - target: aarch64-apple-darwin
+            os: macos-15
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    env:
+      CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+      CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+      AR_aarch64_unknown_linux_gnu: aarch64-linux-gnu-ar
+    steps:
+      - uses: actions/checkout@v7
+      - name: Cross toolchain
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install stable --profile minimal --target ${{ matrix.target }}
+          rustup default stable
+          command -v jq >/dev/null || { apt-get update && apt-get install -y --no-install-recommends jq; }
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+      - name: Build
+        run: cargo build --release --locked --workspace --bins --target ${{ matrix.target }}
+      - name: Package
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="photovault-${{ needs.version.outputs.tag }}-${{ matrix.target }}"
+          mkdir -p "dist/$name"
+          for bin in $(cargo metadata --no-deps --format-version 1 \
+                         | jq -r '.packages[].targets[] | select(.kind[] == "bin") | .name'); do
+            cp "target/${{ matrix.target }}/release/$bin" "dist/$name/"
+          done
+          cp LICENSE README.md "dist/$name/"
+          tar -C dist -czf "dist/$name.tar.gz" "$name"
+          if [ -n "${{ matrix.arch }}" ]; then
+            mkdir -p "image/bin/${{ matrix.arch }}"
+            cp "target/${{ matrix.target }}/release/photovault" "image/bin/${{ matrix.arch }}/"
+          fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-${{ matrix.target }}
+          path: dist/*.tar.gz
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: matrix.arch != ''
+        with:
+          name: image-${{ matrix.arch }}
+          path: image/
+          if-no-files-found: error
+
+  image:
+    needs: [test, version, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: image-*
+          path: .github/release
+          merge-multiple: true
+      - name: Image root filesystem
+        run: mkdir -p .github/release/rootfs/data .github/release/rootfs/db
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ needs.version.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.version.outputs.tag }}
+            type=raw,value=latest
+      - uses: docker/build-push-action@v7
+        with:
+          context: .github/release
+          file: .github/release/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  release:
+    needs: [version, build, image]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: dist-*
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        run: cd dist && sha256sum *.tar.gz > SHA256SUMS
+      - name: Tag and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" dist/* \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "Photovault $TAG" \
+            --generate-notes \
+            --notes "Docker image: \`${{ env.IMAGE }}:${{ needs.version.outputs.version }}\`"
