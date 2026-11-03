@@ -37,7 +37,7 @@ object PlaceholderPng {
             val row = y * stride
             raw[row] = 0 // filter: none
             for (x in 0 until width) {
-                val hill = horizon + waveAmp * kotlin.math.sin(x / waveLen * 6.2831855f).toFloat()
+                val hill = horizon + waveAmp * kotlin.math.sin(x / waveLen * 6.2831855f)
                 var c: Int
                 if (y >= hill) {
                     val t = ((y - hill) / max(1f, height - hill)).coerceIn(0f, 1f)

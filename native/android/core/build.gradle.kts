@@ -24,6 +24,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    lint {
+        // This module holds only UniFFI-generated code. It picks java.lang.ref.Cleaner (API 33) by
+        // reflection and falls back to JNA's cleaner below that, which NewApi cannot see.
+        disable += "NewApi"
+    }
+
     sourceSets {
         getByName("main") {
             kotlin.directories += uniffiDir.path

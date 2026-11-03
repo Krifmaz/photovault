@@ -121,7 +121,9 @@ private class RealCore(private val core: Core) : CoreRepository {
             is CoreException.Unauthorized -> CoreError.Unauthorized()
             is CoreException.IncorrectPassword -> CoreError.IncorrectPassword()
             is CoreException.IncorrectCode -> CoreError.IncorrectCode()
-            is CoreException.Server -> CoreError.Server(status.toInt(), text)
+            // No field access, so this compiles whether CoreError is exported flat or with fields
+            // (with fields named `message`, UniFFI 0.32's Kotlin does not compile; see README).
+            is CoreException.Server -> CoreError.Server(0, text)
             is CoreException.Crypto -> CoreError.Crypto(text)
             is CoreException.Storage -> CoreError.Storage(text)
             is CoreException.NotLoggedIn -> CoreError.NotLoggedIn()

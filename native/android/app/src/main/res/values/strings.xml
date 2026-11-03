@@ -77,6 +77,7 @@
     <string name="timeline_today">Today</string>
     <string name="timeline_yesterday">Yesterday</string>
     <string name="timeline_syncing">Syncing…</string>
+    <string name="timeline_sync_failed">Couldn\'t sync: %1$s</string>
     <string name="timeline_demo">Demo library (built without photovault-core)</string>
     <string name="timeline_account">Account</string>
     <string name="timeline_sync_now">Sync now</string>

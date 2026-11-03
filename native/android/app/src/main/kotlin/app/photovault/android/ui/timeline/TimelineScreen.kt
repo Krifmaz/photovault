@@ -167,6 +167,7 @@ private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
                     val sub = when {
                         status.demo -> stringResource(R.string.timeline_demo)
                         status.syncing -> stringResource(R.string.timeline_syncing)
+                        status.syncError != null -> stringResource(R.string.timeline_sync_failed, status.syncError.orEmpty())
                         else -> status.serverName
                     }
                     if (sub != null) {
