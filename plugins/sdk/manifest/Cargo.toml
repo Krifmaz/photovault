@@ -1,0 +1,14 @@
+[package]
+name = "photovault-plugin-manifest"
+description = "Photovault plugin manifest, permission model and host/guest ABI types. Shared by the plugin SDK and the host runtime."
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+repository = "https://github.com/Krifmaz/photovault"
+rust-version = "1.90"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = { version = "0.9", default-features = false, features = ["parse", "serde", "display"] }
+thiserror = "2"

@@ -13,6 +13,15 @@
 - [Observability](observability.md)
 - [Admin CLI](admin-cli.md)
 
+# Plugins
+
+- [Overview](plugins/overview.md)
+  - [Writing a plugin](plugins/writing.md)
+  - [The manifest](plugins/manifest.md)
+  - [Permissions and sandbox](plugins/security.md)
+  - [Host/guest ABI](plugins/abi.md)
+  - [Running plugins in an app](plugins/host-integration.md)
+
 # Internals
 
 - [Architecture](architecture.md)

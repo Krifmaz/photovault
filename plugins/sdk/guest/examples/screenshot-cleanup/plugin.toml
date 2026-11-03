@@ -1,0 +1,56 @@
+[plugin]
+id = "dev.photovault.screenshot-cleanup"
+name = "Screenshot cleanup"
+version = "0.1.0"
+description = "Finds old screenshots and collects them in an album or moves them to the trash. Favourites are left alone."
+authors = ["Photovault contributors"]
+license = "AGPL-3.0-only"
+homepage = "https://github.com/Krifmaz/photovault/tree/main/plugins/sdk/guest/examples/screenshot-cleanup"
+api_version = 1
+
+[permissions]
+read = ["metadata"]
+write = ["albums", "trash"]
+
+[hooks]
+schedule = { every_minutes = 1440 }
+on_demand = [{ id = "scan", label = "Clean up screenshots now", confirm = true }]
+
+[limits]
+memory_mb = 32
+timeout_ms = 120000
+
+[[settings]]
+key = "action"
+label = "What to do with screenshots"
+type = "select"
+default = "album"
+options = [
+    { value = "album", label = "Collect them in an album" },
+    { value = "trash", label = "Move them to the trash" },
+]
+help = "Trashed files can be restored from the trash, as usual."
+
+[[settings]]
+key = "album_name"
+label = "Album name"
+type = "text"
+default = "Screenshots"
+max_length = 100
+help = "Used when collecting into an album. Created if it does not exist."
+
+[[settings]]
+key = "min_age_days"
+label = "Only screenshots older than"
+type = "number"
+default = 30
+min = 0
+max = 3650
+integer = true
+unit = "days"
+
+[[settings]]
+key = "skip_favorites"
+label = "Never touch favourites"
+type = "toggle"
+default = true

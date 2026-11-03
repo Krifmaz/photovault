@@ -13,6 +13,8 @@ thumbnail, file name, face or location.
 ## Status
 
 Section 1 (Rust server compatible with the stock Ente apps) is in progress.
+The section 5 plugin SDK, host runtime and example plugins are in `plugins/sdk/`;
+wiring them into the app forks follows once the forks exist.
 
 ## Quick start
 
@@ -35,7 +37,7 @@ for HTTPS, reverse proxies and the Proxmox/Portainer setup, and
 | `node/` | Rust compute node (optional, later) |
 | `importers/` | Immich and iCloud import tools (later) |
 | `mobile/`, `web/`, `desktop/` | Light forks of Ente's apps (later) |
-| `plugins/sdk/` | Plugin SDK and examples (later) |
+| `plugins/sdk/` | WebAssembly plugin SDK, host runtime and example plugins |
 | `deploy/` | Docker Compose files (SQLite or PostgreSQL) and example config |
 | `docs/` | mdBook documentation (`mdbook build docs`) |
 | `scripts/` | Maintenance scripts, including the upstream merge |

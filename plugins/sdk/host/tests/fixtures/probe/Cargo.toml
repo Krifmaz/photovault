@@ -1,0 +1,24 @@
+[package]
+name = "photovault-probe-plugin"
+description = "Test fixture for photovault-plugin-host: a plugin that pokes at every host feature and limit."
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+publish = false
+
+# Built separately for wasm32-unknown-unknown by the host's integration tests;
+# not part of the root workspace.
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+extism-pdk = "1.4"
+serde_json = "1"
+
+[profile.release]
+opt-level = "s"
+debug = false
+panic = "abort"

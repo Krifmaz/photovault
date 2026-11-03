@@ -1,6 +1,7 @@
 [workspace]
 resolver = "3"
-members = ["server"]
+members = ["server", "plugins/sdk/manifest", "plugins/sdk/host", "plugins/sdk/cli"]
+exclude = ["plugins/sdk/guest", "plugins/sdk/host/tests/fixtures/probe"]
 
 [workspace.package]
 version = "0.1.0"
@@ -15,3 +16,18 @@ lto = "fat"
 codegen-units = 1
 strip = true
 panic = "abort"
+
+# The plugin host compiles Wasm with Cranelift at run time; an unoptimised
+# compiler makes debug builds and tests very slow, so optimise just it.
+[profile.dev.package.cranelift-codegen]
+opt-level = 3
+[profile.dev.package.regalloc2]
+opt-level = 3
+[profile.dev.package.wasmtime-internal-cranelift]
+opt-level = 3
+[profile.dev.package.wasmparser]
+opt-level = 3
+[profile.dev.package.cranelift-frontend]
+opt-level = 3
+[profile.dev.package.cranelift-assembler-x64]
+opt-level = 3
