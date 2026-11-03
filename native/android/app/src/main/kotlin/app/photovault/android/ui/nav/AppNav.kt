@@ -84,7 +84,6 @@ fun AppNav(graph: AppGraph, start: Any) {
                             onChangeServer = {
                                 if (!nav.popBackStack<ConnectRoute>(inclusive = false)) nav.navigateClearing(ConnectRoute)
                             },
-                            onRecovery = { nav.navigate(RecoveryRoute) },
                         )
                     }
                     composable<EmailCodeRoute> { entry ->

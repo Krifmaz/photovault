@@ -7,12 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import app.photovault.android.ui.nav.AppNav
 import app.photovault.android.ui.nav.startDestination
 import app.photovault.android.ui.theme.PhotovaultTheme
 import app.photovault.android.ui.theme.palette
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /** The single activity: Compose all the way down, navigation in [AppNav]. */
 class MainActivity : ComponentActivity() {
@@ -23,8 +26,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             PhotovaultTheme {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.palette.bg, contentColor = MaterialTheme.palette.text) {
-                    val start = remember { startDestination(graph) }
-                    AppNav(graph, start)
+                    // Opening core (native library + local index) happens off the main thread; until it is
+                    // ready the window shows the plain background (normally a few frames at most).
+                    val start by produceState<Any?>(null, graph) {
+                        value = withContext(Dispatchers.IO) { startDestination(graph) }
+                    }
+                    start?.let { AppNav(graph, it) }
                 }
             }
         }

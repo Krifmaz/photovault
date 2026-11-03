@@ -181,14 +181,19 @@ class FakeCore(
         delay(latencyMs)
         if (code.trim() != DEMO_CODE) throw CoreError.IncorrectCode()
         val server = synchronized(lock) { active } ?: throw CoreError.NotLoggedIn()
-        return if ("+totp" in email.lowercase()) LoginStep.TwoFactorTotp("fake-totp-session")
-        else LoginStep.Done(signIn(email.trim().lowercase(), server))
+        return when {
+            "+totp" in email.lowercase() -> LoginStep.TwoFactorTotp(if (password.isEmpty()) "fake-totp-recovery" else "fake-totp-session")
+            // like core: a code verified without a password ("Use recovery key") asks for the recovery key
+            password.isEmpty() -> LoginStep.NeedsRecoveryKey
+            else -> LoginStep.Done(signIn(email.trim().lowercase(), server))
+        }
     }
 
     override suspend fun verifyTotp(sessionId: String, code: String, password: String): LoginStep {
         delay(latencyMs)
         if (code.trim() != DEMO_CODE) throw CoreError.IncorrectCode()
         val server = synchronized(lock) { active } ?: throw CoreError.NotLoggedIn()
+        if (password.isEmpty()) return LoginStep.NeedsRecoveryKey
         return LoginStep.Done(signIn("demo@photovault.app", server))
     }
 

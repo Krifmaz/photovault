@@ -14,6 +14,12 @@ val pvVersionCode: Int = providers.gradleProperty("photovault.versionCode").orEl
 val uniffiDir: File = rootProject.file("core/build/generated/uniffi")
 val hasRealCore: Boolean = uniffiDir.isDirectory && uniffiDir.walkTopDown().any { it.isFile && it.extension == "kt" }
 logger.lifecycle("Photovault Native: building with ${if (hasRealCore) "photovault-core (UniFFI)" else "FakeCore (no core bindings found)"}")
+// CI sets this when the `core` job ran, so a missing artifact fails the build instead of shipping the demo.
+if (!hasRealCore && providers.gradleProperty("photovault.requireRealCore").orNull == "true") {
+    throw GradleException("photovault.requireRealCore is set but $uniffiDir has no UniFFI bindings")
+}
+// -Pphotovault.demo=true: use the in-memory demo library even when the real core is built in.
+val forceDemo: Boolean = providers.gradleProperty("photovault.demo").orNull == "true"
 
 // Release signing from the environment (set by .github/workflows/android-native.yml). Without a keystore the
 // release build is signed with the debug key so local builds still work.
@@ -32,6 +38,7 @@ android {
         versionName = pvVersionName
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"${defaultServer.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("boolean", "REAL_CORE", hasRealCore.toString())
+        buildConfigField("boolean", "DEMO", forceDemo.toString())
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
         }

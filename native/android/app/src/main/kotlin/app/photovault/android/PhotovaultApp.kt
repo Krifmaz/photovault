@@ -16,7 +16,16 @@ import java.io.File
 
 /** The app's few long-lived objects, created on first use. */
 class AppGraph(private val context: Context) {
+    /**
+     * photovault-core. Opening it loads the native library and decrypts the local index, so it is warmed up
+     * on a background thread at process start ([warmUp]); the UI reads it only from background dispatchers
+     * (MainActivity resolves the start screen on Dispatchers.IO).
+     */
     val core: CoreRepository by lazy { CoreProvider.create(context) }
+
+    fun warmUp() {
+        Thread({ core }, "photovault-core-init").apply { priority = Thread.NORM_PRIORITY }.start()
+    }
     val discovery: LanDiscovery by lazy { NsdLanDiscovery(context) }
     val timeline: TimelineStore by lazy { TimelineStore(core) }
 
@@ -33,10 +42,11 @@ class PhotovaultApp : Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
-        graph = AppGraph(this)
+        graph = AppGraph(this).also { it.warmUp() }
     }
 
-    override fun newImageLoader(context: PlatformContext): ImageLoader = buildImageLoader(this, graph.core)
+    // The fetcher reads graph.core lazily on its IO dispatcher, so building the loader never opens core.
+    override fun newImageLoader(context: PlatformContext): ImageLoader = buildImageLoader(this) { graph.core }
 }
 
 val Context.appGraph: AppGraph get() = (applicationContext as PhotovaultApp).graph

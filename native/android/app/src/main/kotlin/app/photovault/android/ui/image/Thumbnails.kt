@@ -30,11 +30,11 @@ data class Thumb(val fileId: Long)
 class ThumbnailFetcher(
     private val data: Thumb,
     private val options: Options,
-    private val core: CoreRepository,
+    private val core: () -> CoreRepository,
     private val io: CoroutineDispatcher,
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
-        val bytes = withContext(io) { core.thumbnail(data.fileId) }
+        val bytes = withContext(io) { core().thumbnail(data.fileId) }
         val buffer = Buffer().write(bytes)
         return SourceFetchResult(
             source = ImageSource(buffer, options.fileSystem),
@@ -43,7 +43,7 @@ class ThumbnailFetcher(
         )
     }
 
-    class Factory(private val core: CoreRepository, private val io: CoroutineDispatcher = Dispatchers.IO) : Fetcher.Factory<Thumb> {
+    class Factory(private val core: () -> CoreRepository, private val io: CoroutineDispatcher = Dispatchers.IO) : Fetcher.Factory<Thumb> {
         override fun create(data: Thumb, options: Options, imageLoader: ImageLoader): Fetcher =
             ThumbnailFetcher(data, options, core, io)
     }
@@ -55,7 +55,7 @@ class ThumbKeyer : Keyer<Thumb> {
 }
 
 /** The app's single ImageLoader: thumbnails from core, full-size files from the viewer cache. */
-fun buildImageLoader(context: Context, core: CoreRepository): ImageLoader =
+fun buildImageLoader(context: Context, core: () -> CoreRepository): ImageLoader =
     ImageLoader.Builder(context)
         .components {
             add(ThumbnailFetcher.Factory(core))

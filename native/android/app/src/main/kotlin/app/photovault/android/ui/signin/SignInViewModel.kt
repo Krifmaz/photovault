@@ -97,6 +97,24 @@ class SignInViewModel(
         }
     }
 
+    /**
+     * "Use recovery key": core unlocks with a recovery key only after the server has authorized the account,
+     * so this verifies the email first (the forgot-password flow of the stock apps). The code is checked
+     * without a password, which makes core answer NeedsRecoveryKey (after TOTP if the account has it) and
+     * opens the recovery screen.
+     */
+    fun startRecovery() {
+        val e = _state.value.email.trim()
+        if (e.isEmpty()) return problem(SignInProblem.MissingFields)
+        password = ""
+        _state.update { it.copy(email = e) }
+        launchBusy {
+            core.sendEmailOtt(e)
+            _state.update { it.copy(codeSent = true) }
+            events.send(SignInEvent.EmailCode)
+        }
+    }
+
     fun verifyEmailCode(code: String) {
         if (code.isBlank()) return problem(SignInProblem.MissingFields)
         runStep { core.verifyEmailOtt(_state.value.email, code.trim(), password) }
@@ -126,7 +144,8 @@ class SignInViewModel(
         when (val next = step()) {
             is LoginStep.Done -> finish()
             LoginStep.EmailOtt -> {
-                core.sendEmailOtt(_state.value.email)
+                // core's login has already sent the code (contracts/photovault-core.md); "Send a new code"
+                // on the code screen calls sendCode().
                 _state.update { it.copy(codeSent = true) }
                 events.send(SignInEvent.EmailCode)
             }

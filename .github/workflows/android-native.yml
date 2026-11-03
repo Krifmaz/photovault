@@ -118,7 +118,18 @@ jobs:
       - if: steps.has.outputs.app == 'true'
         name: Build and test
         working-directory: native/android
-        run: ./gradlew --no-daemon testReleaseUnitTest lintRelease assembleRelease
+        run: |
+          # With core in the repo the APK must carry the real photovault-core, never the demo library.
+          extra=()
+          if [ -f ../../core/Cargo.toml ]; then extra+=(-Pphotovault.requireRealCore=true); fi
+          ./gradlew --no-daemon "${extra[@]}" testReleaseUnitTest lintRelease assembleRelease
+          if [ -f ../../core/Cargo.toml ]; then
+            unzip -l app/build/outputs/apk/release/*.apk > "$RUNNER_TEMP/apk-files.txt"
+            for abi in arm64-v8a x86_64; do
+              grep -q "lib/$abi/libphotovault_core.so" "$RUNNER_TEMP/apk-files.txt" \
+                || { echo "::error::APK has no lib/$abi/libphotovault_core.so"; exit 1; }
+            done
+          fi
       - if: steps.has.outputs.app == 'true'
         uses: actions/upload-artifact@v7
         with:

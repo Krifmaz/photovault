@@ -99,6 +99,21 @@ class SignInViewModelTest {
     }
 
     @Test
+    fun useRecoveryKeyVerifiesEmailFirst() = runTest(main.dispatcher) {
+        val vm = vm()
+        vm.startRecovery()
+        assertEquals(SignInProblem.MissingFields, vm.state.value.problem)
+        vm.onEmailChange("me@example.com")
+        vm.startRecovery()
+        advanceUntilIdle()
+        assertEquals(SignInEvent.EmailCode, vm.eventFlow.first())
+        assertTrue(vm.state.value.codeSent)
+        vm.verifyEmailCode(FakeCore.DEMO_CODE)
+        advanceUntilIdle()
+        assertEquals(SignInEvent.RecoveryKey, vm.eventFlow.first())
+    }
+
+    @Test
     fun recoveryKeyChecksPasswords() = runTest(main.dispatcher) {
         val vm = vm()
         vm.recover("word ".repeat(24), "longenough", "different")

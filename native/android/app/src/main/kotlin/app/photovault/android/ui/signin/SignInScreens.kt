@@ -117,7 +117,7 @@ private fun problemText(problem: SignInProblem): String = when (problem) {
 }
 
 @Composable
-fun SignInScreen(vm: SignInViewModel, onChangeServer: () -> Unit, onRecovery: () -> Unit) {
+fun SignInScreen(vm: SignInViewModel, onChangeServer: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     var password by remember { mutableStateOf("") } // secrets stay out of saved state
     var showSignupNote by rememberSaveable { mutableStateOf(false) }
@@ -149,7 +149,7 @@ fun SignInScreen(vm: SignInViewModel, onChangeServer: () -> Unit, onRecovery: ()
             loading = state.busy,
             modifier = Modifier.fillMaxWidth(),
         )
-        LinkButton(stringResource(R.string.signin_use_recovery), onRecovery, Modifier.align(Alignment.CenterHorizontally))
+        LinkButton(stringResource(R.string.signin_use_recovery), vm::startRecovery, Modifier.align(Alignment.CenterHorizontally))
         LinkButton(stringResource(R.string.signin_create_account), { showSignupNote = true }, Modifier.align(Alignment.CenterHorizontally))
         if (showSignupNote) {
             Text(
