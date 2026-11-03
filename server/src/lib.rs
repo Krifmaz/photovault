@@ -13,6 +13,7 @@ pub mod crypto;
 pub mod db;
 pub mod entities;
 pub mod error;
+pub mod gojson;
 pub mod jwt;
 pub mod legacy;
 pub mod library;
@@ -65,6 +66,7 @@ pub fn app(state: AppState) -> Router {
         ])
         .max_age(std::time::Duration::from_secs(86400));
     routes::api(&state)
+        .layer(axum::middleware::from_fn(gojson::middleware))
         .layer(axum::middleware::from_fn_with_state(state.clone(), observe))
         .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
         .layer(SetRequestIdLayer::new(x_request_id, MakeRequestUuid))

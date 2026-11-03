@@ -4,7 +4,7 @@
 //! Each test sends requests shaped exactly like the app's (Dio `enteDio` headers,
 //! body field names, query parameters, body-less POSTs) and asserts only what the app
 //! reads back (field names, JSON types, null vs missing, status codes). Tests that
-//! currently fail are `#[ignore = "mobile-compat: …"]` so the suite stays green; run
+//! currently fail would be `#[ignore = "mobile-compat: …"]` so the suite stays green (none are now); run
 //! them with `cargo test --test mobile_compat -- --ignored`.
 
 use photovault_server::crypto::{b64, random_bytes, secretbox};
@@ -1459,7 +1459,6 @@ async fn public_link_management() {
 /// explicit `null` on Android. museum's Go `string`/`[]byte` fields decode `null` as
 /// the zero value; a serde `String` rejects it, so the app gets a 400.
 #[tokio::test]
-#[ignore = "mobile-compat: POST /push/token rejects \"apnsToken\": null (serde String) with 400; museum accepts null as \"\""]
 async fn push_token_with_nulls() {
     let srv = TestServer::start().await.unwrap();
     let app = user(&srv, "push@example.org").await;

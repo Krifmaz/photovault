@@ -31,7 +31,7 @@ Only one mismatch was found on SQLite and Postgres:
 
 | # | Call | Mismatch | Test |
 | --- | --- | --- | --- |
-| 1 | `POST /push/token` | The app always sends `"apnsToken": null` (and `"notificationKey": null`) on Android. museum's Go `string` field decodes `null` as `""`. Our `PushTokenRequest.apns_token: String` with `#[serde(default)]` rejects an explicit `null`, so the app gets **400 `{}`** and push registration silently fails. Fix: `Option<String>` (or `deserialize_with` that maps null → `""`). | `push_token_with_nulls` (ignored) |
+| 1 | `POST /push/token` | The app always sends `"apnsToken": null` (and `"notificationKey": null`) on Android. museum's Go `string` field decodes `null` as `""`. Our `PushTokenRequest.apns_token: String` with `#[serde(default)]` rejects an explicit `null`, so the app gets **400 `{}`** and push registration silently fails. Fix: `Option<String>` (or `deserialize_with` that maps null → `""`). | `push_token_with_nulls` — **fixed**: request bodies now decode with Go's null semantics (`server/src/gojson.rs`) |
 
 One route is missing, and it is missing in museum too. No test was added for it:
 
@@ -294,7 +294,7 @@ Types the app uses: `location`, `person`, `cgroup`, `smart_album`, `memory`,
 
 | Caller | Request | App reads | Our route | Status / test |
 | --- | --- | --- | --- | --- |
-| `PushGateway.registerToken` | `POST /push/token {fcmToken, platform, apnsToken: String \| null, notificationKey: String \| null}` | status | `push` | **mismatch**: 400 on `apnsToken: null`. `push_token_with_nulls` (ignored) |
+| `PushGateway.registerToken` | `POST /push/token {fcmToken, platform, apnsToken: String \| null, notificationKey: String \| null}` | status | `push` | matches (fixed; `push_token_with_nulls`) |
 | `getUserPlans` / `getSubscription` | `GET /billing/user-plans` → `plans[]`; `GET /billing/subscription` → `subscription` | | `billing` (stub) | matches: `flags_billing_and_bonus_views` |
 | `verifySubscription` | `POST /billing/verify-subscription {paymentProvider, productID, verificationData}` | `subscription`; 409 handled | same | matches (stub, existing) |
 | Stripe | `POST /billing/stripe/{cancel,activate}-subscription` (no body), `GET /billing/stripe/customer-portal?redirectURL` → `url` | | same (stub) | matches (stub; not used on self-hosted) |

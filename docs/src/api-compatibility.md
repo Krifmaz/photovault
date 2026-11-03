@@ -21,312 +21,312 @@ the JWT groups (payment, family, accounts) and the share-token groups
 
 | Method | Path | Auth | museum handler | Status |
 | --- | --- | --- | --- | --- |
-| GET | `/ping` | public | `(inline)` | planned |
-| GET | `/fire/db-m-ping` | public | `(inline)` | planned |
-| POST | `/events` | public | `eventHandler.Create` | planned |
-| POST | `/events/user` | private | `eventHandler.CreateForUser` | planned |
-| GET | `/files/upload-eligibility` | storage | `fileHandler.ValidateUploadEligibility` | planned |
-| GET | `/files/upload-urls` | storage | `fileHandler.GetUploadURLs` | planned |
-| GET | `/files/multipart-upload-urls` | storage | `fileHandler.GetMultipartUploadURLs` | planned |
-| POST | `/files/upload-url` | storage | `fileHandler.GetUploadURLV2` | planned |
-| POST | `/files/multipart-upload-url` | storage | `fileHandler.GetMultipartUploadURLV2` | planned |
-| GET | `/files/download/{fileID}` | storage | `fileHandler.Get` | planned |
-| GET | `/files/download/v2/{fileID}` | storage | `fileHandler.GetURL` | planned |
-| GET | `/files/download/v3/{fileID}` | storage | `fileHandler.GetURLV3` | planned |
-| GET | `/files/preview/{fileID}` | storage | `fileHandler.GetThumbnail` | planned |
-| GET | `/files/preview/v2/{fileID}` | storage | `fileHandler.GetThumbnailURL` | planned |
-| GET | `/files/thumbnail/v3/{fileID}` | storage | `fileHandler.GetThumbnailURLV3` | planned |
-| POST | `/files/share-url` | storage | `fileHandler.ShareUrl` | planned |
-| GET | `/files/share-url` | storage | `fileHandler.GetUrls` | planned |
-| PUT | `/files/share-url` | storage | `fileHandler.UpdateFileURL` | planned |
-| DELETE | `/files/share-url/{fileID}` | storage | `fileHandler.DisableUrl` | planned |
-| GET | `/files/share-urls/` | storage | `fileHandler.GetUrls` | planned |
-| PUT | `/files/data` | storage | `fileHandler.PutFileData` | planned |
-| PUT | `/files/video-data` | storage | `fileHandler.PutVideoData` | planned |
-| POST | `/files/data/status-diff` | storage | `fileHandler.FileDataStatusDiff` | planned |
-| POST | `/files/data/fetch` | storage | `fileHandler.GetFilesData` | planned |
-| GET | `/files/data/fetch` | storage | `fileHandler.GetFileData` | planned |
-| GET | `/files/data/preview-upload-url` | storage | `fileHandler.GetPreviewUploadURL` | planned |
-| POST | `/files/data/preview-upload-url` | storage | `fileHandler.GetPreviewUploadURLV2` | planned |
-| POST | `/files/data/multipart-preview-upload-url` | storage | `fileHandler.GetMultipartPreviewUploadURL` | planned |
-| GET | `/files/data/preview` | storage | `fileHandler.GetPreviewURL` | planned |
-| POST | `/files` | storage | `fileHandler.CreateOrUpdate` | planned |
-| POST | `/files/meta` | storage | `fileHandler.CreateMetaFile` | planned |
-| POST | `/files/copy` | storage | `fileHandler.CopyFiles` | planned |
-| PUT | `/files/update` | storage | `fileHandler.Update` | planned |
-| POST | `/files/trash` | storage | `fileHandler.Trash` | planned |
-| POST | `/files/size` | storage | `fileHandler.GetSize` | planned |
-| POST | `/files/info` | storage | `fileHandler.GetInfo` | planned |
-| GET | `/files/duplicates` | storage | `fileHandler.GetDuplicates` | planned |
-| PUT | `/files/thumbnail` | storage | `fileHandler.UpdateThumbnail` | planned |
-| PUT | `/files/magic-metadata` | storage | `fileHandler.UpdateMagicMetadata` | planned |
-| PUT | `/files/public-magic-metadata` | storage | `fileHandler.UpdatePublicMagicMetadata` | planned |
-| GET | `/files/count` | public | `fileHandler.GetTotalFileCount` | planned |
-| POST | `/paste/create` | public | `pasteHandler.Create` | planned |
-| POST | `/paste/guard` | public | `pasteHandler.Guard` | planned |
-| POST | `/paste/consume` | public | `pasteHandler.Consume` | planned |
-| GET | `/trash/v2/diff` | storage | `trashHandler.GetDiffV2` | planned |
-| POST | `/trash/delete` | storage | `trashHandler.Delete` | planned |
-| POST | `/trash/empty` | storage | `trashHandler.Empty` | planned |
-| GET | `/comments/diff` | storage | `commentsHandler.Diff` | planned |
-| POST | `/comments` | storage | `commentsHandler.Create` | planned |
-| PUT | `/comments/{commentID}` | storage | `commentsHandler.Update` | planned |
-| DELETE | `/comments/{commentID}` | storage | `commentsHandler.Delete` | planned |
-| GET | `/reactions/diff` | storage | `reactionsHandler.Diff` | planned |
-| PUT | `/reactions` | storage | `reactionsHandler.Upsert` | planned |
-| DELETE | `/reactions/{reactionID}` | storage | `reactionsHandler.Delete` | planned |
-| GET | `/social/diff` | storage | `socialHandler.UnifiedDiff` | planned |
-| GET | `/social/anon-profiles` | storage | `socialHandler.AnonProfiles` | planned |
-| GET | `/comments-reactions/updated-at` | storage | `socialHandler.LatestUpdates` | planned |
-| POST | `/users/ott` | public | `userHandler.SendOTT` | planned |
-| POST | `/users/verify-email` | public | `userHandler.VerifyEmail` | planned |
-| POST | `/users/two-factor/verify` | public | `userHandler.VerifyTwoFactor` | planned |
-| GET | `/users/two-factor/recover` | public | `userHandler.RecoverTwoFactor` | planned |
-| POST | `/users/two-factor/remove` | public | `userHandler.RemoveTwoFactor` | planned |
-| POST | `/users/two-factor/passkeys/begin` | public | `userHandler.BeginPasskeyAuthenticationCeremony` | planned |
-| POST | `/users/two-factor/passkeys/finish` | public | `userHandler.FinishPasskeyAuthenticationCeremony` | planned |
-| GET | `/users/two-factor/passkeys/get-token` | public | `userHandler.GetTokenForPasskeySession` | planned |
-| GET | `/users/two-factor/recovery-status` | private | `userHandler.GetTwoFactorRecoveryStatus` | planned |
-| POST | `/users/two-factor/passkeys/configure-recovery` | private | `userHandler.ConfigurePasskeyRecovery` | planned |
-| GET | `/users/two-factor/status` | private | `userHandler.GetTwoFactorStatus` | planned |
-| POST | `/users/two-factor/setup` | private | `userHandler.SetupTwoFactor` | planned |
-| POST | `/users/two-factor/enable` | private | `userHandler.EnableTwoFactor` | planned |
-| POST | `/users/two-factor/disable` | private | `userHandler.DisableTwoFactor` | planned |
-| PUT | `/users/attributes` | private | `userHandler.SetAttributes` | planned |
-| PUT | `/users/email-mfa` | private | `userHandler.UpdateEmailMFA` | planned |
-| POST | `/users/srp/setup` | private | `userHandler.SetupSRP` | planned |
-| POST | `/users/srp/complete` | private | `userHandler.CompleteSRPSetup` | planned |
-| POST | `/users/srp/update` | private | `userHandler.UpdateSrpAndKeyAttributes` | planned |
-| GET | `/users/srp/attributes` | public | `userHandler.GetSRPAttributes` | planned |
-| POST | `/users/srp/verify-session` | public | `userHandler.VerifySRPSession` | planned |
-| POST | `/users/srp/create-session` | public | `userHandler.CreateSRPSession` | planned |
-| PUT | `/users/recovery-key` | private | `userHandler.SetRecoveryKey` | planned |
-| GET | `/users/public-key` | private | `userHandler.GetPublicKey` | planned |
-| POST | `/users/public-keys` | private | `userHandler.GetPublicKeys` | planned |
-| GET | `/users/session-validity/v2` | private | `userHandler.GetSessionValidityV2` | planned |
-| POST | `/users/event` | private | `userHandler.ReportEvent` | planned |
-| POST | `/users/logout` | private | `userHandler.Logout` | planned |
-| GET | `/users/payment-token` | private | `userHandler.GetPaymentToken` | planned |
-| GET | `/users/families-token` | private | `userHandler.GetFamiliesToken` | planned |
-| GET | `/users/accounts-token` | private | `userHandler.GetAccountsToken` | planned |
-| GET | `/users/details/v2` | private | `userHandler.GetDetailsV2` | planned |
-| GET | `/users/deletion-summary` | private | `userHandler.GetAccountDeletionSummary` | planned |
-| GET | `/users/locker-usage` | storage | `userHandler.GetLockerUsage` | planned |
-| POST | `/users/change-email` | private | `userHandler.ChangeEmail` | planned |
-| GET | `/users/sessions` | private | `userHandler.GetActiveSessions` | planned |
-| DELETE | `/users/session` | private | `userHandler.TerminateSession` | planned |
-| GET | `/users/delete-challenge` | private | `userHandler.GetDeleteChallenge` | planned |
-| DELETE | `/users/delete` | private | `userHandler.DeleteUser` | planned |
-| GET | `/users/recover-account` | public | `userHandler.SelfAccountRecovery` | planned |
-| POST | `/users/recover-account/validate` | public | `userHandler.ValidateSelfAccountRecovery` | planned |
-| POST | `/users/recover-account` | public | `userHandler.RecoverSelfAccount` | planned |
-| GET | `/passkeys` | accounts JWT | `passkeysHandler.GetPasskeys` | planned |
-| PATCH | `/passkeys/{passkeyID}` | accounts JWT | `passkeysHandler.RenamePasskey` | planned |
-| DELETE | `/passkeys/{passkeyID}` | accounts JWT | `passkeysHandler.DeletePasskey` | planned |
-| POST | `/passkeys/registration/begin` | accounts JWT | `passkeysHandler.BeginRegistration` | planned |
-| POST | `/passkeys/registration/finish` | accounts JWT | `passkeysHandler.FinishRegistration` | planned |
-| POST | `/collections` | storage | `collectionHandler.Create` | planned |
-| GET | `/collection-actions/pending-remove` | storage | `collectionActionsHandler.ListPendingRemove` | planned |
-| GET | `/collection-actions/delete-suggestions` | storage | `collectionActionsHandler.ListDeleteSuggestions` | planned |
-| POST | `/collection-actions/reject-delete-suggestions` | storage | `collectionActionsHandler.RejectDeleteSuggestions` | planned |
-| GET | `/collections/{collectionID}` | storage | `collectionHandler.GetCollectionByID` | planned |
-| GET | `/collections` | storage | `collectionHandler.Get` | planned |
-| GET | `/collections/v2` | storage | `collectionHandler.GetV2` | planned |
-| GET | `/collections/v3` | storage | `collectionHandler.GetWithLimit` | planned |
-| POST | `/collections/share` | storage | `collectionHandler.Share` | planned |
-| POST | `/collections/share/batch` | storage | `collectionHandler.BatchShare` | planned |
-| POST | `/collections/share/bulk` | storage | `collectionHandler.BulkShare` | planned |
-| POST | `/collections/join-link` | storage | `collectionHandler.JoinLink` | planned |
-| POST | `/collections/share-url` | storage | `collectionHandler.ShareURL` | planned |
-| PUT | `/collections/share-url` | storage | `collectionHandler.UpdateShareURL` | planned |
-| DELETE | `/collections/share-url/{collectionID}` | storage | `collectionHandler.UnShareURL` | planned |
-| POST | `/collections/unshare` | storage | `collectionHandler.UnShare` | planned |
-| POST | `/collections/unshare/bulk` | storage | `collectionHandler.BulkUnShare` | planned |
-| POST | `/collections/leave/{collectionID}` | storage | `collectionHandler.Leave` | planned |
-| POST | `/collections/add-files` | storage | `collectionHandler.AddFiles` | planned |
-| POST | `/collections/move-files` | storage | `collectionHandler.MoveFiles` | planned |
-| POST | `/collections/restore-files` | storage | `collectionHandler.RestoreFiles` | planned |
-| POST | `/collections/v3/remove-files` | storage | `collectionHandler.RemoveFilesV3` | planned |
-| POST | `/collections/suggest-delete` | storage | `collectionHandler.SuggestDeleteInSharedCollection` | planned |
-| GET | `/collections/v2/diff` | storage | `collectionHandler.GetDiffV2` | planned |
-| GET | `/collections/file` | storage | `collectionHandler.GetFile` | planned |
-| GET | `/collections/sharees` | storage | `collectionHandler.GetSharees` | planned |
-| DELETE | `/collections/v3/{collectionID}` | storage | `collectionHandler.TrashV3` | planned |
-| POST | `/collections/rename` | storage | `collectionHandler.Rename` | planned |
-| PUT | `/collections/magic-metadata` | storage | `collectionHandler.PrivateMagicMetadataUpdate` | planned |
-| PUT | `/collections/public-magic-metadata` | storage | `collectionHandler.PublicMagicMetadataUpdate` | planned |
-| PUT | `/collections/sharee-magic-metadata` | storage | `collectionHandler.ShareeMagicMetadataUpdate` | planned |
-| GET | `/file-link/info` | file-link token | `fileHandler.LinkInfo` | planned |
-| GET | `/file-link/pass-info` | file-link token | `fileHandler.PasswordInfo` | planned |
-| GET | `/file-link/thumbnail` | file-link token | `fileHandler.LinkThumbnail` | planned |
-| GET | `/file-link/thumbnail/v3` | file-link token | `fileHandler.LinkThumbnailURLV3` | planned |
-| GET | `/file-link/file` | file-link token | `fileHandler.LinkFile` | planned |
-| GET | `/file-link/file/v3` | file-link token | `fileHandler.LinkFileURLV3` | planned |
-| POST | `/file-link/verify-password` | file-link token | `fileHandler.VerifyPassword` | planned |
-| GET | `/public-collection/files/preview/{fileID}` | public-collection token | `publicCollectionHandler.GetThumbnail` | planned |
-| GET | `/public-collection/files/thumbnail/v3/{fileID}` | public-collection token | `publicCollectionHandler.GetThumbnailURLV3` | planned |
-| GET | `/public-collection/files/download/{fileID}` | public-collection token | `publicCollectionHandler.GetFile` | planned |
-| GET | `/public-collection/files/download/v3/{fileID}` | public-collection token | `publicCollectionHandler.GetFileURLV3` | planned |
-| GET | `/public-collection/files/data/fetch` | public-collection token | `publicCollectionHandler.GetFileData` | planned |
-| GET | `/public-collection/files/data/preview` | public-collection token | `publicCollectionHandler.GetPreviewURL` | planned |
-| GET | `/public-collection/diff` | public-collection token | `publicCollectionHandler.GetDiff` | planned |
-| GET | `/public-collection/info` | public-collection token | `publicCollectionHandler.GetCollection` | planned |
-| POST | `/public-collection/upload-url` | public-collection token | `publicCollectionHandler.GetUploadURLV2` | planned |
-| POST | `/public-collection/multipart-upload-url` | public-collection token | `publicCollectionHandler.GetMultipartUploadURLV2` | planned |
-| POST | `/public-collection/file` | public-collection token | `publicCollectionHandler.CreateFile` | planned |
-| POST | `/public-collection/verify-password` | public-collection token | `publicCollectionHandler.VerifyPassword` | planned |
-| GET | `/public-collection/social/diff` | public-collection token | `publicSocialHandler.SocialDiff` | planned |
-| GET | `/public-collection/comments/diff` | public-collection token | `publicSocialHandler.CommentDiff` | planned |
-| POST | `/public-collection/comments` | public-collection token | `publicSocialHandler.CreateComment` | planned |
-| PUT | `/public-collection/comments/{commentID}` | public-collection token | `publicSocialHandler.UpdateComment` | planned |
-| DELETE | `/public-collection/comments/{commentID}` | public-collection token | `publicSocialHandler.DeleteComment` | planned |
-| GET | `/public-collection/reactions/diff` | public-collection token | `publicSocialHandler.ReactionDiff` | planned |
-| POST | `/public-collection/reactions` | public-collection token | `publicSocialHandler.CreateReaction` | planned |
-| DELETE | `/public-collection/reactions/{reactionID}` | public-collection token | `publicSocialHandler.DeleteReaction` | planned |
-| GET | `/public-collection/participants/masked-emails` | public-collection token | `publicSocialHandler.Participants` | planned |
-| GET | `/public-collection/anon-profiles` | public-collection token | `publicSocialHandler.AnonProfiles` | planned |
-| POST | `/public-collection/anon-identity` | public-collection token | `publicSocialHandler.CreateAnonIdentity` | planned |
-| POST | `/memory-share` | storage | `memoryShareHandler.Create` | planned |
-| GET | `/memory-share` | storage | `memoryShareHandler.List` | planned |
-| GET | `/memory-share/{shareID}` | storage | `memoryShareHandler.GetByID` | planned |
-| DELETE | `/memory-share/{shareID}` | storage | `memoryShareHandler.Delete` | planned |
-| GET | `/public-memory/info` | public-memory token | `publicMemoryShareHandler.GetInfo` | planned |
-| GET | `/public-memory/files` | public-memory token | `publicMemoryShareHandler.GetFiles` | planned |
-| GET | `/public-memory/files/preview/{fileID}` | public-memory token | `publicMemoryShareHandler.GetThumbnail` | planned |
-| GET | `/public-memory/files/thumbnail/v3/{fileID}` | public-memory token | `publicMemoryShareHandler.GetThumbnailURLV3` | planned |
-| GET | `/public-memory/files/download/{fileID}` | public-memory token | `publicMemoryShareHandler.GetFile` | planned |
-| GET | `/public-memory/files/download/v3/{fileID}` | public-memory token | `publicMemoryShareHandler.GetFileURLV3` | planned |
-| GET | `/public-memory/file-data` | public-memory token | `publicMemoryShareHandler.GetFileData` | planned |
-| GET | `/public-memory/files/data/preview` | public-memory token | `publicMemoryShareHandler.GetPreviewURL` | planned |
-| POST | `/cast/device-info` | public | `castHandler.RegisterDevice` | planned |
-| GET | `/cast/device-info` | storage | `castHandler.GetAllDevices` | planned |
-| DELETE | `/cast/device-info/{deviceID}` | storage | `castHandler.DeleteDevice` | planned |
-| POST | `/cast/device-info/` | public | `castHandler.RegisterDevice` | planned |
-| GET | `/cast/device-info/{deviceCode}` | storage | `castHandler.GetDeviceInfo` | planned |
-| GET | `/cast/cast-data/{deviceCode}` | public | `castHandler.GetCastData` | planned |
-| POST | `/cast/cast-data` | storage | `castHandler.InsertCastData` | planned |
-| POST | `/cast/cast-data/` | storage | `castHandler.InsertCastData` | planned |
-| DELETE | `/cast/revoke-all-tokens` | storage | `castHandler.RevokeAllToken` | planned |
-| DELETE | `/cast/revoke-all-tokens/` | storage | `castHandler.RevokeAllToken` | planned |
-| GET | `/cast/files/preview/{fileID}` | cast token | `castHandler.GetThumbnail` | planned |
-| GET | `/cast/files/thumbnail/v3/{fileID}` | cast token | `castHandler.GetThumbnailURLV3` | planned |
-| GET | `/cast/files/download/{fileID}` | cast token | `castHandler.GetFile` | planned |
-| GET | `/cast/files/download/v3/{fileID}` | cast token | `castHandler.GetFileURLV3` | planned |
-| GET | `/cast/diff` | cast token | `castHandler.GetDiff` | planned |
-| GET | `/cast/info` | cast token | `castHandler.GetCollection` | planned |
-| GET | `/family/invite-info/{token}` | public | `familyHandler.GetInviteInfo` | planned |
-| POST | `/family/accept-invite` | public | `familyHandler.AcceptInvite` | planned |
-| DELETE | `/family/leave` | private | `familyHandler.Leave` | planned |
-| POST | `/family/create` | family JWT | `familyHandler.CreateFamily` | planned |
-| POST | `/family/add-member` | family JWT | `familyHandler.InviteMember` | planned |
-| GET | `/family/members` | family JWT | `familyHandler.FetchMembers` | planned |
-| DELETE | `/family/remove-member/{id}` | family JWT | `familyHandler.RemoveMember` | planned |
-| DELETE | `/family/revoke-invite/{id}` | family JWT | `familyHandler.RevokeInvite` | planned |
-| POST | `/family/modify-storage` | family JWT | `familyHandler.ModifyStorageLimit` | planned |
-| POST | `/emergency-contacts/add` | private | `emergencyHandler.AddContact` | planned |
-| GET | `/emergency-contacts/info` | private | `emergencyHandler.GetInfo` | planned |
-| POST | `/emergency-contacts/update` | private | `emergencyHandler.UpdateContact` | planned |
-| POST | `/emergency-contacts/update-recovery-notice` | private | `emergencyHandler.UpdateRecoveryNotice` | planned |
-| POST | `/emergency-contacts/start-recovery` | private | `emergencyHandler.StartRecovery` | planned |
-| POST | `/emergency-contacts/stop-recovery` | private | `emergencyHandler.StopRecovery` | planned |
-| POST | `/emergency-contacts/reject-recovery` | private | `emergencyHandler.RejectRecovery` | planned |
-| POST | `/emergency-contacts/approve-recovery` | private | `emergencyHandler.ApproveRecovery` | planned |
-| GET | `/emergency-contacts/recovery-info/{id}` | private | `emergencyHandler.GetRecoveryInfo` | planned |
-| POST | `/emergency-contacts/init-change-password` | private | `emergencyHandler.InitChangePassword` | planned |
-| POST | `/emergency-contacts/change-password` | private | `emergencyHandler.ChangePassword` | planned |
-| POST | `/legacy-kits` | private | `legacyKitHandler.Create` | planned |
-| GET | `/legacy-kits` | private | `legacyKitHandler.List` | planned |
-| GET | `/legacy-kits/{id}/download` | private | `legacyKitHandler.DownloadContent` | planned |
-| GET | `/legacy-kits/{id}/download-content` | private | `legacyKitHandler.DownloadContent` | planned |
-| GET | `/legacy-kits/{id}/recovery-session` | private | `legacyKitHandler.OwnerRecoverySession` | planned |
-| POST | `/legacy-kits/update-recovery-notice` | private | `legacyKitHandler.UpdateRecoveryNotice` | planned |
-| POST | `/legacy-kits/block-recovery` | private | `legacyKitHandler.BlockRecovery` | planned |
-| DELETE | `/legacy-kits/{id}` | private | `legacyKitHandler.Delete` | planned |
-| POST | `/legacy-kits/recovery/challenge` | public | `legacyKitHandler.CreateChallenge` | planned |
-| POST | `/legacy-kits/recovery/open` | public | `legacyKitHandler.OpenRecovery` | planned |
-| POST | `/legacy-kits/recovery/session` | public | `legacyKitHandler.Session` | planned |
-| POST | `/legacy-kits/recovery/info` | public | `legacyKitHandler.RecoveryInfo` | planned |
-| POST | `/legacy-kits/recovery/init-change-password` | public | `legacyKitHandler.InitChangePassword` | planned |
-| POST | `/legacy-kits/recovery/change-password` | public | `legacyKitHandler.ChangePassword` | planned |
-| GET | `/billing/plans/v2` | public | `billingHandler.GetPlansV2` | planned |
-| GET | `/billing/user-plans` | private | `billingHandler.GetUserPlans` | planned |
-| GET | `/billing/subscription` | private | `billingHandler.GetSubscription` | planned |
-| POST | `/billing/verify-subscription` | private | `billingHandler.VerifySubscription` | planned |
-| POST | `/billing/notify/android` | public | `billingHandler.AndroidNotificationHandler` | planned |
-| POST | `/billing/notify/ios` | public | `billingHandler.IOSNotificationHandler` | planned |
-| POST | `/billing/notify/stripe` | public | `billingHandler.StripeINNotificationHandler` | planned |
-| POST | `/billing/notify/stripe/us` | public | `billingHandler.StripeUSNotificationHandler` | planned |
-| GET | `/billing/stripe/customer-portal` | private | `billingHandler.GetStripeCustomerPortal` | planned |
-| POST | `/billing/stripe/cancel-subscription` | private | `billingHandler.StripeCancelSubscription` | planned |
-| POST | `/billing/stripe/activate-subscription` | private | `billingHandler.StripeActivateSubscription` | planned |
-| GET | `/billing/stripe-account-country` | payment JWT | `billingHandler.GetStripeAccountCountry` | planned |
-| GET | `/billing/stripe/checkout-session` | payment JWT | `billingHandler.GetCheckoutSession` | planned |
-| POST | `/billing/stripe/update-subscription` | payment JWT | `billingHandler.StripeUpdateSubscription` | planned |
-| GET | `/storage-bonus/details` | private | `storageBonusHandler.GetStorageBonusDetails` | planned |
-| POST | `/storage-bonus/change-code` | private | `storageBonusHandler.UpdateReferralCode` | planned |
-| GET | `/storage-bonus/referral-view` | private | `storageBonusHandler.GetReferralView` | planned |
-| POST | `/storage-bonus/referral-claim` | private | `storageBonusHandler.ClaimReferral` | planned |
-| POST | `/admin/mail` | admin | `adminHandler.SendMail` | planned |
-| POST | `/admin/mail/subscribe` | admin | `adminHandler.SubscribeMail` | planned |
-| POST | `/admin/mail/unsubscribe` | admin | `adminHandler.UnsubscribeMail` | planned |
-| GET | `/admin/listmonk/missing-subscribers/count` | admin | `adminHandler.GetListmonkMissingSubscribersCount` | planned |
-| GET | `/admin/users` | admin | `adminHandler.GetUsers` | planned |
-| GET | `/admin/user` | admin | `adminHandler.GetUser` | planned |
-| GET | `/admin/user/scheduled-deletions` | admin | `adminHandler.GetScheduledDeletions` | planned |
-| POST | `/admin/user/disable-2fa` | admin | `adminHandler.DisableTwoFactor` | planned |
-| POST | `/admin/user/update-referral` | admin | `adminHandler.UpdateReferral` | planned |
-| POST | `/admin/user/disable-passkeys` | admin | `adminHandler.RemovePasskeys` | planned |
-| POST | `/admin/user/update-email-mfa` | admin | `adminHandler.UpdateEmailMFA` | planned |
-| POST | `/admin/user/unblock-storage-warning-login` | admin | `adminHandler.UnblockStorageWarningLogin` | planned |
-| POST | `/admin/user/add-ott` | admin | `adminHandler.AddOtt` | planned |
-| POST | `/admin/user/terminate-session` | admin | `adminHandler.TerminateSession` | planned |
-| POST | `/admin/user/close-family` | admin | `adminHandler.CloseFamily` | planned |
-| PUT | `/admin/user/change-email` | admin | `adminHandler.ChangeEmail` | planned |
-| DELETE | `/admin/user/delete` | admin | `adminHandler.DeleteUser` | planned |
-| POST | `/admin/user/recover` | admin | `adminHandler.RecoverAccount` | planned |
-| POST | `/admin/user/update-flag` | admin | `adminHandler.UpdateFeatureFlag` | planned |
-| GET | `/admin/email-hash` | admin | `adminHandler.GetEmailHash` | planned |
-| POST | `/admin/emails-from-hashes` | admin | `adminHandler.GetEmailsFromHashes` | planned |
-| PUT | `/admin/user/subscription` | admin | `adminHandler.UpdateSubscription` | planned |
-| POST | `/admin/queue/re-queue` | admin | `adminHandler.ReQueueItem` | planned |
-| POST | `/admin/collection/repair-deleted-share` | admin | `adminHandler.RepairDeletedCollectionShare` | planned |
-| POST | `/admin/user/init-file-counts` | admin | `adminHandler.InitializeFileCounts` | planned |
-| POST | `/admin/user/bonus` | admin | `adminHandler.UpdateBonus` | planned |
-| POST | `/user-entity/key` | storage | `userEntityHandler.CreateKey` | planned |
-| POST | `/user-entity/key/ensure` | storage | `userEntityHandler.EnsureKey` | planned |
-| GET | `/user-entity/key` | storage | `userEntityHandler.GetKey` | planned |
-| POST | `/user-entity/entity` | storage | `userEntityHandler.CreateEntity` | planned |
-| PUT | `/user-entity/entity` | storage | `userEntityHandler.UpdateEntity` | planned |
-| DELETE | `/user-entity/entity` | storage | `userEntityHandler.DeleteEntity` | planned |
-| GET | `/user-entity/entity/diff` | storage | `userEntityHandler.GetDiff` | planned |
-| POST | `/contacts` | storage | `contactHandler.Create` | planned |
-| GET | `/contacts/{id}` | storage | `contactHandler.Get` | planned |
-| GET | `/contacts/diff` | storage | `contactHandler.GetDiff` | planned |
-| PUT | `/contacts/{id}` | storage | `contactHandler.Update` | planned |
-| DELETE | `/contacts/{id}` | storage | `contactHandler.Delete` | planned |
-| POST | `/attachments/{type}/upload-url` | storage | `contactHandler.GetAttachmentUploadURL` | planned |
-| GET | `/attachments/{type}/{attachmentID}` | storage | `contactHandler.GetAttachment` | planned |
-| PUT | `/contacts/{id}/attachments/{type}` | storage | `contactHandler.AttachContactAttachment` | planned |
-| GET | `/contacts/{id}/attachments/{type}` | storage | `contactHandler.GetCurrentContactAttachment` | planned |
-| DELETE | `/contacts/{id}/attachments/{type}` | storage | `contactHandler.DeleteContactAttachment` | planned |
-| POST | `/contacts/{id}/profile-picture/upload-url` | storage | `contactHandler.GetProfilePictureUploadURL` | planned |
-| PUT | `/contacts/{id}/profile-picture` | storage | `contactHandler.AttachProfilePicture` | planned |
-| GET | `/contacts/{id}/profile-picture` | storage | `contactHandler.GetProfilePicture` | planned |
-| DELETE | `/contacts/{id}/profile-picture` | storage | `contactHandler.DeleteProfilePicture` | planned |
-| POST | `/authenticator/key` | private | `authenticatorHandler.CreateKey` | planned |
-| GET | `/authenticator/key` | private | `authenticatorHandler.GetKey` | planned |
-| POST | `/authenticator/entity` | private | `authenticatorHandler.CreateEntity` | planned |
-| PUT | `/authenticator/entity` | private | `authenticatorHandler.UpdateEntity` | planned |
-| DELETE | `/authenticator/entity` | private | `authenticatorHandler.DeleteEntity` | planned |
-| GET | `/authenticator/entity/diff` | private | `authenticatorHandler.GetDiff` | planned |
-| POST | `/remote-store/update` | private | `remoteStoreHandler.InsertOrUpdate` | planned |
-| DELETE | `/remote-store/{key}` | private | `remoteStoreHandler.RemoveKey` | planned |
-| GET | `/remote-store` | private | `remoteStoreHandler.GetKey` | planned |
-| GET | `/remote-store/feature-flags` | private | `remoteStoreHandler.GetFeatureFlags` | planned |
-| GET | `/custom-domain` | public | `remoteStoreHandler.CheckDomain` | planned |
-| POST | `/push/token` | private | `pushHandler.AddToken` | planned |
-| POST | `/discount/claim` | public | `discountCouponHandler.ClaimCoupon` | planned |
-| POST | `/admin/discount/add-coupons` | admin | `discountCouponHandler.AddCoupons` | planned |
+| GET | `/ping` | public | `(inline)` | done |
+| GET | `/fire/db-m-ping` | public | `(inline)` | done |
+| POST | `/events` | public | `eventHandler.Create` | done |
+| POST | `/events/user` | private | `eventHandler.CreateForUser` | done |
+| GET | `/files/upload-eligibility` | storage | `fileHandler.ValidateUploadEligibility` | done |
+| GET | `/files/upload-urls` | storage | `fileHandler.GetUploadURLs` | done |
+| GET | `/files/multipart-upload-urls` | storage | `fileHandler.GetMultipartUploadURLs` | done |
+| POST | `/files/upload-url` | storage | `fileHandler.GetUploadURLV2` | done |
+| POST | `/files/multipart-upload-url` | storage | `fileHandler.GetMultipartUploadURLV2` | done |
+| GET | `/files/download/{fileID}` | storage | `fileHandler.Get` | done |
+| GET | `/files/download/v2/{fileID}` | storage | `fileHandler.GetURL` | done |
+| GET | `/files/download/v3/{fileID}` | storage | `fileHandler.GetURLV3` | done |
+| GET | `/files/preview/{fileID}` | storage | `fileHandler.GetThumbnail` | done |
+| GET | `/files/preview/v2/{fileID}` | storage | `fileHandler.GetThumbnailURL` | done |
+| GET | `/files/thumbnail/v3/{fileID}` | storage | `fileHandler.GetThumbnailURLV3` | done |
+| POST | `/files/share-url` | storage | `fileHandler.ShareUrl` | done |
+| GET | `/files/share-url` | storage | `fileHandler.GetUrls` | done |
+| PUT | `/files/share-url` | storage | `fileHandler.UpdateFileURL` | done |
+| DELETE | `/files/share-url/{fileID}` | storage | `fileHandler.DisableUrl` | done |
+| GET | `/files/share-urls/` | storage | `fileHandler.GetUrls` | done |
+| PUT | `/files/data` | storage | `fileHandler.PutFileData` | done |
+| PUT | `/files/video-data` | storage | `fileHandler.PutVideoData` | done |
+| POST | `/files/data/status-diff` | storage | `fileHandler.FileDataStatusDiff` | done |
+| POST | `/files/data/fetch` | storage | `fileHandler.GetFilesData` | done |
+| GET | `/files/data/fetch` | storage | `fileHandler.GetFileData` | done |
+| GET | `/files/data/preview-upload-url` | storage | `fileHandler.GetPreviewUploadURL` | done |
+| POST | `/files/data/preview-upload-url` | storage | `fileHandler.GetPreviewUploadURLV2` | done |
+| POST | `/files/data/multipart-preview-upload-url` | storage | `fileHandler.GetMultipartPreviewUploadURL` | done |
+| GET | `/files/data/preview` | storage | `fileHandler.GetPreviewURL` | done |
+| POST | `/files` | storage | `fileHandler.CreateOrUpdate` | done |
+| POST | `/files/meta` | storage | `fileHandler.CreateMetaFile` | done |
+| POST | `/files/copy` | storage | `fileHandler.CopyFiles` | done |
+| PUT | `/files/update` | storage | `fileHandler.Update` | done |
+| POST | `/files/trash` | storage | `fileHandler.Trash` | done |
+| POST | `/files/size` | storage | `fileHandler.GetSize` | done |
+| POST | `/files/info` | storage | `fileHandler.GetInfo` | done |
+| GET | `/files/duplicates` | storage | `fileHandler.GetDuplicates` | done |
+| PUT | `/files/thumbnail` | storage | `fileHandler.UpdateThumbnail` | done |
+| PUT | `/files/magic-metadata` | storage | `fileHandler.UpdateMagicMetadata` | done |
+| PUT | `/files/public-magic-metadata` | storage | `fileHandler.UpdatePublicMagicMetadata` | done |
+| GET | `/files/count` | public | `fileHandler.GetTotalFileCount` | done |
+| POST | `/paste/create` | public | `pasteHandler.Create` | done |
+| POST | `/paste/guard` | public | `pasteHandler.Guard` | done |
+| POST | `/paste/consume` | public | `pasteHandler.Consume` | done |
+| GET | `/trash/v2/diff` | storage | `trashHandler.GetDiffV2` | done |
+| POST | `/trash/delete` | storage | `trashHandler.Delete` | done |
+| POST | `/trash/empty` | storage | `trashHandler.Empty` | done |
+| GET | `/comments/diff` | storage | `commentsHandler.Diff` | done |
+| POST | `/comments` | storage | `commentsHandler.Create` | done |
+| PUT | `/comments/{commentID}` | storage | `commentsHandler.Update` | done |
+| DELETE | `/comments/{commentID}` | storage | `commentsHandler.Delete` | done |
+| GET | `/reactions/diff` | storage | `reactionsHandler.Diff` | done |
+| PUT | `/reactions` | storage | `reactionsHandler.Upsert` | done |
+| DELETE | `/reactions/{reactionID}` | storage | `reactionsHandler.Delete` | done |
+| GET | `/social/diff` | storage | `socialHandler.UnifiedDiff` | done |
+| GET | `/social/anon-profiles` | storage | `socialHandler.AnonProfiles` | done |
+| GET | `/comments-reactions/updated-at` | storage | `socialHandler.LatestUpdates` | done |
+| POST | `/users/ott` | public | `userHandler.SendOTT` | done |
+| POST | `/users/verify-email` | public | `userHandler.VerifyEmail` | done |
+| POST | `/users/two-factor/verify` | public | `userHandler.VerifyTwoFactor` | done |
+| GET | `/users/two-factor/recover` | public | `userHandler.RecoverTwoFactor` | done |
+| POST | `/users/two-factor/remove` | public | `userHandler.RemoveTwoFactor` | done |
+| POST | `/users/two-factor/passkeys/begin` | public | `userHandler.BeginPasskeyAuthenticationCeremony` | done |
+| POST | `/users/two-factor/passkeys/finish` | public | `userHandler.FinishPasskeyAuthenticationCeremony` | done |
+| GET | `/users/two-factor/passkeys/get-token` | public | `userHandler.GetTokenForPasskeySession` | done |
+| GET | `/users/two-factor/recovery-status` | private | `userHandler.GetTwoFactorRecoveryStatus` | done |
+| POST | `/users/two-factor/passkeys/configure-recovery` | private | `userHandler.ConfigurePasskeyRecovery` | done |
+| GET | `/users/two-factor/status` | private | `userHandler.GetTwoFactorStatus` | done |
+| POST | `/users/two-factor/setup` | private | `userHandler.SetupTwoFactor` | done |
+| POST | `/users/two-factor/enable` | private | `userHandler.EnableTwoFactor` | done |
+| POST | `/users/two-factor/disable` | private | `userHandler.DisableTwoFactor` | done |
+| PUT | `/users/attributes` | private | `userHandler.SetAttributes` | done |
+| PUT | `/users/email-mfa` | private | `userHandler.UpdateEmailMFA` | done |
+| POST | `/users/srp/setup` | private | `userHandler.SetupSRP` | done |
+| POST | `/users/srp/complete` | private | `userHandler.CompleteSRPSetup` | done |
+| POST | `/users/srp/update` | private | `userHandler.UpdateSrpAndKeyAttributes` | done |
+| GET | `/users/srp/attributes` | public | `userHandler.GetSRPAttributes` | done |
+| POST | `/users/srp/verify-session` | public | `userHandler.VerifySRPSession` | done |
+| POST | `/users/srp/create-session` | public | `userHandler.CreateSRPSession` | done |
+| PUT | `/users/recovery-key` | private | `userHandler.SetRecoveryKey` | done |
+| GET | `/users/public-key` | private | `userHandler.GetPublicKey` | done |
+| POST | `/users/public-keys` | private | `userHandler.GetPublicKeys` | done |
+| GET | `/users/session-validity/v2` | private | `userHandler.GetSessionValidityV2` | done |
+| POST | `/users/event` | private | `userHandler.ReportEvent` | done |
+| POST | `/users/logout` | private | `userHandler.Logout` | done |
+| GET | `/users/payment-token` | private | `userHandler.GetPaymentToken` | done |
+| GET | `/users/families-token` | private | `userHandler.GetFamiliesToken` | done |
+| GET | `/users/accounts-token` | private | `userHandler.GetAccountsToken` | done |
+| GET | `/users/details/v2` | private | `userHandler.GetDetailsV2` | done |
+| GET | `/users/deletion-summary` | private | `userHandler.GetAccountDeletionSummary` | done |
+| GET | `/users/locker-usage` | storage | `userHandler.GetLockerUsage` | done |
+| POST | `/users/change-email` | private | `userHandler.ChangeEmail` | done |
+| GET | `/users/sessions` | private | `userHandler.GetActiveSessions` | done |
+| DELETE | `/users/session` | private | `userHandler.TerminateSession` | done |
+| GET | `/users/delete-challenge` | private | `userHandler.GetDeleteChallenge` | done |
+| DELETE | `/users/delete` | private | `userHandler.DeleteUser` | done |
+| GET | `/users/recover-account` | public | `userHandler.SelfAccountRecovery` | done |
+| POST | `/users/recover-account/validate` | public | `userHandler.ValidateSelfAccountRecovery` | done |
+| POST | `/users/recover-account` | public | `userHandler.RecoverSelfAccount` | done |
+| GET | `/passkeys` | accounts JWT | `passkeysHandler.GetPasskeys` | done |
+| PATCH | `/passkeys/{passkeyID}` | accounts JWT | `passkeysHandler.RenamePasskey` | done |
+| DELETE | `/passkeys/{passkeyID}` | accounts JWT | `passkeysHandler.DeletePasskey` | done |
+| POST | `/passkeys/registration/begin` | accounts JWT | `passkeysHandler.BeginRegistration` | done |
+| POST | `/passkeys/registration/finish` | accounts JWT | `passkeysHandler.FinishRegistration` | done |
+| POST | `/collections` | storage | `collectionHandler.Create` | done |
+| GET | `/collection-actions/pending-remove` | storage | `collectionActionsHandler.ListPendingRemove` | done |
+| GET | `/collection-actions/delete-suggestions` | storage | `collectionActionsHandler.ListDeleteSuggestions` | done |
+| POST | `/collection-actions/reject-delete-suggestions` | storage | `collectionActionsHandler.RejectDeleteSuggestions` | done |
+| GET | `/collections/{collectionID}` | storage | `collectionHandler.GetCollectionByID` | done |
+| GET | `/collections` | storage | `collectionHandler.Get` | done |
+| GET | `/collections/v2` | storage | `collectionHandler.GetV2` | done |
+| GET | `/collections/v3` | storage | `collectionHandler.GetWithLimit` | done |
+| POST | `/collections/share` | storage | `collectionHandler.Share` | done |
+| POST | `/collections/share/batch` | storage | `collectionHandler.BatchShare` | done |
+| POST | `/collections/share/bulk` | storage | `collectionHandler.BulkShare` | done |
+| POST | `/collections/join-link` | storage | `collectionHandler.JoinLink` | done |
+| POST | `/collections/share-url` | storage | `collectionHandler.ShareURL` | done |
+| PUT | `/collections/share-url` | storage | `collectionHandler.UpdateShareURL` | done |
+| DELETE | `/collections/share-url/{collectionID}` | storage | `collectionHandler.UnShareURL` | done |
+| POST | `/collections/unshare` | storage | `collectionHandler.UnShare` | done |
+| POST | `/collections/unshare/bulk` | storage | `collectionHandler.BulkUnShare` | done |
+| POST | `/collections/leave/{collectionID}` | storage | `collectionHandler.Leave` | done |
+| POST | `/collections/add-files` | storage | `collectionHandler.AddFiles` | done |
+| POST | `/collections/move-files` | storage | `collectionHandler.MoveFiles` | done |
+| POST | `/collections/restore-files` | storage | `collectionHandler.RestoreFiles` | done |
+| POST | `/collections/v3/remove-files` | storage | `collectionHandler.RemoveFilesV3` | done |
+| POST | `/collections/suggest-delete` | storage | `collectionHandler.SuggestDeleteInSharedCollection` | done |
+| GET | `/collections/v2/diff` | storage | `collectionHandler.GetDiffV2` | done |
+| GET | `/collections/file` | storage | `collectionHandler.GetFile` | done |
+| GET | `/collections/sharees` | storage | `collectionHandler.GetSharees` | done |
+| DELETE | `/collections/v3/{collectionID}` | storage | `collectionHandler.TrashV3` | done |
+| POST | `/collections/rename` | storage | `collectionHandler.Rename` | done |
+| PUT | `/collections/magic-metadata` | storage | `collectionHandler.PrivateMagicMetadataUpdate` | done |
+| PUT | `/collections/public-magic-metadata` | storage | `collectionHandler.PublicMagicMetadataUpdate` | done |
+| PUT | `/collections/sharee-magic-metadata` | storage | `collectionHandler.ShareeMagicMetadataUpdate` | done |
+| GET | `/file-link/info` | file-link token | `fileHandler.LinkInfo` | done |
+| GET | `/file-link/pass-info` | file-link token | `fileHandler.PasswordInfo` | done |
+| GET | `/file-link/thumbnail` | file-link token | `fileHandler.LinkThumbnail` | done |
+| GET | `/file-link/thumbnail/v3` | file-link token | `fileHandler.LinkThumbnailURLV3` | done |
+| GET | `/file-link/file` | file-link token | `fileHandler.LinkFile` | done |
+| GET | `/file-link/file/v3` | file-link token | `fileHandler.LinkFileURLV3` | done |
+| POST | `/file-link/verify-password` | file-link token | `fileHandler.VerifyPassword` | done |
+| GET | `/public-collection/files/preview/{fileID}` | public-collection token | `publicCollectionHandler.GetThumbnail` | done |
+| GET | `/public-collection/files/thumbnail/v3/{fileID}` | public-collection token | `publicCollectionHandler.GetThumbnailURLV3` | done |
+| GET | `/public-collection/files/download/{fileID}` | public-collection token | `publicCollectionHandler.GetFile` | done |
+| GET | `/public-collection/files/download/v3/{fileID}` | public-collection token | `publicCollectionHandler.GetFileURLV3` | done |
+| GET | `/public-collection/files/data/fetch` | public-collection token | `publicCollectionHandler.GetFileData` | done |
+| GET | `/public-collection/files/data/preview` | public-collection token | `publicCollectionHandler.GetPreviewURL` | done |
+| GET | `/public-collection/diff` | public-collection token | `publicCollectionHandler.GetDiff` | done |
+| GET | `/public-collection/info` | public-collection token | `publicCollectionHandler.GetCollection` | done |
+| POST | `/public-collection/upload-url` | public-collection token | `publicCollectionHandler.GetUploadURLV2` | done |
+| POST | `/public-collection/multipart-upload-url` | public-collection token | `publicCollectionHandler.GetMultipartUploadURLV2` | done |
+| POST | `/public-collection/file` | public-collection token | `publicCollectionHandler.CreateFile` | done |
+| POST | `/public-collection/verify-password` | public-collection token | `publicCollectionHandler.VerifyPassword` | done |
+| GET | `/public-collection/social/diff` | public-collection token | `publicSocialHandler.SocialDiff` | done |
+| GET | `/public-collection/comments/diff` | public-collection token | `publicSocialHandler.CommentDiff` | done |
+| POST | `/public-collection/comments` | public-collection token | `publicSocialHandler.CreateComment` | done |
+| PUT | `/public-collection/comments/{commentID}` | public-collection token | `publicSocialHandler.UpdateComment` | done |
+| DELETE | `/public-collection/comments/{commentID}` | public-collection token | `publicSocialHandler.DeleteComment` | done |
+| GET | `/public-collection/reactions/diff` | public-collection token | `publicSocialHandler.ReactionDiff` | done |
+| POST | `/public-collection/reactions` | public-collection token | `publicSocialHandler.CreateReaction` | done |
+| DELETE | `/public-collection/reactions/{reactionID}` | public-collection token | `publicSocialHandler.DeleteReaction` | done |
+| GET | `/public-collection/participants/masked-emails` | public-collection token | `publicSocialHandler.Participants` | done |
+| GET | `/public-collection/anon-profiles` | public-collection token | `publicSocialHandler.AnonProfiles` | done |
+| POST | `/public-collection/anon-identity` | public-collection token | `publicSocialHandler.CreateAnonIdentity` | done |
+| POST | `/memory-share` | storage | `memoryShareHandler.Create` | done |
+| GET | `/memory-share` | storage | `memoryShareHandler.List` | done |
+| GET | `/memory-share/{shareID}` | storage | `memoryShareHandler.GetByID` | done |
+| DELETE | `/memory-share/{shareID}` | storage | `memoryShareHandler.Delete` | done |
+| GET | `/public-memory/info` | public-memory token | `publicMemoryShareHandler.GetInfo` | done |
+| GET | `/public-memory/files` | public-memory token | `publicMemoryShareHandler.GetFiles` | done |
+| GET | `/public-memory/files/preview/{fileID}` | public-memory token | `publicMemoryShareHandler.GetThumbnail` | done |
+| GET | `/public-memory/files/thumbnail/v3/{fileID}` | public-memory token | `publicMemoryShareHandler.GetThumbnailURLV3` | done |
+| GET | `/public-memory/files/download/{fileID}` | public-memory token | `publicMemoryShareHandler.GetFile` | done |
+| GET | `/public-memory/files/download/v3/{fileID}` | public-memory token | `publicMemoryShareHandler.GetFileURLV3` | done |
+| GET | `/public-memory/file-data` | public-memory token | `publicMemoryShareHandler.GetFileData` | done |
+| GET | `/public-memory/files/data/preview` | public-memory token | `publicMemoryShareHandler.GetPreviewURL` | done |
+| POST | `/cast/device-info` | public | `castHandler.RegisterDevice` | done |
+| GET | `/cast/device-info` | storage | `castHandler.GetAllDevices` | done |
+| DELETE | `/cast/device-info/{deviceID}` | storage | `castHandler.DeleteDevice` | done |
+| POST | `/cast/device-info/` | public | `castHandler.RegisterDevice` | done |
+| GET | `/cast/device-info/{deviceCode}` | storage | `castHandler.GetDeviceInfo` | done |
+| GET | `/cast/cast-data/{deviceCode}` | public | `castHandler.GetCastData` | done |
+| POST | `/cast/cast-data` | storage | `castHandler.InsertCastData` | done |
+| POST | `/cast/cast-data/` | storage | `castHandler.InsertCastData` | done |
+| DELETE | `/cast/revoke-all-tokens` | storage | `castHandler.RevokeAllToken` | done |
+| DELETE | `/cast/revoke-all-tokens/` | storage | `castHandler.RevokeAllToken` | done |
+| GET | `/cast/files/preview/{fileID}` | cast token | `castHandler.GetThumbnail` | done |
+| GET | `/cast/files/thumbnail/v3/{fileID}` | cast token | `castHandler.GetThumbnailURLV3` | done |
+| GET | `/cast/files/download/{fileID}` | cast token | `castHandler.GetFile` | done |
+| GET | `/cast/files/download/v3/{fileID}` | cast token | `castHandler.GetFileURLV3` | done |
+| GET | `/cast/diff` | cast token | `castHandler.GetDiff` | done |
+| GET | `/cast/info` | cast token | `castHandler.GetCollection` | done |
+| GET | `/family/invite-info/{token}` | public | `familyHandler.GetInviteInfo` | done |
+| POST | `/family/accept-invite` | public | `familyHandler.AcceptInvite` | done |
+| DELETE | `/family/leave` | private | `familyHandler.Leave` | done |
+| POST | `/family/create` | family JWT | `familyHandler.CreateFamily` | done |
+| POST | `/family/add-member` | family JWT | `familyHandler.InviteMember` | done |
+| GET | `/family/members` | family JWT | `familyHandler.FetchMembers` | done |
+| DELETE | `/family/remove-member/{id}` | family JWT | `familyHandler.RemoveMember` | done |
+| DELETE | `/family/revoke-invite/{id}` | family JWT | `familyHandler.RevokeInvite` | done |
+| POST | `/family/modify-storage` | family JWT | `familyHandler.ModifyStorageLimit` | done |
+| POST | `/emergency-contacts/add` | private | `emergencyHandler.AddContact` | done |
+| GET | `/emergency-contacts/info` | private | `emergencyHandler.GetInfo` | done |
+| POST | `/emergency-contacts/update` | private | `emergencyHandler.UpdateContact` | done |
+| POST | `/emergency-contacts/update-recovery-notice` | private | `emergencyHandler.UpdateRecoveryNotice` | done |
+| POST | `/emergency-contacts/start-recovery` | private | `emergencyHandler.StartRecovery` | done |
+| POST | `/emergency-contacts/stop-recovery` | private | `emergencyHandler.StopRecovery` | done |
+| POST | `/emergency-contacts/reject-recovery` | private | `emergencyHandler.RejectRecovery` | done |
+| POST | `/emergency-contacts/approve-recovery` | private | `emergencyHandler.ApproveRecovery` | done |
+| GET | `/emergency-contacts/recovery-info/{id}` | private | `emergencyHandler.GetRecoveryInfo` | done |
+| POST | `/emergency-contacts/init-change-password` | private | `emergencyHandler.InitChangePassword` | done |
+| POST | `/emergency-contacts/change-password` | private | `emergencyHandler.ChangePassword` | done |
+| POST | `/legacy-kits` | private | `legacyKitHandler.Create` | done |
+| GET | `/legacy-kits` | private | `legacyKitHandler.List` | done |
+| GET | `/legacy-kits/{id}/download` | private | `legacyKitHandler.DownloadContent` | done |
+| GET | `/legacy-kits/{id}/download-content` | private | `legacyKitHandler.DownloadContent` | done |
+| GET | `/legacy-kits/{id}/recovery-session` | private | `legacyKitHandler.OwnerRecoverySession` | done |
+| POST | `/legacy-kits/update-recovery-notice` | private | `legacyKitHandler.UpdateRecoveryNotice` | done |
+| POST | `/legacy-kits/block-recovery` | private | `legacyKitHandler.BlockRecovery` | done |
+| DELETE | `/legacy-kits/{id}` | private | `legacyKitHandler.Delete` | done |
+| POST | `/legacy-kits/recovery/challenge` | public | `legacyKitHandler.CreateChallenge` | done |
+| POST | `/legacy-kits/recovery/open` | public | `legacyKitHandler.OpenRecovery` | done |
+| POST | `/legacy-kits/recovery/session` | public | `legacyKitHandler.Session` | done |
+| POST | `/legacy-kits/recovery/info` | public | `legacyKitHandler.RecoveryInfo` | done |
+| POST | `/legacy-kits/recovery/init-change-password` | public | `legacyKitHandler.InitChangePassword` | done |
+| POST | `/legacy-kits/recovery/change-password` | public | `legacyKitHandler.ChangePassword` | done |
+| GET | `/billing/plans/v2` | public | `billingHandler.GetPlansV2` | done |
+| GET | `/billing/user-plans` | private | `billingHandler.GetUserPlans` | done |
+| GET | `/billing/subscription` | private | `billingHandler.GetSubscription` | done |
+| POST | `/billing/verify-subscription` | private | `billingHandler.VerifySubscription` | done |
+| POST | `/billing/notify/android` | public | `billingHandler.AndroidNotificationHandler` | stub |
+| POST | `/billing/notify/ios` | public | `billingHandler.IOSNotificationHandler` | stub |
+| POST | `/billing/notify/stripe` | public | `billingHandler.StripeINNotificationHandler` | stub |
+| POST | `/billing/notify/stripe/us` | public | `billingHandler.StripeUSNotificationHandler` | stub |
+| GET | `/billing/stripe/customer-portal` | private | `billingHandler.GetStripeCustomerPortal` | stub |
+| POST | `/billing/stripe/cancel-subscription` | private | `billingHandler.StripeCancelSubscription` | stub |
+| POST | `/billing/stripe/activate-subscription` | private | `billingHandler.StripeActivateSubscription` | stub |
+| GET | `/billing/stripe-account-country` | payment JWT | `billingHandler.GetStripeAccountCountry` | stub |
+| GET | `/billing/stripe/checkout-session` | payment JWT | `billingHandler.GetCheckoutSession` | stub |
+| POST | `/billing/stripe/update-subscription` | payment JWT | `billingHandler.StripeUpdateSubscription` | stub |
+| GET | `/storage-bonus/details` | private | `storageBonusHandler.GetStorageBonusDetails` | done |
+| POST | `/storage-bonus/change-code` | private | `storageBonusHandler.UpdateReferralCode` | done |
+| GET | `/storage-bonus/referral-view` | private | `storageBonusHandler.GetReferralView` | done |
+| POST | `/storage-bonus/referral-claim` | private | `storageBonusHandler.ClaimReferral` | done |
+| POST | `/admin/mail` | admin | `adminHandler.SendMail` | stub |
+| POST | `/admin/mail/subscribe` | admin | `adminHandler.SubscribeMail` | stub |
+| POST | `/admin/mail/unsubscribe` | admin | `adminHandler.UnsubscribeMail` | stub |
+| GET | `/admin/listmonk/missing-subscribers/count` | admin | `adminHandler.GetListmonkMissingSubscribersCount` | stub |
+| GET | `/admin/users` | admin | `adminHandler.GetUsers` | done |
+| GET | `/admin/user` | admin | `adminHandler.GetUser` | done |
+| GET | `/admin/user/scheduled-deletions` | admin | `adminHandler.GetScheduledDeletions` | done |
+| POST | `/admin/user/disable-2fa` | admin | `adminHandler.DisableTwoFactor` | done |
+| POST | `/admin/user/update-referral` | admin | `adminHandler.UpdateReferral` | done |
+| POST | `/admin/user/disable-passkeys` | admin | `adminHandler.RemovePasskeys` | done |
+| POST | `/admin/user/update-email-mfa` | admin | `adminHandler.UpdateEmailMFA` | done |
+| POST | `/admin/user/unblock-storage-warning-login` | admin | `adminHandler.UnblockStorageWarningLogin` | done |
+| POST | `/admin/user/add-ott` | admin | `adminHandler.AddOtt` | done |
+| POST | `/admin/user/terminate-session` | admin | `adminHandler.TerminateSession` | done |
+| POST | `/admin/user/close-family` | admin | `adminHandler.CloseFamily` | done |
+| PUT | `/admin/user/change-email` | admin | `adminHandler.ChangeEmail` | done |
+| DELETE | `/admin/user/delete` | admin | `adminHandler.DeleteUser` | done |
+| POST | `/admin/user/recover` | admin | `adminHandler.RecoverAccount` | done |
+| POST | `/admin/user/update-flag` | admin | `adminHandler.UpdateFeatureFlag` | done |
+| GET | `/admin/email-hash` | admin | `adminHandler.GetEmailHash` | done |
+| POST | `/admin/emails-from-hashes` | admin | `adminHandler.GetEmailsFromHashes` | done |
+| PUT | `/admin/user/subscription` | admin | `adminHandler.UpdateSubscription` | done |
+| POST | `/admin/queue/re-queue` | admin | `adminHandler.ReQueueItem` | stub |
+| POST | `/admin/collection/repair-deleted-share` | admin | `adminHandler.RepairDeletedCollectionShare` | stub |
+| POST | `/admin/user/init-file-counts` | admin | `adminHandler.InitializeFileCounts` | stub |
+| POST | `/admin/user/bonus` | admin | `adminHandler.UpdateBonus` | done |
+| POST | `/user-entity/key` | storage | `userEntityHandler.CreateKey` | done |
+| POST | `/user-entity/key/ensure` | storage | `userEntityHandler.EnsureKey` | done |
+| GET | `/user-entity/key` | storage | `userEntityHandler.GetKey` | done |
+| POST | `/user-entity/entity` | storage | `userEntityHandler.CreateEntity` | done |
+| PUT | `/user-entity/entity` | storage | `userEntityHandler.UpdateEntity` | done |
+| DELETE | `/user-entity/entity` | storage | `userEntityHandler.DeleteEntity` | done |
+| GET | `/user-entity/entity/diff` | storage | `userEntityHandler.GetDiff` | done |
+| POST | `/contacts` | storage | `contactHandler.Create` | done |
+| GET | `/contacts/{id}` | storage | `contactHandler.Get` | done |
+| GET | `/contacts/diff` | storage | `contactHandler.GetDiff` | done |
+| PUT | `/contacts/{id}` | storage | `contactHandler.Update` | done |
+| DELETE | `/contacts/{id}` | storage | `contactHandler.Delete` | done |
+| POST | `/attachments/{type}/upload-url` | storage | `contactHandler.GetAttachmentUploadURL` | done |
+| GET | `/attachments/{type}/{attachmentID}` | storage | `contactHandler.GetAttachment` | done |
+| PUT | `/contacts/{id}/attachments/{type}` | storage | `contactHandler.AttachContactAttachment` | done |
+| GET | `/contacts/{id}/attachments/{type}` | storage | `contactHandler.GetCurrentContactAttachment` | done |
+| DELETE | `/contacts/{id}/attachments/{type}` | storage | `contactHandler.DeleteContactAttachment` | done |
+| POST | `/contacts/{id}/profile-picture/upload-url` | storage | `contactHandler.GetProfilePictureUploadURL` | done |
+| PUT | `/contacts/{id}/profile-picture` | storage | `contactHandler.AttachProfilePicture` | done |
+| GET | `/contacts/{id}/profile-picture` | storage | `contactHandler.GetProfilePicture` | done |
+| DELETE | `/contacts/{id}/profile-picture` | storage | `contactHandler.DeleteProfilePicture` | done |
+| POST | `/authenticator/key` | private | `authenticatorHandler.CreateKey` | done |
+| GET | `/authenticator/key` | private | `authenticatorHandler.GetKey` | done |
+| POST | `/authenticator/entity` | private | `authenticatorHandler.CreateEntity` | done |
+| PUT | `/authenticator/entity` | private | `authenticatorHandler.UpdateEntity` | done |
+| DELETE | `/authenticator/entity` | private | `authenticatorHandler.DeleteEntity` | done |
+| GET | `/authenticator/entity/diff` | private | `authenticatorHandler.GetDiff` | done |
+| POST | `/remote-store/update` | private | `remoteStoreHandler.InsertOrUpdate` | done |
+| DELETE | `/remote-store/{key}` | private | `remoteStoreHandler.RemoveKey` | done |
+| GET | `/remote-store` | private | `remoteStoreHandler.GetKey` | done |
+| GET | `/remote-store/feature-flags` | private | `remoteStoreHandler.GetFeatureFlags` | done |
+| GET | `/custom-domain` | public | `remoteStoreHandler.CheckDomain` | done |
+| POST | `/push/token` | private | `pushHandler.AddToken` | done |
+| POST | `/discount/claim` | public | `discountCouponHandler.ClaimCoupon` | done |
+| POST | `/admin/discount/add-coupons` | admin | `discountCouponHandler.AddCoupons` | done |
 
 ## Photovault-only routes
 
