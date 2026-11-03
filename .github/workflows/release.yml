@@ -1,4 +1,5 @@
-# Tags and publishes a GitHub Release on every push to the default branch.
+# Tags and publishes a GitHub Release on every push to main (and only main:
+# integration branches never release, even when one is the default branch).
 #
 #   1. test     cargo test for the whole workspace
 #   2. version  next tag from .github/release/next-version.sh
@@ -14,6 +15,7 @@ name: Release
 
 on:
   push:
+    branches: [main]
     paths-ignore:
       - "**.md"
       - "docs/**"
@@ -40,7 +42,7 @@ env:
 
 jobs:
   test:
-    if: github.ref_name == github.event.repository.default_branch
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -49,7 +51,7 @@ jobs:
       - run: cargo test --locked --workspace --no-fail-fast
 
   version:
-    if: github.ref_name == github.event.repository.default_branch
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     outputs:
       tag: ${{ steps.next.outputs.tag }}
