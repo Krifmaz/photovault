@@ -589,7 +589,7 @@ class _MLDebugSettingsPageState extends State<MLDebugSettingsPage> {
       children: [
         if (wrappedService.isEnabled)
           MenuItemWidgetNew(
-            title: "Recompute Ente Rewind",
+            title: "Recompute Rewind", // PHOTOVAULT: was "Ente Rewind"
             leadingIconWidget: _buildIconWidget(
               context,
               HugeIcons.strokeRoundedReload,
@@ -914,7 +914,7 @@ class _MLDebugSettingsPageState extends State<MLDebugSettingsPage> {
       await wrappedService.forceRecompute();
       await localSettings.resetWrapped2025Complete();
       if (!context.mounted) return;
-      showShortToast(context, "Ente Rewind recomputed");
+      showShortToast(context, "Rewind recomputed"); // PHOTOVAULT
     } catch (e, s) {
       logger.severe('Wrapped recompute failed ', e, s);
       if (!context.mounted) return;

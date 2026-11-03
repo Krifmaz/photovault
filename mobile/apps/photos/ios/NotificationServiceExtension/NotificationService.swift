@@ -14,7 +14,7 @@ final class NotificationService: UNNotificationServiceExtension {
       contentHandler(request.content)
       return
     }
-    content.title = "Ente"
+    content.title = "Photovault" // PHOTOVAULT: branding
     content.subtitle = ""
     content.body = "New activity"
     lock.lock()

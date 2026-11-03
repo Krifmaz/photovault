@@ -76,10 +76,12 @@ class RemoteFlags {
     betaUser: kDebugMode,
     enableMobMultiPart: false,
     serverApiFlag: 0,
-    castUrl: "https://cast.ente.com",
+    // PHOTOVAULT: no Ente-hosted fallbacks; the server's feature flags supply
+    // these (Photos falls back to <endpoint>/cast for the cast URL).
+    castUrl: "",
     customDomain: "",
-    embedUrl: "https://embed.ente.com",
-    customDomainCNAME: "my.ente.com",
+    embedUrl: "",
+    customDomainCNAME: "",
   );
 
   String toJson() => json.encode(toMap());

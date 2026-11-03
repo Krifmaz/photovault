@@ -93,6 +93,4 @@ class _SharingProgressSheetState extends State<_SharingProgressSheet> {
       Navigator.of(context).pop(true);
     }
   }
-
-
 }

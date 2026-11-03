@@ -1,4 +1,3 @@
-
 bool isChristmasDateRange() {
   final now = DateTime.now();
   return now.month == 12 && now.day >= 24 && now.day <= 26;

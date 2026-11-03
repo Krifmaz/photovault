@@ -31,7 +31,6 @@ class LoadingPhotosWidget extends StatefulWidget {
 }
 
 class _LoadingPhotosWidgetState extends State<LoadingPhotosWidget> {
-
   late StreamSubscription<SyncStatusUpdate> _firstImportEvent;
   StreamSubscription<LocalImportProgressEvent>? _importProgressEvent;
   int _currentPage = 0;

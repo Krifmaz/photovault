@@ -10,7 +10,6 @@ import "package:photos/events/video_preview_state_changed_event.dart";
 import "package:photos/models/preview/preview_item_status.dart";
 import "package:photos/services/video_preview_service.dart";
 
-
 class VideoStreamingSettingsPage extends StatefulWidget {
   const VideoStreamingSettingsPage({super.key});
 

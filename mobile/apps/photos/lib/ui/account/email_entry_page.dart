@@ -323,8 +323,6 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
   }
 
   bool _isFormValid() {
-    return _emailIsValid &&
-        _passwordsMatch &&
-        _passwordIsValid;
+    return _emailIsValid && _passwordsMatch && _passwordIsValid;
   }
 }

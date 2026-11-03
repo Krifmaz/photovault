@@ -691,10 +691,7 @@ Future<void> _sync(String caller) async {
   }
 }
 
-Future runWithLogs(
-  Function() function, {
-  String prefix = "",
-}) async {
+Future runWithLogs(Function() function, {String prefix = ""}) async {
   // PHOTOVAULT: telemetry removed (no Sentry DSN, tunnel or init timeout).
   await SuperLogging.main(
     LogConfig(

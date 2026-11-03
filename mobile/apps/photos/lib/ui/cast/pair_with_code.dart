@@ -74,7 +74,13 @@ class _PairWithCodeSheetState extends State<_PairWithCodeSheet> {
     return BottomSheetComponent(
       title: l10n.castAlbum,
       content: Text(
-        l10n.castInstruction(castUrl: flagService.castUrl),
+        // PHOTOVAULT: the cast web app lives at <server>/cast when the server
+        // does not announce its own castUrl.
+        l10n.castInstruction(
+          castUrl: flagService.castUrl.isNotEmpty
+              ? flagService.castUrl
+              : "${endpointConfig.endpoint}/cast",
+        ),
         style: textStyles.smallMuted,
       ),
       isKeyboardAware: true,

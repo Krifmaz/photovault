@@ -193,11 +193,7 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
   // ("onboarding.riv"), in the same height-limited box.
   Widget _buildOnboardingAnimation() {
     final size = MediaQuery.of(context).size.height * 0.325;
-    return PhotovaultGlyph(
-      width: size,
-      height: size,
-      color: encoreDarkAccent2,
-    );
+    return PhotovaultGlyph(width: size, height: size, color: encoreDarkAccent2);
   }
 
   Widget _buildDebugLanguageButton() {

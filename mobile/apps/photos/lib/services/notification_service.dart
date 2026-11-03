@@ -328,7 +328,7 @@ class NotificationService {
     final androidSpecs = AndroidNotificationDetails(
       channelID,
       channelName,
-      channelDescription: 'ente alerts',
+      channelDescription: 'Photovault alerts', // PHOTOVAULT: was 'ente alerts'
       importance: Importance.max,
       priority: Priority.high,
       icon: 'notification_icon',
@@ -398,7 +398,8 @@ class NotificationService {
       final androidSpecs = AndroidNotificationDetails(
         channelID,
         channelName,
-        channelDescription: 'ente alerts',
+        channelDescription:
+            'Photovault alerts', // PHOTOVAULT: was 'ente alerts'
         importance: Importance.max,
         priority: Priority.high,
         category: AndroidNotificationCategory.reminder,

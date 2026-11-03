@@ -446,38 +446,38 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
                 ),
               ),
             Positioned(
-                top:
-                    mediaQuery.padding.top +
-                    illustration.topOffset * illustrationScale +
-                    (compactIllustrationScale > 0
-                        ? (visibleHeaderHeight - widget.headerHeight) *
-                              illustrationScale *
-                              0.18
-                        : 0),
-                left: 0,
-                right: 0,
-                height: illustration.height,
-                child: IgnorePointer(
-                  child: Visibility(
-                    visible: illustrationScale > 0,
-                    maintainState: true,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Transform.translate(
-                        offset: Offset(
-                          illustration.centerOffset * illustrationScale,
-                          0,
-                        ),
-                        child: Transform.scale(
-                          scale: illustrationScale,
-                          alignment: Alignment.topCenter,
-                          child: _illustrationWidget,
-                        ),
+              top:
+                  mediaQuery.padding.top +
+                  illustration.topOffset * illustrationScale +
+                  (compactIllustrationScale > 0
+                      ? (visibleHeaderHeight - widget.headerHeight) *
+                            illustrationScale *
+                            0.18
+                      : 0),
+              left: 0,
+              right: 0,
+              height: illustration.height,
+              child: IgnorePointer(
+                child: Visibility(
+                  visible: illustrationScale > 0,
+                  maintainState: true,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Transform.translate(
+                      offset: Offset(
+                        illustration.centerOffset * illustrationScale,
+                        0,
+                      ),
+                      child: Transform.scale(
+                        scale: illustrationScale,
+                        alignment: Alignment.topCenter,
+                        child: _illustrationWidget,
                       ),
                     ),
                   ),
                 ),
               ),
+            ),
           ],
         );
       },
