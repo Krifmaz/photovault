@@ -429,7 +429,7 @@
   },
   "getStarted": "Alusta",
   "googlePlayId": "Google Play ID",
-  "hearUsWhereOptionalTitle": "Kust sa Entest kuulsid? (kui tahad lisada)",
+  "hearUsWhereOptionalTitle": "Kust sa Photovaultist kuulsid? (kui tahad lisada)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },

@@ -1434,7 +1434,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Uitloggen",
-  "logsDialogBody": "Dit zal logboeken verzenden om ons te helpen uw probleem op te lossen. Houd er rekening mee dat bestandsnamen zullen worden meegenomen om problemen met specifieke bestanden bij te houden.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2468,7 +2467,6 @@
   "sharedWith": "Gedeeld met",
   "shareKey": "Sleutel delen",
   "shareLink": "Link delen",
-  "shareMyVerificationID": "Dit is mijn verificatie-ID: {verificationID} voor ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -2476,14 +2474,13 @@
   },
   "shareNotSupportedForSharedFiles": "Delen wordt niet ondersteund voor gedeelde bestanden",
   "shareStorageWith5Members": "Opslagruimte delen met 5 deelnemers",
-  "shareTextConfirmOthersVerificationID": "Hey, kunt u bevestigen dat dit uw ente.com verificatie ID is: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Download Photovault zodat ik je kan toevoegen aan mijn familie abonnement\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Photovault zodat we gemakkelijk foto's en video's van originele kwaliteit kunnen delen\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault zodat ik je kan toevoegen aan mijn familie abonnement",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault zodat we gemakkelijk foto's en video's van originele kwaliteit kunnen delen",
   "shareThisLink": "Met deze link kan iedereen die hem ontvangt je item openen. Je kunt de toegang op elk moment intrekken door de link te verwijderen.",
   "shareWithNonenteUsers": "Delen met niet-Photovault gebruikers",
   "sharing": "Delen...",
@@ -2605,8 +2602,6 @@
   "subject": "Onderwerp",
   "submit": "Verzenden",
   "subscribe": "Abonneer",
-  "subscribeToChangeLinkSetting": "Je hebt een betaald abonnement nodig om deze koppelingsinstelling te wijzigen.",
-  "subscribeToEnableSharing": "Je hebt een actief betaald abonnement nodig om delen mogelijk te maken.",
   "subscription": "Abonnement",
   "subscriptionRequiredForSharing": "Je hebt een betaald abonnement nodig om links te delen",
   "subWillBeCancelledOn": "Uw abonnement loopt af op {endDate}",

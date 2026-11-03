@@ -912,7 +912,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Deconectare",
-  "logsDialogBody": "Aceasta va trimite jurnalele pentru a ne ajuta să depistăm problema. Vă rugăm să rețineți că numele fișierelor vor fi incluse pentru a ne ajuta să urmărim problemele cu anumite fișiere.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1505,7 +1504,6 @@
     "description": "Strong password strength label"
   },
   "subscribe": "Abonare",
-  "subscribeToEnableSharing": "Aveți nevoie de un abonament plătit activ pentru a activa distribuirea.",
   "subscription": "Abonament",
   "subscriptionRequiredForSharing": "Aveti nevoie de un abonament platit pentru a partaja link-uri",
   "subWillBeCancelledOn": "Abonamentul dvs. va fi anulat pe {endDate}",

@@ -1572,7 +1572,6 @@
   "loginWithAuthAccount": "Inicia sesión con tu cuenta de Auth",
   "logout": "Cerrar sesión",
   "logs": "Registros",
-  "logsDialogBody": "Esto enviará registros para ayudarnos a depurar su problema. Ten en cuenta que los nombres de los archivos se incluirán para ayudar a rastrear problemas con archivos específicos.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2798,8 +2797,6 @@
   },
   "submit": "Enviar",
   "subscribe": "Suscribirse",
-  "subscribeToChangeLinkSetting": "Necesitas una suscripción de pago para cambiar la configuración de este enlace.",
-  "subscribeToEnableSharing": "Necesitas una suscripción activa de pago para habilitar el compartir.",
   "subscription": "Suscripción",
   "subscriptionRequiredForSharing": "Necesitas una suscripcion de pago para compartir enlaces",
   "subWillBeCancelledOn": "Tu suscripción se cancelará el {endDate}",

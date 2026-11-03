@@ -144,7 +144,7 @@
   "addTo": "הוסף ל",
   "addToAlbum": "הוסף לאלבום",
   "addToCollection": "להוסיף לאוסף",
-  "addToEnte": "הוסף ל-ente",
+  "addToEnte": "הוסף ל-Photovault",
   "addToHiddenAlbum": "להוסיף לאלבום מוסתר",
   "addToPerson": "להוסיף לאדם",
   "@addToPerson": {
@@ -491,7 +491,7 @@
     }
   },
   "emailHint": "הכנס את כתובת הדוא״ל שלך",
-  "emailNoEnteAccountPhotos": "לא נמצא חשבון ente ל-{email}.\n\nשלח להם הזמנה על מנת לשתף תמונות.",
+  "emailNoEnteAccountPhotos": "לא נמצא חשבון Photovault ל-{email}.\n\nשלח להם הזמנה על מנת לשתף תמונות.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1196,7 +1196,7 @@
   "shareCodes": "שיתוף הקודים",
   "shareCodesDuration": "בחירת משך הזמן שבמהלכו ברצונך לשתף את הקודים.",
   "shareLink": "שתף קישור",
-  "shareWithNonenteUsers": "שתף עם משתמשים שהם לא של ente",
+  "shareWithNonenteUsers": "שתף עם משתמשים שהם לא של Photovault",
   "sharing": "משתף...",
   "shouldHideCode": "הסתר קודים",
   "showLargeIcons": "הצג סמלים גדולים",

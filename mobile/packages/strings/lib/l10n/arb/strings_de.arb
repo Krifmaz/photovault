@@ -742,7 +742,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Ich verstehe, dass dadurch meine Daten in Photovault, Ente Auth und Ente Locker gelöscht werden.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -2345,7 +2344,6 @@
   },
   "logout": "Ausloggen",
   "logs": "Protokolle",
-  "logsDialogBody": "Dies wird über Logs gesendet, um uns zu helfen, Ihr Problem zu beheben. Bitte beachten Sie, dass Dateinamen aufgenommen werden, um Probleme mit bestimmten Dateien zu beheben.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2760,7 +2758,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Sie haben ein einziges Konto für Photovault, Ente Auth und Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -3984,7 +3981,6 @@
     "description": "Subtitle for sending a viewing link to the current photo or video from the file viewer"
   },
   "shareMemory": "Erinnerung teilen",
-  "shareMyVerificationID": "Hier ist meine Verifizierungs-ID: {verificationID} für ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3992,15 +3988,14 @@
   },
   "shareNotSupportedForSharedFiles": "Freigabe wird für freigegebene Dateien nicht unterstützt",
   "shareStorageWith5Members": "Teile Speicher mit 5 Mitgliedern",
-  "shareTextConfirmOthersVerificationID": "Hey, kannst du bestätigen, dass dies deine ente.com Verifizierungs-ID ist: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Laden Sie Photovault herunter, damit wir problemlos Dateien in Originalqualität freigeben können https://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Lade Photovault herunter, damit ich dich zu meinem Familientarif hinzufügen kann\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Hol dir Photovault, damit wir ganz einfach Fotos und Videos in Originalqualität teilen können\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Laden Sie Photovault herunter, damit wir problemlos Dateien in Originalqualität freigeben können",
+  "shareTextRecommendUsingEnteForFamily": "Lade Photovault herunter, damit ich dich zu meinem Familientarif hinzufügen kann",
+  "shareTextRecommendUsingEnteForPhotos": "Hol dir Photovault, damit wir ganz einfach Fotos und Videos in Originalqualität teilen können",
   "shareTextReferralInvite": "Erhalte 20 GB kostenlos mit Photovault! Lade die App unter https://ente.com/invite herunter und nutze den Code {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -4209,8 +4204,6 @@
   "subject": "Betreff",
   "submit": "Abschicken",
   "subscribe": "Abonnieren",
-  "subscribeToChangeLinkSetting": "Du benötigst ein kostenpflichtiges Abonnement, um diese Link-Einstellung zu ändern.",
-  "subscribeToEnableSharing": "Du benötigst ein aktives, bezahltes Abonnement, um das Teilen zu aktivieren.",
   "subscription": "Abonnement",
   "subscriptionRequiredForSharing": "Du benötigst ein kostenpflichtiges Abonnement, um Links zu teilen",
   "subWillBeCancelledOn": "Dein Abo endet am {endDate}",
@@ -4888,6 +4881,5 @@
       }
     }
   },
-  "notEnoughStorageTitle": "Zu wenig Speicherplatz",
-  "notEnoughStorageBody": "Du hast nicht genug freien Speicherplatz auf Photovault, um neue Fotos hinzuzufügen. Gib Speicherplatz frei oder führe ein Upgrade durch, um weitere hinzuzufügen."
+  "notEnoughStorageTitle": "Zu wenig Speicherplatz"
 }

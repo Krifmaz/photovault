@@ -742,7 +742,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Jag förstår att det här raderar min data i Photovault, Ente Auth och Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -2515,7 +2514,6 @@
   },
   "logout": "Logga ut",
   "logs": "Loggar",
-  "logsDialogBody": "Detta skickar loggar som hjälper oss att felsöka problemet. Observera att filnamn inkluderas för att spåra problem med specifika filer.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2931,7 +2929,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Du har ett konto i Photovault, Ente Auth och Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -4175,7 +4172,6 @@
     "description": "Subtitle for sending a viewing link to the current photo or video from the file viewer"
   },
   "shareMemory": "Dela minne",
-  "shareMyVerificationID": "Här är mitt verifierings-ID: {verificationID} för ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -4183,15 +4179,14 @@
   },
   "shareNotSupportedForSharedFiles": "Det går inte att dela delade filer",
   "shareStorageWith5Members": "Dela lagring med 5 medlemmar",
-  "shareTextConfirmOthersVerificationID": "Hej, kan du bekräfta att detta är ditt verifierings-ID för ente.com: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Ladda ner Photovault så kan vi enkelt dela filer i originalkvalitet\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Ladda ner Photovault så att jag kan lägga till dig i mitt familjeabonnemang\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Ladda ner Photovault så kan vi enkelt dela foton och videor i originalkvalitet\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Ladda ner Photovault så kan vi enkelt dela filer i originalkvalitet",
+  "shareTextRecommendUsingEnteForFamily": "Ladda ner Photovault så att jag kan lägga till dig i mitt familjeabonnemang",
+  "shareTextRecommendUsingEnteForPhotos": "Ladda ner Photovault så kan vi enkelt dela foton och videor i originalkvalitet",
   "shareTextReferralInvite": "Få 20 GB gratis med Photovault! Ladda ner appen på https://ente.com/invite och använd koden {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -4400,8 +4395,6 @@
   "subject": "Ämne",
   "submit": "Skicka",
   "subscribe": "Prenumerera",
-  "subscribeToChangeLinkSetting": "Du behöver ett betalt abonnemang för att ändra länkinställningen.",
-  "subscribeToEnableSharing": "Du behöver ett aktivt betalt abonnemang för att aktivera delning.",
   "subscription": "Abonnemang",
   "subscriptionRequiredForSharing": "Du behöver ett betalt abonnemang för att dela länkar",
   "subWillBeCancelledOn": "Ditt abonnemang kommer att avslutas den {endDate}",
@@ -5214,6 +5207,5 @@
       }
     }
   },
-  "notEnoughStorageTitle": "Otillräckligt lagringsutrymme",
-  "notEnoughStorageBody": "Du har inte tillräckligt med ledigt utrymme i Photovault för att lägga till nya foton. Frigör utrymme eller uppgradera för att fortsätta lägga till."
+  "notEnoughStorageTitle": "Otillräckligt lagringsutrymme"
 }

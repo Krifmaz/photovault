@@ -769,7 +769,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Logg ut",
-  "logsDialogBody": "Dette vil sende over logger for å hjelpe oss med å feilsøke problemet. Vær oppmerksom på at filnavn vil bli inkludert for å hjelpe å spore problemer med spesifikke filer.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -870,7 +869,7 @@
     "description": "No internet connection error message"
   },
   "noPhotosFoundHere": "Ingen bilder funnet her",
-  "noRecoveryKeyNoDecryption": "Grunnet vår type ente-til-ende-krypteringsprotokoll kan ikke dine data dekrypteres uten passordet ditt eller gjenopprettingsnøkkelen din",
+  "noRecoveryKeyNoDecryption": "Grunnet vår type ende-til-ende-krypteringsprotokoll kan ikke dine data dekrypteres uten passordet ditt eller gjenopprettingsnøkkelen din",
   "@noRecoveryKeyNoDecryption": {
     "description": "Explanation that data cannot be decrypted without password or recovery key"
   },
@@ -1435,7 +1434,6 @@
     "description": "Strong password strength label"
   },
   "subscribe": "Abonner",
-  "subscribeToEnableSharing": "Du trenger et aktivt betalt abonnement for å aktivere deling.",
   "subscription": "Abonnement",
   "subWillBeCancelledOn": "Abonnementet ditt blir avsluttet den {endDate}",
   "@subWillBeCancelledOn": {

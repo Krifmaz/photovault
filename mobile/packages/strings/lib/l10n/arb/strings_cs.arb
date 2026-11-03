@@ -1623,7 +1623,6 @@
   "loginWithAuthAccount": "Přihlásit se pomocí účtu Auth",
   "logout": "Odhlásit se",
   "logs": "Protokoly",
-  "logsDialogBody": "Tímto se odešlou záznamy, které nám pomohou vyřešit Váš problém. Upozorňujeme, že budou zahrnuty názvy souborů, aby bylo možné sledovat problémy s konkrétními soubory.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2821,8 +2820,8 @@
   "shareLink": "Sdílet odkaz",
   "shareNotSupportedForSharedFiles": "Sdílení není u sdílených souborů podporováno",
   "shareStorageWith5Members": "Sdílejte úložiště s 5 členy",
-  "shareTextRecommendUsingEnteForFamily": "Stáhněte si Photovault, abych Vás mohl přidat do svého rodinného plánu\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Stáhněte si aplikaci Photovault, abychom mohli snadno sdílet fotografie a videa v originální kvalitě\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Stáhněte si Photovault, abych Vás mohl přidat do svého rodinného plánu",
+  "shareTextRecommendUsingEnteForPhotos": "Stáhněte si aplikaci Photovault, abychom mohli snadno sdílet fotografie a videa v originální kvalitě",
   "shareThisLink": "Tento odkaz umožňuje každému, kdo jej obdrží, přístup k vašemu obsahu. Přístup můžete kdykoli zrušit smazáním odkazu.",
   "shareWithNonenteUsers": "Sdílet s jinými uživateli",
   "shareYourSubscription": "Sdílejte své předplatné se svými blízkými",
@@ -2966,8 +2965,6 @@
   "subject": "Předmět",
   "submit": "Odeslat",
   "subscribe": "Odebírat",
-  "subscribeToChangeLinkSetting": "Pro změnu nastavení odkazu potřebujete placené předplatné.",
-  "subscribeToEnableSharing": "K povolení sdílení potřebujete aktivní placené předplatné.",
   "subscription": "Předplatné",
   "subscriptionRequiredForSharing": "Pro sdílení odkazu potřebujete placené předplatné",
   "subWillBeCancelledOn": "Vaše předplatné bude zrušeno dne {endDate}",

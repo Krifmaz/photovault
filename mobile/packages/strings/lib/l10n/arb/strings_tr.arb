@@ -1217,7 +1217,6 @@
   },
   "logout": "Çıkış yap",
   "logs": "Günlükler",
-  "logsDialogBody": "Bu, sorununuzu gidermemize yardımcı olmak için kayıtları gönderecektir. Belirli dosyalarla ilgili sorunların izlenmesine yardımcı olmak için dosya adlarının ekleneceğini lütfen unutmayın.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2166,8 +2165,6 @@
   "subject": "Konu",
   "submit": "Gönder",
   "subscribe": "Abone ol",
-  "subscribeToChangeLinkSetting": "Bu bağlantı ayarını değiştirmek için ücretli aboneliğinizin olması gerekli.",
-  "subscribeToEnableSharing": "Paylaşımı etkinleştirmek için aktif bir ücretli aboneliğe ihtiyacınız var.",
   "subscription": "Abonelik",
   "subscriptionRequiredForSharing": "Bağlantı paylaşmak için ücretli aboneliğe ihtiyacınız var",
   "subWillBeCancelledOn": "Aboneliğiniz {endDate} tarihinde iptal edilecektir",

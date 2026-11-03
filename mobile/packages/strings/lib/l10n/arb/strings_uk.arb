@@ -1526,7 +1526,6 @@
   },
   "logout": "Вийти",
   "logs": "Журнали",
-  "logsDialogBody": "Це призведе до надсилання журналів, які допоможуть нам усунути вашу проблему. Зверніть увагу, що назви файлів будуть включені, щоби допомогти відстежувати проблеми з конкретними файлами.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2565,7 +2564,7 @@
   "sharedWith": "Поділено з",
   "shareLink": "Поділитися посиланням",
   "shareStorageWith5Members": "Поділитися сховищем із 5 учасниками",
-  "shareTextRecommendUsingEnteForFamily": "Установи Photovault, щоб мені можна було додати тебе до сімейного тарифу\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Установи Photovault, щоб мені можна було додати тебе до сімейного тарифу",
   "shareThisLink": "Це посилання дозволяє будь-кому, хто його отримає, отримати доступ до вашого елемента. Ви можете скасувати доступ у будь-який час, видаливши посилання.",
   "shareWithNonenteUsers": "Поділитися з користувачами без Photovault",
   "shareYourSubscription": "Поділіться своєю підпискою з близькими",
@@ -2684,7 +2683,6 @@
   "subject": "Тема",
   "submit": "Підтвердити",
   "subscribe": "Передплачувати",
-  "subscribeToEnableSharing": "Вам потрібна активна передплата, щоб увімкнути спільне поширення.",
   "subscription": "Передплата",
   "subscriptionRequiredForSharing": "Для поширення посилань потрібна платна підписка",
   "subWillBeCancelledOn": "Вашу передплату буде скасовано {endDate}",

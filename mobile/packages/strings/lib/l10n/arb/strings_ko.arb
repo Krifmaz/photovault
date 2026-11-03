@@ -168,7 +168,7 @@
   "addTo": "다음으로 추가",
   "addToAlbum": "앨범에 추가",
   "addToCollection": "컬렉션에 추가",
-  "addToEnte": "Ente에 추가",
+  "addToEnte": "Photovault에 추가",
   "addToHiddenAlbum": "숨김 앨범에 추가",
   "addToPerson": "사람에 추가",
   "@addToPerson": {
@@ -232,7 +232,7 @@
   "allowJoining": "참여 허용",
   "allowJoiningAlbum": "앨범에 참여 허용",
   "allowJoiningDescription": "Photovault 계정이 있는 사용자는 귀하의 앨범에 참여하여 최신 소식을 확인할 수 있습니다",
-  "allowPermBody": "Ente가 라이브러리를 표시하고 백업할 수 있도록 설정에서 사진 접근을 허용해 주세요.",
+  "allowPermBody": "Photovault이 라이브러리를 표시하고 백업할 수 있도록 설정에서 사진 접근을 허용해 주세요.",
   "allowPermTitle": "사진에 대한 접근 허용",
   "allPersonGroupingWillReset": "이 사람에 대한 모든 grouping 이 초기화되며, 이 사람과 관련하여 제공된 모든 추천 항목도 사라집니다",
   "allTabEmptyHint": "아직 텅 비었습니다. + 눌러 코드를 추가하거나 휴지통을 열어 하나를 복원하세요.",
@@ -275,7 +275,7 @@
   "appearance": "외관",
   "appIcon": "아이콘",
   "appleId": "애플 ID",
-  "applePhotosUnsupportedResource": "이 파일을 Apple 사진 앱에 저장할 수 없습니다. Ente에서는 계속해서 확인할 수 있습니다.",
+  "applePhotosUnsupportedResource": "이 파일을 Apple 사진 앱에 저장할 수 없습니다. Photovault에서는 계속해서 확인할 수 있습니다.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -444,7 +444,7 @@
   "backupModeScreenWillDim": "배터리를 절약하기 위해 화면이 자동으로 어두워집니다",
   "backupModeSettingsDescription": "백업을 완료하려면 화면을 계속 열어 두세요",
   "backupModeStart": "백업 모드 시작",
-  "backupModeStayInEnte": "Ente를 계속 실행해 주세요. 화면을 전환하면 백업이 일시 중지됩니다.",
+  "backupModeStayInEnte": "Photovault을 계속 실행해 주세요. 화면을 전환하면 백업이 일시 중지됩니다.",
   "backupModeTapToWakeScreen": "화면을 깨우려면 누르세요",
   "backupOnlyNewPhotos": "새로운 사진만 백업",
   "backupOnlyNewPhotosAllFoldersSelected": "현재 모든 폴더가 백업 대상으로 선택되어 있습니다.\n\n지금 바로 진행하거나 선택된 폴더를 업데이트할 수 있습니다.",
@@ -466,7 +466,7 @@
   "backupSettings": "백업 설정",
   "backupStatus": "백업 상태",
   "backupStatusDescription": "백업한 항목이 여기에 표시됩니다",
-  "backupToEnte": "Ente에 백업",
+  "backupToEnte": "Photovault에 백업",
   "backupVideos": "동영상 백업",
   "beach": "모래와 바다",
   "birthday": "생일",
@@ -714,7 +714,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Photovault, Ente Auth, Ente Locker 전체에서 내 데이터가 삭제된다는 것을 이해합니다.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -919,7 +918,7 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Ente에서 삭제",
+  "deletedFromEnte": "Photovault에서 삭제",
   "deletedItemsStayHereForThirtyDays": "삭제 된 파일은 여기 30일 간 보관 됩니다",
   "deleteDuplicates": "중복 제거",
   "deleteEmptyAlbums": "빈 앨범 삭제",
@@ -932,7 +931,7 @@
   "deleteFromBoth": "양 쪽 모두 삭제",
   "deleteFromDevice": "장비에서 삭제",
   "deleteFromDeviceQuestion": "장비에서 삭제 하시겠습니까?",
-  "deleteFromEnte": "Ente에서 삭제",
+  "deleteFromEnte": "Photovault에서 삭제",
   "deleteHiddenFilesFromDevice": "장비에서 숨긴 파일 삭제",
   "deleteHiddenFilesFromDeviceDescription": "기기에서 숨긴 파일의 로컬 사본 삭제",
   "deleteItemCount": "{count, plural, one{항목 {count}개 삭제} other{항목 {count}개 삭제}}",
@@ -1687,7 +1686,7 @@
       }
     }
   },
-  "filesInAlbumSafelyOnEnte": "{count, plural, one{앨범의 이 항목은 Ente에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.} other{앨범의 항목 {formattedNumber}개가 모두 Ente에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.}}",
+  "filesInAlbumSafelyOnEnte": "{count, plural, one{앨범의 이 항목은 Photovault에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.} other{앨범의 항목 {formattedNumber}개가 모두 Photovault에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.}}",
   "@filesInAlbumSafelyOnEnte": {
     "description": "Explains that device copies for files in an album can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1731,7 +1730,7 @@
       }
     }
   },
-  "filesSafelyOnEnte": "{count, plural, one{이 항목은 Ente에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.} other{항목 {formattedNumber}개가 모두 Ente에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.}}",
+  "filesSafelyOnEnte": "{count, plural, one{이 항목은 Photovault에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.} other{항목 {formattedNumber}개가 모두 Photovault에 백업되어 있으므로, 기기에 있는 사본을 삭제해도 잃지 않고 공간을 확보할 수 있습니다.}}",
   "@filesSafelyOnEnte": {
     "description": "Explains that device copies can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1846,11 +1845,11 @@
   "guestView": "게스트 보기",
   "guestViewEnablePreSteps": "게스트 보기를 사용하려면 시스템 설정에서 기기 암호나 화면 잠금을 설정해 주세요.",
   "happyBirthday": "생일 축하합니다! 🥳",
-  "hearUsWhereOptionalTitle": "Ente에 대해 어떻게 알게 되셨나요? (선택 사항)",
+  "hearUsWhereOptionalTitle": "Photovault에 대해 어떻게 알게 되셨나요? (선택 사항)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "Ente를 어떻게 알게 되셨나요?",
+  "hearUsWhereTitle": "Photovault을 어떻게 알게 되셨나요?",
   "help": "도움말",
   "helpAndSupport": "도움말 및 지원",
   "hidden": "숨김",
@@ -2064,7 +2063,7 @@
       }
     }
   },
-  "inviteToEnte": "Ente에 초대",
+  "inviteToEnte": "Photovault에 초대",
   "ok": "확인",
   "@ok": {
     "description": "Generic OK button label"
@@ -2446,7 +2445,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Ente에 로그인",
+  "loginToEnte": "Photovault에 로그인",
   "loginToExistingAccount": "기존 계정으로 로그인",
   "loginWithAuthAccount": "Auth 계정으로 로그인",
   "loginWithTOTP": "TOTP로 로그인 하기",
@@ -2455,7 +2454,6 @@
   },
   "logout": "로그아웃",
   "logs": "로그",
-  "logsDialogBody": "문제 해결을 돕기 위해 로그를 전송합니다. 특정 파일의 문제를 추적할 수 있도록 파일 이름이 포함된다는 점에 유의해 주세요.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2495,7 +2493,7 @@
   "mapsPrivacyNotice": "지도와 위치를 표시하기 위해 대략적인 좌표가 OpenStreetMap과 같이 개인정보를 중시하는 제3자에게 전송됩니다.",
   "markingAsImportant": "중요로 표시 중...",
   "me": "나",
-  "mediaManagementHintMessage": "설정에서 Ente의 미디어 관리 권한을 켜면 확인 메시지가 더 이상 표시되지 않습니다.",
+  "mediaManagementHintMessage": "설정에서 Photovault의 미디어 관리 권한을 켜면 확인 메시지가 더 이상 표시되지 않습니다.",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -2592,7 +2590,7 @@
   "mixedGrouping": "여러 사람이 섞인 그룹입니까?",
   "mlConsent": "머신 러닝 활성화",
   "mlConsentConfirmation": "이해했으며, 머신 러닝을 활성화하겠습니다",
-  "mlConsentDescription": "머신 러닝을 활성화하면 Ente가 회원님과 공유된 파일을 포함한 파일에서 얼굴 형태 등의 정보를 추출합니다.\n\n이 작업은 기기에서 이루어지며, 생성된 생체 정보는 모두 종단간 암호화됩니다.",
+  "mlConsentDescription": "머신 러닝을 활성화하면 Photovault이 회원님과 공유된 파일을 포함한 파일에서 얼굴 형태 등의 정보를 추출합니다.\n\n이 작업은 기기에서 이루어지며, 생성된 생체 정보는 모두 종단간 암호화됩니다.",
   "mlCouldNotProcessItems": "{count, plural, one{항목 {count}개를 처리할 수 없습니다} other{항목 {count}개를 처리할 수 없습니다}}",
   "@mlCouldNotProcessItems": {
     "description": "Title shown when machine learning could not process one or more items",
@@ -2644,7 +2642,7 @@
   "moon": "달빛 아래에서",
   "more": "더보기",
   "moreDetails": "자세히 보기",
-  "moreFrom": "Ente의 다른 앱",
+  "moreFrom": "Photovault의 다른 앱",
   "@moreFrom": {
     "description": "Heading shown above links to other Ente apps"
   },
@@ -2693,11 +2691,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Ente에 접속할 수 없습니다, 잠시 후에 다시 시도해주세요. 에러가 반복되는 경우, 저희 지원 팀에 문의해주세요.",
+  "networkConnectionRefusedErr": "Photovault에 접속할 수 없습니다, 잠시 후에 다시 시도해주세요. 에러가 반복되는 경우, 저희 지원 팀에 문의해주세요.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Ente에 접속할 수 없습니다, 네트워크 설정을 확인해주시고 에러가 반복되는 경우 저희 지원 팀에 문의해주세요.",
+  "networkHostLookUpErr": "Photovault에 접속할 수 없습니다, 네트워크 설정을 확인해주시고 에러가 반복되는 경우 저희 지원 팀에 문의해주세요.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2864,7 +2862,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "하나의 계정으로 Photovault, Ente Auth, Ente Locker를 모두 사용할 수 있습니다.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -3028,7 +3025,7 @@
   },
   "pets": "털복숭이 친구들",
   "photoGridSize": "사진 Grid 크기",
-  "photoLibraryAddPermissionRequired": "Ente가 사진과 동영상을 Apple 사진 앱에 저장하려면 권한이 필요합니다. 설정에서 접근을 허용할 수 있습니다.",
+  "photoLibraryAddPermissionRequired": "Photovault이 사진과 동영상을 Apple 사진 앱에 저장하려면 권한이 필요합니다. 설정에서 접근을 허용할 수 있습니다.",
   "photoLibraryAddPermissionRestricted": "이 기기에서는 사진 보관함 접근이 제한되어 있습니다.",
   "photoOrder": "사진 순서",
   "photoViewerFilmstripLabel": "사진 선택기",
@@ -3531,7 +3528,7 @@
   "resendInvite": "초대 재전송",
   "reset": "초기화",
   "resetIgnoredFiles": "무시된 파일 초기화",
-  "resetIgnoredFilesDescription": "무시된 파일을 초기화하여 Ente가 다시 업로드를 시도하도록 합니다.",
+  "resetIgnoredFilesDescription": "무시된 파일을 초기화하여 Photovault이 다시 업로드를 시도하도록 합니다.",
   "resetPasswordTitle": "암호 초기화",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -3844,7 +3841,7 @@
   "securityDesc": "암호화, 복구 키, 앱 잠금 및 계정 보호",
   "seeAllCollections": "모든 컬렉션 보기",
   "seePublicAlbumLinksInApp": "앱에서 공개 앨범 링크 보기",
-  "selectAlbumsToBackUpToEnte": "Ente에 백업할 앨범 선택",
+  "selectAlbumsToBackUpToEnte": "Photovault에 백업할 앨범 선택",
   "selectAlbumToLikePhoto": "이 사진에 좋아요를 누를 앨범을 선택하세요",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -3880,7 +3877,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "선택한 파일이 Ente에 없습니다",
+  "selectedFilesAreNotOnEnte": "선택한 파일이 Photovault에 없습니다",
   "selectedFilesBackedUpToEnte": "이 항목들이 모든 앨범에서 삭제됩니다. 휴지통에서 복구할 수 있습니다.",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -4067,7 +4064,6 @@
   "shareLegacyDescription": "각 카드를 해당하는 사람에게 보내세요. 카드 한 장만으로는 아무것도 열 수 없습니다.",
   "shareLink": "링크 공유",
   "shareMemory": "추억 공유",
-  "shareMyVerificationID": "ente.com 인증 ID입니다: {verificationID}",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -4075,15 +4071,14 @@
   },
   "shareNotSupportedForSharedFiles": "공유된 파일은 공유할 수 없습니다",
   "shareStorageWith5Members": "최대 5명의 멤버와 저장 공간 공유",
-  "shareTextConfirmOthersVerificationID": "안녕, 이게 네 ente.com 인증 ID가 맞는지 확인해 줄래? {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "원본 화질 그대로 파일을 쉽게 공유할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "내 가족 요금제에 추가할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "원본 화질 그대로 사진과 동영상을 쉽게 공유할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "원본 화질 그대로 파일을 쉽게 공유할 수 있게 Photovault을 다운로드해 줘",
+  "shareTextRecommendUsingEnteForFamily": "내 가족 요금제에 추가할 수 있게 Photovault을 다운로드해 줘",
+  "shareTextRecommendUsingEnteForPhotos": "원본 화질 그대로 사진과 동영상을 쉽게 공유할 수 있게 Photovault을 다운로드해 줘",
   "shareTextReferralInvite": "Photovault에서 20GB를 무료로 받으세요! https://ente.com/invite 에서 앱을 다운로드하고 코드 {referralCode}을 입력하세요.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -4091,7 +4086,7 @@
     }
   },
   "shareThisLink": "이 링크를 통해 누구나 항목에 접근할 수 있습니다. 언제든지 링크를 삭제하여 접근을 제거할 수 있습니다.",
-  "shareWithNonenteUsers": "Ente를 사용하지 않는 사람과 공유",
+  "shareWithNonenteUsers": "Photovault을 사용하지 않는 사람과 공유",
   "shareYourFeedbackHere": "여기에 의견을 남겨 주세요",
   "@shareYourFeedbackHere": {
     "description": "Placeholder for optional account deletion feedback"
@@ -4175,7 +4170,7 @@
   "socialNotifications": "좋아요 및 댓글",
   "socialNotificationsExplanation": "회원님의 사진에 달린 좋아요와 참여 중인 앨범의 댓글",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "앨범을 공유하는 사람은 자신의 기기에서 동일한 ID를 볼 수 있어야 합니다.",
-  "someSelectedFilesBackedUpToEnte": "이 항목들은 기기와 Ente에 모두 있습니다.",
+  "someSelectedFilesBackedUpToEnte": "이 항목들은 기기와 Photovault에 모두 있습니다.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -4290,8 +4285,6 @@
   "subject": "제목",
   "submit": "제출",
   "subscribe": "구독",
-  "subscribeToChangeLinkSetting": "이 링크 설정을 바꾸려면 유료 구독이 필요합니다.",
-  "subscribeToEnableSharing": "공유하기 위해서는 유료 구독이 필요합니다.",
   "subscription": "구독",
   "subscriptionRequiredForSharing": "링크를 공유하려면 유료 구독이 필요합니다",
   "subWillBeCancelledOn": "구독이 {endDate}에 취소됩니다",
@@ -4382,7 +4375,7 @@
   "@thisEmailIsAlreadyInUse": {
     "description": "Error message when email is already in use"
   },
-  "thisHelpsUsImproveEnte": "Ente를 개선하는 데 도움이 됩니다",
+  "thisHelpsUsImproveEnte": "Photovault을 개선하는 데 도움이 됩니다",
   "@thisHelpsUsImproveEnte": {
     "description": "Subtitle under account deletion reason prompt"
   },
@@ -5089,6 +5082,5 @@
       }
     }
   },
-  "notEnoughStorageTitle": "저장 공간 부족",
-  "notEnoughStorageBody": "Ente에 새 사진을 추가할 공간이 부족합니다. 계속 추가하려면 공간을 확보하거나 업그레이드하세요."
+  "notEnoughStorageTitle": "저장 공간 부족"
 }

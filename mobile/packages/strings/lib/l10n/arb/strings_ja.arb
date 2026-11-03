@@ -70,7 +70,7 @@
   "addTag": "タグの追加",
   "addToAlbum": "アルバムに追加",
   "addToCollection": "コレクションに追加",
-  "addToEnte": "Enteに追加",
+  "addToEnte": "Photovaultに追加",
   "addToHiddenAlbum": "非表示アルバムに追加",
   "addToPerson": "人物を追加",
   "@addToPerson": {
@@ -110,7 +110,7 @@
   "allowAppToOpenSharedAlbumLinks": "共有アルバムリンクを開くことをアプリに許可する",
   "allowDownloads": "ダウンロードを許可",
   "allowJoiningAlbum": "アルバムへの参加を許可",
-  "allowPermBody": "Enteがライブラリを表示およびバックアップできるように、端末の設定から写真へのアクセスを許可してください。",
+  "allowPermBody": "Photovaultがライブラリを表示およびバックアップできるように、端末の設定から写真へのアクセスを許可してください。",
   "allowPermTitle": "写真へのアクセスを許可",
   "allPersonGroupingWillReset": "この人のグループ化がリセットされ、この人かもしれない写真への提案もなくなります",
   "allTabEmptyHint": "まだ何もありません。+ をタップしてコードを追加するか、ゴミ箱を開いて復元してください。",
@@ -209,7 +209,7 @@
   "authToViewYourHiddenFiles": "隠しファイルを表示するには認証してください",
   "authToViewYourMemories": "思い出を閲覧するためには認証が必要です",
   "autoCastDialogBody": "利用可能なキャストデバイスが表示されます。",
-  "autoCastiOSPermission": "ローカルネットワークへのアクセス許可がEnte Photosアプリに与えられているか確認してください",
+  "autoCastiOSPermission": "ローカルネットワークへのアクセス許可がPhotovaultアプリに与えられているか確認してください",
   "autoLock": "自動ロック",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -236,7 +236,7 @@
   "backupSettings": "バックアップ設定",
   "backupStatus": "バックアップの状態",
   "backupStatusDescription": "バックアップされたアイテムがここに表示されます",
-  "backupToEnte": "Enteにバックアップ",
+  "backupToEnte": "Photovaultにバックアップ",
   "backupVideos": "動画をバックアップ",
   "beach": "砂浜と海",
   "birthday": "誕生日",
@@ -500,7 +500,7 @@
   "deleteFiles": "ファイルを削除",
   "deleteFromBoth": "両方から削除",
   "deleteFromDevice": "デバイスから削除",
-  "deleteFromEnte": "Enteから削除",
+  "deleteFromEnte": "Photovaultから削除",
   "deleteHiddenFilesFromDevice": "デバイスから隠れたファイルを削除する",
   "deleteLink": "リンクを削除",
   "deleteLinkQuestion": "リンクを削除しますか？",
@@ -657,7 +657,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "編集が保存されました",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "位置情報の編集はEnteでのみ表示されます",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "位置情報の編集はPhotovaultでのみ表示されます",
   "editTag": "タグの編集",
   "editTime": "時刻を編集",
   "eligible": "対象となる",
@@ -679,7 +679,7 @@
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} はEnteアカウントを持っていません。\n\n写真を共有するために「招待」を送信してください。",
+  "emailNoEnteAccountPhotos": "{email} はPhotovaultアカウントを持っていません。\n\n写真を共有するために「招待」を送信してください。",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1010,7 +1010,7 @@
   "invite": "招待",
   "inviteMembers": "メンバーを招待",
   "inviteResent": "招待を再送する",
-  "inviteToEnte": "Enteに招待する",
+  "inviteToEnte": "Photovaultに招待する",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -1145,7 +1145,7 @@
   "@loginSessionExpiredDetails": {
     "description": "Login session expired details"
   },
-  "loginToEnte": "Enteにログイン",
+  "loginToEnte": "Photovaultにログイン",
   "loginToExistingAccount": "既存のアカウントでログイン",
   "loginWithAuthAccount": "認証アカウントでログイン",
   "loginWithTOTP": "TOTPでログイン",
@@ -1154,7 +1154,6 @@
   },
   "logout": "ログアウト",
   "logs": "ログ",
-  "logsDialogBody": "これにより、問題のデバッグに役立つログが送信されます。 特定のファイルの問題を追跡するために、ファイル名が含まれることに注意してください。",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1200,7 +1199,7 @@
   "minimizeToTrayOnClose": "閉じたときにトレイに最小化",
   "mlConsent": "機械学習を有効にする",
   "mlConsentConfirmation": "機械学習を有効にします",
-  "mlConsentDescription": "機械学習を有効にすると、Enteは顔などの情報をファイルから抽出します。\n\nこれはお使いのデバイスで行われ、生成された生体情報は暗号化されます。",
+  "mlConsentDescription": "機械学習を有効にすると、Photovaultは顔などの情報をファイルから抽出します。\n\nこれはお使いのデバイスで行われ、生成された生体情報は暗号化されます。",
   "mlProgressBannerDescription": "あなたの写真は、顔やオブジェクトなどを検出するためにデバイス上で処理されます。",
   "mlProgressBannerTitle": "もう少しお待ちください！",
   "modifyYourQueryOrTrySearchingFor": "クエリを変更するか、以下のように検索してみてください",
@@ -1236,11 +1235,11 @@
   "moveToHiddenAlbum": "隠しアルバムに移動",
   "movingFilesToAlbum": "アルバムにファイルを移動中",
   "name": "名前順",
-  "networkConnectionRefusedErr": "Enteに接続できませんでした。しばらくしてから再試行してください。エラーが解決しない場合は、サポートにお問い合わせください。",
+  "networkConnectionRefusedErr": "Photovaultに接続できませんでした。しばらくしてから再試行してください。エラーが解決しない場合は、サポートにお問い合わせください。",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Enteに接続できませんでした。ネットワーク設定を確認し、エラーが解決しない場合はサポートにお問い合わせください。",
+  "networkHostLookUpErr": "Photovaultに接続できませんでした。ネットワーク設定を確認し、エラーが解決しない場合はサポートにお問い合わせください。",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1945,7 +1944,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "選択したファイルはEnte上にありません",
+  "selectedFilesAreNotOnEnte": "選択したファイルはPhotovault上にありません",
   "selectedItemsWillBeRemovedFromThisPerson": "選択したアイテムはこの人としての登録が解除されますが、ライブラリからは削除されません。",
   "selectedPhotos": "{count} 個を選択",
   "@selectedPhotos": {
@@ -2035,9 +2034,9 @@
   "shareCodesDuration": "コードを共有したい期間を選択してください。",
   "sharedWith": "共有先",
   "shareLink": "リンクの共有",
-  "shareTextRecommendUsingEnteForPhotos": "Enteをダウンロードして、写真や動画を簡単に共有\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Photovaultをダウンロードして、写真や動画を簡単に共有",
   "shareThisLink": "このリンクを受け取った人は誰でもあなたのアイテムにアクセスできます。リンクを削除することでいつでもアクセスを取り消すことができます。",
-  "shareWithNonenteUsers": "Enteを使っていない人に共有",
+  "shareWithNonenteUsers": "Photovaultを使っていない人に共有",
   "sharing": "共有中...",
   "sharingAndCollaboration": "共有と共同作業",
   "sharingAndCollaborationDesc": "アルバム、リンク、ファミリープラン",
@@ -2136,7 +2135,6 @@
   "subject": "件名",
   "submit": "送信",
   "subscribe": "サブスクライブ",
-  "subscribeToEnableSharing": "共有を有効にするには、有料サブスクリプションが必要です。",
   "subscription": "サブスクリプション",
   "subscriptionRequiredForSharing": "リンクを共有するには有料サブスクリプションが必要です",
   "subWillBeCancelledOn": "サブスクリプションは {endDate} でキャンセルされます",

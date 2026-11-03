@@ -742,7 +742,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Saya memahami bahwa tindakan ini akan menghapus data saya dari Photovault, Ente Auth, dan Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -2512,7 +2511,6 @@
   },
   "logout": "Keluar akun",
   "logs": "Log",
-  "logsDialogBody": "Ini akan mengirimkan log untuk membantu kami memperbaiki masalah anda. Harap diperhatikan bahwa nama file akan disertakan untuk membantu melacak masalah pada file tertentu.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2927,7 +2925,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Anda memiliki satu akun untuk Photovault, Ente Auth, dan Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -4171,7 +4168,6 @@
     "description": "Subtitle for sending a viewing link to the current photo or video from the file viewer"
   },
   "shareMemory": "Bagikan kenangan",
-  "shareMyVerificationID": "Ini ID verifikasi saya: {verificationID} untuk ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -4179,15 +4175,14 @@
   },
   "shareNotSupportedForSharedFiles": "Berbagi tidak didukung untuk file bersama",
   "shareStorageWith5Members": "Bagikan penyimpanan dengan 5 anggota",
-  "shareTextConfirmOthersVerificationID": "Hai, bisakah Anda mengonfirmasi bahwa ini ID verifikasi ente.com Anda: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Unduh Photovault agar kita dapat berbagi file dengan kualitas asli dengan mudah\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Unduh Photovault agar saya dapat menambahkan Anda ke paket keluarga saya\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Unduh Photovault agar kita dapat berbagi foto dan video dengan kualitas asli dengan mudah\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Unduh Photovault agar kita dapat berbagi file dengan kualitas asli dengan mudah",
+  "shareTextRecommendUsingEnteForFamily": "Unduh Photovault agar saya dapat menambahkan Anda ke paket keluarga saya",
+  "shareTextRecommendUsingEnteForPhotos": "Unduh Photovault agar kita dapat berbagi foto dan video dengan kualitas asli dengan mudah",
   "shareTextReferralInvite": "Dapatkan 20 GB gratis dengan Photovault! Unduh aplikasinya di https://ente.com/invite dan gunakan kode {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -4396,8 +4391,6 @@
   "subject": "Subjek",
   "submit": "Kirim",
   "subscribe": "Berlangganan",
-  "subscribeToChangeLinkSetting": "Anda memerlukan langganan berbayar untuk mengubah pengaturan tautan ini.",
-  "subscribeToEnableSharing": "Anda memerlukan langganan berbayar yang aktif untuk bisa berbagi.",
   "subscription": "Langganan",
   "subscriptionRequiredForSharing": "Anda memerlukan langganan berbayar untuk membagikan tautan.",
   "subWillBeCancelledOn": "Langganan kamu akan dibatalkan pada {endDate}",
@@ -5210,6 +5203,5 @@
       }
     }
   },
-  "notEnoughStorageTitle": "Penyimpanan tidak cukup",
-  "notEnoughStorageBody": "Ruang kosong di Photovault tidak cukup untuk menambahkan foto baru. Kosongkan ruang atau tingkatkan paket agar dapat terus menambahkan foto."
+  "notEnoughStorageTitle": "Penyimpanan tidak cukup"
 }

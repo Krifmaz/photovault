@@ -653,7 +653,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Аз осъзнзвам, че това ще изтрие моите данни в Photovault, Ente Auth и Ente Locker. ",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -2162,7 +2161,6 @@
   },
   "logout": "Изход",
   "logs": "Logs",
-  "logsDialogBody": "This will send across logs to help us debug your issue. Please note that file names will be included to help track issues with specific files.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2516,7 +2514,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Имате един общ профил за Photovault, Ente Auth и Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -3591,7 +3588,6 @@
   "shareLegacyDescription": "Send each card to the person it's for. No single card works alone.",
   "shareLink": "Share link",
   "shareMemory": "Share memory",
-  "shareMyVerificationID": "Here's my verification ID: {verificationID} for ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3599,15 +3595,14 @@
   },
   "shareNotSupportedForSharedFiles": "Share is not supported for shared files",
   "shareStorageWith5Members": "Share storage with 5 members",
-  "shareTextConfirmOthersVerificationID": "Hey, can you confirm that this is your ente.com verification ID: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos",
   "shareThisLink": "This link allows anyone who receives it to access your item. You can remove access at any time by deleting the link.",
   "shareWithNonenteUsers": "Share with non-Photovault users",
   "shareYourFeedbackHere": "Споделете вашата обратната връзка тук",
@@ -3803,8 +3798,6 @@
   "subject": "Subject",
   "submit": "Потвърди",
   "subscribe": "Subscribe",
-  "subscribeToChangeLinkSetting": "You need a paid subscription to change this link setting.",
-  "subscribeToEnableSharing": "You need an active paid subscription to enable sharing.",
   "subscription": "Subscription",
   "subscriptionRequiredForSharing": "You need a paid subscription to share links",
   "subWillBeCancelledOn": "Your subscription will be cancelled on {endDate}",

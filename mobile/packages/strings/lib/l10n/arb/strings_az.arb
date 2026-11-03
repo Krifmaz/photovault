@@ -1127,7 +1127,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Çıxış",
-  "logsDialogBody": "Bu, probleminizi həll etməyə kömək etmək üçün qeydləri göndərəcək. Zəhmət olmasa nəzərə alın ki, konkret fayllarla bağlı problemləri izləmək üçün fayl adları bura daxil ediləcək.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2137,8 +2136,6 @@
     "description": "Strong password strength label"
   },
   "subscribe": "Abunə ol",
-  "subscribeToChangeLinkSetting": "Bu link parametrini dəyişmək üçün ödənişli abunəlik lazımdır.",
-  "subscribeToEnableSharing": "Paylaşımı aktiv etmək üçün aktiv ödənişli abunəliyiniz olmalıdır.",
   "subscription": "Abunəlik",
   "subWillBeCancelledOn": "Abunəliyiniz {endDate} tarixində ləğv ediləcək",
   "@subWillBeCancelledOn": {

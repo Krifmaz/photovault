@@ -1762,7 +1762,6 @@
   "loginWithAuthAccount": "Connectez-vous avec votre compte Auth",
   "logout": "Déconnexion",
   "logs": "Journaux",
-  "logsDialogBody": "Les journaux seront envoyés pour nous aider à déboguer votre problème. Les noms de fichiers seront inclus pour aider à identifier les problèmes.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2959,21 +2958,19 @@
   "sharedWith": "Partage avec",
   "shareKey": "Clé de partage",
   "shareLink": "Partager le lien",
-  "shareMyVerificationID": "Voici mon ID de vérification : {verificationID} pour ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "Partager votre espace de stockage avec 5 membres",
-  "shareTextConfirmOthersVerificationID": "Hé ! Pouvez-vous confirmer qu'il s'agit de votre ID de vérification ente.com : {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Téléchargez Photovault pour que je puisse vous ajouter à mon abonnement familial\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Téléchargez Photovault pour pouvoir facilement partager des photos et vidéos en qualité originale\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Téléchargez Photovault pour que je puisse vous ajouter à mon abonnement familial",
+  "shareTextRecommendUsingEnteForPhotos": "Téléchargez Photovault pour pouvoir facilement partager des photos et vidéos en qualité originale",
   "shareThisLink": "Ce lien permet a toute personne qui le recoit d'acceder a ton element. Tu peux supprimer l'acces a tout moment en supprimant le lien.",
   "shareWithNonenteUsers": "Partager avec des utilisateurs non-Photovault",
   "shareYourSubscription": "Partagez votre abonnement avec vos proches",
@@ -3138,8 +3135,6 @@
   "subject": "Sujet",
   "submit": "Envoyer",
   "subscribe": "S'abonner",
-  "subscribeToChangeLinkSetting": "Vous avez besoin d'un abonnement payant pour modifier le paramètre de ce lien.",
-  "subscribeToEnableSharing": "Vous avez besoin d'un abonnement payant actif pour activer le partage.",
   "subscription": "Abonnement",
   "subscriptionRequiredForSharing": "Tu as besoin d'un abonnement payant pour partager des liens",
   "subWillBeCancelledOn": "Votre abonnement sera annulé le {endDate}",

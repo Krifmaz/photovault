@@ -700,7 +700,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Capisco che tutti i miei dati di Photovault, Ente Auth e Ente Locker saranno eliminati.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -2101,7 +2100,6 @@
     "description": "Login with TOTP button label"
   },
   "logs": "Log",
-  "logsDialogBody": "Invia i log per aiutarci a risolvere il tuo problema. Si prega di notare che i nomi dei file saranno inclusi per aiutare a tenere traccia di problemi con file specifici.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -3406,7 +3404,6 @@
   "shareKey": "Condividi chiave",
   "shareLink": "Condividi link",
   "shareMemory": "Condividi ricordo",
-  "shareMyVerificationID": "Ecco il mio ID di verifica: {verificationID} per ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3414,14 +3411,13 @@
   },
   "shareNotSupportedForSharedFiles": "La condivisione non è supportata per i file condivisi",
   "shareStorageWith5Members": "Condividi lo spazio con 5 membri",
-  "shareTextConfirmOthersVerificationID": "Ehi, puoi confermare che questo è il tuo ID di verifica per ente.com: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Scarica Photovault così posso aggiungerti al mio piano famiglia\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Scarica Photovault così possiamo condividere foto e video in qualità originale\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Scarica Photovault così posso aggiungerti al mio piano famiglia",
+  "shareTextRecommendUsingEnteForPhotos": "Scarica Photovault così possiamo condividere foto e video in qualità originale",
   "shareThisLink": "Questo link permette a chiunque lo riceva di accedere al tuo elemento. Puoi rimuovere l'accesso in qualsiasi momento eliminando il link.",
   "shareWithNonenteUsers": "Condividi con utenti che non hanno un account Photovault",
   "shareYourLegacyBannerDescription": "Aiuta i cari ad accedere a informazioni importanti, in tua assenza.",
@@ -3608,8 +3604,6 @@
   "subject": "Soggetto",
   "submit": "Invia",
   "subscribe": "Iscriviti",
-  "subscribeToChangeLinkSetting": "Devi avere un abbonamento a pagamento per cambiare le impostazioni di questo link.",
-  "subscribeToEnableSharing": "È necessario un abbonamento a pagamento attivo per abilitare la condivisione.",
   "subscription": "Abbonamento",
   "subscriptionRequiredForSharing": "Hai bisogno di un abbonamento a pagamento per condividere link",
   "subWillBeCancelledOn": "L'abbonamento verrà cancellato il {endDate}",

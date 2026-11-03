@@ -1084,7 +1084,6 @@
     "description": "Login session expired title"
   },
   "loginWithAuthAccount": "Inicieu sessió amb el vostre compte Auth",
-  "logsDialogBody": "Això enviarà els registres per ajudar-nos a depurar el teu problema. Si us plau, tingues en compte que els noms dels fitxers s'inclouran per ajudar a rastrejar problemes amb fitxers específics.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2050,8 +2049,6 @@
   },
   "submit": "Envia",
   "subscribe": "Subscriu-te",
-  "subscribeToChangeLinkSetting": "Necessiteu una subscripció de pagament per canviar aquesta configuració d'enllaç.",
-  "subscribeToEnableSharing": "Necessites una subscripció de pagament activa per activar la compartició.",
   "subscription": "Subscripció",
   "subWillBeCancelledOn": "La teva subscripció es cancel·larà el {endDate}",
   "@subWillBeCancelledOn": {

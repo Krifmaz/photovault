@@ -1566,7 +1566,6 @@
   },
   "logout": "登出",
   "logs": "紀錄日誌",
-  "logsDialogBody": "這將傳送紀錄以協助我們偵錯您的問題。請注意，檔名會一併包含，以便追蹤特定檔案的問題。",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2747,15 +2746,14 @@
   "shareKey": "分享金鑰",
   "shareLink": "分享連結",
   "shareMemory": "分享回憶",
-  "shareMyVerificationID": "這是我在 ente.com 的驗證 ID：{verificationID}。",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "與 5 位成員共享空間",
-  "shareTextRecommendUsingEnteForFamily": "下載 Photovault，讓我可以將你加入我的家庭方案\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "下載 Photovault，讓我們輕鬆分享原始畫質的照片與影片\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "下載 Photovault，讓我可以將你加入我的家庭方案",
+  "shareTextRecommendUsingEnteForPhotos": "下載 Photovault，讓我們輕鬆分享原始畫質的照片與影片",
   "shareWithNonenteUsers": "與非 Photovault 使用者分享",
   "shareYourSubscription": "與摯愛分享您的訂閱",
   "sharing": "正在分享……",
@@ -2928,8 +2926,6 @@
   "subject": "主題",
   "submit": "送出",
   "subscribe": "訂閱",
-  "subscribeToChangeLinkSetting": "您需要付費訂閱才能更改此連結設定。",
-  "subscribeToEnableSharing": "您需要有效的付費訂閱才能啟用分享功能。",
   "subscription": "訂閱",
   "subWillBeCancelledOn": "您的訂閱將於 {endDate} 取消",
   "@subWillBeCancelledOn": {

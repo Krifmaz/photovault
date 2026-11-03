@@ -742,7 +742,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Tôi hiểu rằng điều này sẽ xóa dữ liệu của tôi trên Photovault, Ente Auth và Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -2515,7 +2514,6 @@
   },
   "logout": "Đăng xuất",
   "logs": "Log",
-  "logsDialogBody": "Gửi file nhật ký để chúng tôi có thể phân tích lỗi mà bạn gặp. Lưu ý rằng, trong nhật ký lỗi sẽ bao gồm tên các tệp để giúp theo dõi vấn đề với từng tệp cụ thể.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2931,7 +2929,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Bạn chỉ cần một tài khoản duy nhất cho cả Photovault, Ente Auth và Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -4175,7 +4172,6 @@
     "description": "Subtitle for sending a viewing link to the current photo or video from the file viewer"
   },
   "shareMemory": "Chia sẻ kỷ niệm",
-  "shareMyVerificationID": "Đây là ID xác minh của tôi: {verificationID} cho ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -4183,15 +4179,14 @@
   },
   "shareNotSupportedForSharedFiles": "Không hỗ trợ chia sẻ đối với các tệp được chia sẻ",
   "shareStorageWith5Members": "Chia sẻ dung lượng bộ nhớ với 5 thành viên",
-  "shareTextConfirmOthersVerificationID": "Này, bạn có thể xác nhận rằng đây là ID xác minh ente.com của bạn không: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Tải Photovault để chúng ta có thể dễ dàng chia sẻ tệp chất lượng gốc\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Tải Photovault để tôi có thể thêm bạn vào gói gia đình\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Tải Photovault để chúng ta có thể dễ dàng chia sẻ ảnh và video chất lượng gốc\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Tải Photovault để chúng ta có thể dễ dàng chia sẻ tệp chất lượng gốc",
+  "shareTextRecommendUsingEnteForFamily": "Tải Photovault để tôi có thể thêm bạn vào gói gia đình",
+  "shareTextRecommendUsingEnteForPhotos": "Tải Photovault để chúng ta có thể dễ dàng chia sẻ ảnh và video chất lượng gốc",
   "shareTextReferralInvite": "Nhận miễn phí 20 GB với Photovault! Tải ứng dụng tại https://ente.com/invite và sử dụng mã {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -4400,8 +4395,6 @@
   "subject": "Tiêu đề",
   "submit": "Áp dụng",
   "subscribe": "Đăng ký gói",
-  "subscribeToChangeLinkSetting": "Bạn cần mua gói trả phí để thay đổi cài đặt liên kết này.",
-  "subscribeToEnableSharing": "Bạn phải dùng gói trả phí mới có thể chia sẻ.",
   "subscription": "Gói đăng ký",
   "subscriptionRequiredForSharing": "Ban can goi tra phi de chia se lien ket",
   "subWillBeCancelledOn": "Gói của bạn sẽ bị hủy vào {endDate}",
@@ -5214,6 +5207,5 @@
       }
     }
   },
-  "notEnoughStorageTitle": "Không đủ dung lượng",
-  "notEnoughStorageBody": "Bạn không đủ dung lượng trống trên Photovault để thêm ảnh mới. Hãy giải phóng dung lượng hoặc nâng cấp gói dịch vụ để tiếp tục thêm ảnh."
+  "notEnoughStorageTitle": "Không đủ dung lượng"
 }

@@ -703,7 +703,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Я понимаю, что это приведет к удалению моих данных из Photovault, Ente Auth и Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -2231,7 +2230,6 @@
   },
   "logout": "Выйти",
   "logs": "Логи",
-  "logsDialogBody": "Это отправит нам логи, чтобы помочь разобраться с вашей проблемой. Обратите внимание, что имена файлов будут включены для отслеживания проблем с конкретными файлами.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2593,7 +2591,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "У вас один аккаунт для Photovault, Ente Auth и Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -3759,7 +3756,6 @@
   "shareKey": "Поделиться ключом",
   "shareLink": "Поделиться ссылкой",
   "shareMemory": "Поделиться воспоминаниями",
-  "shareMyVerificationID": "Вот мой идентификатор подтверждения: {verificationID} для ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3767,15 +3763,14 @@
   },
   "shareNotSupportedForSharedFiles": "Нельзя делиться общими файлами",
   "shareStorageWith5Members": "Поделиться хранилищем с 5 участниками",
-  "shareTextConfirmOthersVerificationID": "Привет, можешь подтвердить, что это твой идентификатор подтверждения ente.com: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Скачайте Photovault, чтобы мы могли легко обмениваться файлами оригинального качества\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Скачай Photovault, чтобы я мог добавить тебя в свой семейный тариф\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Скачай Photovault, чтобы мы могли легко делиться фото и видео в оригинальном качестве\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Скачайте Photovault, чтобы мы могли легко обмениваться файлами оригинального качества",
+  "shareTextRecommendUsingEnteForFamily": "Скачай Photovault, чтобы я мог добавить тебя в свой семейный тариф",
+  "shareTextRecommendUsingEnteForPhotos": "Скачай Photovault, чтобы мы могли легко делиться фото и видео в оригинальном качестве",
   "shareTextReferralInvite": "Получите 20 Гб бесплатно с помощью Photovault! Скачайте приложение по ссылке https://ente.com/invite and use code {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -3980,8 +3975,6 @@
   "subject": "Тема",
   "submit": "Отправить",
   "subscribe": "Подписаться",
-  "subscribeToChangeLinkSetting": "Вам нужна платная подписка, чтобы изменить эту ссылку.",
-  "subscribeToEnableSharing": "Вам нужна активная платная подписка, чтобы включить общий доступ.",
   "subscription": "Подписка",
   "subscriptionRequiredForSharing": "Для публикации ссылок требуется платная подписка",
   "subWillBeCancelledOn": "Ваша подписка будет отменена {endDate}",
@@ -4705,6 +4698,5 @@
   "noEnteAccountWithThisEmail": "Нет аккаунта Photovault с таким адресом электронной почты.",
   "shareALinkInline": "Поделиться ссылкой.",
   "personAlreadyHasAccess": "У этого человека уже есть доступ.",
-  "notEnoughStorageTitle": "Недостаточно места для хранения",
-  "notEnoughStorageBody": "У вас недостаточно свободного места на Photovault для добавления новых фотографий. Освободите место или обновите тариф, чтобы продолжать добавлять фотографии."
+  "notEnoughStorageTitle": "Недостаточно места для хранения"
 }

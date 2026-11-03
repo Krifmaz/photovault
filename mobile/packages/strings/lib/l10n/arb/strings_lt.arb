@@ -1490,7 +1490,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Atsijungti",
-  "logsDialogBody": "Tai nusiųs žurnalus, kurie padės mums išspręsti jūsų problemą. Atkreipkite dėmesį, kad failų pavadinimai bus įtraukti, kad būtų lengviau atsekti problemas su konkrečiais failais.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1782,7 +1781,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Turite vieną paskyrą tarp „Photovault“ nuotraukų, „Ente Auth“ ir „Photovault“ spintelės.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -2598,20 +2596,18 @@
   "sharedPhotoNotifications": "Naujos bendrintos nuotraukos ir albumai",
   "shareKey": "Bendrinti raktą",
   "shareLink": "Bendrinti nuorodą",
-  "shareMyVerificationID": "Štai mano patvirtinimo ID: {verificationID}, skirta ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextConfirmOthersVerificationID": "Ei, ar galite patvirtinti, kad tai yra jūsų ente.com patvirtinimo ID: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Atsisiųsk „Photovault“, kad galėčiau tave įtraukti į savo šeimos planą\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Atsisiųsk „Photovault“, kad galėtume lengvai bendrinti originalios kokybės nuotraukas ir vaizdo įrašus.\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Atsisiųsk „Photovault“, kad galėčiau tave įtraukti į savo šeimos planą",
+  "shareTextRecommendUsingEnteForPhotos": "Atsisiųsk „Photovault“, kad galėtume lengvai bendrinti originalios kokybės nuotraukas ir vaizdo įrašus.",
   "shareTextReferralInvite": "Gaukite 20 GB nemokamai su „Photovault“ nuotraukomis! Atsisiųskite programą adresu https://ente.com/invite ir naudokite kodą {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -2728,7 +2724,6 @@
   },
   "submit": "Pateikti",
   "subscribe": "Prenumeruoti",
-  "subscribeToEnableSharing": "Kad įjungtumėte bendrinimą, reikia aktyvios mokamos prenumeratos.",
   "subscription": "Prenumerata",
   "subWillBeCancelledOn": "Jūsų prenumerata bus atsisakyta {endDate}",
   "@subWillBeCancelledOn": {

@@ -720,7 +720,6 @@
   "@loggingOut": {
     "description": "Message shown while logging out"
   },
-  "logsDialogBody": "આનાથી અમને તમારી સમસ્યાનું નિરાકરણ કરવામાં મદદ મળે તેવા લોગ્સ મોકલવામાં આવશે. કૃપા કરીને નોંધ લો કે ચોક્કસ ફાઇલોને લગતી સમસ્યાઓને ટ્રેક કરવામાં મદદ મળે તે માટે ફાઇલના નામોનો પણ સમાવેશ કરવામાં આવશે.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -944,6 +943,5 @@
   "noEnteAccountWithThisEmail": "આ ઈમેલ સાથે કોઈ Photovault એકાઉન્ટ નથી.",
   "shareALinkInline": "એક લિંક શેર કરો.",
   "personAlreadyHasAccess": "આ વ્યક્તિ પાસે પહેલેથી જ એક્સેસ છે.",
-  "notEnoughStorageTitle": "પૂરતી સ્ટોરેજ નથી",
-  "notEnoughStorageBody": "Photovault પર નવા ફોટા ઉમેરવા માટે તમારી પાસે પૂરતી ખાલી જગ્યા નથી. વધુ ફોટા ઉમેરવાનું ચાલુ રાખવા માટે જગ્યા ખાલી કરો અથવા અપગ્રેડ કરો."
+  "notEnoughStorageTitle": "પૂરતી સ્ટોરેજ નથી"
 }

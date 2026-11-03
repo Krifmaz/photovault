@@ -35,7 +35,7 @@
   "addPhotos": "Додај фотографије",
   "addTag": "Додај ознаку",
   "addToAlbum": "Додај у албум",
-  "addToEnte": "Додај у Енте",
+  "addToEnte": "Додај у Photovault",
   "addToHiddenAlbum": "Додај у тајни албум",
   "adjust": "Прилагоди",
   "advanced": "Напредно",
@@ -286,7 +286,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "Обриши празне албуме?",
   "deleteFromBoth": "Обриши са оба",
   "deleteFromDevice": "Обриши са уређаја",
-  "deleteFromEnte": "Обриши са Енте-а",
+  "deleteFromEnte": "Обриши са Photovault-а",
   "deleteLocation": "Обриши локацију",
   "deletePhotos": "Обриши фотгорафије",
   "deleteSharedAlbum": "Иѕбриши дељени албум?",
@@ -392,7 +392,7 @@
   "editOrder": "Уреди поредак",
   "editsSaved": "Измене сачуване",
   "editTag": "Уреди ознаку",
-  "emailNoEnteAccountPhotos": "{email} нема Енте налог.\n\nПошаљи им позивницу за дељење фотографија.",
+  "emailNoEnteAccountPhotos": "{email} нема Photovault налог.\n\nПошаљи им позивницу за дељење фотографија.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -616,7 +616,7 @@
   "invalidQRCode": "Неважећи QR кôд",
   "invalidRecoveryKey": "Кључ за опоравак који сте унели није исправан. Постарајте се да садржи 24 речи, и проверите да ли сте их правилно уписали.\n\nУколико сте унели стари формат кључа, постарајте се да садржи 64 карактера и додатно проверите да ли је сваки исправно уписан.",
   "invite": "Позови",
-  "inviteToEnte": "Позови у Енте",
+  "inviteToEnte": "Позови у Photovault",
   "ok": "ОК",
   "@ok": {
     "description": "Generic OK button label"
@@ -1147,7 +1147,7 @@
   "shareALink": "Подели везу",
   "shareCodes": "Дели кôдове",
   "shareCodesDuration": "Изаберите трајање за које желите да поделите кôдове.",
-  "shareWithNonenteUsers": "Пошаљи корисницима који немају Енте налог",
+  "shareWithNonenteUsers": "Пошаљи корисницима који немају Photovault налог",
   "sharing": "Делим...",
   "shouldHideCode": "Сакриј кодове",
   "showLargeIcons": "Прикажи велике иконе",

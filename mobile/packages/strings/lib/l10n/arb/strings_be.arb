@@ -1086,7 +1086,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Выйсці",
-  "logsDialogBody": "Гэта дзеянне прывядзе да адпраўкі журналаў, якія дапамогуць нам адладзіць вашу праблему. Звярніце ўвагу, што назвы файлаў будуць уключаны для адсочвання праблем з канкрэтнымі файламі.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2013,8 +2012,6 @@
   },
   "submit": "Пацвердзіць",
   "subscribe": "Падпісацца",
-  "subscribeToChangeLinkSetting": "Каб змяніць гэты параметр спасылкі, вам патрэбна платная падпіска.",
-  "subscribeToEnableSharing": "У вас павінна быць актыўная платная падпіска, каб уключыць абагульванне.",
   "subscription": "Падпіска",
   "subWillBeCancelledOn": "Ваша падпіска будзе скасавана {endDate}",
   "@subWillBeCancelledOn": {
