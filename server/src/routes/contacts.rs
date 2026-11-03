@@ -31,11 +31,16 @@ pub fn router() -> Router<AppState> {
         .route("/contacts", post(create))
         .route("/contacts/diff", get(diff))
         .route("/contacts/{id}", get(get_one).put(update).delete(remove))
-        .route("/attachments/{type}/upload-url", post(attachment_upload_url))
+        .route(
+            "/attachments/{type}/upload-url",
+            post(attachment_upload_url),
+        )
         .route("/attachments/{type}/{attachment_id}", get(get_attachment))
         .route(
             "/contacts/{id}/attachments/{type}",
-            put(attach).get(current_attachment).delete(delete_attachment),
+            put(attach)
+                .get(current_attachment)
+                .delete(delete_attachment),
         )
         .route(
             "/contacts/{id}/profile-picture/upload-url",
@@ -84,7 +89,9 @@ fn attachment_policy(raw: &str) -> ApiResult<i64> {
     if raw == PROFILE_PICTURE {
         Ok(MAX_PROFILE_PICTURE_SIZE)
     } else {
-        Err(ApiError::bad_request(format!("invalid attachment type: {raw}")))
+        Err(ApiError::bad_request(format!(
+            "invalid attachment type: {raw}"
+        )))
     }
 }
 
@@ -119,7 +126,7 @@ type ContactTuple = (
     Option<String>,
     String,
     Option<String>,
-    bool,
+    i64,
     i64,
     i64,
     Option<String>,
@@ -127,7 +134,7 @@ type ContactTuple = (
 );
 
 const SELECT_WITH_EMAIL: &str = "SELECT c.id, c.user_id, c.contact_user_id, c.profile_picture_attachment_id, c.encrypted_key, \
-     c.encrypted_data, c.is_deleted, c.created_at, c.updated_at, u.encrypted_email, u.email_decryption_nonce \
+     c.encrypted_data, CASE WHEN c.is_deleted THEN 1 ELSE 0 END, c.created_at, c.updated_at, u.encrypted_email, u.email_decryption_nonce \
      FROM contact_entity c LEFT JOIN users u ON u.user_id = c.contact_user_id";
 
 fn to_entity(st: &AppState, t: ContactTuple) -> ApiResult<ContactEntity> {
@@ -139,7 +146,7 @@ fn to_entity(st: &AppState, t: ContactTuple) -> ApiResult<ContactEntity> {
         profile_picture_attachment_id: t.3,
         encrypted_key: Some(t.4),
         encrypted_data: t.5,
-        is_deleted: t.6,
+        is_deleted: t.6 != 0,
         created_at: t.7,
         updated_at: t.8,
     };
@@ -149,7 +156,10 @@ fn to_entity(st: &AppState, t: ContactTuple) -> ApiResult<ContactEntity> {
         e.encrypted_data = None;
         return Ok(e);
     }
-    if let (Some(enc), Some(nonce)) = (t.9.filter(|s| !s.is_empty()), t.10.filter(|s| !s.is_empty())) {
+    if let (Some(enc), Some(nonce)) = (
+        t.9.filter(|s| !s.is_empty()),
+        t.10.filter(|s| !s.is_empty()),
+    ) {
         e.email = Some(
             crate::legacy::users::decrypt_email(st, &enc, &nonce)
                 .ok_or_else(|| ApiError::internal("failed to decrypt contact email"))?,
@@ -159,12 +169,13 @@ fn to_entity(st: &AppState, t: ContactTuple) -> ApiResult<ContactEntity> {
 }
 
 async fn fetch(st: &AppState, user_id: i64, id: &str) -> ApiResult<ContactEntity> {
-    let row: Option<ContactTuple> =
-        sqlx::query_as(&format!("{SELECT_WITH_EMAIL} WHERE c.id = $1 AND c.user_id = $2"))
-            .bind(id)
-            .bind(user_id)
-            .fetch_optional(&st.db.pool)
-            .await?;
+    let row: Option<ContactTuple> = sqlx::query_as(&format!(
+        "{SELECT_WITH_EMAIL} WHERE c.id = $1 AND c.user_id = $2"
+    ))
+    .bind(id)
+    .bind(user_id)
+    .fetch_optional(&st.db.pool)
+    .await?;
     to_entity(st, row.ok_or_else(not_found_typed)?)
 }
 
@@ -175,15 +186,16 @@ async fn contact_for_update(
     user_id: i64,
     id: &str,
 ) -> ApiResult<(i64, Option<String>, bool)> {
-    let row: Option<(i64, Option<String>, bool)> = sqlx::query_as(&format!(
-        "SELECT contact_user_id, profile_picture_attachment_id, is_deleted FROM contact_entity WHERE id = $1 AND user_id = $2{}",
+    let row: Option<(i64, Option<String>, i64)> = sqlx::query_as(&format!(
+        "SELECT contact_user_id, profile_picture_attachment_id, CASE WHEN is_deleted THEN 1 ELSE 0 END FROM contact_entity WHERE id = $1 AND user_id = $2{}",
         for_update(engine)
     ))
     .bind(id)
     .bind(user_id)
     .fetch_optional(&mut *conn)
     .await?;
-    row.ok_or_else(not_found_typed)
+    row.map(|(c, p, d)| (c, p, d != 0))
+        .ok_or_else(not_found_typed)
 }
 
 async fn contact_user_exists(st: &AppState, contact_user_id: i64) -> ApiResult<bool> {
@@ -290,7 +302,9 @@ async fn create(
     let key = bytes_field(&key)?;
     let data = bytes_field(&data)?;
     if req.contact_user_id < 0 {
-        return Err(ApiError::bad_request("contactUserID must be greater than 0"));
+        return Err(ApiError::bad_request(
+            "contactUserID must be greater than 0",
+        ));
     }
     if key.is_empty() {
         return Err(ApiError::bad_request("encryptedKey is required"));
@@ -393,7 +407,9 @@ async fn update(
     let data = bytes_field(&data)?;
     check_contact_id(&id)?;
     if req.contact_user_id < 0 {
-        return Err(ApiError::bad_request("contactUserID must be greater than 0"));
+        return Err(ApiError::bad_request(
+            "contactUserID must be greater than 0",
+        ));
     }
     if data.is_empty() {
         return Err(ApiError::bad_request("encryptedData is required"));
@@ -401,15 +417,15 @@ async fn update(
     if !contact_user_exists(&st, req.contact_user_id).await? {
         return Err(ApiError::bad_request("contactUserID does not exist"));
     }
-    let state: Option<(i64, bool)> = sqlx::query_as(
-        "SELECT contact_user_id, is_deleted FROM contact_entity WHERE id = $1 AND user_id = $2",
+    let state: Option<(i64, i64)> = sqlx::query_as(
+        "SELECT contact_user_id, CASE WHEN is_deleted THEN 1 ELSE 0 END FROM contact_entity WHERE id = $1 AND user_id = $2",
     )
     .bind(&id)
     .bind(user.user_id)
     .fetch_optional(&st.db.pool)
     .await?;
     let (current_contact, deleted) = state.ok_or_else(not_found_typed)?;
-    if (deleted || current_contact != req.contact_user_id)
+    if (deleted != 0 || current_contact != req.contact_user_id)
         && !can_create_contact(&st, user.user_id, req.contact_user_id).await?
     {
         return Err(ApiError::bad_request(
@@ -511,10 +527,14 @@ async fn upload_url(
     }
     let max = attachment_policy(kind)?;
     if req.content_length < 0 {
-        return Err(ApiError::bad_request("contentLength must be greater than 0"));
+        return Err(ApiError::bad_request(
+            "contentLength must be greater than 0",
+        ));
     }
     if req.content_length > max {
-        return Err(ApiError::bad_request(format!("{kind} must be <= {max} bytes")));
+        return Err(ApiError::bad_request(format!(
+            "{kind} must be <= {max} bytes"
+        )));
     }
     if req.content_md5.trim().is_empty() {
         return Err(ApiError::bad_request("contentMD5 is required"));
@@ -524,7 +544,12 @@ async fn upload_url(
     let key = attachment_object_key(user_id, kind, &attachment_id);
     let url = st
         .store
-        .presign_put(&key, URL_VALIDITY, Some(req.content_length), Some(&req.content_md5))
+        .presign_put(
+            &key,
+            URL_VALIDITY,
+            Some(req.content_length),
+            Some(&req.content_md5),
+        )
         .await?;
     let now = now_micros();
     sqlx::query(
@@ -589,7 +614,9 @@ async fn commit_attachment(
         return Err(ApiError::bad_request("size must be greater than 0"));
     }
     if req.size > max {
-        return Err(ApiError::bad_request(format!("{kind} must be <= {max} bytes")));
+        return Err(ApiError::bad_request(format!(
+            "{kind} must be <= {max} bytes"
+        )));
     }
     let key = attachment_object_key(user_id, kind, &req.attachment_id);
     let staged: Option<(i64,)> =
@@ -602,7 +629,11 @@ async fn commit_attachment(
     }
     match st.store.head(&key).await? {
         Some(n) if n as i64 == req.size => {}
-        _ => return Err(ApiError::internal("attachment size does not match expected size")),
+        _ => {
+            return Err(ApiError::internal(
+                "attachment size does not match expected size",
+            ));
+        }
     }
     let db = &st.db;
     let mut tx = begin_write(db).await?;
@@ -688,20 +719,23 @@ async fn attachment_url(
     if !valid_attachment_id(attachment_id) {
         return Err(ApiError::bad_request("invalid attachment id"));
     }
-    let row: Option<(String, bool)> = sqlx::query_as(
-        "SELECT attachment_type, is_deleted FROM user_attachments WHERE attachment_id = $1 AND user_id = $2",
+    let row: Option<(String, i64)> = sqlx::query_as(
+        "SELECT attachment_type, CASE WHEN is_deleted THEN 1 ELSE 0 END FROM user_attachments WHERE attachment_id = $1 AND user_id = $2",
     )
     .bind(attachment_id)
     .bind(user_id)
     .fetch_optional(&st.db.pool)
     .await?;
     let (stored_kind, deleted) = row.ok_or_else(not_found_typed)?;
-    if deleted || stored_kind != kind {
+    if deleted != 0 || stored_kind != kind {
         return Err(not_found_typed());
     }
     let url = st
         .store
-        .presign_get(&attachment_object_key(user_id, &stored_kind, attachment_id), URL_VALIDITY)
+        .presign_get(
+            &attachment_object_key(user_id, &stored_kind, attachment_id),
+            URL_VALIDITY,
+        )
         .await?;
     Ok(Json(json!({ "url": url })))
 }
@@ -714,14 +748,21 @@ async fn get_attachment(
     attachment_url(&st, user.user_id, &kind, &attachment_id).await
 }
 
-async fn current_url(st: &AppState, user_id: i64, contact_id: &str, kind: &str) -> ApiResult<Json<Value>> {
+async fn current_url(
+    st: &AppState,
+    user_id: i64,
+    contact_id: &str,
+    kind: &str,
+) -> ApiResult<Json<Value>> {
     check_contact_id(contact_id)?;
     attachment_policy(kind)?;
     let e = fetch(st, user_id, contact_id).await?;
     if e.is_deleted {
         return Err(not_found_typed());
     }
-    let id = e.profile_picture_attachment_id.ok_or_else(not_found_typed)?;
+    let id = e
+        .profile_picture_attachment_id
+        .ok_or_else(not_found_typed)?;
     attachment_url(st, user_id, kind, &id).await
 }
 

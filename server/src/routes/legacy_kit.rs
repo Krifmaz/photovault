@@ -39,7 +39,10 @@ pub fn router() -> Router<AppState> {
             "/legacy-kits/recovery/init-change-password",
             post(init_change_password),
         )
-        .route("/legacy-kits/recovery/change-password", post(change_password))
+        .route(
+            "/legacy-kits/recovery/change-password",
+            post(change_password),
+        )
 }
 
 fn bind_error() -> ApiError {
@@ -120,11 +123,12 @@ async fn create(
 
 async fn list(State(st): State<AppState>, user: AuthUser) -> ApiResult<Json<Value>> {
     let kits = kit::list_kits(&st, user.user_id).await?;
-    let sessions: HashMap<String, kit::SessionRow> = kit::active_sessions_for_user(&st, user.user_id)
-        .await?
-        .into_iter()
-        .map(|s| (s.kit_id.clone(), s))
-        .collect();
+    let sessions: HashMap<String, kit::SessionRow> =
+        kit::active_sessions_for_user(&st, user.user_id)
+            .await?
+            .into_iter()
+            .map(|s| (s.kit_id.clone(), s))
+            .collect();
     let out: Vec<LegacyKit> = kits
         .iter()
         .map(|k| kit::to_api(k, sessions.get(&k.id)))

@@ -322,7 +322,12 @@ fn valid_previous_states(new_state: &str) -> &'static str {
 }
 
 /// museum's `validateUpdateReq`.
-pub fn validate_update(actor: i64, user_id: i64, contact_id: i64, new_state: &str) -> ApiResult<()> {
+pub fn validate_update(
+    actor: i64,
+    user_id: i64,
+    contact_id: i64,
+    new_state: &str,
+) -> ApiResult<()> {
     if contact_id == user_id {
         return Err(ApiError::bad_request("contact and user can not be same"));
     }
@@ -380,7 +385,13 @@ pub async fn update_contact(
         .execute(&mut *tx)
         .await?;
     if r.rows_affected() == 0 {
-        tracing::warn!(actor, user_id, contact_id, new_state, "no update applied for emergency contact");
+        tracing::warn!(
+            actor,
+            user_id,
+            contact_id,
+            new_state,
+            "no update applied for emergency contact"
+        );
         return Ok(());
     }
     let mut cancelled = 0;
@@ -491,7 +502,12 @@ async fn has_active_recovery(
 }
 
 /// `POST /emergency-contacts/start-recovery` (actor must be the trusted contact).
-pub async fn start_recovery(st: &AppState, actor: i64, user_id: i64, contact_id: i64) -> ApiResult<()> {
+pub async fn start_recovery(
+    st: &AppState,
+    actor: i64,
+    user_id: i64,
+    contact_id: i64,
+) -> ApiResult<()> {
     if contact_id == user_id {
         return Err(ApiError::bad_request("contact and user can not be same"));
     }
@@ -601,7 +617,13 @@ async fn set_session_status(st: &AppState, s: &RecoverRow, new_status: &str) -> 
 }
 
 /// `POST /emergency-contacts/reject-recovery` (owner).
-pub async fn reject_recovery(st: &AppState, actor: i64, id: &str, user_id: i64, contact_id: i64) -> ApiResult<()> {
+pub async fn reject_recovery(
+    st: &AppState,
+    actor: i64,
+    id: &str,
+    user_id: i64,
+    contact_id: i64,
+) -> ApiResult<()> {
     if contact_id == user_id {
         return Err(ApiError::bad_request("contact and user can not be same"));
     }
@@ -615,12 +637,24 @@ pub async fn reject_recovery(st: &AppState, actor: i64, id: &str, user_id: i64, 
     if !set_session_status(st, &s, status::REJECTED).await? {
         return Err(ApiError::conflict("recovery session is no longer active"));
     }
-    notify_recovery(st, s.user_id, s.emergency_contact_id, status::REJECTED, None);
+    notify_recovery(
+        st,
+        s.user_id,
+        s.emergency_contact_id,
+        status::REJECTED,
+        None,
+    );
     Ok(())
 }
 
 /// `POST /emergency-contacts/approve-recovery` (owner skips the notice period).
-pub async fn approve_recovery(st: &AppState, actor: i64, id: &str, user_id: i64, contact_id: i64) -> ApiResult<()> {
+pub async fn approve_recovery(
+    st: &AppState,
+    actor: i64,
+    id: &str,
+    user_id: i64,
+    contact_id: i64,
+) -> ApiResult<()> {
     if contact_id == user_id {
         return Err(ApiError::bad_request("contact and user can not be same"));
     }
@@ -637,7 +671,13 @@ pub async fn approve_recovery(st: &AppState, actor: i64, id: &str, user_id: i64,
 }
 
 /// `POST /emergency-contacts/stop-recovery` (trusted contact).
-pub async fn stop_recovery(st: &AppState, actor: i64, id: &str, user_id: i64, contact_id: i64) -> ApiResult<()> {
+pub async fn stop_recovery(
+    st: &AppState,
+    actor: i64,
+    id: &str,
+    user_id: i64,
+    contact_id: i64,
+) -> ApiResult<()> {
     if contact_id == user_id {
         return Err(ApiError::bad_request("contact and user can not be same"));
     }
@@ -757,8 +797,16 @@ pub async fn run_reminders_once(st: &AppState) -> ApiResult<()> {
             .execute(&st.db.pool)
             .await;
             match r {
-                Ok(_) => notify_recovery(st, row.user_id, row.emergency_contact_id, status::READY, None),
-                Err(e) => tracing::error!(error = %e, session = %row.id, "failed to update recovery status"),
+                Ok(_) => notify_recovery(
+                    st,
+                    row.user_id,
+                    row.emergency_contact_id,
+                    status::READY,
+                    None,
+                ),
+                Err(e) => {
+                    tracing::error!(error = %e, session = %row.id, "failed to update recovery status")
+                }
             }
         } else if days_left >= 2 {
             let next = if days_left > 9 {
@@ -768,18 +816,23 @@ pub async fn run_reminders_once(st: &AppState) -> ApiResult<()> {
             } else {
                 row.wait_till
             };
-            if let Err(e) = sqlx::query(
-                "UPDATE emergency_recovery SET next_reminder_at = $1 WHERE id = $2",
-            )
-            .bind(next)
-            .bind(&row.id)
-            .execute(&st.db.pool)
-            .await
+            if let Err(e) =
+                sqlx::query("UPDATE emergency_recovery SET next_reminder_at = $1 WHERE id = $2")
+                    .bind(next)
+                    .bind(&row.id)
+                    .execute(&st.db.pool)
+                    .await
             {
                 tracing::error!(error = %e, session = %row.id, "failed to update next reminder");
                 continue;
             }
-            notify_recovery(st, row.user_id, row.emergency_contact_id, status::WAITING, Some(days_left));
+            notify_recovery(
+                st,
+                row.user_id,
+                row.emergency_contact_id,
+                status::WAITING,
+                Some(days_left),
+            );
         }
     }
     Ok(())
@@ -801,30 +854,51 @@ fn contact_mails(legacy: &str, trusted: &str, new_state: &str) -> Vec<Mail> {
     };
     match new_state {
         state::INVITED => vec![
-            m(trusted, "You have been added as a trusted contact", format!(
-                "{legacy} has added you as a trusted contact. Open the app to accept the invite; you will then be able to recover their account if they ever lose access."
-            )),
-            m(legacy, "Trusted contact invited", format!(
-                "You have invited {trusted} as a trusted contact. They will be able to help recover your account once they accept."
-            )),
+            m(
+                trusted,
+                "You have been added as a trusted contact",
+                format!(
+                    "{legacy} has added you as a trusted contact. Open the app to accept the invite; you will then be able to recover their account if they ever lose access."
+                ),
+            ),
+            m(
+                legacy,
+                "Trusted contact invited",
+                format!(
+                    "You have invited {trusted} as a trusted contact. They will be able to help recover your account once they accept."
+                ),
+            ),
         ],
-        state::REVOKED => vec![m(trusted, "Legacy account access removed", format!(
-            "{legacy} has removed you as a trusted contact."
-        ))],
-        state::CONTACT_LEFT => vec![m(legacy, "Trusted contact removed", format!(
-            "{trusted} is no longer your trusted contact."
-        ))],
-        state::CONTACT_DENIED => vec![m(legacy, "Legacy invite rejected", format!(
-            "{trusted} has declined your invite to be a trusted contact."
-        ))],
-        state::ACCEPTED => vec![m(legacy, "Trusted contact added", format!(
-            "{trusted} has accepted your invite and is now your trusted contact."
-        ))],
+        state::REVOKED => vec![m(
+            trusted,
+            "Legacy account access removed",
+            format!("{legacy} has removed you as a trusted contact."),
+        )],
+        state::CONTACT_LEFT => vec![m(
+            legacy,
+            "Trusted contact removed",
+            format!("{trusted} is no longer your trusted contact."),
+        )],
+        state::CONTACT_DENIED => vec![m(
+            legacy,
+            "Legacy invite rejected",
+            format!("{trusted} has declined your invite to be a trusted contact."),
+        )],
+        state::ACCEPTED => vec![m(
+            legacy,
+            "Trusted contact added",
+            format!("{trusted} has accepted your invite and is now your trusted contact."),
+        )],
         _ => vec![],
     }
 }
 
-fn recovery_mails(legacy: &str, trusted: &str, new_status: &str, days_left: Option<i64>) -> Vec<Mail> {
+fn recovery_mails(
+    legacy: &str,
+    trusted: &str,
+    new_status: &str,
+    days_left: Option<i64>,
+) -> Vec<Mail> {
     let m = |to: &str, subject: &'static str, body: String| Mail {
         to: to.to_string(),
         subject,
@@ -833,53 +907,84 @@ fn recovery_mails(legacy: &str, trusted: &str, new_status: &str, days_left: Opti
     match new_status {
         status::INITIATED => {
             let days = days_left.unwrap_or(30);
-            vec![m(legacy, "Account recovery initiated", format!(
-                "{trusted} has started recovering your account. If you do nothing, they will be able to reset your password in {days} days. If this was not expected, open the app and reject the recovery."
-            ))]
+            vec![m(
+                legacy,
+                "Account recovery initiated",
+                format!(
+                    "{trusted} has started recovering your account. If you do nothing, they will be able to reset your password in {days} days. If this was not expected, open the app and reject the recovery."
+                ),
+            )]
         }
         status::RECOVERED => vec![
-            m(legacy, "Account password reset", format!(
-                "{trusted} has recovered your account and reset its password."
-            )),
-            m(trusted, "Account recovery successful", format!(
-                "You have recovered the account of {legacy}."
-            )),
+            m(
+                legacy,
+                "Account password reset",
+                format!("{trusted} has recovered your account and reset its password."),
+            ),
+            m(
+                trusted,
+                "Account recovery successful",
+                format!("You have recovered the account of {legacy}."),
+            ),
         ],
-        status::STOPPED => vec![m(legacy, "Account recovery cancelled", format!(
-            "{trusted} has cancelled the recovery of your account."
-        ))],
-        status::REJECTED => vec![m(trusted, "Account recovery blocked", format!(
-            "{legacy} has blocked your request to recover their account."
-        ))],
+        status::STOPPED => vec![m(
+            legacy,
+            "Account recovery cancelled",
+            format!("{trusted} has cancelled the recovery of your account."),
+        )],
+        status::REJECTED => vec![m(
+            trusted,
+            "Account recovery blocked",
+            format!("{legacy} has blocked your request to recover their account."),
+        )],
         status::WAITING => {
             let days = days_left.unwrap_or(0);
-            vec![m(legacy, "Account recovery due", format!(
-                "{trusted} is recovering your account. They will be able to reset your password in {days} days unless you reject the recovery in the app."
-            ))]
+            vec![m(
+                legacy,
+                "Account recovery due",
+                format!(
+                    "{trusted} is recovering your account. They will be able to reset your password in {days} days unless you reject the recovery in the app."
+                ),
+            )]
         }
         status::READY => vec![
-            m(trusted, "Account recoverable", format!(
-                "You can now recover the account of {legacy}."
-            )),
-            m(legacy, "Account recoverable", format!(
-                "{trusted} can now recover your account."
-            )),
+            m(
+                trusted,
+                "Account recoverable",
+                format!("You can now recover the account of {legacy}."),
+            ),
+            m(
+                legacy,
+                "Account recoverable",
+                format!("{trusted} can now recover your account."),
+            ),
         ],
         _ => vec![],
     }
 }
 
-fn send_all(st: &AppState, legacy_id: i64, trusted_id: i64, build: impl FnOnce(&str, &str) -> Vec<Mail> + Send + 'static) {
+fn send_all(
+    st: &AppState,
+    legacy_id: i64,
+    trusted_id: i64,
+    build: impl FnOnce(&str, &str) -> Vec<Mail> + Send + 'static,
+) {
     let st = st.clone();
     tokio::spawn(async move {
-        let (Ok(Some(legacy)), Ok(Some(trusted))) =
-            (email_of(&st, legacy_id).await, email_of(&st, trusted_id).await)
-        else {
-            tracing::warn!(legacy_id, trusted_id, "legacy notification skipped: user not found");
+        let (Ok(Some(legacy)), Ok(Some(trusted))) = (
+            email_of(&st, legacy_id).await,
+            email_of(&st, trusted_id).await,
+        ) else {
+            tracing::warn!(
+                legacy_id,
+                trusted_id,
+                "legacy notification skipped: user not found"
+            );
             return;
         };
         for mail in build(&legacy, &trusted) {
-            if let Err(e) = crate::mail::send(&st.config, &mail.to, mail.subject, &mail.body).await {
+            if let Err(e) = crate::mail::send(&st.config, &mail.to, mail.subject, &mail.body).await
+            {
                 tracing::error!(error = %e, subject = mail.subject, "failed to send legacy email");
                 return;
             }
@@ -889,10 +994,20 @@ fn send_all(st: &AppState, legacy_id: i64, trusted_id: i64, build: impl FnOnce(&
 
 fn notify_contact(st: &AppState, legacy_id: i64, trusted_id: i64, new_state: &str) {
     let s = new_state.to_string();
-    send_all(st, legacy_id, trusted_id, move |l, t| contact_mails(l, t, &s));
+    send_all(st, legacy_id, trusted_id, move |l, t| {
+        contact_mails(l, t, &s)
+    });
 }
 
-fn notify_recovery(st: &AppState, legacy_id: i64, trusted_id: i64, new_status: &str, days_left: Option<i64>) {
+fn notify_recovery(
+    st: &AppState,
+    legacy_id: i64,
+    trusted_id: i64,
+    new_status: &str,
+    days_left: Option<i64>,
+) {
     let s = new_status.to_string();
-    send_all(st, legacy_id, trusted_id, move |l, t| recovery_mails(l, t, &s, days_left));
+    send_all(st, legacy_id, trusted_id, move |l, t| {
+        recovery_mails(l, t, &s, days_left)
+    });
 }

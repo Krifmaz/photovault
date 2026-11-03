@@ -75,7 +75,10 @@ impl<S: Send + Sync> FromRequestParts<S> for QueryMap {
 impl QueryMap {
     /// A non-empty string parameter.
     pub fn str(&self, key: &str) -> Option<&str> {
-        self.0.get(key).map(String::as_str).filter(|s| !s.is_empty())
+        self.0
+            .get(key)
+            .map(String::as_str)
+            .filter(|s| !s.is_empty())
     }
 
     /// A required integer parameter parsed like gin's form binding into Go's

@@ -33,7 +33,10 @@ pub fn router() -> Router<AppState> {
         .route("/emergency-contacts/start-recovery", post(start_recovery))
         .route("/emergency-contacts/stop-recovery", post(stop_recovery))
         .route("/emergency-contacts/reject-recovery", post(reject_recovery))
-        .route("/emergency-contacts/approve-recovery", post(approve_recovery))
+        .route(
+            "/emergency-contacts/approve-recovery",
+            post(approve_recovery),
+        )
         .route("/emergency-contacts/recovery-info/{id}", get(recovery_info))
         .route(
             "/emergency-contacts/init-change-password",
@@ -184,7 +187,14 @@ async fn stop_recovery(
     CodedJson(req): CodedJson<RecoveryIdentifier>,
 ) -> ApiResult<Json<Value>> {
     let id = req.checked()?;
-    em::stop_recovery(&st, user.user_id, &id, req.user_id, req.emergency_contact_id).await?;
+    em::stop_recovery(
+        &st,
+        user.user_id,
+        &id,
+        req.user_id,
+        req.emergency_contact_id,
+    )
+    .await?;
     Ok(Json(json!({})))
 }
 
@@ -194,7 +204,14 @@ async fn reject_recovery(
     CodedJson(req): CodedJson<RecoveryIdentifier>,
 ) -> ApiResult<Json<Value>> {
     let id = req.checked()?;
-    em::reject_recovery(&st, user.user_id, &id, req.user_id, req.emergency_contact_id).await?;
+    em::reject_recovery(
+        &st,
+        user.user_id,
+        &id,
+        req.user_id,
+        req.emergency_contact_id,
+    )
+    .await?;
     Ok(Json(json!({})))
 }
 
@@ -204,7 +221,14 @@ async fn approve_recovery(
     CodedJson(req): CodedJson<RecoveryIdentifier>,
 ) -> ApiResult<Json<Value>> {
     let id = req.checked()?;
-    em::approve_recovery(&st, user.user_id, &id, req.user_id, req.emergency_contact_id).await?;
+    em::approve_recovery(
+        &st,
+        user.user_id,
+        &id,
+        req.user_id,
+        req.emergency_contact_id,
+    )
+    .await?;
     Ok(Json(json!({})))
 }
 

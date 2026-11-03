@@ -69,8 +69,8 @@ pub struct KitRow {
     pub updated_at: i64,
 }
 
-type KitTuple = (String, i64, i64, i64, String, String, String, bool, i64, i64);
-const KIT_COLS: &str = "id, user_id, variant, notice_period_in_hrs, encrypted_recovery_blob, auth_public_key, encrypted_owner_blob, is_deleted, created_at, updated_at";
+type KitTuple = (String, i64, i64, i64, String, String, String, i64, i64, i64);
+const KIT_COLS: &str = "id, user_id, variant, notice_period_in_hrs, encrypted_recovery_blob, auth_public_key, encrypted_owner_blob, CASE WHEN is_deleted THEN 1 ELSE 0 END, created_at, updated_at";
 
 impl From<KitTuple> for KitRow {
     fn from(t: KitTuple) -> Self {
@@ -82,7 +82,7 @@ impl From<KitTuple> for KitRow {
             encrypted_recovery_blob: t.4,
             auth_public_key: t.5,
             encrypted_owner_blob: t.6,
-            is_deleted: t.7,
+            is_deleted: t.7 != 0,
             created_at: t.8,
             updated_at: t.9,
         }
@@ -233,16 +233,16 @@ pub fn validate_public_key(b64: &str) -> bool {
     if pk.len() != 32 {
         return false;
     }
-    let scalar = match hex::decode("a5465c1d0f3f1e0d49f5cf0a5dbf3d74b2c1f5d9a604de884812a4ccf4a4c5f0") {
-        Ok(s) => s,
-        Err(_) => return false,
-    };
+    let scalar =
+        match hex::decode("a5465c1d0f3f1e0d49f5cf0a5dbf3d74b2c1f5d9a604de884812a4ccf4a4c5f0") {
+            Ok(s) => s,
+            Err(_) => return false,
+        };
     crate::crypto::init();
     let mut out = [0u8; 32];
     // SAFETY: all buffers are 32 bytes; crypto_scalarmult returns -1 for an all-zero result.
-    let rc = unsafe {
-        libsodium_sys::crypto_scalarmult(out.as_mut_ptr(), scalar.as_ptr(), pk.as_ptr())
-    };
+    let rc =
+        unsafe { libsodium_sys::crypto_scalarmult(out.as_mut_ptr(), scalar.as_ptr(), pk.as_ptr()) };
     rc == 0
 }
 
@@ -416,7 +416,10 @@ pub async fn delete_kit(st: &AppState, user_id: i64, kit_id: &str) -> ApiResult<
     if !lock_user(&mut tx, db.engine, user_id).await? {
         return Err(not_found());
     }
-    if kit_for_owner_tx(&mut tx, db.engine, user_id, kit_id).await?.is_none() {
+    if kit_for_owner_tx(&mut tx, db.engine, user_id, kit_id)
+        .await?
+        .is_none()
+    {
         return Ok(false);
     }
     block_active_session_tx(&mut tx, kit_id, user_id).await?;
@@ -434,16 +437,27 @@ pub async fn delete_kit(st: &AppState, user_id: i64, kit_id: &str) -> ApiResult<
 }
 
 /// Change the notice period. False when the kit is not found.
-pub async fn update_notice(st: &AppState, user_id: i64, kit_id: &str, hours: i64) -> ApiResult<bool> {
+pub async fn update_notice(
+    st: &AppState,
+    user_id: i64,
+    kit_id: &str,
+    hours: i64,
+) -> ApiResult<bool> {
     let db = &st.db;
     let mut tx = begin_write(db).await?;
     if !lock_user(&mut tx, db.engine, user_id).await? {
         return Err(not_found());
     }
-    if kit_for_owner_tx(&mut tx, db.engine, user_id, kit_id).await?.is_none() {
+    if kit_for_owner_tx(&mut tx, db.engine, user_id, kit_id)
+        .await?
+        .is_none()
+    {
         return Ok(false);
     }
-    if active_session_for_kit_tx(&mut tx, db.engine, kit_id).await?.is_some() {
+    if active_session_for_kit_tx(&mut tx, db.engine, kit_id)
+        .await?
+        .is_some()
+    {
         return Err(ApiError::new(
             StatusCode::BAD_REQUEST,
             "ACTIVE_RECOVERY_SESSION",
@@ -470,7 +484,10 @@ pub async fn block_recovery(st: &AppState, user_id: i64, kit_id: &str) -> ApiRes
     if !lock_user(&mut tx, db.engine, user_id).await? {
         return Err(not_found());
     }
-    if kit_for_owner_tx(&mut tx, db.engine, user_id, kit_id).await?.is_none() {
+    if kit_for_owner_tx(&mut tx, db.engine, user_id, kit_id)
+        .await?
+        .is_none()
+    {
         return Ok(false);
     }
     let updated = block_active_session_tx(&mut tx, kit_id, user_id).await?;
@@ -485,7 +502,10 @@ pub fn format_challenge(kit_id: &str, challenge: &str) -> String {
 
 /// Create a challenge for a kit; returns (sealed challenge base64, expires_at).
 pub async fn create_challenge(st: &AppState, kit: &KitRow) -> ApiResult<(String, i64)> {
-    let challenge = format_challenge(&kit.id, &crate::crypto::b64(&crate::crypto::random_bytes(32)));
+    let challenge = format_challenge(
+        &kit.id,
+        &crate::crypto::b64(&crate::crypto::random_bytes(32)),
+    );
     let pk = crate::crypto::unb64(&kit.auth_public_key).map_err(ApiError::internal)?;
     let sealed = crate::crypto::box_seal(challenge.as_bytes(), &pk).map_err(ApiError::internal)?;
     let now = now_micros();
@@ -700,7 +720,11 @@ async fn session_by_token_tx(
 
 /// museum's `GetSessionByIDAndTokenForUse`: the session for a valid token, with
 /// a finished notice period promoted to READY. `None` when the token is unknown.
-pub async fn session_for_use(st: &AppState, session_id: &str, token: &str) -> ApiResult<Option<SessionRow>> {
+pub async fn session_for_use(
+    st: &AppState,
+    session_id: &str,
+    token: &str,
+) -> ApiResult<Option<SessionRow>> {
     let db = &st.db;
     let now = now_micros();
     let mut tx = begin_write(db).await?;
@@ -721,7 +745,9 @@ pub async fn complete_recovery_tx(
     user_id: i64,
     token: &str,
 ) -> ApiResult<()> {
-    let kit = kit_by_id_tx(conn, engine, kit_id).await?.ok_or_else(not_found)?;
+    let kit = kit_by_id_tx(conn, engine, kit_id)
+        .await?
+        .ok_or_else(not_found)?;
     if kit.is_deleted || kit.user_id != user_id {
         return Err(not_found());
     }
@@ -734,12 +760,14 @@ pub async fn complete_recovery_tx(
     if s.status != status::READY {
         return Err(ApiError::bad_request("legacy kit recovery is not ready"));
     }
-    sqlx::query("UPDATE legacy_kit_recovery_session SET status = $1, updated_at = $2 WHERE id = $3")
-        .bind(status::RECOVERED)
-        .bind(now_micros())
-        .bind(session_id)
-        .execute(&mut *conn)
-        .await?;
+    sqlx::query(
+        "UPDATE legacy_kit_recovery_session SET status = $1, updated_at = $2 WHERE id = $3",
+    )
+    .bind(status::RECOVERED)
+    .bind(now_micros())
+    .bind(session_id)
+    .execute(&mut *conn)
+    .await?;
     Ok(())
 }
 
@@ -751,12 +779,18 @@ fn delay_label(hours: i64) -> String {
     }
 }
 
-fn send(st: &AppState, user_id: i64, subject: &'static str, body: impl FnOnce(&str) -> String + Send + 'static) {
+fn send(
+    st: &AppState,
+    user_id: i64,
+    subject: &'static str,
+    body: impl FnOnce(&str) -> String + Send + 'static,
+) {
     let st = st.clone();
     tokio::spawn(async move {
         match crate::legacy::users::email_of(&st, user_id).await {
             Ok(Some(email)) => {
-                if let Err(e) = crate::mail::send(&st.config, &email, subject, &body(&email)).await {
+                if let Err(e) = crate::mail::send(&st.config, &email, subject, &body(&email)).await
+                {
                     tracing::error!(error = %e, subject, "failed to send legacy kit email");
                 }
             }
@@ -768,27 +802,33 @@ fn send(st: &AppState, user_id: i64, subject: &'static str, body: impl FnOnce(&s
 /// "Kit created" email.
 pub fn notify_created(st: &AppState, user_id: i64) {
     send(st, user_id, "Your Legacy kit was created", |_| {
-        "A Legacy kit was created for your account. Keep its printed parts with people you trust.".into()
+        "A Legacy kit was created for your account. Keep its printed parts with people you trust."
+            .into()
     });
 }
 
 /// "Recovery started" email.
 pub fn notify_started(st: &AppState, user_id: i64, notice_hrs: i64, beneficiary: Option<String>) {
-    send(st, user_id, "Legacy Kit recovery initiated", move |account| {
-        let who = beneficiary
-            .filter(|b| !b.is_empty())
-            .map(|b| format!(" by {b}"))
-            .unwrap_or_default();
-        let when = if notice_hrs == 0 {
-            "The account can be recovered immediately.".to_string()
-        } else {
-            format!(
-                "The account can be recovered after {}, unless you block the recovery in the app.",
-                delay_label(notice_hrs)
-            )
-        };
-        format!("A recovery of {account} was started with one of your Legacy kits{who}. {when}")
-    });
+    send(
+        st,
+        user_id,
+        "Legacy Kit recovery initiated",
+        move |account| {
+            let who = beneficiary
+                .filter(|b| !b.is_empty())
+                .map(|b| format!(" by {b}"))
+                .unwrap_or_default();
+            let when = if notice_hrs == 0 {
+                "The account can be recovered immediately.".to_string()
+            } else {
+                format!(
+                    "The account can be recovered after {}, unless you block the recovery in the app.",
+                    delay_label(notice_hrs)
+                )
+            };
+            format!("A recovery of {account} was started with one of your Legacy kits{who}. {when}")
+        },
+    );
 }
 
 /// "Recovery completed" email.

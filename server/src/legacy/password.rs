@@ -216,15 +216,16 @@ async fn verify_session(
     .fetch_optional(&state.db.pool)
     .await?;
     let Some((session_srp_user, server_key, srp_a)) = reserved else {
-        let row: Option<(bool,)> =
-            sqlx::query_as("SELECT has_verified FROM srp_sessions WHERE id = $1")
-                .bind(session_id)
-                .fetch_optional(&state.db.pool)
-                .await?;
+        let row: Option<(i64,)> = sqlx::query_as(
+            "SELECT CASE WHEN has_verified THEN 1 ELSE 0 END FROM srp_sessions WHERE id = $1",
+        )
+        .bind(session_id)
+        .fetch_optional(&state.db.pool)
+        .await?;
         return Err(match row {
             None => invalid_password(),
-            Some((true,)) => ApiError::new(StatusCode::GONE, "SESSION_ALREADY_VERIFIED", ""),
-            Some((false,)) => ApiError::new(StatusCode::GONE, "TOO_MANY_WRONG_ATTEMPTS", ""),
+            Some((1,)) => ApiError::new(StatusCode::GONE, "SESSION_ALREADY_VERIFIED", ""),
+            Some(_) => ApiError::new(StatusCode::GONE, "TOO_MANY_WRONG_ATTEMPTS", ""),
         });
     };
     if parse_uuid(&session_srp_user).as_deref() != Some(srp_user_id) {
@@ -233,7 +234,8 @@ async fn verify_session(
     let verifier = crate::crypto::unb64(verifier_b64).map_err(ApiError::internal)?;
     let secret = crate::crypto::unb64(&server_key).map_err(ApiError::internal)?;
     let a = crate::crypto::unb64(&srp_a).map_err(ApiError::internal)?;
-    let m2 = crate::legacy::srp::verify_m1(&verifier, &secret, &a, &m1).ok_or_else(invalid_password)?;
+    let m2 =
+        crate::legacy::srp::verify_m1(&verifier, &secret, &a, &m1).ok_or_else(invalid_password)?;
     let claimed = sqlx::query(
         "UPDATE srp_sessions SET has_verified = TRUE, updated_at = $1 WHERE id = $2 AND has_verified = FALSE",
     )
@@ -242,7 +244,11 @@ async fn verify_session(
     .execute(&state.db.pool)
     .await?;
     if claimed.rows_affected() != 1 {
-        return Err(ApiError::new(StatusCode::GONE, "SESSION_ALREADY_VERIFIED", ""));
+        return Err(ApiError::new(
+            StatusCode::GONE,
+            "SESSION_ALREADY_VERIFIED",
+            "",
+        ));
     }
     Ok(crate::crypto::b64(&m2))
 }
@@ -401,10 +407,12 @@ pub async fn recover_srp_and_key_attributes(
         sqlx::query(sql).bind(user_id).execute(&mut *tx).await?;
     }
     if log_out_all {
-        sqlx::query("UPDATE tokens SET is_deleted = TRUE WHERE user_id = $1 AND is_deleted = FALSE")
-            .bind(user_id)
-            .execute(&mut *tx)
-            .await?;
+        sqlx::query(
+            "UPDATE tokens SET is_deleted = TRUE WHERE user_id = $1 AND is_deleted = FALSE",
+        )
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await?;
     }
     tx.commit().await?;
     Ok(UpdateSrpSetupResponse {

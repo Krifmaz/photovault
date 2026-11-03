@@ -84,9 +84,17 @@ struct EntityData {
     updated_at: i64,
 }
 
-type DataTuple = (String, i64, String, Option<String>, Option<String>, bool, i64, i64);
-const DATA_COLS: &str =
-    "id, user_id, type, encrypted_data, header, is_deleted, created_at, updated_at";
+type DataTuple = (
+    String,
+    i64,
+    String,
+    Option<String>,
+    Option<String>,
+    i64,
+    i64,
+    i64,
+);
+const DATA_COLS: &str = "id, user_id, type, encrypted_data, header, CASE WHEN is_deleted THEN 1 ELSE 0 END, created_at, updated_at";
 
 impl From<DataTuple> for EntityData {
     fn from(t: DataTuple) -> Self {
@@ -96,7 +104,7 @@ impl From<DataTuple> for EntityData {
             kind: t.2,
             encrypted_data: t.3,
             header: t.4,
-            is_deleted: t.5,
+            is_deleted: t.5 != 0,
             created_at: t.6,
             updated_at: t.7,
         }
@@ -345,7 +353,11 @@ async fn update_entity(
     StorageUser(user): StorageUser,
     JsonBody(req): JsonBody<UpdateRequest>,
 ) -> ApiResult<Json<EntityData>> {
-    if req.id.is_empty() || req.kind.is_empty() || req.encrypted_data.is_empty() || req.header.is_empty() {
+    if req.id.is_empty()
+        || req.kind.is_empty()
+        || req.encrypted_data.is_empty()
+        || req.header.is_empty()
+    {
         return Err(bind_error());
     }
     validate_type(&req.kind)?;

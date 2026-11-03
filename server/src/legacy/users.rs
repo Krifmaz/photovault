@@ -43,12 +43,11 @@ pub fn decrypt_email(state: &AppState, encrypted: &str, nonce: &str) -> Option<S
 
 /// Id of the (non-deleted) user with this email.
 pub async fn user_id_by_email(state: &AppState, email: &str) -> ApiResult<Option<i64>> {
-    let row: Option<(i64,)> = sqlx::query_as(
-        "SELECT user_id FROM users WHERE email_hash = $1 AND is_deleted = FALSE",
-    )
-    .bind(email_hash(state, email))
-    .fetch_optional(&state.db.pool)
-    .await?;
+    let row: Option<(i64,)> =
+        sqlx::query_as("SELECT user_id FROM users WHERE email_hash = $1 AND is_deleted = FALSE")
+            .bind(email_hash(state, email))
+            .fetch_optional(&state.db.pool)
+            .await?;
     Ok(row.map(|r| r.0))
 }
 

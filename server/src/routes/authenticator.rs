@@ -58,8 +58,8 @@ struct Entity {
     updated_at: i64,
 }
 
-type EntityTuple = (String, i64, Option<String>, Option<String>, bool, i64, i64);
-const COLS: &str = "id, user_id, encrypted_data, header, is_deleted, created_at, updated_at";
+type EntityTuple = (String, i64, Option<String>, Option<String>, i64, i64, i64);
+const COLS: &str = "id, user_id, encrypted_data, header, CASE WHEN is_deleted THEN 1 ELSE 0 END, created_at, updated_at";
 
 impl From<EntityTuple> for Entity {
     fn from(t: EntityTuple) -> Self {
@@ -68,7 +68,7 @@ impl From<EntityTuple> for Entity {
             user_id: t.1,
             encrypted_data: t.2,
             header: t.3,
-            is_deleted: t.4,
+            is_deleted: t.4 != 0,
             created_at: t.5,
             updated_at: t.6,
         }
@@ -248,10 +248,7 @@ async fn delete_entity(
     AuthAppUser(user): AuthAppUser,
     q: QueryMap,
 ) -> ApiResult<StatusCode> {
-    let id = q
-        .str("id")
-        .and_then(parse_uuid)
-        .ok_or_else(bind_error)?;
+    let id = q.str("id").and_then(parse_uuid).ok_or_else(bind_error)?;
     sqlx::query(
         "UPDATE authenticator_entity SET is_deleted = TRUE, encrypted_data = NULL, header = NULL, updated_at = $1 \
          WHERE id = $2 AND user_id = $3",
