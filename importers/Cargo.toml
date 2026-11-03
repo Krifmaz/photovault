@@ -24,6 +24,7 @@ hex = "0.4"
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "tiff", "bmp"] }
 kamadak-exif = "0.6"
 libsodium-sys-stable = "1.24"
+md-5 = "0.10"
 num-bigint-dig = "0.8"
 reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider", "http2", "json", "query", "stream"] }
 rpassword = "7"

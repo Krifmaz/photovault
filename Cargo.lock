@@ -1634,6 +1634,7 @@ dependencies = [
  "image",
  "kamadak-exif",
  "libsodium-sys-stable",
+ "md-5",
  "num-bigint-dig",
  "reqwest",
  "rpassword",
