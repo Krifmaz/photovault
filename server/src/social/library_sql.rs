@@ -6,9 +6,9 @@
 
 use super::permission_denied;
 use crate::auth::App;
-use crate::library::collections;
 use crate::db::Db;
 use crate::error::ApiResult;
+use crate::library::collections;
 use crate::state::AppState;
 
 /// The caller's role on a collection.

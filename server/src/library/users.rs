@@ -180,16 +180,3 @@ pub async fn require_key_attributes(state: &AppState, user_id: i64) -> ApiResult
             .map_err(db_err)?;
     row.map(|_| ()).ok_or_else(errors::not_found)
 }
-
-/// Best-effort cleanup in tables owned by other workstreams (cast tokens, comments,
-/// reactions). A missing table or column is logged and ignored, so this crate keeps
-/// working whichever of those workstreams are merged.
-pub async fn best_effort(state: &AppState, what: &str, sql: &str, args: &[i64]) {
-    let mut q = sqlx::query(sql);
-    for a in args {
-        q = q.bind(*a);
-    }
-    if let Err(e) = q.execute(&state.db.pool).await {
-        tracing::debug!(error = %e, what, "best-effort cleanup skipped");
-    }
-}

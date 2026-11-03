@@ -337,7 +337,11 @@ pub struct NewReaction {
 
 /// museum `ReactionsController.Upsert` after the access check. Returns the id of the
 /// (possibly pre-existing) reaction of this actor on this target.
-pub async fn upsert_reaction(state: &AppState, actor: &Actor, req: NewReaction) -> ApiResult<String> {
+pub async fn upsert_reaction(
+    state: &AppState,
+    actor: &Actor,
+    req: NewReaction,
+) -> ApiResult<String> {
     let db = &state.db;
     let id = normalize_id("rct_", &req.id)?;
     if req.cipher.is_empty() || req.nonce.is_empty() {

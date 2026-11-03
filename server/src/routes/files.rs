@@ -13,8 +13,7 @@ use crate::library::http::{Empty200, JsonBody, QueryMap, empty_json, header, pat
 use crate::library::links::{self, CreateFileUrlRequest, UpdateFileUrlRequest};
 use crate::library::model::{File, FileAttributes};
 use crate::library::objects::{
-    self, MAX_PARTS, MultipartUploadUrls, TempObject, URL_TTL,
-    UploadUrl,
+    self, MAX_PARTS, MultipartUploadUrls, TempObject, URL_TTL, UploadUrl,
 };
 use crate::library::usage;
 use crate::state::AppState;

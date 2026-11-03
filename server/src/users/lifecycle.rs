@@ -16,6 +16,7 @@ pub async fn delete_account(state: &AppState, user_id: i64, send_email: bool) ->
     let user = get_user(state, user_id).await?;
     crate::legacy::emergency::handle_account_deletion(state, user_id).await?;
     crate::public::memory::delete_for_user(&state.db.pool, user_id).await?;
+    crate::library::collections::handle_account_deletion(state, user_id).await?;
     family::reset_family_access(state, user_id).await?;
     revoke_tokens(&state.db, user_id, Revoke::All).await?;
     let now = now_micros();

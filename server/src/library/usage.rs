@@ -96,18 +96,16 @@ pub async fn can_upload(
         }
         return Ok(());
     }
-    let mut limit = quota(state, user_id).await?;
-    let mut new_usage = usage(state, user_id).await?;
-    if let Some(s) = size {
-        new_usage += s;
-        limit += OVERFLOW;
-    }
-    if new_usage > limit {
-        // Locker bytes do not count against the Photos quota.
-        let (_, locker) = locker_usage(state, user_id).await?;
-        if new_usage - locker > limit {
-            return Err(errors::storage_limit());
+    // Photos: the account's plan, bonus and family limits (`users::store::can_upload`).
+    match crate::users::store::can_upload(state, user_id, size).await {
+        Err(e) if e.status == axum::http::StatusCode::UPGRADE_REQUIRED => {
+            // Locker bytes do not count against the Photos quota.
+            let (_, locker) = locker_usage(state, user_id).await?;
+            if locker == 0 {
+                return Err(e);
+            }
+            crate::users::store::can_upload(state, user_id, Some(size.unwrap_or(0) - locker)).await
         }
+        r => r,
     }
-    Ok(())
 }

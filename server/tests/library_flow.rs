@@ -107,10 +107,6 @@ fn rb64(n: usize) -> String {
     b64(&random_bytes(n))
 }
 
-async fn exec(srv: &TestServer, sql: &str) {
-    sqlx::query(sql).execute(&srv.state.db.pool).await.unwrap();
-}
-
 /// Insert a user with key attributes and a session token; returns a client for it.
 async fn add_user(srv: &TestServer, id: i64, email: &str) -> Client {
     let _ = tracing_subscriber::fmt()

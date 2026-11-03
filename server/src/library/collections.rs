@@ -995,9 +995,63 @@ pub async fn cleanup_revoked_share(state: &AppState, cid: i64, uid: i64) {
     if let Err(e) = crate::social::remove_user_social_activity(&state.db, cid, uid).await {
         tracing::warn!(collection_id = cid, user_id = uid, error = ?e, "social cleanup after unshare failed");
     }
-    if let Err(e) = crate::public::cast::revoke_for_user_and_collection(&state.db.pool, cid, uid).await {
+    if let Err(e) =
+        crate::public::cast::revoke_for_user_and_collection(&state.db.pool, cid, uid).await
+    {
         tracing::warn!(collection_id = cid, user_id = uid, error = %e, "cast revoke after unshare failed");
     }
+}
+
+/// `CollectionController.HandleAccountDeletion` (`ResetUserSharingAccess`): end every share
+/// with or by the user (cleaning up the sharee's comments, reactions and cast sessions),
+/// revoke the user's cast sessions, and disable the user's album and file links.
+/// Memory shares are deleted separately (`public::memory::delete_for_user`).
+pub async fn handle_account_deletion(state: &AppState, uid: i64) -> ApiResult<()> {
+    let rows = sqlx::query(
+        "SELECT collection_id, to_user_id FROM collection_shares
+         WHERE (from_user_id = $1 OR to_user_id = $1) AND is_deleted = FALSE",
+    )
+    .bind(uid)
+    .fetch_all(&state.db.pool)
+    .await
+    .map_err(db_err)?;
+    for r in &rows {
+        let cid = get_i64(r, "collection_id").map_err(db_err)?;
+        let to = get_i64(r, "to_user_id").map_err(db_err)?;
+        unshare_user(state, cid, to).await?;
+        crate::social::remove_user_social_activity(&state.db, cid, to).await?;
+    }
+    crate::public::cast::revoke_for_user(&state.db.pool, uid)
+        .await
+        .map_err(db_err)?;
+    let now = now_micros();
+    let owned = sqlx::query(
+        "SELECT t.collection_id FROM public_collection_tokens t
+         JOIN collections c ON c.collection_id = t.collection_id
+         WHERE c.owner_id = $1 AND t.is_disabled = FALSE",
+    )
+    .bind(uid)
+    .fetch_all(&state.db.pool)
+    .await
+    .map_err(db_err)?;
+    let mut tx = begin(&state.db).await.map_err(db_err)?;
+    for r in &owned {
+        let cid = get_i64(r, "collection_id").map_err(db_err)?;
+        links::disable_collection_link(tx.conn(), cid, now)
+            .await
+            .map_err(db_err)?;
+    }
+    sqlx::query(
+        "UPDATE public_file_tokens SET is_disabled = TRUE, updated_at = $1
+         WHERE owner_id = $2 AND is_disabled = FALSE",
+    )
+    .bind(now)
+    .bind(uid)
+    .execute(tx.conn())
+    .await
+    .map_err(db_err)?;
+    tx.commit().await.map_err(db_err)?;
+    Ok(())
 }
 
 /// `CollectionController.UnShare` (`{collectionID, email}`): returns the remaining sharees.

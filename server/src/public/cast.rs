@@ -3,8 +3,8 @@
 
 use super::http::{header_or_query, json_response, random_string};
 use crate::auth::App;
-use crate::library::collections;
 use crate::db::now_micros;
+use crate::library::collections;
 use crate::state::AppState;
 use axum::extract::FromRequestParts;
 use axum::http::StatusCode;
@@ -302,9 +302,16 @@ impl FromRequestParts<AppState> for CastSession {
             return Err(invalid());
         };
         // museum verifies the caster still has access (`AccessCtrl.GetCollection`).
-        if collections::access(state, collection_id, user_id, App::from_parts(parts), false, false)
-            .await
-            .is_err()
+        if collections::access(
+            state,
+            collection_id,
+            user_id,
+            App::from_parts(parts),
+            false,
+            false,
+        )
+        .await
+        .is_err()
         {
             return Err(invalid());
         }

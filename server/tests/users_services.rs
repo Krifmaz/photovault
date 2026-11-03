@@ -18,18 +18,29 @@ fn far_future() -> i64 {
         + 365 * 24 * 3600 * 1_000_000
 }
 
+/// Mark a user admin, as `photovault admin mark-admin` does.
+async fn mark_admin(srv: &photovault_server::testing::TestServer, user_id: i64) {
+    sqlx::query("UPDATE users SET is_admin = $1 WHERE user_id = $2")
+        .bind(true)
+        .bind(user_id)
+        .execute(&srv.state.db.pool)
+        .await
+        .unwrap();
+}
+
 #[tokio::test]
 async fn admin_billing_and_family() {
     let (a, b, c3) = ("admin@example.org", "bob@example.org", "carol@example.org");
     let srv = server(&[a, b, c3]).await;
     let c = Client::new(&srv);
     let admin = signup(&c, a).await;
+    mark_admin(&srv, admin.id).await;
     let bob = signup(&c, b).await;
     let carol = signup(&c, c3).await;
     let ac = c.with_token(&admin.token);
     let bc = c.with_token(&bob.token);
 
-    // Only the first account (no `admins` configured) is an admin.
+    // Only accounts marked admin (`admin mark-admin`) are admins.
     let (s, v) = bc.get("/admin/users?sinceTime=0").await;
     assert_eq!(s, 401, "{v}");
     let (s, v) = ac.get("/admin/users?sinceTime=0").await;
@@ -272,6 +283,7 @@ async fn referrals_remote_store_and_misc() {
     let srv = server(&[a, b]).await;
     let c = Client::new(&srv);
     let rita = signup(&c, a).await;
+    mark_admin(&srv, rita.id).await;
     let sam = signup(&c, b).await;
     let rc = c.with_token(&rita.token);
     let sc = c.with_token(&sam.token);
@@ -415,7 +427,7 @@ async fn referrals_remote_store_and_misc() {
         )
         .await;
     assert_eq!(s, 400);
-    // Rita is the instance admin (first account).
+    // Rita is the instance admin (marked admin).
     let (s, v) = rc
         .post(
             "/discount/add-coupons",
