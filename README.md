@@ -12,7 +12,12 @@ thumbnail, file name, face or location.
 
 ## Status
 
-Section 1 (Rust server compatible with the stock Ente apps) is in progress.
+Section 1 (Rust server compatible with the stock Ente apps) is complete:
+
+* All 306 museum routes are implemented ([API matrix](docs/src/api-compatibility.md)), on Postgres or SQLite, with local-disk or S3 storage.
+* The unmodified Ente Photos web app passes the end-to-end suite in `tests/e2e/` (21 pass, 1 skipped: the web app has no Legacy screens), the same result as Ente's own server; the desktop app smoke test passes.
+* The mobile app's API usage is audited call by call ([audit](docs/src/mobile-api-audit.md)) with tests in `server/tests/mobile_compat.rs`; a manual phone checklist is in `tests/e2e/README.md`.
+* SRP and crypto are checked against vectors produced by the real Ente client code (`server/tests/vectors/`).
 
 ## Quick start
 
