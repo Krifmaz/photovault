@@ -87,7 +87,7 @@ The harness was validated against Ente's own server (museum, built from the
 same commit) with Postgres and an S3 mock (moto) using
 [`reference/museum.yaml`](reference/museum.yaml) and
 `PHOTOVAULT_E2E_EXTERNAL_API=1` (or by running `runner.mjs` directly):
-**21 passed, 1 skipped** (2026-11-03). Every failure against photovault is
+**21 passed, 1 skipped** of 22 (2026-11-03, full run about 3 min). Every failure against photovault is
 therefore a server incompatibility, not a harness problem.
 
 ### Status against the current photovault core
@@ -95,6 +95,9 @@ therefore a server incompatibility, not a harness problem.
 Against the core scaffold (health/metrics only): `web_app_loads` passes;
 `signup` fails at `POST /users/ott` (404), everything depending on it is
 blocked, `dev_settings_custom_endpoint` fails because `GET /ping` is missing.
+Total: 1 passed, 3 failed (`dev_settings_custom_endpoint`, `signup`,
+`signup_second_user`), 17 blocked, 1 skipped; `run.sh` takes about 4.5 min
+(mostly the two 120 s signup timeouts; the debug server build is cached).
 
 ### Server requirements the tests surfaced
 
@@ -128,7 +131,17 @@ To go back, open the dialog again and clear the field.
 `$PHOTOVAULT_E2E_CACHE/desktop-<commit>`), launches it headless under
 `xvfb-run` with Playwright's Electron driver, sets the endpoint through
 Developer settings and checks that login requests go to the server. It needs
-a server already listening (`E2E_API_URL`, default `http://localhost:18080`).
+a server already listening (`E2E_API_URL`, default `http://localhost:18080`)
+and fails early if `GET /ping` does not answer, so it cannot pass against the
+current core yet. Upstream's `postinstall` (vips, ffmpeg, Electron native deps,
+ONNX Runtime, and a release build of the app's napi Rust addon) is run
+explicitly after `npm ci`, so the build also works where npm is configured
+with `ignore-scripts=true` (as on this machine).
+
+Validated 2026-11-03 against museum: `PASS desktop smoke: app accepted
+http://localhost:18080 and called .../users/srp/attributes?...`. Cold build
+about 11 min on this machine (most of it the napi addon and Electron/vips/
+ffmpeg/ONNX downloads), reusing the web checkout; cached afterwards.
 
 ## Mobile (Flutter) manual checklist
 

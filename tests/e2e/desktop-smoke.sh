@@ -33,6 +33,10 @@ if [[ ! -f "$out/.complete" ]]; then
     (
         cd "$src/desktop"
         npm ci --no-audit --no-fund
+        # Upstream's postinstall (vips, ffmpeg, native deps, ONNX Runtime) is
+        # run explicitly so the build also works where npm has
+        # ignore-scripts=true configured.
+        npm run postinstall
         # Release-like renderer: no NEXT_PUBLIC_ENTE_ENDPOINT, so the app
         # starts on Ente's production API until the user changes it.
         env -u NEXT_PUBLIC_ENTE_ENDPOINT npm run build:quick
