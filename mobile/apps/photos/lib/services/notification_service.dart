@@ -1,0 +1,494 @@
+import "dart:async";
+import 'dart:io';
+
+import "package:android_intent_plus/android_intent.dart";
+import "package:flutter/services.dart";
+import "package:flutter/widgets.dart";
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import "package:flutter_timezone/flutter_timezone.dart";
+import "package:logging/logging.dart";
+import "package:package_info_plus/package_info_plus.dart";
+import "package:permission_handler/permission_handler.dart";
+import "package:photos/core/configuration.dart";
+import "package:photos/services/language_service.dart";
+import "package:photos/services/notification_key_service.dart";
+import "package:photos/services/timezone_aliases.dart";
+import "package:shared_preferences/shared_preferences.dart";
+import 'package:timezone/data/latest_10y.dart' as tzdb;
+import "package:timezone/timezone.dart" as tz;
+
+class NotificationService {
+  static final NotificationService instance =
+      NotificationService._privateConstructor();
+  static const String keyShouldShowNotificationsForSharedPhotos =
+      "notifications_enabled_shared_photos";
+  static const String keyShouldShowSocialNotifications =
+      "notifications_enabled_social";
+  static const String _keyHasAttemptedNotificationPermission =
+      "has_attempted_notification_permission";
+
+  NotificationService._privateConstructor();
+
+  late SharedPreferences _preferences;
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  final _logger = Logger("NotificationService");
+  void Function(NotificationResponse notificationResponse)?
+  _onNotificationTapped;
+  bool _pluginInitialized = false;
+  bool _launchDetailsHandled = false;
+
+  void init(SharedPreferences preferences) {
+    _preferences = preferences;
+    unawaited(preferences.remove("notification_permission_granted"));
+    unawaited(_shareNotificationPreferencesWithNSE());
+  }
+
+  Future<void> handlePushNotification(
+    Map<String, dynamic> data, {
+    required Future<void> Function() onSync,
+  }) async {
+    if (!data.containsKey('notificationCiphertext')) {
+      if (data['action'] == 'sync') await onSync();
+      return;
+    }
+    if (!Platform.isAndroid) return;
+    Map<String, dynamic>? event;
+    try {
+      event = await NotificationKeyService.decrypt(data);
+    } catch (_) {
+      _logger.warning('Could not decrypt notification');
+    }
+    if (event == null) {
+      await _preferences.reload();
+      if (!_preferences.containsKey(Configuration.hasSecureTokenKey) &&
+          !_preferences.containsKey(Configuration.tokenKey)) {
+        return;
+      }
+      if (shouldShowNotificationsForSharedPhotosAndAlbums()) {
+        final strings = await LanguageService.locals;
+        await showNotification(
+          strings.entePhotos,
+          strings.notificationNewActivity,
+          id: -1,
+        );
+      }
+      return;
+    }
+    if (event['eventType'] == 'album_shared') {
+      _logger.info('Received encrypted album-share push');
+      await onSync();
+    }
+  }
+
+  bool timezoneInitialized = false;
+
+  Future<void> initialize(
+    void Function(NotificationResponse notificationResponse)
+    onNotificationTapped,
+  ) async {
+    _onNotificationTapped = onNotificationTapped;
+    await _ensurePluginInitialized();
+    await _handleLaunchDetailsIfNeeded();
+  }
+
+  Future<void> initializeForBackground() async {
+    await _ensurePluginInitialized();
+  }
+
+  Future<void> _ensurePluginInitialized() async {
+    if (_pluginInitialized) return;
+    final pluginInitStopwatch = Stopwatch()..start();
+    const androidSettings = AndroidInitializationSettings('notification_icon');
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestCriticalPermission: false,
+    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: androidSettings, iOS: iosSettings);
+    await _notificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: _handleNotificationResponse,
+    );
+    _logger.info(
+      "flutter_local_notifications.initialize took ${pluginInitStopwatch.elapsedMilliseconds}ms",
+    );
+    _pluginInitialized = true;
+  }
+
+  void _handleNotificationResponse(NotificationResponse response) {
+    if (_onNotificationTapped != null) {
+      _onNotificationTapped!(response);
+      return;
+    }
+    _logger.warning(
+      "Notification response received before handler was set; ignoring.",
+    );
+  }
+
+  Future<void> _handleLaunchDetailsIfNeeded() async {
+    if (_launchDetailsHandled) return;
+    final launchDetailsStopwatch = Stopwatch()..start();
+    final launchDetails = await _notificationsPlugin
+        .getNotificationAppLaunchDetails();
+    _logger.info(
+      "getNotificationAppLaunchDetails took ${launchDetailsStopwatch.elapsedMilliseconds}ms",
+    );
+    if (launchDetails != null &&
+        launchDetails.didNotificationLaunchApp &&
+        launchDetails.notificationResponse != null) {
+      _onNotificationTapped?.call(launchDetails.notificationResponse!);
+    }
+    _launchDetailsHandled = true;
+  }
+
+  Future<void> initTimezones() async {
+    if (timezoneInitialized) return;
+    final timezoneInitStopwatch = Stopwatch()..start();
+    final tzdbStopwatch = Stopwatch()..start();
+    tzdb.initializeTimeZones();
+    _logger.info(
+      "tz.initializeTimeZones took ${tzdbStopwatch.elapsedMilliseconds}ms",
+    );
+    final localTimezoneStopwatch = Stopwatch()..start();
+    final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    _logger.info(
+      "FlutterTimezone.getLocalTimezone took ${localTimezoneStopwatch.elapsedMilliseconds}ms",
+    );
+    final String resolvedTimeZone = _resolveTimeZoneName(currentTimeZone);
+    tz.setLocalLocation(tz.getLocation(resolvedTimeZone));
+    timezoneInitialized = true;
+    _logger.info(
+      "Notification timezone init took ${timezoneInitStopwatch.elapsedMilliseconds}ms",
+    );
+  }
+
+  String _resolveTimeZoneName(String timeZoneName) {
+    if (tz.timeZoneDatabase.locations.containsKey(timeZoneName)) {
+      return timeZoneName;
+    }
+
+    final alias = kTimeZoneAliases[timeZoneName];
+    if (alias != null && tz.timeZoneDatabase.locations.containsKey(alias)) {
+      _logger.warning(
+        'Timezone "$timeZoneName" not found, using alias "$alias".',
+      );
+      return alias;
+    }
+
+    final normalized = timeZoneName.replaceAll(' ', '_');
+    if (normalized != timeZoneName &&
+        tz.timeZoneDatabase.locations.containsKey(normalized)) {
+      _logger.warning(
+        'Timezone "$timeZoneName" not found, using normalized "$normalized".',
+      );
+      return normalized;
+    }
+
+    final lower = timeZoneName.toLowerCase();
+    String? caseMatch;
+    for (final name in tz.timeZoneDatabase.locations.keys) {
+      if (name.toLowerCase() == lower) {
+        caseMatch = name;
+        break;
+      }
+    }
+    if (caseMatch != null) {
+      _logger.warning(
+        'Timezone "$timeZoneName" not found, using "$caseMatch".',
+      );
+      return caseMatch;
+    }
+
+    _logger.warning('Timezone "$timeZoneName" not found, falling back to UTC.');
+    return 'UTC';
+  }
+
+  Future<bool> requestPermissions(BuildContext context) async {
+    if (await hasGrantedPermissions()) return true;
+    if (!context.mounted) return false;
+
+    final hasAttemptedPermission =
+        _preferences.getBool(_keyHasAttemptedNotificationPermission) ?? false;
+    if (!hasAttemptedPermission) {
+      await _preferences.setBool(_keyHasAttemptedNotificationPermission, true);
+      if (!context.mounted) return false;
+      return _askPermissions();
+    }
+
+    if (!context.mounted) return false;
+    await _openNotificationSettings();
+    const interval = Duration(milliseconds: 500);
+    const maxAttempts = 400;
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      await Future.delayed(interval);
+      if (await hasGrantedPermissions()) return true;
+    }
+    return false;
+  }
+
+  Future<bool> _askPermissions() async {
+    await _ensurePluginInitialized();
+    if (Platform.isIOS) {
+      final impl = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      return await impl?.requestPermissions(sound: true, alert: true) ?? false;
+    }
+    final impl = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    return await impl?.requestNotificationsPermission() ?? false;
+  }
+
+  Future<void> _openNotificationSettings() async {
+    if (Platform.isIOS) {
+      await openAppSettings();
+      return;
+    }
+    final packageInfo = await PackageInfo.fromPlatform();
+    await AndroidIntent(
+      action: "android.settings.APP_NOTIFICATION_SETTINGS",
+      arguments: {
+        "android.provider.extra.APP_PACKAGE": packageInfo.packageName,
+      },
+    ).launch();
+  }
+
+  Future<bool> hasGrantedPermissions() async {
+    await _ensurePluginInitialized();
+    if (Platform.isIOS) {
+      final impl = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      return (await impl?.checkPermissions())?.isEnabled ?? false;
+    }
+    final impl = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    return await impl?.areNotificationsEnabled() ?? false;
+  }
+
+  bool shouldShowNotificationsForSharedPhotosAndAlbums() {
+    final result = _preferences.getBool(
+      keyShouldShowNotificationsForSharedPhotos,
+    );
+    return result ?? true;
+  }
+
+  Future<void> setShouldShowNotificationsForSharedPhotosAndAlbums(
+    bool value,
+  ) async {
+    await _preferences.setBool(
+      keyShouldShowNotificationsForSharedPhotos,
+      value,
+    );
+    await _shareNotificationPreferencesWithNSE();
+  }
+
+  bool shouldShowSocialNotifications() {
+    final result = _preferences.getBool(keyShouldShowSocialNotifications);
+    return result ?? true;
+  }
+
+  Future<void> setShouldShowSocialNotifications(bool value) async {
+    await _preferences.setBool(keyShouldShowSocialNotifications, value);
+    await _shareNotificationPreferencesWithNSE();
+  }
+
+  Future<void> _shareNotificationPreferencesWithNSE() async {
+    if (!Platform.isIOS) return;
+    try {
+      await const MethodChannel(
+        'io.ente.frame.notifications',
+      ).invokeMethod<void>('sharePreferences');
+    } on PlatformException catch (e, s) {
+      _logger.warning('Could not share notification preferences', e, s);
+    }
+  }
+
+  Future<void> showNotification(
+    String title,
+    String message, {
+    int? id,
+    String channelID = "io.ente.photos",
+    String channelName = "ente",
+    String payload = "ente://home",
+  }) async {
+    await _ensurePluginInitialized();
+    _logger.info(
+      "Showing notification with: $title, $message, $channelID, $channelName, $payload",
+    );
+    final androidSpecs = AndroidNotificationDetails(
+      channelID,
+      channelName,
+      channelDescription: 'ente alerts',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: 'notification_icon',
+      showWhen: false,
+    );
+    final iosSpecs = DarwinNotificationDetails(threadIdentifier: channelID);
+    final platformChannelSpecs = NotificationDetails(
+      android: androidSpecs,
+      iOS: iosSpecs,
+    );
+    await _notificationsPlugin.show(
+      id ?? channelName.hashCode,
+      title,
+      message,
+      platformChannelSpecs,
+      payload: payload,
+    );
+  }
+
+  Future<void> showBackgroundDebugNotification(
+    String title,
+    String message,
+  ) async {
+    await _ensurePluginInitialized();
+    const channelID = "io.ente.photos.background.debug";
+    const androidSpecs = AndroidNotificationDetails(
+      channelID,
+      "Background debug",
+      importance: Importance.min,
+      priority: Priority.min,
+      playSound: false,
+      enableVibration: false,
+      icon: 'notification_icon',
+    );
+    const iosSpecs = DarwinNotificationDetails(
+      threadIdentifier: channelID,
+      presentSound: false,
+    );
+    await _notificationsPlugin.show(
+      DateTime.now().microsecondsSinceEpoch.remainder(1 << 31),
+      title,
+      message,
+      const NotificationDetails(android: androidSpecs, iOS: iosSpecs),
+      payload: "ente://home",
+    );
+  }
+
+  Future<void> scheduleNotification(
+    String title, {
+    String? message,
+    required int id,
+    String channelID = "io.ente.photos",
+    String channelName = "ente",
+    String payload = "ente://home",
+    required DateTime dateTime,
+    Duration? timeoutDurationAndroid,
+    bool logSchedule = true,
+  }) async {
+    try {
+      await _ensurePluginInitialized();
+      if (logSchedule) {
+        _logger.info(
+          "Scheduling notification with: $title, $message, $channelID, $channelName, $payload",
+        );
+      }
+      await initTimezones();
+      final androidSpecs = AndroidNotificationDetails(
+        channelID,
+        channelName,
+        channelDescription: 'ente alerts',
+        importance: Importance.max,
+        priority: Priority.high,
+        category: AndroidNotificationCategory.reminder,
+        icon: 'notification_icon',
+        showWhen: false,
+        timeoutAfter: timeoutDurationAndroid?.inMilliseconds,
+      );
+      final iosSpecs = DarwinNotificationDetails(threadIdentifier: channelID);
+      final platformChannelSpecs = NotificationDetails(
+        android: androidSpecs,
+        iOS: iosSpecs,
+      );
+      final scheduledDate = tz.TZDateTime.local(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        dateTime.hour,
+        dateTime.minute,
+        dateTime.second,
+      );
+      await _notificationsPlugin.zonedSchedule(
+        id,
+        title,
+        message,
+        scheduledDate,
+        platformChannelSpecs,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: payload,
+      );
+      if (logSchedule) {
+        _logger.info(
+          "Scheduled notification with: $title, $message, $channelID, $channelName, $payload for $dateTime",
+        );
+      }
+    } catch (e, s) {
+      // Notification failures must not interrupt memory or ritual updates.
+      _logger.severe(
+        "Something went wrong while scheduling notification",
+        e,
+        s,
+      );
+    }
+  }
+
+  Future<void> clearAllScheduledNotifications({
+    String? containingPayload,
+    bool logLines = true,
+  }) async {
+    try {
+      await _ensurePluginInitialized();
+      if (logLines) {
+        _logger.info("Clearing all scheduled notifications");
+      }
+      final pending = await _notificationsPlugin.pendingNotificationRequests();
+      if (pending.isEmpty) {
+        if (logLines) {
+          _logger.info("No pending notifications to clear");
+        }
+        return;
+      }
+      for (final request in pending) {
+        if (containingPayload != null &&
+            !request.payload.toString().contains(containingPayload)) {
+          if (logLines) {
+            _logger.info(
+              "Skip clearing of notification with id: ${request.id} and payload: ${request.payload}",
+            );
+          }
+          continue;
+        }
+        if (logLines) {
+          _logger.info(
+            "Clearing notification with id: ${request.id} and payload: ${request.payload}",
+          );
+        }
+        await _notificationsPlugin.cancel(request.id);
+        if (logLines) {
+          _logger.info(
+            "Cleared notification with id: ${request.id} and payload: ${request.payload}",
+          );
+        }
+      }
+    } catch (e, s) {
+      _logger.severe("Something is wrong with scheduled notifications", e, s);
+    }
+  }
+
+  Future<int> pendingNotifications() async {
+    await _ensurePluginInitialized();
+    final pending = await _notificationsPlugin.pendingNotificationRequests();
+    return pending.length;
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES2023",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "noEmit": true,
+        "checkJs": true,
+        "esModuleInterop": true
+    },
+    "include": ["eslintrc-base.mjs"]
+}

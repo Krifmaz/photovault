@@ -1,0 +1,508 @@
+import {
+    beginPasskeyAuthentication,
+    finishPasskeyAuthentication,
+    isWebAuthnSupported,
+    parseRedirectURLParam,
+    passkeyAuthenticationSuccessRedirectURL,
+    redirectToPasskeyRecoverPage,
+    signChallenge,
+    type BeginPasskeyAuthenticationResponse,
+} from "@/services/passkey";
+import InfoIcon from "@mui/icons-material/Info";
+import KeyIcon from "@mui/icons-material/Key";
+import { Paper, Stack, Typography, styled } from "@mui/material";
+import { TwoFactorAuthorizationResponse } from "ente-accounts/services/user";
+import { CenteredFill } from "ente-base/components/containers";
+import { EnteLogo } from "ente-base/components/EnteLogo";
+import { ActivityIndicator } from "ente-base/components/mui/ActivityIndicator";
+import { FocusVisibleButton } from "ente-base/components/mui/FocusVisibleButton";
+import { NavbarBase } from "ente-base/components/Navbar";
+import { isNamedError } from "ente-base/error";
+import { HTTPError } from "ente-base/http";
+import log from "ente-base/log";
+import { nullToUndefined } from "ente-utils/transform";
+import { t } from "i18next";
+import React, { useCallback, useEffect, useState } from "react";
+
+const Page = () => {
+    type Status =
+        | "loading"
+        | "webAuthnNotSupported"
+        | "unknownRedirect"
+        | "sessionAlreadyClaimed"
+        | "unrecoverableFailure"
+        | "failedDuringSignChallenge"
+        | "failed"
+        | "lockerRegistrationDisabled"
+        | "lockerRolloutLimitReached"
+        | "needUserFocus"
+        | "waitingForUser"
+        | "redirectingWeb"
+        | "redirectingApp";
+
+    const [status, setStatus] = useState<Status>("loading");
+
+    // Safari can reject WebAuthn on a newly opened page as unfocused.
+    // Preserve the server response so a user click can retry the browser step.
+    interface Continuation {
+        redirectURL: URL;
+        clientPackage: string;
+        passkeySessionID: string;
+        beginResponse: BeginPasskeyAuthenticationResponse;
+    }
+    const [continuation, setContinuation] = useState<
+        Continuation | undefined
+    >();
+
+    const [successRedirectURL, setSuccessRedirectURL] = useState<
+        URL | undefined
+    >();
+
+    const authenticateBegin = useCallback(async () => {
+        if (!isWebAuthnSupported()) {
+            setStatus("webAuthnNotSupported");
+            return;
+        }
+
+        const searchParams = new URLSearchParams(window.location.search);
+
+        const redirect = nullToUndefined(searchParams.get("redirect"));
+        const redirectURL = parseRedirectURLParam(redirect);
+        if (!redirectURL) {
+            log.error(`Redirect '${redirect}' is not whitelisted`);
+            setStatus("unknownRedirect");
+            return;
+        }
+
+        const clientPackage = nullToUndefined(
+            searchParams.get("clientPackage"),
+        );
+        if (!clientPackage) {
+            setStatus("unrecoverableFailure");
+            return;
+        }
+
+        setStatus("loading");
+
+        const passkeySessionID = nullToUndefined(
+            searchParams.get("passkeySessionID"),
+        );
+        if (!passkeySessionID) {
+            setStatus("unrecoverableFailure");
+            return;
+        }
+
+        let beginResponse: BeginPasskeyAuthenticationResponse;
+        try {
+            beginResponse = await beginPasskeyAuthentication(passkeySessionID);
+        } catch (e) {
+            log.error("Failed to begin passkey authentication", e);
+            setStatus(
+                isNamedError(e, "passkey_session_already_claimed")
+                    ? "sessionAlreadyClaimed"
+                    : "failed",
+            );
+            return;
+        }
+
+        return { redirectURL, passkeySessionID, clientPackage, beginResponse };
+    }, []);
+
+    const authenticateContinue = useCallback(async (cont: Continuation) => {
+        const { redirectURL, passkeySessionID, clientPackage, beginResponse } =
+            cont;
+        const { ceremonySessionID, options } = beginResponse;
+
+        setStatus("waitingForUser");
+
+        let credential: Credential | undefined;
+        try {
+            credential = await signChallenge(options.publicKey);
+            if (!credential) {
+                setStatus("failedDuringSignChallenge");
+                return;
+            }
+        } catch (e) {
+            log.error("Failed to get credentials", e);
+            if (
+                isNamedError(e, "NotAllowedError") &&
+                e.message == "The document is not focused."
+            ) {
+                setStatus("needUserFocus");
+            } else {
+                setStatus("failedDuringSignChallenge");
+            }
+            return;
+        }
+
+        setStatus("loading");
+
+        let authorizationResponse: TwoFactorAuthorizationResponse;
+        try {
+            authorizationResponse = await finishPasskeyAuthentication({
+                passkeySessionID,
+                ceremonySessionID,
+                clientPackage,
+                credential,
+            });
+        } catch (e) {
+            log.error("Failed to finish passkey authentication", e);
+            const lockerErrorCode = await lockerAccessErrorCode(e);
+            if (lockerErrorCode == "LOCKER_REGISTRATION_DISABLED") {
+                setStatus("lockerRegistrationDisabled");
+            } else if (lockerErrorCode == "LOCKER_ROLLOUT_LIMIT") {
+                setStatus("lockerRolloutLimitReached");
+            } else {
+                setStatus("failed");
+            }
+            return;
+        }
+
+        setStatus(isHTTP(redirectURL) ? "redirectingWeb" : "redirectingApp");
+
+        setSuccessRedirectURL(
+            await passkeyAuthenticationSuccessRedirectURL(
+                redirectURL,
+                passkeySessionID,
+                authorizationResponse,
+            ),
+        );
+    }, []);
+
+    const authenticate = useCallback(async () => {
+        const cont = await authenticateBegin();
+        if (cont) {
+            setContinuation(cont);
+            await authenticateContinue(cont);
+        }
+    }, [authenticateBegin, authenticateContinue]);
+
+    useEffect(() => {
+        void authenticate();
+    }, [authenticate]);
+
+    useEffect(() => {
+        if (successRedirectURL) redirectToURL(successRedirectURL);
+    }, [successRedirectURL]);
+
+    const handleVerify = () => void authenticateContinue(continuation!);
+
+    const handleRetry = () => void authenticate();
+
+    const handleRecover = (() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const recover = nullToUndefined(searchParams.get("recover"));
+        if (!recover) return undefined;
+
+        const recoverURL = parseRedirectURLParam(recover);
+        if (!recoverURL) return undefined;
+
+        return () => redirectToPasskeyRecoverPage(recoverURL);
+    })();
+
+    const handleRedirectAgain = () => redirectToURL(successRedirectURL!);
+
+    const components: Record<Status, React.ReactNode> = {
+        loading: <ActivityIndicator />,
+        unknownRedirect: <UnknownRedirect />,
+        webAuthnNotSupported: <WebAuthnNotSupported />,
+        sessionAlreadyClaimed: <SessionAlreadyClaimed />,
+        unrecoverableFailure: <UnrecoverableFailure />,
+        failedDuringSignChallenge: (
+            <RetriableFailed
+                duringSignChallenge
+                onRetry={handleRetry}
+                onRecover={handleRecover}
+            />
+        ),
+        failed: (
+            <RetriableFailed onRetry={handleRetry} onRecover={handleRecover} />
+        ),
+        lockerRegistrationDisabled: (
+            <LockerAccessError
+                title="Oops"
+                body="Locker is available only to Ente photos paid users. Upgrade to a paid plan from Photos to use Locker"
+            />
+        ),
+        lockerRolloutLimitReached: (
+            <LockerAccessError
+                title="We're out of beta seats for now"
+                body="This preview access has reached capacity. We'll be opening it to more users soon."
+            />
+        ),
+        needUserFocus: <Verify onVerify={handleVerify} />,
+        waitingForUser: <WaitingForUser />,
+        redirectingWeb: <RedirectingWeb />,
+        redirectingApp: <RedirectingApp onRetry={handleRedirectAgain} />,
+    };
+
+    return (
+        <Stack
+            sx={[
+                { minHeight: "100svh", bgcolor: "secondary.main" },
+                (theme) =>
+                    theme.applyStyles("dark", {
+                        bgcolor: "background.default",
+                    }),
+            ]}
+        >
+            <NavbarBase
+                sx={{
+                    boxShadow: "none",
+                    borderBottom: "none",
+                    bgcolor: "transparent",
+                }}
+            >
+                <EnteLogo />
+            </NavbarBase>
+            <CenteredFill
+                sx={[
+                    { bgcolor: "secondary.main" },
+                    (theme) =>
+                        theme.applyStyles("dark", {
+                            bgcolor: "background.default",
+                        }),
+                ]}
+            >
+                {components[status]}
+            </CenteredFill>
+        </Stack>
+    );
+};
+
+export default Page;
+
+const isHTTP = (url: URL) => url.protocol.startsWith("http");
+
+const redirectToURL = (url: URL) => {
+    log.info("Redirecting after passkey authentication");
+    window.location.href = url.href;
+};
+
+const UnknownRedirect: React.FC = () => (
+    <Failed message={t("passkey_login_invalid_url")} />
+);
+
+const WebAuthnNotSupported: React.FC = () => (
+    <Failed message={t("passkeys_not_supported")} />
+);
+
+const SessionAlreadyClaimed: React.FC = () => (
+    <ContentPaper>
+        <SessionAlreadyClaimed_>
+            <InfoIcon color="secondary" />
+            <Typography>
+                {t("passkey_login_already_claimed_session")}
+            </Typography>
+        </SessionAlreadyClaimed_>
+    </ContentPaper>
+);
+
+const SessionAlreadyClaimed_ = styled("div")`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+`;
+
+const UnrecoverableFailure: React.FC = () => (
+    <Failed message={t("passkey_login_generic_error")} />
+);
+
+interface FailedProps {
+    message: string;
+}
+
+const Failed: React.FC<FailedProps> = ({ message }) => (
+    <ContentPaper>
+        <InfoIcon color="secondary" />
+        <Typography variant="h6">{t("passkey_login_failed")}</Typography>
+        <Typography sx={{ color: "text.muted" }}>{message}</Typography>
+    </ContentPaper>
+);
+
+interface LockerAccessErrorProps {
+    title: string;
+    body: string;
+}
+
+const LockerAccessError: React.FC<LockerAccessErrorProps> = ({
+    title,
+    body,
+}) => (
+    <ContentPaper>
+        <InfoIcon color="secondary" fontSize="large" />
+        <Typography variant="h5">{title}</Typography>
+        <Typography sx={{ color: "text.muted" }}>{body}</Typography>
+    </ContentPaper>
+);
+
+const ContentPaper = styled(Paper)(({ theme }) => ({
+    marginBlock: theme.spacing(2),
+    padding: theme.spacing(5, 3),
+    [theme.breakpoints.up("sm")]: { padding: theme.spacing(5) },
+    width: "min(420px, 85vw)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+    boxShadow: "none",
+    borderRadius: "20px",
+}));
+
+interface VerifyProps {
+    onVerify: () => void;
+}
+
+const Verify: React.FC<VerifyProps> = ({ onVerify }) => (
+    <ContentPaper>
+        <KeyIcon color="secondary" fontSize="large" />
+        <Typography variant="h3">{t("passkey")}</Typography>
+        <Typography sx={{ color: "text.muted" }}>
+            {t("passkey_verify_description")}
+        </Typography>
+        <ButtonStack>
+            <FocusVisibleButton onClick={onVerify} fullWidth color="accent">
+                {t("verify")}
+            </FocusVisibleButton>
+        </ButtonStack>
+    </ContentPaper>
+);
+
+interface RetriableFailedProps {
+    duringSignChallenge?: boolean;
+    onRetry: () => void;
+    onRecover: (() => void) | undefined;
+}
+
+const RetriableFailed: React.FC<RetriableFailedProps> = ({
+    duringSignChallenge,
+    onRetry,
+    onRecover,
+}) => (
+    <ContentPaper>
+        <InfoIcon color="secondary" fontSize="large" />
+        <Typography variant="h5">{t("passkey_login_failed")}</Typography>
+        <Typography sx={{ color: "text.muted" }}>
+            {duringSignChallenge
+                ? t("passkey_login_credential_hint")
+                : t("passkey_login_generic_error")}
+        </Typography>
+        <ButtonStack>
+            <FocusVisibleButton onClick={onRetry} fullWidth color="secondary">
+                {t("try_again")}
+            </FocusVisibleButton>
+            {onRecover && (
+                <FocusVisibleButton
+                    onClick={onRecover}
+                    fullWidth
+                    variant="text"
+                >
+                    {t("recover_two_factor")}
+                </FocusVisibleButton>
+            )}
+        </ButtonStack>
+    </ContentPaper>
+);
+
+const ButtonStack = styled("div")`
+    display: flex;
+    flex-direction: column;
+    margin-block-start: 1rem;
+    gap: 1rem;
+`;
+
+const WaitingForUser: React.FC = () => (
+    <ContentPaper>
+        <Typography variant="h3" sx={{ mt: 1 }}>
+            {t("passkey_login")}
+        </Typography>
+        <Typography sx={{ color: "text.muted" }}>
+            {t("passkey_login_instructions")}
+        </Typography>
+        <WaitingImgContainer>
+            <img
+                alt=""
+                height={150}
+                width={150}
+                src="/images/ente-circular.png"
+            />
+        </WaitingImgContainer>
+    </ContentPaper>
+);
+
+const WaitingImgContainer = styled("div")`
+    display: flex;
+    justify-content: center;
+    margin-block-start: 1rem;
+`;
+
+const RedirectingWeb: React.FC = () => (
+    <ContentPaper>
+        <InfoIcon color="accent" fontSize="large" />
+        <Typography variant="h5">{t("passkey_verified")}</Typography>
+        <Typography sx={{ color: "text.muted" }}>
+            {t("redirecting_back_to_app")}
+        </Typography>
+    </ContentPaper>
+);
+
+interface RedirectingAppProps {
+    onRetry: () => void;
+}
+
+const RedirectingApp: React.FC<RedirectingAppProps> = ({ onRetry }) => (
+    <ContentPaper>
+        <InfoIcon color="accent" fontSize="large" />
+        <Typography variant="h5">{t("passkey_verified")}</Typography>
+        <Typography sx={{ color: "text.muted" }}>
+            {t("redirecting_back_to_app")}
+        </Typography>
+        <Typography sx={{ color: "text.muted" }}>
+            {t("redirect_close_instructions")}
+        </Typography>
+        <ButtonStack>
+            <FocusVisibleButton fullWidth color="secondary" onClick={onRetry}>
+                {t("redirect_again")}
+            </FocusVisibleButton>
+        </ButtonStack>
+    </ContentPaper>
+);
+
+type LockerErrorCode =
+    "LOCKER_REGISTRATION_DISABLED" | "LOCKER_ROLLOUT_LIMIT" | undefined;
+
+interface LockerErrorPayload {
+    code: string;
+}
+
+const isLockerErrorPayload = (
+    payload: unknown,
+): payload is LockerErrorPayload =>
+    typeof payload == "object" &&
+    payload !== null &&
+    "code" in payload &&
+    typeof payload.code === "string";
+
+const lockerAccessErrorCode = async (
+    error: unknown,
+): Promise<LockerErrorCode> => {
+    if (!(error instanceof HTTPError) || error.res.status !== 403) {
+        return undefined;
+    }
+
+    try {
+        const payload = (await error.res.clone().json()) as unknown;
+        const code = isLockerErrorPayload(payload) ? payload.code : undefined;
+
+        if (
+            code === "LOCKER_REGISTRATION_DISABLED" ||
+            code === "LOCKER_ROLLOUT_LIMIT"
+        ) {
+            return code;
+        }
+    } catch (parseError) {
+        log.warn("Failed to parse locker access error payload", parseError);
+    }
+
+    return undefined;
+};

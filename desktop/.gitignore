@@ -1,0 +1,13 @@
+.env
+.env.*.local
+
+app/
+out
+dist/
+
+build/vips*
+build/ffmpeg/
+build/onnxruntime/
+build/napi/
+
+rust-bindings/
