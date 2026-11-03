@@ -1,0 +1,52 @@
+{
+  "$comment": "App identity contract v1. APK 1 and APK 2 install side by side.",
+  "apps": {
+    "photovault": {
+      "displayName": "Photovault",
+      "track": "fork-mobile",
+      "path": "mobile/apps/photos",
+      "androidApplicationId": "app.photovault",
+      "androidApplicationIdDebug": "app.photovault.debug",
+      "androidReleaseFlavor": "independent (applicationIdSuffix removed so release is exactly app.photovault)",
+      "abi": "arm64-v8a",
+      "buildDefines": {
+        "endpoint": "--dart-define=endpoint=<default server URL> (Ente's existing key, endpoint_config.dart)",
+        "PHOTOVAULT_SERVER_NAME": "--dart-define=PHOTOVAULT_SERVER_NAME=<optional label for the built-in server>"
+      },
+      "deepLinkScheme": "photovault"
+    },
+    "photovault-native": {
+      "displayName": "Photovault Native",
+      "track": "native-android",
+      "path": "native/android",
+      "androidApplicationId": "app.photovault.native",
+      "androidApplicationIdDebug": "app.photovault.native.debug",
+      "androidNamespace": "app.photovault.android",
+      "$namespaceNote": "namespace/Kotlin package cannot contain 'native' (Java keyword breaks generated R/BuildConfig); the applicationId can.",
+      "abi": "arm64-v8a",
+      "minSdk": 28,
+      "targetSdk": 36,
+      "buildConfig": { "DEFAULT_SERVER_URL": "gradle property photovault.defaultServer, empty = none" },
+      "deepLinkScheme": "photovault"
+    },
+    "photovault-web": {
+      "displayName": "Photovault",
+      "track": "fork-web",
+      "path": "web/apps/photos",
+      "staticExport": "web/apps/photos/out",
+      "servedFrom": "PHOTOVAULT_WEB_DIR (/app/web in the image), same port as the API",
+      "buildEnv": { "NEXT_PUBLIC_ENTE_ENDPOINT": "default API origin; empty = same origin the page was served from" }
+    }
+  },
+  "core": {
+    "crate": "core",
+    "package": "photovault-core",
+    "libName": "photovault_core",
+    "kotlinPackage": "app.photovault.core",
+    "uniffi": "0.32 proc-macros"
+  },
+  "discovery": { "dnsSdService": "_photovault._tcp", "txt": ["name", "version", "public", "home", "info"] },
+  "qr": "photovault://connect?url=<publicUrl>&home=<homeUrl>&name=<name> (bare http(s) URL also accepted)",
+  "aboutCredit": "Based on Ente",
+  "signing": "Release APKs are signed in CI from secrets PHOTOVAULT_KEYSTORE_B64, PHOTOVAULT_KEYSTORE_PASSWORD, PHOTOVAULT_KEY_ALIAS, PHOTOVAULT_KEY_PASSWORD; unsigned debug-signed fallback when absent."
+}
