@@ -1,3 +1,4 @@
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_icons/ente_icons.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:ente_ui/components/loading_widget.dart";
@@ -18,7 +19,7 @@ import "package:photos/ui/viewer/file/thumbnail_widget.dart";
 
 final _logger = Logger("LikeCollectionSelectorSheet");
 
-const _greenHeartColor = Color(0xFF08C225);
+const _greenHeartColor = encoreLightAccent2; // PHOTOVAULT: theme
 
 class _CollectionLikeState {
   final Collection collection;

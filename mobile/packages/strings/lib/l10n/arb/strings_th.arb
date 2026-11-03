@@ -19,7 +19,7 @@
   },
   "addMore": "เพิ่มอีก",
   "addToAlbum": "เพิ่มไปยังอัลบั้ม",
-  "addToEnte": "เพิ่มไปที่ Ente",
+  "addToEnte": "เพิ่มไปที่ Photovault",
   "after1Day": "หลังจาก 1 วัน",
   "after1Hour": "หลังจาก 1 ชั่วโมง",
   "after1Month": "หลังจาก 1 เดือน",
@@ -91,7 +91,7 @@
     "description": "Create account button label"
   },
   "createAlbumActionHint": "กดค้างเพื่อเลือกรูปภาพ แล้วกด + เพื่อสร้างอัลบั้ม",
-  "createAnEnteAccount": "สร้างบัญชี Ente",
+  "createAnEnteAccount": "สร้างบัญชี Photovault",
   "createPublicLink": "สร้างลิงก์สาธารณะ",
   "creatingLink": "กำลังสร้างลิ้งค์",
   "custom": "กำหนดเอง",
@@ -113,7 +113,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "ลบอัลบั้มที่ว่างเปล่าหรือไม่?",
   "deleteFromBoth": "ลบออกจากทั้งคู่",
   "deleteFromDevice": "ลบออกจากเครื่อง",
-  "deleteFromEnte": "ลบออกจาก Ente",
+  "deleteFromEnte": "ลบออกจาก Photovault",
   "deleteProgress": "กำลังลบ {currentlyDeleting} / {totalCount}",
   "@deleteProgress": {
     "placeholders": {
@@ -149,7 +149,7 @@
     "description": "Error message when email is already registered"
   },
   "emailHint": "กรอกที่อยู่อีเมลของคุณ",
-  "emailNoEnteAccountPhotos": "{email} ไม่มีบัญชี Ente\n\nส่งคำเชิญไปให้พวกเขาเพื่อแบ่งปันรูปภาพ",
+  "emailNoEnteAccountPhotos": "{email} ไม่มีบัญชี Photovault\n\nส่งคำเชิญไปให้พวกเขาเพื่อแบ่งปันรูปภาพ",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -220,7 +220,7 @@
   "invalidKey": "รหัสไม่ถูกต้อง",
   "invalidRecoveryKey": "คีย์การกู้คืนที่คุณป้อนไม่ถูกต้อง โปรดตรวจสอบให้แน่ใจว่ามี 24 คำ และตรวจสอบการสะกดของแต่ละคำ\n\nหากคุณป้อนรหัสกู้คืนที่เก่ากว่า ตรวจสอบให้แน่ใจว่ามีความยาว 64 ตัวอักษร และตรวจสอบแต่ละตัวอักษร",
   "invalidReferralCode": "โค้ดไม่ถูกต้อง",
-  "inviteToEnte": "เชิญเข้าร่วม Ente",
+  "inviteToEnte": "เชิญเข้าร่วม Photovault",
   "ok": "ตกลง",
   "@ok": {
     "description": "Generic OK button label"
@@ -290,7 +290,7 @@
   "ocrImageDecodeFailedError": "ไม่สามารถอ่านไฟล์รูปภาพได้",
   "ocrImageNotFoundError": "ไม่พบไฟล์รูปภาพ",
   "ocrNoTextDetected": "ไม่พบข้อความ",
-  "onEnte": "บน <branding>ente</branding>",
+  "onEnte": "บน <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"

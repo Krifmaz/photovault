@@ -45,7 +45,8 @@ class CheckboxComponent extends StatelessWidget {
               ? Icon(
                   Icons.check_rounded,
                   size: IconSizes.tiny,
-                  color: colors.specialWhite,
+                  // PHOTOVAULT: theme (readable on Encore accent)
+                  color: colors.onPrimary,
                 )
               : null,
         ),

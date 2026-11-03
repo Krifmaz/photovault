@@ -30,7 +30,7 @@
   "addNewEmail": "Προσθήκη νέου email",
   "addToAlbum": "Πρσθήκη σε άλμπουμ",
   "addToCollection": "Προσθήκη σε συλλογή",
-  "addToEnte": "Προσθήκη στο Ente",
+  "addToEnte": "Προσθήκη στο Photovault",
   "addYourPhotosNow": "Προσθέστε τις φωτογραφίες σας τώρα",
   "advanced": "Για προχωρημένους",
   "after1Day": "Μετά από 1 ημέρα",
@@ -45,7 +45,7 @@
   "allFilesAlreadyMarkedAsImportant": "Όλα τα στοιχεία είναι ήδη σημαντικά",
   "allMemoriesPreserved": "Όλες σας οι μνήμες έχουν διατηρηθεί",
   "allowDownloads": "Να επιτρέπονται οι λήψεις",
-  "allowPermBody": "Παρακαλούμε επιτρέψτε την πρόσβαση στις φωτογραφίες σας από τις Ρυθμίσεις, ώστε το Ente να μπορεί να εμφανίζει και να δημιουργεί αντίγραφα ασφαλείας της βιβλιοθήκης σας.",
+  "allowPermBody": "Παρακαλούμε επιτρέψτε την πρόσβαση στις φωτογραφίες σας από τις Ρυθμίσεις, ώστε το Photovault να μπορεί να εμφανίζει και να δημιουργεί αντίγραφα ασφαλείας της βιβλιοθήκης σας.",
   "allowPermTitle": "Να επιτρέπεται η πρόσβαση στις φωτογραφίες",
   "allPersonGroupingWillReset": "Οι ομαδοποιήσεις προσώπου θα επαναφερθούν και θα χάσετε όλες τις προτάσεις σχετικά με αυτό το άτομο",
   "androidBiometricHint": "Επαλήθευση ταυτότητας",
@@ -60,7 +60,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "Μια νέα έκδοση του Ente είναι διαθέσιμη.",
+  "aNewVersionOfEnteIsAvailable": "Μια νέα έκδοση του Photovault είναι διαθέσιμη.",
   "appLock": "Κλείδωμα εφαρμογής",
   "@appLock": {
     "description": "App lock setting title"
@@ -315,7 +315,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "Διαγραφή κενών άλμπουμ;",
   "deleteFromBoth": "Διαγραφή και από τα δύο",
   "deleteFromDevice": "Διαγραφή από τη συσκευή",
-  "deleteFromEnte": "Διαγραφή από το Ente",
+  "deleteFromEnte": "Διαγραφή από το Photovault",
   "deleteLink": "Διαγραφή συνδέσμου",
   "deleteLinkQuestion": "Διαγραφή συνδέσμου;",
   "deleteLocation": "Διαγραφή τοποθεσίας",
@@ -457,7 +457,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Οι αλλαγές αποθηκεύτηκαν",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Οι αλλαγές στην τοποθεσία θα εμφανίζονται μόνο μέσα στο Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Οι αλλαγές στην τοποθεσία θα εμφανίζονται μόνο μέσα στο Photovault",
   "editTag": "Επεξεργασία ετικέτας",
   "eligible": "επιλέξιμο",
   "emailChangedTo": "Το email άλλαξε σε {newEmail}",
@@ -472,13 +472,13 @@
     }
   },
   "emailHint": "Εισάγετε την διεύθυνση ηλ. ταχυδρομείου σας",
-  "emailNoEnteAccount": "Το {email} δεν έχει λογαριασμό Ente.\n\nΣτείλτε τους πρόσκληση για να μοιραστείτε στοιχεία.",
+  "emailNoEnteAccount": "Το {email} δεν έχει λογαριασμό Photovault.\n\nΣτείλτε τους πρόσκληση για να μοιραστείτε στοιχεία.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "Η διεύθυνση {email} δεν αντιστοιχεί σε λογαριασμό Ente.\n\nΣτείλτε μια πρόσκληση για να μοιραστείτε φωτογραφίες.",
+  "emailNoEnteAccountPhotos": "Η διεύθυνση {email} δεν αντιστοιχεί σε λογαριασμό Photovault.\n\nΣτείλτε μια πρόσκληση για να μοιραστείτε φωτογραφίες.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -633,7 +633,7 @@
   "@forgotPassword": {
     "description": "Forgot password link label"
   },
-  "freeStorageOffer": "10% έκπτωση στο <bold-green>ente</bold-green> photos",
+  "freeStorageOffer": "10% έκπτωση στο <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Χρησιμοποιήστε τον κωδικό \"AUTH\" για να λάβετε 10% έκπτωση για τον πρώτο χρόνο",
   "freeTrial": "Δωρεάν δοκιμή",
   "freeUpAmount": "Εξοικονόμηση {sizeInMBorGB}",
@@ -660,7 +660,7 @@
   "grantPermission": "Παραχώρηση δικαιωμάτων",
   "guestView": "Προβολή επισκέπτη",
   "guestViewEnablePreSteps": "Για να ενεργοποιήσετε την προβολή επισκέπτη, παρακαλώ ρυθμίστε τον κωδικό πρόσβασης της συσκευής ή το κλείδωμα οθόνης στις ρυθμίσεις συστήματος.",
-  "hearUsWhereOptionalTitle": "Πώς ακούσατε για το Ente; (προαιρετικό)",
+  "hearUsWhereOptionalTitle": "Πώς ακούσατε για το Photovault; (προαιρετικό)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -695,7 +695,7 @@
   "importBitwardenGuide": "Χρησιμοποιήστε την επιλογή \"Εξαγωγή θησαυ/κίου\" μέσα στα Εργαλεία Bitwarden και εισάγετε το μη κρυπτογραφημένο αρχείο JSON.",
   "importCodeDelimiterInfo": "Οι κωδικοί μπορούν να διαχωριστούν με κόμμα ή με μία νέα γραμμή",
   "importCodes": "Εισαγωγή κωδικών",
-  "importEnteEncGuide": "Επιλέξτε το κρυπτογραφημένο αρχείο JSON που εξήχθη από το Ente",
+  "importEnteEncGuide": "Επιλέξτε το κρυπτογραφημένο αρχείο JSON που εξήχθη από το Photovault",
   "importEnterSetupKey": "Εισάγετε ένα κλειδί ρύθμισης",
   "importFailureDesc": "Αδυναμία ανάλυσης του επιλεγμένου αρχείου.",
   "importInstruction": "Παρακαλώ επιλέξτε ένα αρχείο που περιέχει μια λίστα των κωδικών σας με τον ακόλουθο τύπο",
@@ -720,7 +720,7 @@
     }
   },
   "importSuccessTitle": "Ζήτω!",
-  "importTypeEnteEncrypted": "Κρυπτογραφημένη Ente εξαγωγή",
+  "importTypeEnteEncrypted": "Κρυπτογραφημένη Photovault εξαγωγή",
   "incorrectCode": "Εσφαλμένος κωδικός",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -761,7 +761,7 @@
   "invalidKey": "Μη έγκυρο κλειδί",
   "invalidQRCode": "Μη έγκυρος κωδικός QR",
   "invite": "Πρόσκληση",
-  "inviteToEnte": "Προσκαλέστε στο Ente",
+  "inviteToEnte": "Προσκαλέστε στο Photovault",
   "ok": "ΟΚ",
   "@ok": {
     "description": "Generic OK button label"
@@ -906,7 +906,7 @@
   "minimizeAppOnCopy": "Ελαχιστοποίηση εφαρμογής κατά την αντιγραφή",
   "mlConsent": "Ενεργοποίηση μηχανικής μάθησης",
   "mlConsentConfirmation": "Καταλαβαίνω και επιθυμώ να ενεργοποιήσω τη μηχανική μάθηση",
-  "mlConsentDescription": "Αν ενεργοποιήσετε τη μηχανική μάθηση, το Ente θα εξάγει από τα αρχεία, συμπεριλαμβανομένων εκείνων που έχουν διαμοιραστεί άλλοι με εσάς, πληροφορίες όπως χαρακτηριστικά προσώπων.\n\nΑυτό θα συμβαίνει στη συσκευή σας και κάθε βιομετρική πληροφορία που δημιουργείται θα είναι κρυπρογραφημένη από άκρο σε άκρο.",
+  "mlConsentDescription": "Αν ενεργοποιήσετε τη μηχανική μάθηση, το Photovault θα εξάγει από τα αρχεία, συμπεριλαμβανομένων εκείνων που έχουν διαμοιραστεί άλλοι με εσάς, πληροφορίες όπως χαρακτηριστικά προσώπων.\n\nΑυτό θα συμβαίνει στη συσκευή σας και κάθε βιομετρική πληροφορία που δημιουργείται θα είναι κρυπρογραφημένη από άκρο σε άκρο.",
   "moderateStrength": "Μέτριος",
   "@moderateStrength": {
     "description": "Moderate password strength label"
@@ -919,11 +919,11 @@
   "movedToTrash": "Μετακίνηση στον κάδο",
   "moveToAlbum": "Μετακίνηση σε άλμπουμ",
   "name": "Όνομα",
-  "networkConnectionRefusedErr": "Δεν είναι δυνατή η σύνδεση με το Ente, παρακαλώ προσπαθήστε ξανά μετά από λίγο. Εάν το σφάλμα παραμένει, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
+  "networkConnectionRefusedErr": "Δεν είναι δυνατή η σύνδεση με το Photovault, παρακαλώ προσπαθήστε ξανά μετά από λίγο. Εάν το σφάλμα παραμένει, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Δεν είναι δυνατή η σύνδεση με το Ente, ελέγξτε τις ρυθμίσεις του δικτύου σας και επικοινωνήστε με την υποστήριξη αν το σφάλμα παραμένει.",
+  "networkHostLookUpErr": "Δεν είναι δυνατή η σύνδεση με το Photovault, ελέγξτε τις ρυθμίσεις του δικτύου σας και επικοινωνήστε με την υποστήριξη αν το σφάλμα παραμένει.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -990,7 +990,7 @@
   "ocrModelsPrepareFailed": "Δεν ήταν δυνατή η προετοιμασία μοντέλων OCR",
   "ocrNoTextDetected": "Δεν ανιχνεύθηκε κείμενο",
   "offlineModeWarning": "Επιλέξατε να προχωρήσετε χωρίς αντίγραφα ασφαλείας. Παρακαλώ κάντε χειροκίνητα αντίγραφα ασφαλείας για να βεβαιωθείτε ότι οι κωδικοί σας είναι ασφαλείς.",
-  "onEnte": "Στο <branding>ente</branding>",
+  "onEnte": "Στο <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"

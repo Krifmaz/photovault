@@ -309,8 +309,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "Zabudli ste váš kľúč obnovenia?",
-  "free10GB": "10GB zadarmo na <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "O 10% lacnejšie <bold-green>ente</bold-green> fotky",
+  "free10GB": "10GB zadarmo na <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "O 10% lacnejšie <bold-green>Photovault</bold-green> fotky",
   "freeStorageOfferDescription": "Použite kód „AUTH“ a dostanete zľavu 10% na váš prvý rok",
   "general": "Všeobecné",
   "generatingEncryptionKeys": "Generovanie šifrovacích kľúčov...",
@@ -323,7 +323,7 @@
   },
   "getStarted": "Poďme na to",
   "giveUsAStarOnGithub": "Dajte nám hviezdy na Githube",
-  "hearUsWhereOptionalTitle": "Ako ste sa dozvedeli o Ente? (voliteľné)",
+  "hearUsWhereOptionalTitle": "Ako ste sa dozvedeli o Photovault? (voliteľné)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -356,7 +356,7 @@
   "importBitwardenGuide": "Použite možnosť „Exportovať trezor“ v službe Bitwarden Tools a importujte nezašifrovaný JSON súbor.",
   "importCodeDelimiterInfo": "Kódy môžu byť oddelené čiarkou alebo novým riadkom",
   "importCodes": "Importovať kódy",
-  "importEnteEncGuide": "Vyberte zašifrovaný JSON export súbor aplikácie Ente",
+  "importEnteEncGuide": "Vyberte zašifrovaný JSON export súbor aplikácie Photovault",
   "importEnterSetupKey": "Vložte kľúč nastavenia",
   "importFailureDesc": "Vybraný súbor nie je možné spracovať.",
   "importFromGallery": "Importovať z galérie",
@@ -382,7 +382,7 @@
     }
   },
   "importSuccessTitle": "Jéj!",
-  "importTypeEnteEncrypted": "Šifrovaný Ente export",
+  "importTypeEnteEncrypted": "Šifrovaný Photovault export",
   "incorrectCode": "Neplatný kód",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -479,11 +479,11 @@
       "count": {}
     }
   },
-  "networkConnectionRefusedErr": "Nemožno sa pripojiť k Ente, skúste znova v krátkom čase. Ak chyba pretrváva, kontaktujte podporu.",
+  "networkConnectionRefusedErr": "Nemožno sa pripojiť k Photovault, skúste znova v krátkom čase. Ak chyba pretrváva, kontaktujte podporu.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nemožno sa pripojiť k Ente, skontrolujte svoje nastavenia siete a kontaktujte podporu, ak chyba pretrváva.",
+  "networkHostLookUpErr": "Nemožno sa pripojiť k Photovault, skontrolujte svoje nastavenia siete a kontaktujte podporu, ak chyba pretrváva.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -566,7 +566,7 @@
   },
   "passwordToEncryptExport": "Heslo na zašifrovanie exportu",
   "passwordTooShort": "Heslo musí byť dlhé aspoň 8 charakterov.",
-  "passwordWarning": "Ente neukladá tohto heslo. V prípade, že ho zabudnete, <underline>nie sme schopní rozšifrovať vaše údaje</underline>",
+  "passwordWarning": "Photovault neukladá tohto heslo. V prípade, že ho zabudnete, <underline>nie sme schopní rozšifrovať vaše údaje</underline>",
   "@passwordWarning": {
     "description": "Warning about password storage"
   },
@@ -764,7 +764,7 @@
   "shouldHideCode": "Skryť kódy",
   "showLargeIcons": "Zobraziť veľké ikony",
   "showQRAuthMessage": "Pre zobrazenie QR kódu sa musíte overiť",
-  "sigInBackupReminder": "Ente bude automaticky zálohovať kódy po prihlásení.\n\nStále však odporúčame exportovať kódy manuálne ako extra zálohu.",
+  "sigInBackupReminder": "Photovault bude automaticky zálohovať kódy po prihlásení.\n\nStále však odporúčame exportovať kódy manuálne ako extra zálohu.",
   "signInToBackup": "Prihláste sa a zálohujte svoje kódy",
   "signOutFromOtherDevices": "Odhlásiť sa z iných zariadení",
   "@signOutFromOtherDevices": {
@@ -807,7 +807,7 @@
   "submit": "Odoslať",
   "suggestFeatures": "Navrhnúť funkcionalitu",
   "support": "Podpora",
-  "supportEnte": "Podpora <bold-green>ente</bold-green>",
+  "supportEnte": "Podpora <bold-green>Photovault</bold-green>",
   "systemTheme": "Systémová",
   "tags": "Tagy",
   "tapToUnlock": "Ťuknutím odomknete",

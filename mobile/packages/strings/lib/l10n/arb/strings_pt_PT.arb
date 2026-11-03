@@ -71,7 +71,7 @@
   "addTag": "Adicionar tag",
   "addToAlbum": "Adicionar ao álbum",
   "addToCollection": "Adicionar à coleção",
-  "addToEnte": "Adicionar ao Ente",
+  "addToEnte": "Adicionar ao Photovault",
   "addToHiddenAlbum": "Adicionar a álbum oculto",
   "addUpTo5MembersFree": "Adicione até 5 membros gratuitamente",
   "addYourPhotosNow": "Adicione suas fotos agora",
@@ -106,7 +106,7 @@
   "allowAppToOpenSharedAlbumLinks": "Permitir Aplicação Abrir Ligações Partilhadas",
   "allowDownloads": "Permitir downloads",
   "allowJoiningAlbum": "Permitir juntar-se ao álbum",
-  "allowPermBody": "Favor, permite acesso às fotos nas Definições para que Ente possa exibi-las e fazer backup na Fototeca.",
+  "allowPermBody": "Favor, permite acesso às fotos nas Definições para que Photovault possa exibi-las e fazer backup na Fototeca.",
   "allowPermTitle": "Garanta acesso às fotos",
   "allPersonGroupingWillReset": "Todos os agrupamentos para esta pessoa serão reiniciados e perderá todas as sugestões feitas para esta pessoa",
   "allTabEmptyHint": "Nada aqui ainda. Toque em + para adicionar um código ou abrir o Lixo para recuperar um.",
@@ -127,7 +127,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "Está disponível uma nova versão do Ente.",
+  "aNewVersionOfEnteIsAvailable": "Está disponível uma nova versão do Photovault.",
   "appIcon": "Ícone da aplicação",
   "appleId": "ID da Apple",
   "appLockDescription": "Selecione entre o bloqueio de ecrã padrão e um ecrã de bloqueio personalizado com um PIN ou palavra-passe.",
@@ -183,7 +183,7 @@
   "autoAddPeople": "Auto adicionar pessoas",
   "autoAddToAlbum": "Auto adicionar ao álbum",
   "autoCastDialogBody": "Verá os dispositivos Cast disponíveis aqui.",
-  "autoCastiOSPermission": "Certifique-se de que as permissões de Rede local estão activadas para a aplicação Ente Photos, nas Definições.",
+  "autoCastiOSPermission": "Certifique-se de que as permissões de Rede local estão activadas para a aplicação Photovault, nas Definições.",
   "autoLock": "Bloqueio automático",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -467,7 +467,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "Apagar álbuns vazios?",
   "deleteFromBoth": "Apagar de ambos",
   "deleteFromDevice": "Apagar do dispositivo",
-  "deleteFromEnte": "Apagar do Ente",
+  "deleteFromEnte": "Apagar do Photovault",
   "deleteLink": "Excluir link",
   "deleteLinkQuestion": "Excluir link?",
   "deleteLocation": "Apagar localização",
@@ -617,7 +617,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Edição guardada",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Edições para localização só serão vistas dentro do Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Edições para localização só serão vistas dentro do Photovault",
   "editTag": "Editar tag",
   "editTime": "Editar tempo",
   "eligible": "elegível",
@@ -626,7 +626,7 @@
     "description": "Email field label"
   },
   "emailAddress": "Correio eletrónico",
-  "emailNeedsEnteAccountForFamily": "{email} não possui conta Ente.\n\nConvide-os para adicionar à sua família assim que criarem uma conta em Ente.",
+  "emailNeedsEnteAccountForFamily": "{email} não possui conta Photovault.\n\nConvide-os para adicionar à sua família assim que criarem uma conta em Photovault.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -635,13 +635,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email} não tem uma conta Ente.\n\nEnvie um convite para compartilhar itens.",
+  "emailNoEnteAccount": "{email} não tem uma conta Photovault.\n\nEnvie um convite para compartilhar itens.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} não possui uma conta Ente.\n\nEnvie um convite para compartilhar fotos.",
+  "emailNoEnteAccountPhotos": "{email} não possui uma conta Photovault.\n\nEnvie um convite para compartilhar fotos.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -823,8 +823,8 @@
   "font": "Fonte",
   "food": "Culinária saborosa",
   "forgotRecoveryKey": "Esqueceu a chave de recuperação?",
-  "free10GB": "10GB grátis em <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "10% de desconto em <bold-green>ente</bold-green> photos",
+  "free10GB": "10GB grátis em <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "10% de desconto em <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Usa o código \"AUTH\" para obter 10% de desconto no primeiro ano",
   "freeTrial": "Teste grátis",
   "freeUpAmount": "Libertar {sizeInMBorGB}",
@@ -856,7 +856,7 @@
   "guestView": "Visão de convidado",
   "guestViewEnablePreSteps": "Para ativar a vista de convidado, configure o código de acesso do dispositivo ou o bloqueio do ecrã nas definições do sistema.",
   "happyBirthday": "Felicidades! 🥳",
-  "hearUsWhereOptionalTitle": "Como conheceste o Ente? (opcional)",
+  "hearUsWhereOptionalTitle": "Como conheceste o Photovault? (opcional)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -899,7 +899,7 @@
   "importBitwardenGuide": "Use a opção \"Exportar cofre\" nas ferramentas do Bitwarden e importe o ficheiro JSON não encriptado.",
   "importCodeDelimiterInfo": "Os códigos podem ser separados por uma vírgula ou uma nova linha",
   "importCodes": "Importar códigos",
-  "importEnteEncGuide": "Seleciona o ficheiro JSON encriptado exportado do Ente",
+  "importEnteEncGuide": "Seleciona o ficheiro JSON encriptado exportado do Photovault",
   "importEnterSetupKey": "Digite uma chave de configuração",
   "importFailureDesc": "Não foi possível processar o ficheiro selecionado.",
   "importFromGallery": "Importar da galeria",
@@ -926,7 +926,7 @@
     }
   },
   "importSuccessTitle": "Ótimo!",
-  "importTypeEnteEncrypted": "Exportação encriptada do Ente",
+  "importTypeEnteEncrypted": "Exportação encriptada do Photovault",
   "incorrectDetails": "Detalhes incorretos",
   "incorrectPasswordTitle": "Palavra-passe incorreta",
   "@incorrectPasswordTitle": {
@@ -965,7 +965,7 @@
   "invite": "Convidar",
   "inviteLimitReached": "Adicionou 5 convites. Remova um para adicionar outro",
   "inviteMembers": "Convidar membros",
-  "inviteToEnte": "Convidar para Ente",
+  "inviteToEnte": "Convidar para Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -1141,7 +1141,7 @@
   "mixedGrouping": "Agrupamento misturado?",
   "mlConsent": "Ativar aprendizagem automática",
   "mlConsentConfirmation": "Eu entendo, e desejo ativar a aprendizagem automática",
-  "mlConsentDescription": "Se ativar a aprendizagem automática, o Ente extrairá informações como a geometria do rosto de ficheiros, incluindo os partilhados consigo.\n\n\nIsto acontecerá no seu dispositivo e todas as informações biométricas geradas serão encriptadas de ponta a ponta.",
+  "mlConsentDescription": "Se ativar a aprendizagem automática, o Photovault extrairá informações como a geometria do rosto de ficheiros, incluindo os partilhados consigo.\n\n\nIsto acontecerá no seu dispositivo e todas as informações biométricas geradas serão encriptadas de ponta a ponta.",
   "moderateStrength": "Moderada",
   "@moderateStrength": {
     "description": "Moderate password strength label"
@@ -1264,7 +1264,7 @@
   "ocrModelsPrepareFailed": "Não possível preparar os modelos OCR",
   "ocrNoTextDetected": "Nenhum texto detetado",
   "offlineModeWarning": "Selecionou continuar sem backups. Faça backups manuais para certificar de que os códigos estejam seguros.",
-  "onEnte": "Em <branding>ente</branding>",
+  "onEnte": "Em <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1722,7 +1722,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Os arquivos selecionados não estão no Ente",
+  "selectedFilesAreNotOnEnte": "Os arquivos selecionados não estão no Photovault",
   "selectedItemsWillBeRemovedFromThisPerson": "Os itens em seleção serão removidos desta pessoa, mas não da sua biblioteca.",
   "selectedPhotos": "{count} selecionado(s)",
   "@selectedPhotos": {
@@ -1826,10 +1826,10 @@
     }
   },
   "shareStorageWith5Members": "Partilhe armazenamento com 5 membros",
-  "shareTextRecommendUsingEnteForFamily": "Transfira Ente para poder adicioná-lo ao meu plano de família\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Transfira Ente para podermos partilhar facilmente fotos e vídeos com qualidade original\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Transfira Photovault para poder adicioná-lo ao meu plano de família\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Transfira Photovault para podermos partilhar facilmente fotos e vídeos com qualidade original\n\nhttps://ente.com",
   "shareThisLink": "Este link permite que qualquer pessoa que o receba acesse seu item. Você pode remover o acesso a qualquer momento excluindo o link.",
-  "shareWithNonenteUsers": "Compartilhar com usuários que não usam Ente",
+  "shareWithNonenteUsers": "Compartilhar com usuários que não usam Photovault",
   "shareYourSubscription": "Partilhe a sua subscrição para entes queridos",
   "sharing": "Partilhar...",
   "shiftDatesAndTime": "Mude as Datas e Horas",
@@ -1840,7 +1840,7 @@
   "showMoreFaces": "Mostrar mais rostos",
   "showPerson": "Mostrar pessoa",
   "showQRAuthMessage": "Autenticar para mostrar código QR",
-  "sigInBackupReminder": "Ente fará cópia de segurança automática dos códigos após o início de sessão.\n\nAinda assim, recomendamos a exportação dos códigos como uma cópia de segurança adicional.",
+  "sigInBackupReminder": "Photovault fará cópia de segurança automática dos códigos após o início de sessão.\n\nAinda assim, recomendamos a exportação dos códigos como uma cópia de segurança adicional.",
   "signInToBackup": "Inicie a sessão para fazer backup dos códigos",
   "singIn": "Iniciar sessão",
   "skip": "Pular",
@@ -1918,7 +1918,7 @@
   "successfullyUnhid": "Reexibido com sucesso",
   "sunrise": "No horizonte",
   "support": "Suporte",
-  "supportEnte": "Mostre suporte ao <bold-green>ente</bold-green>",
+  "supportEnte": "Mostre suporte ao <bold-green>Photovault</bold-green>",
   "syncing": "Sincronizando...",
   "syncProgress": "{completed}/{total} memórias preservadas",
   "@syncProgress": {

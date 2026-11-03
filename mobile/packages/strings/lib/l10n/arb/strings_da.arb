@@ -333,7 +333,7 @@
     }
   },
   "emailHint": "Indtast din email adresse",
-  "emailNoEnteAccount": "{email} har ikke en Ente-konto.\n\nSend dem en invitation for at dele elementer.",
+  "emailNoEnteAccount": "{email} har ikke en Photovault-konto.\n\nSend dem en invitation for at dele elementer.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
@@ -479,7 +479,7 @@
     "description": "Generating encryption keys title"
   },
   "getStarted": "Kom i gang",
-  "hearUsWhereOptionalTitle": "Hvordan hørte du om Ente? (valgfrit)",
+  "hearUsWhereOptionalTitle": "Hvordan hørte du om Photovault? (valgfrit)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -514,7 +514,7 @@
   "importBitwardenGuide": "Brug \"Export vault\" i Bitwarden Tools og importer den ukrypterede JSON fil.",
   "importCodeDelimiterInfo": "Koderne kan adskilles med enten et komma eller en ny linje",
   "importCodes": "Importer koder",
-  "importEnteEncGuide": "Vælg den krypterede JSON fil eksporteret fra Ente",
+  "importEnteEncGuide": "Vælg den krypterede JSON fil eksporteret fra Photovault",
   "importEnterSetupKey": "Indtast en oprettelsesnøgle",
   "importFailureDesc": "Kunne ikke afkode den valgte fil.",
   "importInstruction": "Vælg venligst en fil der indeholder en liste af dine koder i det følgende format",
@@ -538,7 +538,7 @@
       }
     }
   },
-  "importTypeEnteEncrypted": "Krypteret Ente eksport",
+  "importTypeEnteEncrypted": "Krypteret Photovault eksport",
   "incorrectCode": "Forkert kode",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -580,7 +580,7 @@
   "invalidQRCode": "Ugyldig QR kode",
   "invalidRecoveryKey": "Den indtastede gendannelsesnøgle er ikke gyldig. Sørg venligst for at den indeholder 24 ord, og tjek stavningen af hvert ord.\n\nHvis du indtastede en ældre gendannelseskode, sørg for at den er 64 tegn lang, og tjek hvert tegn.",
   "invite": "Inviter",
-  "inviteToEnte": "Inviter til Ente",
+  "inviteToEnte": "Inviter til Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -659,11 +659,11 @@
   "mlConsent": "Aktiver maskinlæring",
   "moments": "Øjeblikke",
   "name": "Navn",
-  "networkConnectionRefusedErr": "Ude af stand til at forbinde til Ente. Forsøg igen efter et stykke tid. Hvis fejlen varer ved, kontakt da venligst support.",
+  "networkConnectionRefusedErr": "Ude af stand til at forbinde til Photovault. Forsøg igen efter et stykke tid. Hvis fejlen varer ved, kontakt da venligst support.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Ude af stand til at forbinde til Ente. Tjek venligst dine netværksindstillinger og kontakt support hvis fejlen varer ved.",
+  "networkHostLookUpErr": "Ude af stand til at forbinde til Photovault. Tjek venligst dine netværksindstillinger og kontakt support hvis fejlen varer ved.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -964,7 +964,7 @@
   "sharedWith": "Delt med",
   "shareLink": "Del link",
   "shareThisLink": "Dette link giver alle, der modtager det, adgang til dit element. Du kan fjerne adgangen når som helst ved at slette linket.",
-  "shareWithNonenteUsers": "Del med ikke Ente brugere",
+  "shareWithNonenteUsers": "Del med ikke Photovault brugere",
   "sharing": "Deler...",
   "shouldHideCode": "Skjul koder",
   "showLargeIcons": "Vis store ikoner",

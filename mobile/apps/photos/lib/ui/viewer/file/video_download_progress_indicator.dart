@@ -1,3 +1,4 @@
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_ui/components/loading_widget.dart";
 import "package:flutter/material.dart";
 import "package:photos/theme/colors.dart";
@@ -25,7 +26,7 @@ class VideoDownloadProgressIndicator extends StatelessWidget {
             backgroundColor: Colors.transparent,
             value: progress,
             valueColor: const AlwaysStoppedAnimation<Color>(
-              Color.fromRGBO(45, 194, 98, 1.0),
+              encoreLightAccent2, // PHOTOVAULT: theme
             ),
             strokeWidth: 2,
             strokeCap: StrokeCap.round,

@@ -171,7 +171,7 @@
   "addToAlbum": "Tambah ke album",
   "addToCollection": "Tambahkan ke koleksi",
   "addToCollections": "Tambahkan ke koleksi",
-  "addToEnte": "Tambah ke Ente",
+  "addToEnte": "Tambah ke Photovault",
   "addToHiddenAlbum": "Tambah ke album tersembunyi",
   "addToPerson": "Tambahkan ke orang",
   "@addToPerson": {
@@ -251,8 +251,8 @@
   "allowDownloads": "Izinkan pengunduhan",
   "allowJoining": "Izinkan bergabung",
   "allowJoiningAlbum": "Izinkan bergabung ke album",
-  "allowJoiningDescription": "Penonton dengan akun Ente bisa bergabung ke album Anda dan tetap update",
-  "allowPermBody": "Ijinkan akses ke foto Anda dari Pengaturan agar Ente dapat menampilkan dan mencadangkan pustaka Anda.",
+  "allowJoiningDescription": "Penonton dengan akun Photovault bisa bergabung ke album Anda dan tetap update",
+  "allowPermBody": "Ijinkan akses ke foto Anda dari Pengaturan agar Photovault dapat menampilkan dan mencadangkan pustaka Anda.",
   "allowPermTitle": "Izinkan akses ke foto",
   "allPersonGroupingWillReset": "Semua pengelompokan untuk orang ini akan diatur ulang, dan semua saran untuk orang ini akan hilang",
   "allTabEmptyHint": "Belum ada apa pun. Ketuk + untuk menambahkan kode atau buka Sampah untuk memulihkannya.",
@@ -286,7 +286,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Versi baru dari Ente telah tersedia.",
+  "aNewVersionOfEnteIsAvailable": "Versi baru dari Photovault telah tersedia.",
   "aNewVersionOfEnteLockerIsAvailable": "Versi baru Ente Locker tersedia.",
   "anythingElse": "Ada lagi?\n",
   "@anythingElse": {
@@ -295,7 +295,7 @@
   "appearance": "Tampilan",
   "appIcon": "Ikon aplikasi",
   "appleId": "ID Apple",
-  "applePhotosUnsupportedResource": "File ini tidak dapat disimpan ke Apple Photos. Anda masih bisa melihatnya di Ente",
+  "applePhotosUnsupportedResource": "File ini tidak dapat disimpan ke Apple Photos. Anda masih bisa melihatnya di Photovault",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -406,7 +406,7 @@
   "autoAddPeople": "Tambahkan orang secara otomatis",
   "autoAddToAlbum": "Tambahkan ke album secara otomatis",
   "autoCastDialogBody": "Perangkat Cast yang tersedia akan ditampilkan di sini.",
-  "autoCastiOSPermission": "Pastikan izin Jaringan Lokal untuk app Ente Foto aktif di Pengaturan.",
+  "autoCastiOSPermission": "Pastikan izin Jaringan Lokal untuk app Photovault Foto aktif di Pengaturan.",
   "autoLock": "Kunci otomatis",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -468,7 +468,7 @@
   "backupModeScreenWillDim": "Layar akan otomatis meredup untuk menghemat baterai",
   "backupModeSettingsDescription": "Biarkan aplikasi tetap terbuka untuk menyelesaikan pencadangan",
   "backupModeStart": "Mulai mode pencadangan",
-  "backupModeStayInEnte": "Tetap di Ente. Beralih ke aplikasi lain akan menjeda pencadangan Anda.",
+  "backupModeStayInEnte": "Tetap di Photovault. Beralih ke aplikasi lain akan menjeda pencadangan Anda.",
   "backupModeTapToWakeScreen": "Ketuk untuk membangunkan layar",
   "backupOnlyNewPhotos": "Cadangkan hanya foto baru",
   "backupOnlyNewPhotosAllFoldersSelected": "Semua folder saat ini dipilih untuk pencadangan.\n\nAnda dapat melanjutkan sekarang atau memperbarui folder yang dipilih.",
@@ -490,7 +490,7 @@
   "backupSettings": "Pengaturan pencadangan",
   "backupStatus": "Status pencadangan",
   "backupStatusDescription": "Item yang sudah dicadangkan akan terlihat di sini",
-  "backupToEnte": "Cadangkan ke Ente",
+  "backupToEnte": "Cadangkan ke Photovault",
   "backupVideos": "Cadangkan video",
   "beach": "Pantai dan laut",
   "birthday": "Hari ulang tahun",
@@ -651,7 +651,7 @@
   "codeChangeLimitReached": "Maaf, kamu telah mencapai batas perubahan kode.",
   "codeCopiedToClipboard": "Kode tersalin ke papan klip",
   "codeIssuerHint": "Penerbit",
-  "collabLinkSectionDescription": "Izinkan orang menambahkan foto tanpa akun Ente",
+  "collabLinkSectionDescription": "Izinkan orang menambahkan foto tanpa akun Photovault",
   "collaborator": "Kolaborator",
   "collageLayout": "Tata letak",
   "collageSaved": "Kolase tersimpan ke galeri",
@@ -742,7 +742,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Saya memahami bahwa tindakan ini akan menghapus data saya dari Ente Photos, Ente Auth, dan Ente Locker.",
+  "confirmDeleteAccountAcrossApps": "Saya memahami bahwa tindakan ini akan menghapus data saya dari Photovault, Ente Auth, dan Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -834,7 +834,7 @@
   "createAccountTitle": "Buat akun",
   "createAlbum": "Buat album",
   "createAlbumActionHint": "Tekan dan tahan foto lalu klik + untuk membuat album baru",
-  "createAnEnteAccount": "Buat akun Ente",
+  "createAnEnteAccount": "Buat akun Photovault",
   "createAnotherKit": "Buat kit lain",
   "createBackupNow": "Cadangkan sekarang",
   "createCollaborativeLink": "Buat link kolaborasi",
@@ -947,12 +947,12 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Dihapus dari Ente",
+  "deletedFromEnte": "Dihapus dari Photovault",
   "deletedItemsStayHereForThirtyDays": "Item yang dihapus akan tetap di sini selama 30 hari",
   "deleteDuplicates": "Hapus duplikat",
   "deleteEmptyAlbums": "Hapus album kosong",
   "deleteEmptyAlbumsWithQuestionMark": "Hapus album yang kosong?",
-  "deleteEnteAccount": "Hapus akun Ente",
+  "deleteEnteAccount": "Hapus akun Photovault",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -960,7 +960,7 @@
   "deleteFromBoth": "Hapus dari keduanya",
   "deleteFromDevice": "Hapus dari perangkat ini",
   "deleteFromDeviceQuestion": "Hapus dari perangkat?",
-  "deleteFromEnte": "Hapus dari Ente",
+  "deleteFromEnte": "Hapus dari Photovault",
   "deleteHiddenFilesFromDevice": "Hapus file tersembunyi dari perangkat",
   "deleteHiddenFilesFromDeviceDescription": "Hapus salinan lokal file tersembunyi dari perangkat Anda",
   "deleteItemCount": "{count, plural, one{Hapus {count} item} other{Hapus {count} item}}",
@@ -1258,7 +1258,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Perubahan tersimpan",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Perubahan lokasi hanya akan terlihat di Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Perubahan lokasi hanya akan terlihat di Photovault",
   "editStorageLimit": "Edit batas penyimpanan",
   "editTag": "Ubah tanda",
   "editTime": "Edit waktu",
@@ -1284,7 +1284,7 @@
     }
   },
   "emailHint": "Masukkan alamat email Anda",
-  "emailNeedsEnteAccountForFamily": "{email} tidak memiliki akun Ente.\n\nKirim undangan kepadanya, lalu tambahkan ke keluarga Anda setelah mereka membuat akun Ente.",
+  "emailNeedsEnteAccountForFamily": "{email} tidak memiliki akun Photovault.\n\nKirim undangan kepadanya, lalu tambahkan ke keluarga Anda setelah mereka membuat akun Photovault.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -1293,13 +1293,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email} tidak memiliki akun Ente.\n\nKirim undangan untuk berbagi item.",
+  "emailNoEnteAccount": "{email} tidak memiliki akun Photovault.\n\nKirim undangan untuk berbagi item.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} tidak punya akun Ente.\n\nUndang dia untuk berbagi foto.",
+  "emailNoEnteAccountPhotos": "{email} tidak punya akun Photovault.\n\nUndang dia untuk berbagi foto.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1351,7 +1351,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -1360,7 +1360,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1738,7 +1738,7 @@
       }
     }
   },
-  "filesInAlbumSafelyOnEnte": "{count, plural, one{Item ini di album sudah dicadangkan ke Ente. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangannya.} other{Semua {formattedNumber} item di album sudah dicadangkan ke Ente. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangan item tersebut.}}",
+  "filesInAlbumSafelyOnEnte": "{count, plural, one{Item ini di album sudah dicadangkan ke Photovault. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangannya.} other{Semua {formattedNumber} item di album sudah dicadangkan ke Photovault. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangan item tersebut.}}",
   "@filesInAlbumSafelyOnEnte": {
     "description": "Explains that device copies for files in an album can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1782,7 +1782,7 @@
       }
     }
   },
-  "filesSafelyOnEnte": "{count, plural, one{Item ini sudah dicadangkan ke Ente. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangannya.} other{Semua {formattedNumber} item sudah dicadangkan ke Ente. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangan item tersebut.}}",
+  "filesSafelyOnEnte": "{count, plural, one{Item ini sudah dicadangkan ke Photovault. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangannya.} other{Semua {formattedNumber} item sudah dicadangkan ke Photovault. Hapus salinan dari perangkat untuk mengosongkan ruang tanpa kehilangan item tersebut.}}",
   "@filesSafelyOnEnte": {
     "description": "Explains that device copies can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1830,8 +1830,8 @@
   },
   "forgotPasswordPrompt": "Lupa kata sandi?",
   "forgotRecoveryKey": "Lupa kunci pemulihan?",
-  "free10GB": "10 GB gratis di <bold-green>Ente</bold-green> Photos",
-  "freeStorageOffer": "Potongan 10% di <bold-green>ente</bold-green> photos",
+  "free10GB": "10 GB gratis di <bold-green>Photovault</bold-green> Photos",
+  "freeStorageOffer": "Potongan 10% di <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Gunakan kode \"AUTH\" untuk mendapatkan potongan 10% untuk tahun pertama",
   "free": "Gratis",
   "freeTrial": "Percobaan gratis",
@@ -1887,7 +1887,7 @@
   "grantGalleryPermissionDesc": "Berikan izin untuk mengakses dan mengatur foto dengan pengenalan wajah. Semua pemrosesan dilakukan di perangkat Anda.",
   "grantGalleryPermissionTitle": "Mari temukan foto favorit Anda",
   "grantPermission": "Berikan izin",
-  "grantPermissionDesc": "Silakan izinkan Ente mengakses pustaka foto Anda agar kami dapat mengaturnya dengan pengenalan wajah. Semua pemrosesan dilakukan di perangkat Anda.",
+  "grantPermissionDesc": "Silakan izinkan Photovault mengakses pustaka foto Anda agar kami dapat mengaturnya dengan pengenalan wajah. Semua pemrosesan dilakukan di perangkat Anda.",
   "greenery": "Nuansa hijau",
   "grid": "Kisi",
   "photosInOriginalProportions": "Foto dengan proporsi asli",
@@ -1902,11 +1902,11 @@
   "guestView": "Tampilan tamu",
   "guestViewEnablePreSteps": "Untuk mengaktifkan tampilan tamu, atur kode sandi perangkat atau kunci layar di pengaturan sistem.",
   "happyBirthday": "Selamat ulang tahun! 🥳",
-  "hearUsWhereOptionalTitle": "Dari mana Anda menemukan Ente? (opsional)",
+  "hearUsWhereOptionalTitle": "Dari mana Anda menemukan Photovault? (opsional)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "Dari mana Anda mengetahui Ente?",
+  "hearUsWhereTitle": "Dari mana Anda mengetahui Photovault?",
   "help": "Bantuan",
   "helpAndSupport": "Bantuan & dukungan",
   "hidden": "Tersembunyi",
@@ -2008,7 +2008,7 @@
   "importBitwardenGuide": "Gunakan opsi \"Export vault\" di Bitwarden dan impor file JSON yang tidak terenkripsi.",
   "importCodeDelimiterInfo": "Kode dapat dipisahkan dengan koma atau baris baru",
   "importCodes": "Impor kode",
-  "importEnteEncGuide": "Pilih file enkripsi JSON yang telah diekspor dari Ente",
+  "importEnteEncGuide": "Pilih file enkripsi JSON yang telah diekspor dari Photovault",
   "importEnterSetupKey": "Masukkan kunci penyiapan",
   "importFailureDesc": "Berkas yang dipilih tidak dapat diurai",
   "importFileTooLarge": "File yang dipilih terlalu besar. Ukuran maksimum: {size}.",
@@ -2057,7 +2057,7 @@
     }
   },
   "importSuccessTitle": "Yey! :>",
-  "importTypeEnteEncrypted": "Eksporan Ente terenkripsi",
+  "importTypeEnteEncrypted": "Eksporan Photovault terenkripsi",
   "incorrectCode": "Kode salah",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -2120,7 +2120,7 @@
       }
     }
   },
-  "inviteToEnte": "Undang ke Ente",
+  "inviteToEnte": "Undang ke Photovault",
   "ok": "Oke",
   "@ok": {
     "description": "Generic OK button label"
@@ -2503,7 +2503,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Masuk ke Ente",
+  "loginToEnte": "Masuk ke Photovault",
   "loginToExistingAccount": "Masuk ke akun yang sudah ada",
   "loginWithAuthAccount": "Masuk dengan akun Auth anda",
   "loginWithTOTP": "Masuk menggunakan TOTP",
@@ -2552,7 +2552,7 @@
   "mapsPrivacyNotice": "Koordinat perkiraan akan dikirim ke pihak ketiga yang menjaga privasi seperti OpenStreetMap untuk menampilkan peta dan lokasi.",
   "markingAsImportant": "Menandai sebagai penting...",
   "me": "Saya",
-  "mediaManagementHintMessage": "Aktifkan pengelolaan media untuk Ente di pengaturan agar permintaan konfirmasi berhenti muncul.",
+  "mediaManagementHintMessage": "Aktifkan pengelolaan media untuk Photovault di pengaturan agar permintaan konfirmasi berhenti muncul.",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -2649,7 +2649,7 @@
   "mixedGrouping": "Pengelompokan campuran?",
   "mlConsent": "Aktifkan pemelajaran mesin",
   "mlConsentConfirmation": "Saya memahami, dan bersedia mengaktifkan pemelajaran mesin",
-  "mlConsentDescription": "Jika kamu mengaktifkan pemelajaran mesin, Ente akan memproses informasi seperti geometri wajah dari file yang ada, termasuk file yang dibagikan kepadamu.\n\nIni dijalankan pada perangkatmu, dan setiap informasi biometrik yang dibuat akan terenkripsi ujung ke ujung.",
+  "mlConsentDescription": "Jika kamu mengaktifkan pemelajaran mesin, Photovault akan memproses informasi seperti geometri wajah dari file yang ada, termasuk file yang dibagikan kepadamu.\n\nIni dijalankan pada perangkatmu, dan setiap informasi biometrik yang dibuat akan terenkripsi ujung ke ujung.",
   "mlConsentPrivacyDetails": "Silakan <policy>klik di sini</policy> untuk detail lebih lanjut tentang fitur ini dalam kebijakan privasi kami",
   "@mlConsentPrivacyDetails": {
     "description": "Machine learning consent screen sentence; only the text inside the policy tags is tappable and opens the privacy policy"
@@ -2755,11 +2755,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Tidak dapat terhubung dengan Ente, silakan coba lagi setelah beberapa saat. Jika masalah berlanjut, harap hubungi dukungan.",
+  "networkConnectionRefusedErr": "Tidak dapat terhubung dengan Photovault, silakan coba lagi setelah beberapa saat. Jika masalah berlanjut, harap hubungi dukungan.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Tidak dapat terhubung dengan Ente, harap periksa pengaturan jaringan kamu dan hubungi dukungan jika masalah berlanjut.",
+  "networkHostLookUpErr": "Tidak dapat terhubung dengan Photovault, harap periksa pengaturan jaringan kamu dan hubungi dukungan jika masalah berlanjut.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2927,12 +2927,12 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Anda memiliki satu akun untuk Ente Photos, Ente Auth, dan Ente Locker.",
+  "oneAccountAcrossEnteApps": "Anda memiliki satu akun untuk Photovault, Ente Auth, dan Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
   "oneLineAboutTheIssue": "Jelaskan masalah dalam satu baris",
-  "onEnte": "Di <branding>ente</branding>",
+  "onEnte": "Di <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -3071,7 +3071,7 @@
       }
     }
   },
-  "permanentlyDeleteYourEnteAccount": "Hapus akun Ente Anda secara permanen?",
+  "permanentlyDeleteYourEnteAccount": "Hapus akun Photovault Anda secara permanen?",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -3094,7 +3094,7 @@
   },
   "pets": "Hewan peliharaan",
   "photoGridSize": "Ukuran kotak foto",
-  "photoLibraryAddPermissionRequired": "Ente memerlukan izin untuk menyimpan foto dan video ke Apple Photos. Anda dapat mengizinkan akses di Pengaturan.",
+  "photoLibraryAddPermissionRequired": "Photovault memerlukan izin untuk menyimpan foto dan video ke Apple Photos. Anda dapat mengizinkan akses di Pengaturan.",
   "photoLibraryAddPermissionRestricted": "Akses ke Pustaka Foto dibatasi di perangkat ini.",
   "photoOrder": "Urutan foto",
   "photoViewerFilmstripLabel": "Pemilih foto",
@@ -3262,8 +3262,8 @@
     }
   },
   "publicLink": "Tautan publik",
-  "publicCollectionLinkAccessDescription": "Siapa pun yang memiliki tautan dapat membuka koleksi tanpa akun Ente.",
-  "publicLinkAccessDescription": "Siapa pun yang memiliki tautan dapat membuka album tanpa akun Ente.",
+  "publicCollectionLinkAccessDescription": "Siapa pun yang memiliki tautan dapat membuka koleksi tanpa akun Photovault.",
+  "publicLinkAccessDescription": "Siapa pun yang memiliki tautan dapat membuka album tanpa akun Photovault.",
   "publicLinkCollectDescription": "Siapa pun yang memiliki tautan ini dapat menambahkan foto ke album Anda.",
   "publicLinkEnabled": "Link publik aktif",
   "publicLinkViewDescription": "Siapa pun yang memiliki tautan ini dapat mengakses album Anda.",
@@ -3598,7 +3598,7 @@
   "resendInvite": "Kirim ulang undangan",
   "reset": "Atur ulang",
   "resetIgnoredFiles": "Atur ulang file yang diabaikan",
-  "resetIgnoredFilesDescription": "Atur ulang file yang diabaikan ini agar Ente dapat mencoba mengunggahnya lagi.",
+  "resetIgnoredFilesDescription": "Atur ulang file yang diabaikan ini agar Photovault dapat mencoba mengunggahnya lagi.",
   "resetPasswordTitle": "Atur ulang kata sandi",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -3750,7 +3750,7 @@
     "description": "Description text asking user if they want to save to storage or share with other apps"
   },
   "savePerson": "Simpan orang",
-  "saveToEnte": "Simpan ke Ente",
+  "saveToEnte": "Simpan ke Photovault",
   "saveToLocker": "Simpan ke Locker",
   "saveYourRecoveryKeyIfYouHaventAlready": "Jika belum, simpan kunci pemulihan kamu",
   "saving": "Menyimpan...",
@@ -3912,7 +3912,7 @@
   "securityDesc": "Enkripsi, kunci pemulihan, kunci aplikasi, dan perlindungan akun",
   "seeAllCollections": "Semua koleksi",
   "seePublicAlbumLinksInApp": "Lihat tautan album publik di aplikasi",
-  "selectAlbumsToBackUpToEnte": "Pilih album yang akan dicadangkan ke Ente",
+  "selectAlbumsToBackUpToEnte": "Pilih album yang akan dicadangkan ke Photovault",
   "selectAlbumToLikePhoto": "Pilih album untuk menyukai foto ini",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -3962,7 +3962,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "File terpilih tidak tersimpan di Ente",
+  "selectedFilesAreNotOnEnte": "File terpilih tidak tersimpan di Photovault",
   "selectedFilesBackedUpToEnte": "Item ini akan dihapus dari semua album. Anda dapat memulihkannya dari Sampah.",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -4122,7 +4122,7 @@
   "share": "Bagikan",
   "shareALink": "Bagikan link",
   "shareAnAlbum": "Bagikan album",
-  "shareCodeEarnStorage": "Dapatkan penyimpanan dua kali lipat di Ente",
+  "shareCodeEarnStorage": "Dapatkan penyimpanan dua kali lipat di Photovault",
   "shareCodes": "Bagikan kode",
   "shareCodesDuration": "Pilih durasi untuk berbagi kode.",
   "shareCollection": "Bagikan koleksi",
@@ -4185,17 +4185,17 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Unduh Ente agar kita dapat berbagi file dengan kualitas asli dengan mudah\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Unduh Ente agar saya dapat menambahkan Anda ke paket keluarga saya\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Unduh Ente agar kita dapat berbagi foto dan video dengan kualitas asli dengan mudah\n\nhttps://ente.com",
-  "shareTextReferralInvite": "Dapatkan 20 GB gratis dengan Ente Photos! Unduh aplikasinya di https://ente.com/invite dan gunakan kode {referralCode}.",
+  "shareTextRecommendUsingEnte": "Unduh Photovault agar kita dapat berbagi file dengan kualitas asli dengan mudah\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Unduh Photovault agar saya dapat menambahkan Anda ke paket keluarga saya\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Unduh Photovault agar kita dapat berbagi foto dan video dengan kualitas asli dengan mudah\n\nhttps://ente.com",
+  "shareTextReferralInvite": "Dapatkan 20 GB gratis dengan Photovault! Unduh aplikasinya di https://ente.com/invite dan gunakan kode {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}
     }
   },
   "shareThisLink": "Tautan ini memungkinkan siapa pun yang menerimanya mengakses item Anda. Anda dapat mencabut akses kapan saja dengan menghapus tautan.",
-  "shareWithNonenteUsers": "Bagikan ke pengguna non-Ente",
+  "shareWithNonenteUsers": "Bagikan ke pengguna non-Photovault",
   "shareYourFeedbackHere": "Bagikan masukan Anda di sini",
   "@shareYourFeedbackHere": {
     "description": "Placeholder for optional account deletion feedback"
@@ -4226,7 +4226,7 @@
   "showQRAuthMessage": "Autentikasikan untuk menampilkan kode Respons Cepat (QR)",
   "showTextOnWidget": "Tampilkan teks di widget",
   "shuffle": "Acak",
-  "sigInBackupReminder": "Ente akan mencadangkan kode secara otomatis setelah Anda masuk.\n\nKami tetap menyarankan Anda mengekspor kode sebagai cadangan tambahan.",
+  "sigInBackupReminder": "Photovault akan mencadangkan kode secara otomatis setelah Anda masuk.\n\nKami tetap menyarankan Anda mengekspor kode sebagai cadangan tambahan.",
   "signInToBackup": "Masuk untuk mencadangkan kode-kode Anda",
   "signOutFromOtherDevices": "Keluar dari perangkat lain",
   "@signOutFromOtherDevices": {
@@ -4260,7 +4260,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "Item ini tersedia di perangkat Anda dan di Ente.",
+  "singleFileInBothLocalAndRemote": "Item ini tersedia di perangkat Anda dan di Photovault.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -4279,7 +4279,7 @@
   "socialNotifications": "Suka dan komentar",
   "socialNotificationsExplanation": "Suka pada foto Anda dan komentar pada album yang Anda ikuti",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "Orang yang membagikan album denganmu bisa melihat ID yang sama di perangkat mereka.",
-  "someSelectedFilesBackedUpToEnte": "Item ini tersedia di perangkat dan di Ente.",
+  "someSelectedFilesBackedUpToEnte": "Item ini tersedia di perangkat dan di Photovault.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -4387,7 +4387,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "{id} Anda sudah ditautkan ke akun Ente lain.\nJika Anda ingin menggunakan {id} dengan akun ini, silakan hubungi dukungan kami.",
+  "subAlreadyLinkedErrMessage": "{id} Anda sudah ditautkan ke akun Photovault lain.\nJika Anda ingin menggunakan {id} dengan akun ini, silakan hubungi dukungan kami.",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -4417,7 +4417,7 @@
   "suggestions": "Saran",
   "sunrise": "Cahaya fajar di cakrawala",
   "support": "Dukungan",
-  "supportEnte": "Dukung <bold-green>ente</bold-green>",
+  "supportEnte": "Dukung <bold-green>Photovault</bold-green>",
   "syncing": "Menyinkronkan...",
   "syncProgress": "{completed}/{total} memori tersimpan",
   "@syncProgress": {
@@ -4488,7 +4488,7 @@
   "@thisEmailIsAlreadyInUse": {
     "description": "Error message when email is already in use"
   },
-  "thisHelpsUsImproveEnte": "Ini membantu kami meningkatkan Ente",
+  "thisHelpsUsImproveEnte": "Ini membantu kami meningkatkan Photovault",
   "@thisHelpsUsImproveEnte": {
     "description": "Subtitle under account deletion reason prompt"
   },
@@ -4606,7 +4606,7 @@
     }
   },
   "trustedContacts": "Kontak tepercaya",
-  "trustedContactsEmptyDescription": "Tunjuk pengguna Ente lain sebagai kontak tepercaya untuk memulihkan akun Anda",
+  "trustedContactsEmptyDescription": "Tunjuk pengguna Photovault lain sebagai kontak tepercaya untuk memulihkan akun Anda",
   "trustedContactStatusAccepted": "Diterima",
   "@trustedContactStatusAccepted": {
     "description": "Short status label shown for an accepted trusted contact"
@@ -4771,7 +4771,7 @@
   "@uploadStorageLimitErrorTitle": {
     "description": "Title shown when uploads fail due to running out of storage"
   },
-  "uploadSubscriptionExpiredErrorBody": "Langganan Ente Photos Anda telah berakhir. Perpanjang langganan untuk melanjutkan pengunggahan.",
+  "uploadSubscriptionExpiredErrorBody": "Langganan Photovault Anda telah berakhir. Perpanjang langganan untuk melanjutkan pengunggahan.",
   "@uploadSubscriptionExpiredErrorBody": {
     "description": "Body shown when uploads fail because the Photos subscription is expired"
   },
@@ -5175,7 +5175,7 @@
       }
     }
   },
-  "noEnteAccountWithThisEmail": "Tidak ada akun Ente dengan email ini.",
+  "noEnteAccountWithThisEmail": "Tidak ada akun Photovault dengan email ini.",
   "shareALinkInline": "Bagikan tautan.",
   "personAlreadyHasAccess": "Orang ini sudah memiliki akses.",
   "removePersonTitle": "Hapus {name}?",
@@ -5211,5 +5211,5 @@
     }
   },
   "notEnoughStorageTitle": "Penyimpanan tidak cukup",
-  "notEnoughStorageBody": "Ruang kosong di Ente tidak cukup untuk menambahkan foto baru. Kosongkan ruang atau tingkatkan paket agar dapat terus menambahkan foto."
+  "notEnoughStorageBody": "Ruang kosong di Photovault tidak cukup untuk menambahkan foto baru. Kosongkan ruang atau tingkatkan paket agar dapat terus menambahkan foto."
 }

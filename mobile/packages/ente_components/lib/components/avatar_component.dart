@@ -293,7 +293,10 @@ class AvatarComponent extends StatelessWidget {
         maxLines: 1,
         textAlign: TextAlign.center,
         style: size.textStyle.copyWith(
-          color: context.componentColors.specialWhite,
+          // PHOTOVAULT: theme (readable on Encore accent)
+          color: seed == null && color == AvatarComponentColor.green
+              ? context.componentColors.onPrimary
+              : context.componentColors.specialWhite,
         ),
       ),
     );

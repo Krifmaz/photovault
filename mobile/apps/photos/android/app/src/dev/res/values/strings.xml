@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">Ente Dev</string>
+    <!-- PHOTOVAULT: brand name -->
+    <string name="app_name">Photovault Dev</string>
     <string name="backup">backup dev</string>
 </resources>

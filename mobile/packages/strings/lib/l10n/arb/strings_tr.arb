@@ -79,7 +79,7 @@
   "addTag": "Etiket ekle",
   "addToAlbum": "Albüme ekle",
   "addToCollection": "Koleksiyona ekle",
-  "addToEnte": "Ente'ye ekle",
+  "addToEnte": "Photovault'ye ekle",
   "addToHiddenAlbum": "Gizli albüme ekle",
   "addToPerson": "Kişi ekle",
   "@addToPerson": {
@@ -123,7 +123,7 @@
   "allowAppToOpenSharedAlbumLinks": "Uygulamanın paylaşılan albüm bağlantılarını açmasına izin ver",
   "allowDownloads": "İndirmeye izin ver",
   "allowJoiningAlbum": "Albüme katılmaya izin ver",
-  "allowPermBody": "Ente'nin kitaplığınızı görüntüleyebilmesi ve yedekleyebilmesi için lütfen Ayarlar'dan fotoğraflarınıza erişime izin verin.",
+  "allowPermBody": "Photovault'nin kitaplığınızı görüntüleyebilmesi ve yedekleyebilmesi için lütfen Ayarlar'dan fotoğraflarınıza erişime izin verin.",
   "allowPermTitle": "Fotoğraflara erişime izin verin",
   "allPersonGroupingWillReset": "Bu kişi için tüm gruplamalar sıfırlanacak ve bu kişi için yaptığınız tüm önerileri kaybedeceksiniz",
   "allTabEmptyHint": "Burada henüz bir şey yok. Kod eklemek için + simgesine dokun ya da bir kodu geri yüklemek için Çöp Kutusu’nu açın.",
@@ -147,7 +147,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "Ente için yeni bir sürüm mevcut.",
+  "aNewVersionOfEnteIsAvailable": "Photovault için yeni bir sürüm mevcut.",
   "aNewVersionOfEnteLockerIsAvailable": "Yeni bir Ente Locker sürümü mevcut.",
   "appearance": "Görünüm",
   "appIcon": "Uygulama simgesi",
@@ -234,7 +234,7 @@
   "autoAddPeople": "Kişileri otomatik ekle",
   "autoAddToAlbum": "Albüme otomatik ekle",
   "autoCastDialogBody": "Mevcut Cast cihazlarını burada görebilirsiniz.",
-  "autoCastiOSPermission": "Ayarlar'da Ente Photos uygulaması için Yerel Ağ izinlerinin açık olduğundan emin olun.",
+  "autoCastiOSPermission": "Ayarlar'da Photovault uygulaması için Yerel Ağ izinlerinin açık olduğundan emin olun.",
   "autoLock": "Otomatik Kilit",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -278,7 +278,7 @@
   "backupSettings": "Yedekleme seçenekleri",
   "backupStatus": "Yedekleme durumu",
   "backupStatusDescription": "Eklenen öğeler burada görünecek",
-  "backupToEnte": "Ente'a yedekle",
+  "backupToEnte": "Photovault'a yedekle",
   "backupVideos": "Videoları yedekle",
   "beach": "Kum ve deniz",
   "birthday": "Doğum Günü",
@@ -438,7 +438,7 @@
   "create": "Oluştur",
   "createAccountTitle": "Hesap oluştur",
   "createAlbumActionHint": "Fotoğrafları seçmek için uzun basın ve + düğmesine tıklayarak bir albüm oluşturun",
-  "createAnEnteAccount": "Ente hesabı oluştur",
+  "createAnEnteAccount": "Photovault hesabı oluştur",
   "createBackupNow": "Şimdi yedekle",
   "createCollaborativeLink": "Ortak bağlantı oluşturun",
   "createCollage": "Kolaj oluştur",
@@ -511,7 +511,7 @@
   "deleteEmptyAlbumsWithQuestionMark": "Boş albümler silinsin mi?",
   "deleteFromBoth": "Her ikisinden de sil",
   "deleteFromDevice": "Cihazınızdan silin",
-  "deleteFromEnte": "Ente'den Sil",
+  "deleteFromEnte": "Photovault'den Sil",
   "deleteLink": "Bağlantıyı sil",
   "deleteLinkQuestion": "Bağlantı silinsin mi?",
   "deleteLocation": "Konumu sil",
@@ -665,7 +665,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Düzenleme kaydedildi",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Konumda yapılan düzenlemeler yalnızca Ente'de görülecektir",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Konumda yapılan düzenlemeler yalnızca Photovault'de görülecektir",
   "editTag": "Etiketi düzenle",
   "editTime": "Zamanı düzenle",
   "eligible": "uygun",
@@ -690,13 +690,13 @@
     }
   },
   "emailHint": "E-posta adresinizi girin",
-  "emailNoEnteAccount": "{email} bir Ente hesabına sahip değil.\n\nÖğe paylaşmak için davet gönderin.",
+  "emailNoEnteAccount": "{email} bir Photovault hesabına sahip değil.\n\nÖğe paylaşmak için davet gönderin.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email}, Ente hesabı bulunmamaktadır.\n\nOnlarla fotoğraf paylaşımı için bir davet gönder.",
+  "emailNoEnteAccountPhotos": "{email}, Photovault hesabı bulunmamaktadır.\n\nOnlarla fotoğraf paylaşımı için bir davet gönder.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -910,8 +910,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "Kurtarma anahtarınızı mı unuttunuz?",
-  "free10GB": "<bold-green>Ente</bold-green> Photos'ta 10 GB ücretsiz",
-  "freeStorageOffer": "<bold-green>ente</bold-green> fotoğraflarında %10 indirim",
+  "free10GB": "<bold-green>Photovault</bold-green> Photos'ta 10 GB ücretsiz",
+  "freeStorageOffer": "<bold-green>Photovault</bold-green> fotoğraflarında %10 indirim",
   "freeStorageOfferDescription": "İlk yılda %10 indirim almak için \"AUTH\" kodunu kullanın",
   "freeTrial": "Ücretsiz deneme",
   "freeUpAmount": "{sizeInMBorGB} yer açın",
@@ -936,7 +936,7 @@
   "googlePlayId": "Google Play ID",
   "grantFullAccessPrompt": "Lütfen Ayarlar uygulamasında tüm fotoğraflara erişime izin verin",
   "grantPermission": "İzinleri değiştir",
-  "grantPermissionDesc": "Lütfen Ente'ın yüz tanıması için kütüphanenize erişmesine izin verin. Tüm işlemler cihazınızda gerçekleşir.",
+  "grantPermissionDesc": "Lütfen Photovault'ın yüz tanıması için kütüphanenize erişmesine izin verin. Tüm işlemler cihazınızda gerçekleşir.",
   "greenery": "Yeşil yaşam",
   "groupBy": "Gruplama",
   "groupByDay": "Gün",
@@ -946,11 +946,11 @@
   "guestView": "Misafir görünümü",
   "guestViewEnablePreSteps": "Misafir görünümünü etkinleştirmek için lütfen sistem ayarlarınızda cihaz şifresi veya ekran kilidi ayarlayın.",
   "happyBirthday": "Doğum günün kutlu olsun! 🥳",
-  "hearUsWhereOptionalTitle": "Ente'yi nereden duydunuz? (opsiyonel)",
+  "hearUsWhereOptionalTitle": "Photovault'yi nereden duydunuz? (opsiyonel)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "Ente'ı nereden duydunuz?",
+  "hearUsWhereTitle": "Photovault'ı nereden duydunuz?",
   "help": "Yardım",
   "hidden": "Gizli",
   "hide": "Gizle",
@@ -999,7 +999,7 @@
   "importBitwardenGuide": "Bitwarden Tools içindeki \"Kasayı dışa aktar\" seçeneğini kullanın ve şifrelenmemiş JSON dosyasını içe aktarın.",
   "importCodeDelimiterInfo": "Kodlar, virgülle ya da yeni bir satırla ayrılabilir",
   "importCodes": "Kodu içe aktar",
-  "importEnteEncGuide": "Ente'den dışa aktarılan şifrelenmiş JSON dosyasını seçin",
+  "importEnteEncGuide": "Photovault'den dışa aktarılan şifrelenmiş JSON dosyasını seçin",
   "importEnterSetupKey": "Kurulum anahtarını girin",
   "importFailureDesc": "Seçilen dosya ayrıştırılamadı.",
   "importFromGallery": "Galeriden aktar",
@@ -1027,7 +1027,7 @@
     }
   },
   "importSuccessTitle": "Oley!",
-  "importTypeEnteEncrypted": "Ente şifrelenmiş dışa aktarma",
+  "importTypeEnteEncrypted": "Photovault şifrelenmiş dışa aktarma",
   "incorrectCode": "Yanlış kod",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -1069,7 +1069,7 @@
   "invalidRecoveryKey": "Girdiğiniz kurtarma anahtarı geçerli değil. Lütfen anahtarın 24 kelime içerdiğinden ve her bir kelimenin doğru şekilde yazıldığından emin olun.\n\nEğer eski bir kurtarma kodu girdiyseniz, o zaman kodun 64 karakter uzunluğunda olduğunu kontrol edin.",
   "invalidReferralCode": "Geçersiz kod",
   "invite": "Davet et",
-  "inviteToEnte": "Ente'ye davet edin",
+  "inviteToEnte": "Photovault'ye davet edin",
   "ok": "Tamam",
   "@ok": {
     "description": "Generic OK button label"
@@ -1291,7 +1291,7 @@
   "mixedGrouping": "Karma gruplama?",
   "mlConsent": "Makine öğrenimini etkinleştir",
   "mlConsentConfirmation": "Anladım, ve makine öğrenimini etkinleştirmek istiyorum",
-  "mlConsentDescription": "Makine öğrenimini etkinleştirirseniz, Ente sizinle paylaşılanlar da dahil olmak üzere dosyalardan yüz geometrisi gibi bilgileri çıkarır.\n\nBu, cihazınızda gerçekleşecek ve oluşturulan tüm biyometrik bilgiler uçtan uca şifrelenecektir.",
+  "mlConsentDescription": "Makine öğrenimini etkinleştirirseniz, Photovault sizinle paylaşılanlar da dahil olmak üzere dosyalardan yüz geometrisi gibi bilgileri çıkarır.\n\nBu, cihazınızda gerçekleşecek ve oluşturulan tüm biyometrik bilgiler uçtan uca şifrelenecektir.",
   "mlIndexingDescription": "Tüm ögeler işlenene kadar makine öğrenmesi yüksek bant genişliği ve pil kullanımına yol açabilir. Daha hızlı işleme için masaüstü uygulamasını kullanabilirsiniz, tüm sonuçlar otomatik olarak eşitlenecektir.",
   "modifyYourQueryOrTrySearchingFor": "Sorgunuzu değiştirin veya aramayı deneyin",
   "moments": "Anlar",
@@ -1435,7 +1435,7 @@
   "ocrNoTextDetected": "Yazı algılanmadı",
   "offlineModeWarning": "Yedekleme yapmadan devam etmeyi seçtiniz. Kodlarınızın güvende olduğundan emin olmak için lütfen manuel yedekleme yapın.",
   "oneLineAboutTheIssue": "Sorunu açıklayan bir satır",
-  "onEnte": "<branding>ente</branding> üzerinde",
+  "onEnte": "<branding>Photovault</branding> üzerinde",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1931,7 +1931,7 @@
   "security": "Güvenlik",
   "seeAllCollections": "Tüm koleksiyonları gör",
   "seePublicAlbumLinksInApp": "Uygulamadaki herkese açık albüm bağlantılarını görün",
-  "selectAlbumsToBackUpToEnte": "Ente'a yedeklenecek albümleri seçin",
+  "selectAlbumsToBackUpToEnte": "Photovault'a yedeklenecek albümleri seçin",
   "selectAllShort": "Tümü",
   "@selectAllShort": {
     "description": "Text that appears in bottom right when you start to select multiple photos. When clicked, it selects all photos."
@@ -1958,7 +1958,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Seçilen dosyalar Ente'de değil",
+  "selectedFilesAreNotOnEnte": "Seçilen dosyalar Photovault'de değil",
   "selectedItemsWillBeRemovedFromThisPerson": "Seçili öğeler bu kişiden silinir, ancak kitaplığınızdan silinmez.",
   "selectedPhotos": "{count} seçildi",
   "@selectedPhotos": {
@@ -2059,7 +2059,7 @@
   "shareKey": "Anahtarı paylaş",
   "shareLink": "Bağlantıyı paylaş",
   "shareThisLink": "Bu bağlantı, alan herkesin öğenize erişmesine izin verir. Bağlantıyı silerek istediğiniz zaman erişimi kaldırabilirsiniz.",
-  "shareWithNonenteUsers": "Ente kullanıcısı olmayanlar için paylaş",
+  "shareWithNonenteUsers": "Photovault kullanıcısı olmayanlar için paylaş",
   "shareYourSubscription": "Aboneliğinizi sevdikleriniz ile paylaşın",
   "sharing": "Paylaşılıyor...",
   "sharingAndCollaboration": "Paylaşım ve işbirliği",
@@ -2074,7 +2074,7 @@
   "showMoreFaces": "Daha fazla yüz göster",
   "showPerson": "Kişiyi Göster",
   "showQRAuthMessage": "QR kodunu göstermek için doğrulama yapın",
-  "sigInBackupReminder": "Ente, oturum açtıktan sonra kodları otomatik olarak yedekleyecek.\n\nYine de kodları ekstra bir yedek olarak dışa aktarmanızı öneririz.",
+  "sigInBackupReminder": "Photovault, oturum açtıktan sonra kodları otomatik olarak yedekleyecek.\n\nYine de kodları ekstra bir yedek olarak dışa aktarmanızı öneririz.",
   "signInToBackup": "Kodlarınızı yedeklemek için giriş yapın",
   "signOutFromOtherDevices": "Diğer cihazlardan çıkış yap",
   "@signOutFromOtherDevices": {

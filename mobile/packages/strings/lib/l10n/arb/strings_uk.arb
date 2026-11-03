@@ -94,7 +94,7 @@
   "addTo": "Додати до",
   "addToAlbum": "Додати до альбому",
   "addToCollection": "Додати до колекції",
-  "addToEnte": "Додати до Ente",
+  "addToEnte": "Додати до Photovault",
   "addToHiddenAlbum": "Додати до прихованого альбому",
   "addToPerson": "Додати до особи",
   "@addToPerson": {
@@ -135,7 +135,7 @@
   "allowAppToOpenSharedAlbumLinks": "Дозволити застосунку відкривати спільні альбоми",
   "allowDownloads": "Дозволити завантаження",
   "allowJoiningAlbum": "Дозволити приєднання до альбому",
-  "allowPermBody": "Надайте доступ до ваших фотографій з налаштувань, щоб Ente міг показувати та створювати резервну копію вашої бібліотеки.",
+  "allowPermBody": "Надайте доступ до ваших фотографій з налаштувань, щоб Photovault міг показувати та створювати резервну копію вашої бібліотеки.",
   "allowPermTitle": "Дозволити доступ до фотографій",
   "allPersonGroupingWillReset": "Усі групи для цієї особи будуть скинуті, і ви втратите всі пропозиції, зроблені для неї",
   "allTabEmptyHint": "Поки що тут нічого немає. Натисніть +, щоб додати код або відкрийте смітник для відновлення.",
@@ -168,7 +168,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Доступна нова версія Ente.",
+  "aNewVersionOfEnteIsAvailable": "Доступна нова версія Photovault.",
   "aNewVersionOfEnteLockerIsAvailable": "Доступна нова версія Ente Locker.",
   "anythingElse": "Щось іще?",
   "@anythingElse": {
@@ -259,7 +259,7 @@
   "autoAddPeople": "Автододавання людей",
   "autoAddToAlbum": "Автододавання до альбому",
   "autoCastDialogBody": "Тут ви побачите доступні пристрої для трансляції.",
-  "autoCastiOSPermission": "Переконайтеся, що дозволи локальної мережі увімкнені для застосунку «Ente Photos» у налаштуваннях.",
+  "autoCastiOSPermission": "Переконайтеся, що дозволи локальної мережі увімкнені для застосунку «Photovault» у налаштуваннях.",
   "autoLock": "Автоблокування",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -291,7 +291,7 @@
   "backupSettings": "Налаштування резервного копіювання",
   "backupStatus": "Стан резервного копіювання",
   "backupStatusDescription": "Елементи, для яких було створено резервну копію, показуватимуться тут",
-  "backupToEnte": "Резервне копіювання в Ente",
+  "backupToEnte": "Резервне копіювання в Photovault",
   "backupVideos": "Резервне копіювання відео",
   "beach": "Пісок і море",
   "birthday": "День народження",
@@ -522,7 +522,7 @@
   "createAccountTitle": "Створення акаунту",
   "createAlbum": "Створити альбом",
   "createAlbumActionHint": "Утримуйте, щоби вибрати фотографії, та натисніть «+», щоб створити альбом",
-  "createAnEnteAccount": "Створення акаунту Ente",
+  "createAnEnteAccount": "Створення акаунту Photovault",
   "createBackupNow": "Створити резервну копію зараз",
   "createCollaborativeLink": "Створити спільне посилання",
   "createCollage": "Створити колаж",
@@ -603,12 +603,12 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Видалено з Ente",
+  "deletedFromEnte": "Видалено з Photovault",
   "deletedItemsStayHereForThirtyDays": "Видалені елементи залишаються тут на 30 днів",
   "deleteDuplicates": "Видалити дублікати",
   "deleteEmptyAlbums": "Видалити пусті альбоми",
   "deleteEmptyAlbumsWithQuestionMark": "Видалити пусті альбоми?",
-  "deleteEnteAccount": "Видалити акаунт Ente",
+  "deleteEnteAccount": "Видалити акаунт Photovault",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -616,7 +616,7 @@
   "deleteFromBoth": "Видалити з обох",
   "deleteFromDevice": "Видалити з пристрою",
   "deleteFromDeviceQuestion": "Видалити з пристрою?",
-  "deleteFromEnte": "Видалити з Ente",
+  "deleteFromEnte": "Видалити з Photovault",
   "deleteHiddenFilesFromDevice": "Видалити приховані файли з пристрою",
   "deleteHiddenFilesFromDeviceDescription": "Видалити локальні копії прихованих файлів з пристрою",
   "deleteItemCount": "{count, plural, one{Видалити {count} елемент} few {Видалити {count} елементи} many {Видалити {count} елементів} other{Видалити {count} елементів}}",
@@ -835,7 +835,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Зміни збережено",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Зміна розташування буде видима лише в Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Зміна розташування буде видима лише в Photovault",
   "editTag": "Редагувати мітку",
   "editTime": "Редагувати час",
   "eligible": "придатний",
@@ -859,7 +859,7 @@
     }
   },
   "emailHint": "Введіть вашу адресу електронної пошти",
-  "emailNeedsEnteAccountForFamily": "У {email} немає акаунту Ente.\n\nНадішліть користувачу запрошення і додайте його до сім'ї після того, як він створить акаунт на Ente.",
+  "emailNeedsEnteAccountForFamily": "У {email} немає акаунту Photovault.\n\nНадішліть користувачу запрошення і додайте його до сім'ї після того, як він створить акаунт на Photovault.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -868,13 +868,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email} не має облікового запису Ente.\n\nНадішліть їм запрошення, щоб поділитися елементами.",
+  "emailNoEnteAccount": "{email} не має облікового запису Photovault.\n\nНадішліть їм запрошення, щоб поділитися елементами.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "У {email} немає облікового запису Ente.\n\nНадішліть їм запрошення для обміну фотографіями.",
+  "emailNoEnteAccountPhotos": "У {email} немає облікового запису Photovault.\n\nНадішліть їм запрошення для обміну фотографіями.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -909,7 +909,7 @@
   "@encryptionKeys": {
     "description": "Encryption keys title"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -918,7 +918,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1136,8 +1136,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "Забули ключ відновлення?",
-  "free10GB": "10 ГБ вільного простору на <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "Знижка 10% на <bold-green>ente</bold-green> Photos",
+  "free10GB": "10 ГБ вільного простору на <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "Знижка 10% на <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Скористайтеся кодом «AUTH», щоб отримати знижку в 10% на перший рік",
   "freeTrial": "Безплатний пробний період",
   "freeUpAmount": "Звільніть {sizeInMBorGB}",
@@ -1188,11 +1188,11 @@
   "guestView": "Гостьовий перегляд",
   "guestViewEnablePreSteps": "Щоб увімкнути гостьовий перегляд, встановіть пароль або блокування екрана в налаштуваннях системи.",
   "happyBirthday": "З днем народження! 🥳",
-  "hearUsWhereOptionalTitle": "Як ви дізналися про Ente? (необов'язково)",
+  "hearUsWhereOptionalTitle": "Як ви дізналися про Photovault? (необов'язково)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "Як ви дізналися про Ente?",
+  "hearUsWhereTitle": "Як ви дізналися про Photovault?",
   "help": "Допомога",
   "helpAndSupport": "Допомога і підтримка",
   "hidden": "Приховано",
@@ -1250,7 +1250,7 @@
   "importBitwardenGuide": "Скористайтеся опцією «Export vault» у Bitwarden Tools та імпортуйте незашифрований файл JSON.",
   "importCodeDelimiterInfo": "Коди можуть бути розділені комою або новим рядком",
   "importCodes": "Імпортувати коди",
-  "importEnteEncGuide": "Виберіть зашифрований файл JSON, експортований з Ente",
+  "importEnteEncGuide": "Виберіть зашифрований файл JSON, експортований з Photovault",
   "importEnterSetupKey": "Ввести ключ налаштування",
   "importFailureDesc": "Не вдалось обробити вибраний файл.",
   "importFromGallery": "Імпортувати з галереї",
@@ -1289,7 +1289,7 @@
     }
   },
   "importSuccessTitle": "Гей, любо!",
-  "importTypeEnteEncrypted": "Зашифрований експорт Ente",
+  "importTypeEnteEncrypted": "Зашифрований експорт Photovault",
   "incorrectCode": "Невірний код",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -1328,7 +1328,7 @@
   "invalidQRCode": "Недійсний QR-код",
   "invalidReferralCode": "Недійсний код",
   "invite": "Запросити",
-  "inviteToEnte": "Запросити до Ente",
+  "inviteToEnte": "Запросити до Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -1517,7 +1517,7 @@
   "@loginSessionExpired": {
     "description": "Login session expired title"
   },
-  "loginToEnte": "Увійти до Ente",
+  "loginToEnte": "Увійти до Photovault",
   "loginToExistingAccount": "Увійти до наявного акаунту",
   "loginWithAuthAccount": "Увійти з допомогою свого акаунту Auth",
   "loginWithTOTP": "Увійти за допомогою TOTP",
@@ -1588,7 +1588,7 @@
   "mixedGrouping": "Змішана група?",
   "mlConsent": "Увімкнути машинне навчання",
   "mlConsentConfirmation": "Я розумію, та бажаю увімкнути машинне навчання",
-  "mlConsentDescription": "Якщо увімкнути машинне навчання, Ente вилучатиме інформацію, наприклад геометрію обличчя з файлів, включно з тими, хто поділився з вами.\n\nЦе відбуватиметься на вашому пристрої, і будь-яка згенерована біометрична інформація буде наскрізно зашифрована.",
+  "mlConsentDescription": "Якщо увімкнути машинне навчання, Photovault вилучатиме інформацію, наприклад геометрію обличчя з файлів, включно з тими, хто поділився з вами.\n\nЦе відбуватиметься на вашому пристрої, і будь-яка згенерована біометрична інформація буде наскрізно зашифрована.",
   "mlProgressBannerTitle": "Тримайтеся!",
   "moderateStrength": "Середній",
   "@moderateStrength": {
@@ -1646,7 +1646,7 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не вдалося під'єднатися до Ente. Спробуйте знову через деякий час. Якщо помилка не зникне, зв'яжіться з нашою командою підтримки.",
+  "networkConnectionRefusedErr": "Не вдалося під'єднатися до Photovault. Спробуйте знову через деякий час. Якщо помилка не зникне, зв'яжіться з нашою командою підтримки.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
@@ -1760,7 +1760,7 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "onEnte": "В <branding>Ente</branding>",
+  "onEnte": "В <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -2268,7 +2268,7 @@
     "description": "Description text asking user if they want to save to storage or share with other apps"
   },
   "savePerson": "Зберегти особу",
-  "saveToEnte": "Зберегти в Ente",
+  "saveToEnte": "Зберегти в Photovault",
   "saveToLocker": "Зберегти в Locker",
   "saveYourRecoveryKeyIfYouHaventAlready": "Збережіть ваш ключ відновлення, якщо ви ще цього не зробили",
   "saving": "Зберігаємо...",
@@ -2442,7 +2442,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Обрані файли не на Ente",
+  "selectedFilesAreNotOnEnte": "Обрані файли не на Photovault",
   "selectedPhotos": "{count} вибрано",
   "@selectedPhotos": {
     "description": "Display the number of selected photos",
@@ -2559,15 +2559,15 @@
   "setupFirstAccount": "Налаштуйте свій \nперший акаунт",
   "share": "Поділитися",
   "shareALink": "Поділитися посиланням",
-  "shareCodeEarnStorage": "Подвоїти своє сховище на Ente",
+  "shareCodeEarnStorage": "Подвоїти своє сховище на Photovault",
   "shareCodes": "Поділитися кодами",
   "shareCodesDuration": "Виберіть тривалість, протягом якої ви хочете поділитися кодом.",
   "sharedWith": "Поділено з",
   "shareLink": "Поділитися посиланням",
   "shareStorageWith5Members": "Поділитися сховищем із 5 учасниками",
-  "shareTextRecommendUsingEnteForFamily": "Установи Ente, щоб мені можна було додати тебе до сімейного тарифу\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Установи Photovault, щоб мені можна було додати тебе до сімейного тарифу\n\nhttps://ente.com",
   "shareThisLink": "Це посилання дозволяє будь-кому, хто його отримає, отримати доступ до вашого елемента. Ви можете скасувати доступ у будь-який час, видаливши посилання.",
-  "shareWithNonenteUsers": "Поділитися з користувачами без Ente",
+  "shareWithNonenteUsers": "Поділитися з користувачами без Photovault",
   "shareYourSubscription": "Поділіться своєю підпискою з близькими",
   "sharing": "Відправлення...",
   "sharingAndCollaborationDesc": "Альбоми, посилання та сімейні тарифи",
@@ -2581,7 +2581,7 @@
   "showPerson": "Показати особу",
   "showQRAuthMessage": "Авторизуйтесь, щоб показати QR-код",
   "showTextOnWidget": "Показувати текст на віджеті",
-  "sigInBackupReminder": "Ente автоматично створюватиме резервні копії кодів після входу.\n\nМи все одно радимо експортувати коди в якості додаткового резервного копіювання.",
+  "sigInBackupReminder": "Photovault автоматично створюватиме резервні копії кодів після входу.\n\nМи все одно радимо експортувати коди в якості додаткового резервного копіювання.",
   "signInToBackup": "Увійдіть для резервного копіювання кодів",
   "signOutFromOtherDevices": "Вийти на інших пристроях",
   "@signOutFromOtherDevices": {
@@ -2702,7 +2702,7 @@
   "suggestions": "Пропозиції",
   "sunrise": "На горизонті",
   "support": "Підтримка",
-  "supportEnte": "Підтримка <bold-green>ente</bold-green>",
+  "supportEnte": "Підтримка <bold-green>Photovault</bold-green>",
   "syncing": "Синхронізуємо...",
   "syncProgress": "{completed} / {total} спогадів збережено",
   "@syncProgress": {

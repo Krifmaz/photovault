@@ -43,7 +43,8 @@ class TagChipComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.componentColors;
     final contentColor = switch (state) {
-      TagChipComponentState.selected => colors.specialWhite,
+      // PHOTOVAULT: theme (readable on Encore accent)
+      TagChipComponentState.selected => colors.onPrimary,
       TagChipComponentState.unselected => colors.textLight,
       TagChipComponentState.disabled => colors.textLightest,
     };

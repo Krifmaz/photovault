@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import "package:ente_components/ente_components.dart";
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:ente_pure_utils/ente_pure_utils.dart';
 import "package:ente_strings/ente_strings.dart";
 import 'package:flutter/material.dart';
@@ -340,7 +341,8 @@ class _SyncStatusWidgetState extends State<SyncStatusWidget> {
 class RefreshIndicatorWidget extends StatelessWidget {
   static const _inProgressIcon = CircularProgressIndicator(
     strokeWidth: 2,
-    valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(45, 194, 98, 1.0)),
+    // PHOTOVAULT: theme
+    valueColor: AlwaysStoppedAnimation<Color>(encoreLightAccent2),
   );
 
   final String text;

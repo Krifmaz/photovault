@@ -595,7 +595,7 @@
   "@forgotPassword": {
     "description": "Forgot password link label"
   },
-  "free10GB": "10GB בחינם ב-<bold-green>ente</bold-green> תמונות",
+  "free10GB": "10GB בחינם ב-<bold-green>Photovault</bold-green> תמונות",
   "freeTrial": "ניסיון חינמי",
   "freeUpDeviceSpace": "פנה אחסון במכשיר",
   "freeUpSpace": "פנה מקום",
@@ -613,7 +613,7 @@
   "googlePlayId": "Google Play ID",
   "grantFullAccessPrompt": "נא לתת גישה לכל התמונות בתוך ההגדרות של הטלפון",
   "grantPermission": "הענק הרשאה",
-  "hearUsWhereOptionalTitle": "איך שמעת על Ente? (אופציונלי)",
+  "hearUsWhereOptionalTitle": "איך שמעת על Photovault? (אופציונלי)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -650,7 +650,7 @@
   "importBitwardenGuide": "השתמשו באפשרות \"ייצוא כספת\" הכלולה בכלים של Bitwarden ובצעו ייבוא של קובץ ה-JSON הבלתי-מוצפן.",
   "importCodeDelimiterInfo": "הקודים יכולים להיות מופרדים על-ידי פסיק או שורה חדשה",
   "importCodes": "ייבא קוד",
-  "importEnteEncGuide": "בחירת קובץ ה-JSON המוצפן שייוצא מ-Ente",
+  "importEnteEncGuide": "בחירת קובץ ה-JSON המוצפן שייוצא מ-Photovault",
   "importEnterSetupKey": "הכנס מפתח התקנה",
   "importFailureDesc": "לא ניתן לנתח את הקובץ שבחרת.",
   "importGoogleAuthConfirmation": "{codeCount, plural, one{לייבא קוד 1 מ-Google Authenticator?} two{לייבא {codeCount} קודים מ-Google Authenticator?} many{לייבא {codeCount} קודים מ-Google Authenticator?} other{לייבא {codeCount} קודים מ-Google Authenticator?}}",
@@ -688,7 +688,7 @@
     }
   },
   "importSuccessTitle": "הידד!",
-  "importTypeEnteEncrypted": "ייצוא מוצפן של Ente",
+  "importTypeEnteEncrypted": "ייצוא מוצפן של Photovault",
   "incorrectCode": "קוד שגוי",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -824,11 +824,11 @@
   "moveToAlbum": "הזז לאלבום",
   "movingFilesToAlbum": "מעביר קבצים לאלבום...",
   "name": "שם",
-  "networkConnectionRefusedErr": "לא ניתן להתחבר ל-Ente, אנא נסו בשנית מאוחר יותר. אם השגיאה נמשכת, אנא צרו קשר עם התמיכה.",
+  "networkConnectionRefusedErr": "לא ניתן להתחבר ל-Photovault, אנא נסו בשנית מאוחר יותר. אם השגיאה נמשכת, אנא צרו קשר עם התמיכה.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "לא ניתן להתחבר ל-Ente, אנא בידקו את הגדרות הרשת שלכם וצרו קשר עם התמיכה אם השגיאה נמשכת.",
+  "networkHostLookUpErr": "לא ניתן להתחבר ל-Photovault, אנא בידקו את הגדרות הרשת שלכם וצרו קשר עם התמיכה אם השגיאה נמשכת.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1202,7 +1202,7 @@
   "showLargeIcons": "הצג סמלים גדולים",
   "showMemories": "הצג זכרונות",
   "showQRAuthMessage": "אמת כדי להראות קוד QR",
-  "sigInBackupReminder": "Ente תבצע אוטומטית גיבוי הקודים לאחר כניסה רשומה.\n\nאנו בכל זאת ממליצים לייצא קודים כגיבוי נוסף.",
+  "sigInBackupReminder": "Photovault תבצע אוטומטית גיבוי הקודים לאחר כניסה רשומה.\n\nאנו בכל זאת ממליצים לייצא קודים כגיבוי נוסף.",
   "signInToBackup": "אנא התחבר כדי לבצע גיבוי לקודים שלך",
   "signOutFromOtherDevices": "יציאה מהחשבון במכשירים אחרים",
   "@signOutFromOtherDevices": {
@@ -1267,7 +1267,7 @@
   "success": "הצלחה",
   "suggestFeatures": "הציעו מאפיינים",
   "support": "תמיכה",
-  "supportEnte": "תמיכה ב-<bold-green>ente</bold-green>",
+  "supportEnte": "תמיכה ב-<bold-green>Photovault</bold-green>",
   "syncing": "מסנכרן...",
   "syncProgress": "{completed}/{total} זכרונות נשמרו",
   "@syncProgress": {

@@ -2,6 +2,7 @@ import "dart:async";
 import "dart:math" as math;
 
 import "package:ente_components/ente_components.dart";
+import "package:ente_components/theme/photovault/encore_tokens.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_svg/flutter_svg.dart";
@@ -470,7 +471,9 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
           children: [
             Positioned.fill(
               bottom: -_cardRadius,
-              child: _OnboardingBackdrop(color: colors.green),
+              // PHOTOVAULT: theme. Charcoal header (Encore) in both modes;
+              // keeps the white back button readable.
+              child: const _OnboardingBackdrop(color: encoreLightAccent),
             ),
             if (hasHeaderBar)
               Positioned(

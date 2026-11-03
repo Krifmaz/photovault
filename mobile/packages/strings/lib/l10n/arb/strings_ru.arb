@@ -156,7 +156,7 @@
   "addTo": "Добавить в",
   "addToAlbum": "Добавить в альбом",
   "addToCollection": "Добавить в коллекцию",
-  "addToEnte": "Добавить в Ente",
+  "addToEnte": "Добавить в Photovault",
   "addToHiddenAlbum": "Добавить в скрытый альбом",
   "addToPerson": "Добавить нового человека",
   "@addToPerson": {
@@ -220,8 +220,8 @@
   "allowDownloads": "Разрешить скачивание",
   "allowJoining": "Разрешить присоединение",
   "allowJoiningAlbum": "Разрешить объединение альбомов",
-  "allowJoiningDescription": "Пользователи с аккаунтом Ente могут присоединиться к вашему альбому и оставаться в курсе событий",
-  "allowPermBody": "Пожалуйста, разрешите доступ к вашим фото через настройки устройства, чтобы Ente мог отображать и сохранять вашу библиотеку.",
+  "allowJoiningDescription": "Пользователи с аккаунтом Photovault могут присоединиться к вашему альбому и оставаться в курсе событий",
+  "allowPermBody": "Пожалуйста, разрешите доступ к вашим фото через настройки устройства, чтобы Photovault мог отображать и сохранять вашу библиотеку.",
   "allowPermTitle": "Разрешить доступ к фото",
   "allPersonGroupingWillReset": "Все группы этого человека будут сброшены, и вы потеряете все предложения для него",
   "allTabEmptyHint": "Ничего не найдено. Нажмите +, чтобы добавить код, или откройте Корзину, чтобы восстановить его.",
@@ -255,7 +255,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Доступна новая версия Ente.",
+  "aNewVersionOfEnteIsAvailable": "Доступна новая версия Photovault.",
   "aNewVersionOfEnteLockerIsAvailable": "Доступна новая версия Ente Locker.",
   "anythingElse": "Что-то еще?",
   "@anythingElse": {
@@ -264,7 +264,7 @@
   "appearance": "Оформление",
   "appIcon": "Значок приложения",
   "appleId": "Идентификатор Apple",
-  "applePhotosUnsupportedResource": "Этот файл не может быть сохранен в Apple Photos. Вы можете просмотреть его в Ente.",
+  "applePhotosUnsupportedResource": "Этот файл не может быть сохранен в Apple Photos. Вы можете просмотреть его в Photovault.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -375,7 +375,7 @@
   "autoAddPeople": "Автоматически добавлять людей",
   "autoAddToAlbum": "Автоматически добавлять в альбом",
   "autoCastDialogBody": "Здесь вы увидите доступные устройства.",
-  "autoCastiOSPermission": "Убедитесь, что для приложения Ente Photos включены разрешения локальной сети в настройках.",
+  "autoCastiOSPermission": "Убедитесь, что для приложения Photovault включены разрешения локальной сети в настройках.",
   "autoLock": "Автоблокировка",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -433,7 +433,7 @@
   "backupModeScreenWillDim": "Экран автоматически приглушится для экономии заряда батареи",
   "backupModeSettingsDescription": "Не закрывайте приложение, до завершения резервного копирования",
   "backupModeStart": "Начать резервное копирование",
-  "backupModeStayInEnte": "Оставайтесь в Ente. Переключение между приложениями приостанавливает резервное копирование.",
+  "backupModeStayInEnte": "Оставайтесь в Photovault. Переключение между приложениями приостанавливает резервное копирование.",
   "backupModeTapToWakeScreen": "Нажмите, чтобы разбудить экран",
   "backupOnlyNewPhotos": "Резервное копирование только новых фото",
   "backupOnlyNewPhotosAllFoldersSelected": "Сейчас все папки выбраны для резервного копирования.\n\nВы можете продолжить или обновить выбранные папки.",
@@ -455,7 +455,7 @@
   "backupSettings": "Настройки резервного копирования",
   "backupStatus": "Статус резервного копирования",
   "backupStatusDescription": "Элементы, сохранённые в резервной копии, появятся здесь",
-  "backupToEnte": "Резервное копирование в Ente",
+  "backupToEnte": "Резервное копирование в Photovault",
   "backupVideos": "Резервное копирование видео",
   "beach": "Песок и море",
   "birthday": "День рождения",
@@ -612,7 +612,7 @@
   "codeChangeLimitReached": "Извините, вы достигли лимита изменений кода.",
   "codeCopiedToClipboard": "Код скопирован в буфер обмена",
   "codeIssuerHint": "Эмитент",
-  "collabLinkSectionDescription": "Разрешить людям добавлять фотографии без учётной записи Ente",
+  "collabLinkSectionDescription": "Разрешить людям добавлять фотографии без учётной записи Photovault",
   "collaborator": "Соавтор",
   "collageLayout": "Макет",
   "collageSaved": "Коллаж сохранён в галерее",
@@ -703,7 +703,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Я понимаю, что это приведет к удалению моих данных из Ente Photos, Ente Auth и Ente Locker.",
+  "confirmDeleteAccountAcrossApps": "Я понимаю, что это приведет к удалению моих данных из Photovault, Ente Auth и Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -795,7 +795,7 @@
   "createAccountTitle": "Создать аккаунт",
   "createAlbum": "Создать альбом",
   "createAlbumActionHint": "Нажмите и удерживайте, чтобы выбрать фото, и нажмите «+», чтобы создать альбом",
-  "createAnEnteAccount": "Создать аккаунт Ente",
+  "createAnEnteAccount": "Создать аккаунт Photovault",
   "createAnotherKit": "Создать другой набор",
   "createBackupNow": "Создайте резервную копию сейчас",
   "createCollaborativeLink": "Создать совместную ссылку",
@@ -907,12 +907,12 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Удалено из Ente",
+  "deletedFromEnte": "Удалено из Photovault",
   "deletedItemsStayHereForThirtyDays": "Удаленные объекты хранятся здесь 30 дней",
   "deleteDuplicates": "Удалить повторяющиеся",
   "deleteEmptyAlbums": "Удалить пустые альбомы",
   "deleteEmptyAlbumsWithQuestionMark": "Удалить пустые альбомы?",
-  "deleteEnteAccount": "Удалить аккаунт Ente",
+  "deleteEnteAccount": "Удалить аккаунт Photovault",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -920,7 +920,7 @@
   "deleteFromBoth": "Удалить из обоих мест",
   "deleteFromDevice": "Удалить с устройства",
   "deleteFromDeviceQuestion": "Удалить с устройства?",
-  "deleteFromEnte": "Удалить из Ente",
+  "deleteFromEnte": "Удалить из Photovault",
   "deleteHiddenFilesFromDevice": "Удалить скрытые файлы с устройства",
   "deleteHiddenFilesFromDeviceDescription": "Удалить локальные копии скрытых файлов с устройства",
   "deleteItemCount": "{count, plural, one{Удалить {count} объект} few{Удалить {count} объекта} many{Удалить {count} объектов} other{Удалить {count} объекта}}",
@@ -1212,7 +1212,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Изменения сохранены",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Изменения в местоположении будут видны только в Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Изменения в местоположении будут видны только в Photovault",
   "editStorageLimit": "Изменить лимит хранилища",
   "editTag": "Изменить метку",
   "editTime": "Изменить время",
@@ -1238,7 +1238,7 @@
     }
   },
   "emailHint": "Введите адрес вашей электронной почты",
-  "emailNeedsEnteAccountForFamily": "У {email} нет учетной записи Ente.\n\nОтправьте приглашение и добавьте в свою семью после того, как пользователь создаст учетную запись на Ente.",
+  "emailNeedsEnteAccountForFamily": "У {email} нет учетной записи Photovault.\n\nОтправьте приглашение и добавьте в свою семью после того, как пользователь создаст учетную запись на Photovault.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -1247,13 +1247,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "У {email} нет аккаунта Ente.\n\nОтправьте им приглашение, чтобы поделиться элементами.",
+  "emailNoEnteAccount": "У {email} нет аккаунта Photovault.\n\nОтправьте им приглашение, чтобы поделиться элементами.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "У {email} нет аккаунта Ente.\n\nОтправьте ему приглашение для обмена фото.",
+  "emailNoEnteAccountPhotos": "У {email} нет аккаунта Photovault.\n\nОтправьте ему приглашение для обмена фото.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1305,7 +1305,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -1314,7 +1314,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1678,8 +1678,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "Забыли ключ восстановления?",
-  "free10GB": "10ГБ бесплатно в <bold-green>ente</bold-green> Фото",
-  "freeStorageOffer": "Скидка 10% на <bold-green>ente</bold-green> фото",
+  "free10GB": "10ГБ бесплатно в <bold-green>Photovault</bold-green> Фото",
+  "freeStorageOffer": "Скидка 10% на <bold-green>Photovault</bold-green> фото",
   "freeStorageOfferDescription": "Используйте код \"AUTH\", чтобы получить скидку 10% в первый год",
   "freeTrial": "Бесплатный пробный период",
   "freeUpAmount": "Освободить {sizeInMBorGB}",
@@ -1734,7 +1734,7 @@
   "grantGalleryPermissionDesc": "Дайте разрешение на доступ и организуйте фото с распознаванием лица. Все происходит на вашем устройстве.",
   "grantGalleryPermissionTitle": "Давайте найдем ваши лучшие кадры",
   "grantPermission": "Предоставить разрешение",
-  "grantPermissionDesc": "Разрешите Ente доступ к вашей библиотеке, чтобы мы могли упорядочить её с помощью распознавания лиц. Вся обработка происходит на вашем устройстве.",
+  "grantPermissionDesc": "Разрешите Photovault доступ к вашей библиотеке, чтобы мы могли упорядочить её с помощью распознавания лиц. Вся обработка происходит на вашем устройстве.",
   "greenery": "Зелёная жизнь",
   "grid": "Сетка",
   "groupBy": "Группировать по",
@@ -1746,11 +1746,11 @@
   "guestView": "Гостевой просмотр",
   "guestViewEnablePreSteps": "Для включения гостевого просмотра, пожалуйста, настройте код или блокировку экрана в настройках устройства.",
   "happyBirthday": "С днём рождения! 🥳",
-  "hearUsWhereOptionalTitle": "Как вы узнали о Ente? (необязательно)",
+  "hearUsWhereOptionalTitle": "Как вы узнали о Photovault? (необязательно)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "Как вы узнали о Ente?",
+  "hearUsWhereTitle": "Как вы узнали о Photovault?",
   "help": "Помощь",
   "helpAndSupport": "Помощь и поддержка",
   "hidden": "Скрытые",
@@ -1817,7 +1817,7 @@
   "importBitwardenGuide": "Используйте опцию \"Экспортировать хранилище\" в Bitwarden и импортируйте незашифрованный JSON-файл.",
   "importCodeDelimiterInfo": "Коды могут быть разделены запятой или новой строкой",
   "importCodes": "Импортировать коды",
-  "importEnteEncGuide": "Выберите зашифрованный JSON файл, экспортированный из Ente",
+  "importEnteEncGuide": "Выберите зашифрованный JSON файл, экспортированный из Photovault",
   "importEnterSetupKey": "Ввести ключ настройки",
   "importFailureDesc": "Не удалось обработать выбранный файл.",
   "importFromGallery": "Импорт из галереи",
@@ -1856,7 +1856,7 @@
     }
   },
   "importSuccessTitle": "Ура!",
-  "importTypeEnteEncrypted": "Зашифрованный экспорт из Ente",
+  "importTypeEnteEncrypted": "Зашифрованный экспорт из Photovault",
   "incorrectCode": "Неверный код",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -1919,7 +1919,7 @@
       }
     }
   },
-  "inviteToEnte": "Пригласить в Ente",
+  "inviteToEnte": "Пригласить в Photovault",
   "ok": "ОК",
   "@ok": {
     "description": "Generic OK button label"
@@ -2222,7 +2222,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Войти в Ente",
+  "loginToEnte": "Войти в Photovault",
   "loginToExistingAccount": "Вход в существующий аккаунт",
   "loginWithAuthAccount": "Войти с помощью учетной записи Auth",
   "loginWithTOTP": "Вход через TOTP",
@@ -2271,7 +2271,7 @@
   "mapsPrivacyNotice": "Приблизительные координаты будут отправлены заботящимся о конфиденциальности третьим сторонам, таким как OpenStreetMap, для отображения карты и местоположения.",
   "markingAsImportant": "Отметка как важное...",
   "me": "Я",
-  "mediaManagementHintMessage": "Включите управление мультимедиа для Ente в настройках, чтобы отключить подтверждения.",
+  "mediaManagementHintMessage": "Включите управление мультимедиа для Photovault в настройках, чтобы отключить подтверждения.",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -2339,7 +2339,7 @@
   "mixedGrouping": "Смешанная группа?",
   "mlConsent": "Включить машинное обучение",
   "mlConsentConfirmation": "Я понимаю и хочу включить машинное обучение",
-  "mlConsentDescription": "Если вы включите машинное обучение, Ente будет извлекать информацию такую, как геометрия лица, из файлов, включая те, которыми с вами поделились.\n\nЭтот процесс будет происходить на вашем устройстве, и любая сгенерированная биометрическая информация будет защищена сквозным шифрованием.",
+  "mlConsentDescription": "Если вы включите машинное обучение, Photovault будет извлекать информацию такую, как геометрия лица, из файлов, включая те, которыми с вами поделились.\n\nЭтот процесс будет происходить на вашем устройстве, и любая сгенерированная биометрическая информация будет защищена сквозным шифрованием.",
   "mlIndexingDescription": "Обратите внимание, что машинное обучение увеличит использование трафика и батареи, пока все элементы не будут обработаны. Рассмотрите использование приложения для компьютера для более быстрой обработки. Результаты будут автоматически синхронизированы.",
   "mlProcessingIssueReachOut": "Пожалуйста, свяжитесь с нами, чтобы мы могли вам помочь.",
   "@mlProcessingIssueReachOut": {
@@ -2422,11 +2422,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не удаётся подключиться к Ente. Пожалуйста, повторите попытку через некоторое время. Если ошибка сохраняется, обратитесь в службу поддержки.",
+  "networkConnectionRefusedErr": "Не удаётся подключиться к Photovault. Пожалуйста, повторите попытку через некоторое время. Если ошибка сохраняется, обратитесь в службу поддержки.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Не удаётся подключиться к Ente. Пожалуйста, проверьте настройки сети и обратитесь в службу поддержки, если ошибка сохраняется.",
+  "networkHostLookUpErr": "Не удаётся подключиться к Photovault. Пожалуйста, проверьте настройки сети и обратитесь в службу поддержки, если ошибка сохраняется.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2593,12 +2593,12 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "У вас один аккаунт для Ente Photos, Ente Auth и Ente Locker.",
+  "oneAccountAcrossEnteApps": "У вас один аккаунт для Photovault, Ente Auth и Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
   "oneLineAboutTheIssue": "Одна строка о проблеме",
-  "onEnte": "В <branding>ente</branding>",
+  "onEnte": "В <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -2734,7 +2734,7 @@
       }
     }
   },
-  "permanentlyDeleteYourEnteAccount": "Хотите навсегда удалить свой аккаунт Ente?",
+  "permanentlyDeleteYourEnteAccount": "Хотите навсегда удалить свой аккаунт Photovault?",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -2757,7 +2757,7 @@
   },
   "pets": "Пушистые спутники",
   "photoGridSize": "Размер сетки фото",
-  "photoLibraryAddPermissionRequired": "Для сохранения фотографий и видео в Apple Photos программе Ente требуется разрешение. Вы можете разрешить доступ в настройках.",
+  "photoLibraryAddPermissionRequired": "Для сохранения фотографий и видео в Apple Photos программе Photovault требуется разрешение. Вы можете разрешить доступ в настройках.",
   "photoLibraryAddPermissionRestricted": "Доступ к фототеке на этом устройстве ограничен.",
   "photoOrder": "Порядок фото",
   "photoViewerFilmstripLabel": "Выбор фото",
@@ -2925,7 +2925,7 @@
     }
   },
   "publicLink": "Публичная ссылка",
-  "publicLinkAccessDescription": "Любой, у кого есть ссылка, может открыть альбом без аккаунта Ente.",
+  "publicLinkAccessDescription": "Любой, у кого есть ссылка, может открыть альбом без аккаунта Photovault.",
   "publicLinkCollectDescription": "Любой, у кого есть эта ссылка, может добавить фотографии в ваш альбом.",
   "publicLinkEnabled": "Публичная ссылка включена",
   "publicLinkViewDescription": "Любой, у кого есть эта ссылка, может получить доступ к вашему альбому.",
@@ -3260,7 +3260,7 @@
   "resendInvite": "Отправить приглашение повторно",
   "reset": "Сбросить",
   "resetIgnoredFiles": "Сбросить игнорируемые файлы",
-  "resetIgnoredFilesDescription": "Сбросьте эти пропущенные файлы, чтобы Ente снова попытался загрузить их.",
+  "resetIgnoredFilesDescription": "Сбросьте эти пропущенные файлы, чтобы Photovault снова попытался загрузить их.",
   "resetPasswordTitle": "Сбросить пароль",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -3412,7 +3412,7 @@
     "description": "Description text asking user if they want to save to storage or share with other apps"
   },
   "savePerson": "Сохранить человека",
-  "saveToEnte": "Сохранить в Ente",
+  "saveToEnte": "Сохранить в Photovault",
   "saveToLocker": "Сохранить в Locker",
   "saveYourRecoveryKeyIfYouHaventAlready": "Сохраните ваш ключ восстановления, если вы ещё этого не сделали",
   "saving": "Сохранение...",
@@ -3555,7 +3555,7 @@
   "securityDesc": "Шифрование, ключи восстановления, блокировка приложений и защита аккаунта",
   "seeAllCollections": "Смотреть все коллекции",
   "seePublicAlbumLinksInApp": "Просматривать публичные ссылки на альбомы в приложении",
-  "selectAlbumsToBackUpToEnte": "Выберите альбомы для резервного копирования в Ente",
+  "selectAlbumsToBackUpToEnte": "Выберите альбомы для резервного копирования в Photovault",
   "selectAlbumToLikePhoto": "Выберите альбом, чтобы поставить отметку \"Нравится\" на это фото",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -3591,7 +3591,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Выбранные файлы отсутствуют в Ente",
+  "selectedFilesAreNotOnEnte": "Выбранные файлы отсутствуют в Photovault",
   "selectedFilesBackedUpToEnte": "Выбранные элементы будут удалены из всех альбомов. Вы можете восстановить их из корзины.",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -3735,7 +3735,7 @@
   "share": "Поделиться",
   "shareALink": "Поделиться ссылкой",
   "shareAnAlbum": "Поделиться альбомом",
-  "shareCodeEarnStorage": "Удвойте объем вашего хранилища на Ente",
+  "shareCodeEarnStorage": "Удвойте объем вашего хранилища на Photovault",
   "shareCodes": "Поделиться кодами",
   "shareCodesDuration": "Выберите продолжительность, на которую вы хотите поделиться кодами.",
   "shareCollection": "Поделиться коллекцией",
@@ -3773,17 +3773,17 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Скачайте Ente, чтобы мы могли легко обмениваться файлами оригинального качества\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Скачай Ente, чтобы я мог добавить тебя в свой семейный тариф\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Скачай Ente, чтобы мы могли легко делиться фото и видео в оригинальном качестве\n\nhttps://ente.com",
-  "shareTextReferralInvite": "Получите 20 Гб бесплатно с помощью Ente Photos! Скачайте приложение по ссылке https://ente.com/invite and use code {referralCode}.",
+  "shareTextRecommendUsingEnte": "Скачайте Photovault, чтобы мы могли легко обмениваться файлами оригинального качества\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Скачай Photovault, чтобы я мог добавить тебя в свой семейный тариф\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Скачай Photovault, чтобы мы могли легко делиться фото и видео в оригинальном качестве\n\nhttps://ente.com",
+  "shareTextReferralInvite": "Получите 20 Гб бесплатно с помощью Photovault! Скачайте приложение по ссылке https://ente.com/invite and use code {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}
     }
   },
   "shareThisLink": "Эта ссылка позволяет любому, кто её получит, получить доступ к вашему элементу. Вы можете удалить доступ в любое время, удалив ссылку.",
-  "shareWithNonenteUsers": "Поделиться с пользователями, не использующими Ente",
+  "shareWithNonenteUsers": "Поделиться с пользователями, не использующими Photovault",
   "shareYourFeedbackHere": "Поделитесь своим отзывом здесь",
   "@shareYourFeedbackHere": {
     "description": "Placeholder for optional account deletion feedback"
@@ -3814,7 +3814,7 @@
   "showQRAuthMessage": "Аутентификация для отображения QR-кода",
   "showTextOnWidget": "Показывать текст на виджете",
   "shuffle": "Перемешать",
-  "sigInBackupReminder": "Ente автоматически создаст резервную копию кодов после входа в систему.\n\nМы по-прежнему рекомендуем экспортировать коды в качестве дополнительного резервного копирования.",
+  "sigInBackupReminder": "Photovault автоматически создаст резервную копию кодов после входа в систему.\n\nМы по-прежнему рекомендуем экспортировать коды в качестве дополнительного резервного копирования.",
   "signInToBackup": "Войдите в систему, чтобы создать резервную копию своих кодов",
   "signOutFromOtherDevices": "Выйдите из системы на других устройствах",
   "@signOutFromOtherDevices": {
@@ -3848,7 +3848,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "Этот элемент доступен на вашем устройстве и в Ente.",
+  "singleFileInBothLocalAndRemote": "Этот элемент доступен на вашем устройстве и в Photovault.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -3866,7 +3866,7 @@
   "socialNotifications": "Лайки и комментарии",
   "socialNotificationsExplanation": "Лайки к вашим фотографиям и комментарии в альбомах, в которых вы состоите",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "Тот, кто делится с вами альбомами, должен видеть такой же идентификатор на своём устройстве.",
-  "someSelectedFilesBackedUpToEnte": "Эти элементы доступны на устройстве и Ente.",
+  "someSelectedFilesBackedUpToEnte": "Эти элементы доступны на устройстве и Photovault.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -3971,7 +3971,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "Ваш {id} уже связан с другим аккаунтом Ente.\nЕсли вы хотите использовать свой {id} с этой учетной записью, пожалуйста, свяжитесь с нашей службой поддержки.",
+  "subAlreadyLinkedErrMessage": "Ваш {id} уже связан с другим аккаунтом Photovault.\nЕсли вы хотите использовать свой {id} с этой учетной записью, пожалуйста, свяжитесь с нашей службой поддержки.",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -4001,7 +4001,7 @@
   "suggestions": "Предложения",
   "sunrise": "На горизонте",
   "support": "Поддержка",
-  "supportEnte": "Поддержка <bold-green>ente</bold-green>",
+  "supportEnte": "Поддержка <bold-green>Photovault</bold-green>",
   "syncing": "Синхронизация...",
   "syncProgress": "{completed}/{total} воспоминаний сохранено",
   "@syncProgress": {
@@ -4072,7 +4072,7 @@
   "@thisEmailIsAlreadyInUse": {
     "description": "Error message when email is already in use"
   },
-  "thisHelpsUsImproveEnte": "Это помогает нам улучшить Ente",
+  "thisHelpsUsImproveEnte": "Это помогает нам улучшить Photovault",
   "@thisHelpsUsImproveEnte": {
     "description": "Subtitle under account deletion reason prompt"
   },
@@ -4190,7 +4190,7 @@
     }
   },
   "trustedContacts": "Доверенные контакты",
-  "trustedContactsEmptyDescription": "Назначьте другого пользователя Ente доверенным лицом для восстановления вашего аккаунта",
+  "trustedContactsEmptyDescription": "Назначьте другого пользователя Photovault доверенным лицом для восстановления вашего аккаунта",
   "trustedContactStatusAccepted": "Принято",
   "@trustedContactStatusAccepted": {
     "description": "Short status label shown for an accepted trusted contact"
@@ -4352,7 +4352,7 @@
   "@uploadStorageLimitErrorTitle": {
     "description": "Title shown when uploads fail due to running out of storage"
   },
-  "uploadSubscriptionExpiredErrorBody": "Ваша подписка на Ente Photos истекла. Продлите подписку, чтобы продолжить загрузку.",
+  "uploadSubscriptionExpiredErrorBody": "Ваша подписка на Photovault истекла. Продлите подписку, чтобы продолжить загрузку.",
   "@uploadSubscriptionExpiredErrorBody": {
     "description": "Body shown when uploads fail because the Photos subscription is expired"
   },
@@ -4702,9 +4702,9 @@
   "viewerRoleDescription": "Просмотреть и скачать фотографии",
   "collaboratorRoleDescription": "Плюс добавляют свои собственные фотографии",
   "adminRoleDescription": "Плюс добавление и удаление людей",
-  "noEnteAccountWithThisEmail": "Нет аккаунта Ente с таким адресом электронной почты.",
+  "noEnteAccountWithThisEmail": "Нет аккаунта Photovault с таким адресом электронной почты.",
   "shareALinkInline": "Поделиться ссылкой.",
   "personAlreadyHasAccess": "У этого человека уже есть доступ.",
   "notEnoughStorageTitle": "Недостаточно места для хранения",
-  "notEnoughStorageBody": "У вас недостаточно свободного места на Ente для добавления новых фотографий. Освободите место или обновите тариф, чтобы продолжать добавлять фотографии."
+  "notEnoughStorageBody": "У вас недостаточно свободного места на Photovault для добавления новых фотографий. Освободите место или обновите тариф, чтобы продолжать добавлять фотографии."
 }

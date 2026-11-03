@@ -318,7 +318,7 @@ class NotificationService {
     String message, {
     int? id,
     String channelID = "io.ente.photos",
-    String channelName = "ente",
+    String channelName = "Photovault", // PHOTOVAULT: branding
     String payload = "ente://home",
   }) async {
     await _ensurePluginInitialized();
@@ -381,7 +381,7 @@ class NotificationService {
     String? message,
     required int id,
     String channelID = "io.ente.photos",
-    String channelName = "ente",
+    String channelName = "Photovault", // PHOTOVAULT: branding
     String payload = "ente://home",
     required DateTime dateTime,
     Duration? timeoutDurationAndroid,

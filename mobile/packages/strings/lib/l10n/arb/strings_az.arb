@@ -59,7 +59,7 @@
   "addPhotos": "Şəkillər əlavə et",
   "addSelected": "Seçilmişləri əlavə et",
   "addToAlbum": "Alboma əlavə et",
-  "addToEnte": "Ente-yə əlavə et",
+  "addToEnte": "Photovault-yə əlavə et",
   "addToHiddenAlbum": "Gizli alboma əlavə et",
   "addToPerson": "Şəxsə əlavə et",
   "@addToPerson": {
@@ -97,7 +97,7 @@
   "allowAppToOpenSharedAlbumLinks": "Tətbiqə paylaşılan albom linklərini açmağa icazə verin",
   "allowDownloads": "Yükləmələrə icazə ver",
   "allowJoiningAlbum": "Alboma qoşulmağa icazə ver",
-  "allowPermBody": "Lütfən, Ayarlardan şəkillərinizə giriş icazəsi verin ki, Ente kitabxananızı göstərə və yedəkləyə bilsin.",
+  "allowPermBody": "Lütfən, Ayarlardan şəkillərinizə giriş icazəsi verin ki, Photovault kitabxananızı göstərə və yedəkləyə bilsin.",
   "allowPermTitle": "Şəkillərə girişə icazə ver",
   "allPersonGroupingWillReset": "Bu şəxs üçün bütün qruplaşmalar sıfırlanacaq və bu şəxs üçün edilən bütün təklifləri itirəcəksiniz",
   "allWillShiftRangeBasedOnFirst": "Bu, qrupdakı birincidir. Digər seçilmiş şəkillər bu yeni tarixə əsasən avtomatik sürüşdürüləcək",
@@ -114,7 +114,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Ente-nin yeni versiyası mövcuddur.",
+  "aNewVersionOfEnteIsAvailable": "Photovault-nin yeni versiyası mövcuddur.",
   "appearance": "Görünüş",
   "appIcon": "Tətbiq ikonu",
   "appleId": "Apple ID",
@@ -190,7 +190,7 @@
   "autoAddPeople": "İnsanları avtomatik əlavə et",
   "autoAddToAlbum": "Alboma avtomatik əlavə et",
   "autoCastDialogBody": "Mövcud Cast cihazlarını burada görəcəksiniz.",
-  "autoCastiOSPermission": "Tənzimləmələrdə Ente Photos tətbiqi üçün \"Yerli Şəbəkə\" icazələrinin aktiv olduğundan əmin olun.",
+  "autoCastiOSPermission": "Tənzimləmələrdə Photovault tətbiqi üçün \"Yerli Şəbəkə\" icazələrinin aktiv olduğundan əmin olun.",
   "autoLockFeatureDescription": "Tətbiq arxa fona keçdikdən nə qədər vaxt sonra kilidlənsin",
   "@autoLockFeatureDescription": {
     "description": "Description of auto lock feature"
@@ -228,7 +228,7 @@
   "backupSettings": "Yedəkləmə tənzimləmələri",
   "backupStatus": "Yedəkləmə statusu",
   "backupStatusDescription": "Yedəklənmiş elementlər burada görünəcək",
-  "backupToEnte": "Ente yedəklə",
+  "backupToEnte": "Photovault yedəklə",
   "backupVideos": "Videoları yedəklə",
   "beach": "Qum və dəniz",
   "birthday": "Ad günü",
@@ -428,7 +428,7 @@
     "description": "Create account button label"
   },
   "createAlbumActionHint": "Fotoşəkilləri seçmək üçün üzərinə uzun basın və albom yaratmaq üçün + düyməsinə klikləyin",
-  "createAnEnteAccount": "Ente hesabı yaradın",
+  "createAnEnteAccount": "Photovault hesabı yaradın",
   "createCollaborativeLink": "Birgə iş linki yaradın",
   "createCollage": "Kollaj yarat",
   "createPublicLink": "İctimai link yarat",
@@ -495,7 +495,7 @@
   "deleteFiles": "Faylları sil",
   "deleteFromBoth": "Hər ikisindən sil",
   "deleteFromDevice": "Cihazdan sil",
-  "deleteFromEnte": "Ente-dən sil",
+  "deleteFromEnte": "Photovault-dən sil",
   "deleteHiddenFilesFromDevice": "Gizli faylları cihazdan sil",
   "deleteHiddenFilesFromDeviceDescription": "Gizli faylların yerli nüsxələrini cihazınızdan silin",
   "deleteLocation": "Məkanı sil",
@@ -684,7 +684,7 @@
   "editLocation": "Məkanı redaktə et",
   "editPerson": "Şəxsi redaktə et",
   "editsSaved": "Redaktələr saxlanıldı",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Məkan redaktələri yalnız Ente daxilində görünəcək",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Məkan redaktələri yalnız Photovault daxilində görünəcək",
   "editTime": "Vaxtı redaktə et",
   "eligible": "uyğun",
   "email": "E-poçt",
@@ -707,7 +707,7 @@
     }
   },
   "emailHint": "E-poçt ünvanınızı daxil edin",
-  "emailNoEnteAccountPhotos": "{email} ünvanının Ente hesabı yoxdur. Fotoları paylaşmaq üçün onlara dəvət göndərin.",
+  "emailNoEnteAccountPhotos": "{email} ünvanının Photovault hesabı yoxdur. Fotoları paylaşmaq üçün onlara dəvət göndərin.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -920,7 +920,7 @@
   "guestView": "Qonaq görünüşü",
   "guestViewEnablePreSteps": "Qonaq görünüşünü aktivləşdirmək üçün zəhmət olmasa sistem parametrlərində cihaz şifrəsini və ya ekran kilidini quraşdırın.",
   "happyBirthday": "Ad günün mübarək! 🥳",
-  "hearUsWhereTitle": "Ente haqqında haradan eşitmisiniz?",
+  "hearUsWhereTitle": "Photovault haqqında haradan eşitmisiniz?",
   "help": "Kömək",
   "hidden": "Gizli",
   "hide": "Gizlə",
@@ -993,7 +993,7 @@
   "invalidRecoveryKey": "Daxil etdiyiniz bərpa açarı yanlışdır. Zəhmət olmasa, onun 24 sözdən ibarət olduğundan əmin olun və hər bir sözün yazılışını yoxlayın.\n\n​Əgər köhnə bərpa kodunu daxil etmisinizsə, onun 64 simvoldan ibarət olduğuna və hər birinin düzgünlüyünə əmin olun.",
   "invalidReferralCode": "Yanlış kod",
   "invite": "Dəvət et",
-  "inviteToEnte": "Ente-yə dəvət et",
+  "inviteToEnte": "Photovault-yə dəvət et",
   "ok": "Bəli",
   "@ok": {
     "description": "Generic OK button label"
@@ -1120,7 +1120,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Ente-yə daxil ol",
+  "loginToEnte": "Photovault-yə daxil ol",
   "loginToExistingAccount": "Mövcud hesaba daxil olun",
   "loginWithTOTP": "TOTP ilə daxil ol",
   "@loginWithTOTP": {
@@ -1196,7 +1196,7 @@
   "mixedGrouping": "Qarışıq qruplaşdırma?",
   "mlConsent": "Maşın öyrənməsini aktivləşdir",
   "mlConsentConfirmation": "Anlayıram və maşın öyrənməsini aktivləşdirmək istəyirəm",
-  "mlConsentDescription": "Maşın öyrənməsini aktivləşdirsəniz, Ente fayllardan, o cümlədən sizinlə paylaşılanlardan üz həndəsəsi kimi məlumatları çıxaracaq.\n\nBu, cihazınızda baş verəcək və yaradılan hər hansı biometrik məlumat uçdan-uca şifrələnəcək.",
+  "mlConsentDescription": "Maşın öyrənməsini aktivləşdirsəniz, Photovault fayllardan, o cümlədən sizinlə paylaşılanlardan üz həndəsəsi kimi məlumatları çıxaracaq.\n\nBu, cihazınızda baş verəcək və yaradılan hər hansı biometrik məlumat uçdan-uca şifrələnəcək.",
   "mlProgressBannerDescription": "Üzləri, obyektləri və daha çoxunu müəyyən etmək üçün fotolarınız cihazda emal olunur.",
   "mlProgressBannerStatus": "{total} fotodan {indexed} ədədi emal olundu",
   "@mlProgressBannerStatus": {
@@ -1239,11 +1239,11 @@
   "moveToHiddenAlbum": "Gizli alboma köçür",
   "movingFilesToAlbum": "Fayllar alboma köçürülür...",
   "name": "Ad",
-  "networkConnectionRefusedErr": "Ente-yə qoşulmaq mümkün deyil, bir müddət sonra yenidən cəhd edin. Xəta davam edərsə, zəhmət olmasa, dəstək xidməti ilə əlaqə saxlayın.",
+  "networkConnectionRefusedErr": "Photovault-yə qoşulmaq mümkün deyil, bir müddət sonra yenidən cəhd edin. Xəta davam edərsə, zəhmət olmasa, dəstək xidməti ilə əlaqə saxlayın.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Ente-yə qoşulmaq mümkün deyil, zəhmət olmasa şəbəkə parametrlərinizi yoxlayın və xəta davam edərsə dəstək ilə əlaqə saxlayın.",
+  "networkHostLookUpErr": "Photovault-yə qoşulmaq mümkün deyil, zəhmət olmasa şəbəkə parametrlərinizi yoxlayın və xəta davam edərsə dəstək ilə əlaqə saxlayın.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1324,7 +1324,7 @@
   "offlineNameFaceBannerTitle": "Bu üzə ad verin",
   "offlineSettingsBannerDesc": "Sıfır bilik\" Zero-knowledge şifrələməsi o deməkdir ki, xatirələriniz yalnız sizə məxsus qalır.",
   "offlineSettingsBannerTitle": "Biz sizin fotolarınızı görə bilmərik. Heç vaxt.",
-  "onEnte": "<branding>ente</branding>-də",
+  "onEnte": "<branding>Photovault</branding>-də",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1913,7 +1913,7 @@
   "searchSettings": "Axtarış tənzimləmələri",
   "security": "Təhlükəsizlik",
   "seePublicAlbumLinksInApp": "İctimai albom linklərini tətbiqdə gör",
-  "selectAlbumsToBackUpToEnte": "Ente yedəkləmək üçün albomları seçin",
+  "selectAlbumsToBackUpToEnte": "Photovault yedəkləmək üçün albomları seçin",
   "selectAlbumToLikePhoto": "Bu şəkli bəyənmək üçün albom seçin",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -1937,7 +1937,7 @@
       "count": {}
     }
   },
-  "selectedFilesAreNotOnEnte": "Seçilmiş fayllar Ente-də deyil",
+  "selectedFilesAreNotOnEnte": "Seçilmiş fayllar Photovault-də deyil",
   "selectedItemsWillBeRemovedFromThisPerson": "Seçilmiş elementlər bu şəxsdən silinəcək, lakin kitabxananızdan silinməyəcək.",
   "selectedPhotos": "{count} seçildi",
   "@selectedPhotos": {
@@ -2020,7 +2020,7 @@
   "shareALink": "Link paylaş",
   "shareKey": "Açarı paylaş",
   "shareLink": "Linki paylaş",
-  "shareWithNonenteUsers": "Ente istifadəçisi olmayanlarla paylaş",
+  "shareWithNonenteUsers": "Photovault istifadəçisi olmayanlarla paylaş",
   "sharing": "Paylaşılır...",
   "shiftDatesAndTime": "Tarixləri və vaxtı sürüşdürün",
   "shouldRemoveFilesSmartAlbumsDesc": "Ağıllı albomlarda əvvəllər seçilmiş şəxslə bağlı fayllar silinsin?",

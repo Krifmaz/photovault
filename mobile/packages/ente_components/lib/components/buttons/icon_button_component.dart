@@ -418,7 +418,8 @@ class _IconButtonComponentState extends State<IconButtonComponent>
       return colors.primary;
     }
     if (widget.variant == IconButtonComponentVariant.green && !isDisabled) {
-      return colors.specialWhite;
+      // PHOTOVAULT: theme (readable on Encore accent)
+      return colors.onPrimary;
     }
     if (widget.variant == IconButtonComponentVariant.unfilled ||
         widget.variant == IconButtonComponentVariant.secondary) {

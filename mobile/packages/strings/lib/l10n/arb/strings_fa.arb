@@ -29,7 +29,7 @@
   "addTo": "افزودن به",
   "addToAlbum": "افزودن به آلبوم",
   "addToCollection": "افزودن به مجموعه",
-  "addToEnte": "افزودن به Ente",
+  "addToEnte": "افزودن به Photovault",
   "addToHiddenAlbum": "افزودن به آلبوم پنهان",
   "advanced": "پیشرفته",
   "after1Year": "بعد از 1 سال",
@@ -69,7 +69,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "نسخه جدید Ente در دسترس است.",
+  "aNewVersionOfEnteIsAvailable": "نسخه جدید Photovault در دسترس است.",
   "aNewVersionOfEnteLockerIsAvailable": "نسخه جدید Ente Locker در دسترس است.",
   "anythingElse": "چیز دیگری هم هست؟",
   "@anythingElse": {
@@ -376,8 +376,8 @@
   "fileInfoAddDescHint": "افزودن توضیحات...",
   "fileTypes": "انواع پرونده",
   "focusOnSearchBar": "در زمان شروع برنامه، در حالت جستجو باش",
-  "free10GB": "10 گیگابایت فضای رایگان در <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "۱۰٪ تخفیف بر تصاویر <bold-green>ente</bold-green>",
+  "free10GB": "10 گیگابایت فضای رایگان در <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "۱۰٪ تخفیف بر تصاویر <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "کد \"AUTH\" را وارد کنید تا برای سال نخست ۱۰٪ تخفیف بگیرید",
   "general": "عمومی",
   "generatingEncryptionKeys": "در حال تولید کلیدهای رمزگذاری...",
@@ -392,7 +392,7 @@
   "giveUsAStarOnGithub": "در گیت‌هاب به ما ستاره بدهید",
   "grantFullAccessPrompt": "لطفا در تنظیمات برنامه، دسترسی به تمام عکس‌ها را فعال کنید",
   "grantPermission": "اعطای مجوز",
-  "hearUsWhereOptionalTitle": "از کجا در مورد Ente شنیدی؟ (اختیاری)",
+  "hearUsWhereOptionalTitle": "از کجا در مورد Photovault شنیدی؟ (اختیاری)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -426,7 +426,7 @@
   "importBitwardenGuide": "از گزینهٔ «تهیه خروجی از گاوصندوق» در بخش ابزارهای Bitwarden استفاده کنید و فایل JSON رمزگذاری‌نشده را وارد کنید.",
   "importCodeDelimiterInfo": "کدها می‌توانند با کاما یا یک خط جدید از یکدیگر جدا شوند",
   "importCodes": "ورود کدها",
-  "importEnteEncGuide": "انتخاب فایل JSON رمزگذاری شده از Ente",
+  "importEnteEncGuide": "انتخاب فایل JSON رمزگذاری شده از Photovault",
   "importEnterSetupKey": "وارد کردن کلید تنظیم",
   "importFailureDesc": "تجزیهٔ فایل انتخاب‌شده، با خطا مواجه شد.",
   "importFromGallery": "وارد کردن از گالری",
@@ -505,7 +505,7 @@
   "invalidRecoveryKey": "کلید بازیابی که وارد کرده‌اید نامعتبر است. لطفا مطمئن شوید که شامل ۲۴ کلمه است و همه کلمات را صحیح نوشته‌اید.\n\nاگر کد بازیابی قدیمی تری را وارد کرده‌اید، مطمئن شوید که شامل ۶۴ حرف است و همه حروف را صحیح نوشته‌اید.",
   "invite": "دعوت",
   "inviteMembers": "دعوت اعضا",
-  "inviteToEnte": "دعوت به Ente",
+  "inviteToEnte": "دعوت به Photovault",
   "ok": "تأیید",
   "@ok": {
     "description": "Generic OK button label"
@@ -567,11 +567,11 @@
       "count": {}
     }
   },
-  "networkConnectionRefusedErr": "نمی‌توان به Ente متصل شد. لطفاً کمی بعد دوباره امتحان کنید. در صورتی که مشکل برطرف نشد، لطفا به پشتیبانی اطلاع دهید.",
+  "networkConnectionRefusedErr": "نمی‌توان به Photovault متصل شد. لطفاً کمی بعد دوباره امتحان کنید. در صورتی که مشکل برطرف نشد، لطفا به پشتیبانی اطلاع دهید.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "نمی‌توان به Ente متصل شد. لطفاً وضعیت شبکه را بررسی کنید و اگر خطا برطرف نشد، به پشتیبانی اطلاع دهید.",
+  "networkHostLookUpErr": "نمی‌توان به Photovault متصل شد. لطفاً وضعیت شبکه را بررسی کنید و اگر خطا برطرف نشد، به پشتیبانی اطلاع دهید.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -898,7 +898,7 @@
   "success": "موفقیت",
   "suggestFeatures": "پیشنهاد قابلیت ها",
   "support": "پشتیبانی",
-  "supportEnte": "حمایت از <bold-green>ente</bold-green>",
+  "supportEnte": "حمایت از <bold-green>Photovault</bold-green>",
   "tag": "برچسب",
   "tags": "برچسب‌ها",
   "tapToCopy": "برای رونویسی ضربه بزنید",

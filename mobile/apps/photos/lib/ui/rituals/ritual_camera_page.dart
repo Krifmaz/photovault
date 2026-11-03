@@ -3,6 +3,7 @@ import "dart:io";
 
 import "package:camera/camera.dart";
 import "package:ente_components/ente_components.dart";
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_pure_utils/ente_pure_utils.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
@@ -1365,7 +1366,7 @@ class _ConfirmChip extends StatelessWidget {
         width: 48,
         height: 48,
         decoration: const BoxDecoration(
-          color: Color(0xFF08C225),
+          color: encoreDarkAccent2, // PHOTOVAULT: theme
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -1391,7 +1392,7 @@ class _ConfirmChip extends StatelessWidget {
                   color: Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: const Color(0xFF08C225),
+                    color: encoreDarkAccent2, // PHOTOVAULT: theme
                     width: 1.5,
                   ),
                 ),
@@ -1399,7 +1400,7 @@ class _ConfirmChip extends StatelessWidget {
                   child: Text(
                     "$count",
                     style: const TextStyle(
-                      color: Color(0xFF08C225),
+                      color: encoreDarkAccent2, // PHOTOVAULT: theme
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),

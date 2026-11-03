@@ -1,3 +1,4 @@
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:ente_components/theme/text_styles.dart';
 import 'package:ente_pure_utils/ente_pure_utils.dart';
 import "package:ente_strings/ente_strings.dart";
@@ -213,7 +214,7 @@ class _StorageCardWidgetState extends State<StorageCardWidget> {
                     )
                   : const SizedBox.shrink(),
               StorageProgressWidget(
-                color: const Color(0xFF08C225),
+                color: encoreLightAccent2, // PHOTOVAULT: theme
                 fractionOfStorage: (userDetails.usage / totalStorageInBytes),
               ),
             ],
@@ -230,7 +231,7 @@ class _StorageCardWidgetState extends State<StorageCardWidget> {
                           height: 7,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(0xFF08C225),
+                            color: encoreLightAccent2, // PHOTOVAULT: theme
                           ),
                         ),
                         const SizedBox(width: 4),

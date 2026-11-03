@@ -172,7 +172,7 @@
   "addToAlbum": "Add to album",
   "addToCollection": "Add to collection",
   "addToCollections": "Add to collections",
-  "addToEnte": "Add to Ente",
+  "addToEnte": "Add to Photovault",
   "addToHiddenAlbum": "Add to hidden album",
   "addToPerson": "Add to person",
   "@addToPerson": {
@@ -252,8 +252,8 @@
   "allowDownloads": "Allow downloads",
   "allowJoining": "Allow joining",
   "allowJoiningAlbum": "Allow joining album",
-  "allowJoiningDescription": "Viewers with an Ente account can join your album and stay updated",
-  "allowPermBody": "Please allow access to your photos from Settings so Ente can display and backup your library.",
+  "allowJoiningDescription": "Viewers with a Photovault account can join your album and stay updated",
+  "allowPermBody": "Please allow access to your photos from Settings so Photovault can display and backup your library.",
   "allowPermTitle": "Allow access to photos",
   "allPersonGroupingWillReset": "All groupings for this person will be reset, and you will lose all suggestions made for this person",
   "allTabEmptyHint": "Nothing here yet. Tap + to add a code or open Trash to recover one.",
@@ -287,7 +287,7 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "A new version of Ente is available.",
+  "aNewVersionOfEnteIsAvailable": "A new version of Photovault is available.",
   "aNewVersionOfEnteLockerIsAvailable": "A new version of Ente Locker is available.",
   "anythingElse": "Anything else?",
   "@anythingElse": {
@@ -296,7 +296,7 @@
   "appearance": "Appearance",
   "appIcon": "App icon",
   "appleId": "Apple ID",
-  "applePhotosUnsupportedResource": "This file could not be saved to Apple Photos. You can still view it in Ente.",
+  "applePhotosUnsupportedResource": "This file could not be saved to Apple Photos. You can still view it in Photovault.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -407,7 +407,7 @@
   "autoAddPeople": "Auto-add people",
   "autoAddToAlbum": "Auto-add to album",
   "autoCastDialogBody": "You'll see available Cast devices here.",
-  "autoCastiOSPermission": "Make sure Local Network permissions are turned on for the Ente Photos app, in Settings.",
+  "autoCastiOSPermission": "Make sure Local Network permissions are turned on for the Photovault app, in Settings.",
   "autoLock": "Auto lock",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -469,7 +469,7 @@
   "backupModeScreenWillDim": "Screen will dim automatically to save battery",
   "backupModeSettingsDescription": "Keep the app open to finish your backup",
   "backupModeStart": "Start backup mode",
-  "backupModeStayInEnte": "Stay in Ente. Switching apps pauses your backup.",
+  "backupModeStayInEnte": "Stay in Photovault. Switching apps pauses your backup.",
   "backupModeTapToWakeScreen": "Tap to wake the screen",
   "backupOnlyNewPhotos": "Backup only new photos",
   "backupOnlyNewPhotosAllFoldersSelected": "All folders are currently selected for backup.\n\nYou can continue for now, or update selected folders.",
@@ -491,7 +491,7 @@
   "backupSettings": "Backup settings",
   "backupStatus": "Backup status",
   "backupStatusDescription": "Items that have been backed up will show up here",
-  "backupToEnte": "Backup to Ente",
+  "backupToEnte": "Backup to Photovault",
   "backupVideos": "Backup videos",
   "beach": "Sand and sea",
   "birthday": "Birthday",
@@ -652,7 +652,7 @@
   "codeChangeLimitReached": "Sorry, you've reached the limit of code changes.",
   "codeCopiedToClipboard": "Code copied to clipboard",
   "codeIssuerHint": "Issuer",
-  "collabLinkSectionDescription": "Let people add photos without an Ente account",
+  "collabLinkSectionDescription": "Let people add photos without a Photovault account",
   "collaborator": "Collaborator",
   "collageLayout": "Layout",
   "collageSaved": "Collage saved to gallery",
@@ -743,7 +743,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "I understand this deletes my data across Ente Photos, Ente Auth, and Ente Locker.",
+  "confirmDeleteAccountAcrossApps": "I understand this deletes my data across Photovault, Ente Auth, and Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -835,7 +835,7 @@
   "createAccountTitle": "Create an account",
   "createAlbum": "Create album",
   "createAlbumActionHint": "Long press to select photos and click + to create an album",
-  "createAnEnteAccount": "Create an Ente account",
+  "createAnEnteAccount": "Create a Photovault account",
   "createAnotherKit": "Create another kit",
   "createBackupNow": "Create backup now",
   "createCollaborativeLink": "Create collaborative link",
@@ -948,12 +948,12 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Deleted from Ente",
+  "deletedFromEnte": "Deleted from Photovault",
   "deletedItemsStayHereForThirtyDays": "Deleted items stay here for 30 days",
   "deleteDuplicates": "Delete duplicates",
   "deleteEmptyAlbums": "Delete empty albums",
   "deleteEmptyAlbumsWithQuestionMark": "Delete empty albums?",
-  "deleteEnteAccount": "Delete Ente account",
+  "deleteEnteAccount": "Delete Photovault account",
   "@deleteEnteAccount": {
     "description": "Final destructive button label for account deletion"
   },
@@ -961,7 +961,7 @@
   "deleteFromBoth": "Delete from both",
   "deleteFromDevice": "Delete from device",
   "deleteFromDeviceQuestion": "Delete from device?",
-  "deleteFromEnte": "Delete from Ente",
+  "deleteFromEnte": "Delete from Photovault",
   "deleteHiddenFilesFromDevice": "Delete hidden files from device",
   "deleteHiddenFilesFromDeviceDescription": "Delete local copies of hidden files from your device",
   "deleteItemCount": "{count, plural, one{Delete {count} item} other{Delete {count} items}}",
@@ -1262,7 +1262,7 @@
     "description": "Title shown when editing an existing secret"
   },
   "editsSaved": "Edits saved",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Edits to location will only be seen within Ente",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Edits to location will only be seen within Photovault",
   "editStorageLimit": "Edit storage limit",
   "editTag": "Edit tag",
   "editTime": "Edit time",
@@ -1288,7 +1288,7 @@
     }
   },
   "emailHint": "Enter your email address",
-  "emailNeedsEnteAccountForFamily": "{email} does not have an Ente account.\n\nSend them an invite and add them to your family once they've created an account on Ente.",
+  "emailNeedsEnteAccountForFamily": "{email} does not have a Photovault account.\n\nSend them an invite and add them to your family once they've created an account on Photovault.",
   "@emailNeedsEnteAccountForFamily": {
     "placeholders": {
       "email": {
@@ -1297,13 +1297,13 @@
       }
     }
   },
-  "emailNoEnteAccount": "{email} does not have an Ente account.\n\nSend them an invite to share items.",
+  "emailNoEnteAccount": "{email} does not have a Photovault account.\n\nSend them an invite to share items.",
   "@emailNoEnteAccount": {
     "placeholders": {
       "email": {}
     }
   },
-  "emailNoEnteAccountPhotos": "{email} does not have an Ente account.\n\nSend them an invite to share photos.",
+  "emailNoEnteAccountPhotos": "{email} does not have a Photovault account.\n\nSend them an invite to share photos.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1355,7 +1355,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "Ente",
+  "ente": "Photovault",
   "enteAuth": "Ente Auth",
   "@enteAuth": {
     "description": "Product name"
@@ -1364,7 +1364,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Ente Photos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },
@@ -1742,7 +1742,7 @@
       }
     }
   },
-  "filesInAlbumSafelyOnEnte": "{count, plural, one{This item in the album is backed up to Ente, delete the device copy to free space without losing it.} other{All {formattedNumber} items in the album are backed up to Ente, delete device copies to free space without losing them.}}",
+  "filesInAlbumSafelyOnEnte": "{count, plural, one{This item in the album is backed up to Photovault, delete the device copy to free space without losing it.} other{All {formattedNumber} items in the album are backed up to Photovault, delete device copies to free space without losing them.}}",
   "@filesInAlbumSafelyOnEnte": {
     "description": "Explains that device copies for files in an album can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1786,7 +1786,7 @@
       }
     }
   },
-  "filesSafelyOnEnte": "{count, plural, one{This item is backed up to Ente, delete the device copy to free space without losing it.} other{All {formattedNumber} items are backed up to Ente, delete device copies to free space without losing them.}}",
+  "filesSafelyOnEnte": "{count, plural, one{This item is backed up to Photovault, delete the device copy to free space without losing it.} other{All {formattedNumber} items are backed up to Photovault, delete device copies to free space without losing them.}}",
   "@filesSafelyOnEnte": {
     "description": "Explains that device copies can be deleted because the files are stored on Ente",
     "placeholders": {
@@ -1834,8 +1834,8 @@
   },
   "forgotPasswordPrompt": "Forgot password?",
   "forgotRecoveryKey": "Forgot recovery key?",
-  "free10GB": "10GB free on <bold-green>ente</bold-green> Photos",
-  "freeStorageOffer": "10% off on <bold-green>ente</bold-green> photos",
+  "free10GB": "10GB free on <bold-green>Photovault</bold-green>",
+  "freeStorageOffer": "10% off on <bold-green>Photovault</bold-green>",
   "freeStorageOfferDescription": "Use code \"AUTH\" to get 10% off first year",
   "free": "Free",
   "freeTrial": "Free trial",
@@ -1891,7 +1891,7 @@
   "grantGalleryPermissionDesc": "Grant permission to access and organize photos with face recognition. All processing happens on your device.",
   "grantGalleryPermissionTitle": "Let's find your favourites",
   "grantPermission": "Grant permission",
-  "grantPermissionDesc": "Please allow Ente to access your library so we can organize it with face recognition. All processing happens on your device.",
+  "grantPermissionDesc": "Please allow Photovault to access your library so we can organize it with face recognition. All processing happens on your device.",
   "greenery": "The green life",
   "grid": "Grid",
   "photosInOriginalProportions": "Photos in original proportions",
@@ -1906,11 +1906,11 @@
   "guestView": "Guest view",
   "guestViewEnablePreSteps": "To enable guest view, please setup device passcode or screen lock in your system settings.",
   "happyBirthday": "Happy birthday! 🥳",
-  "hearUsWhereOptionalTitle": "How did you hear about Ente? (optional)",
+  "hearUsWhereOptionalTitle": "How did you hear about Photovault? (optional)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "How did you hear about Ente?",
+  "hearUsWhereTitle": "How did you hear about Photovault?",
   "help": "Help",
   "helpAndSupport": "Help & Support",
   "hidden": "Hidden",
@@ -2012,7 +2012,7 @@
   "importBitwardenGuide": "Use the \"Export vault\" option within Bitwarden Tools and import the unencrypted JSON file.",
   "importCodeDelimiterInfo": "The codes can be separated by a comma or a new line",
   "importCodes": "Import codes",
-  "importEnteEncGuide": "Select the encrypted JSON file exported from Ente",
+  "importEnteEncGuide": "Select the encrypted JSON file exported from Photovault",
   "importEnterSetupKey": "Enter a setup key",
   "importFailureDesc": "Could not parse the selected file.",
   "importFileTooLarge": "The selected file is too large. Maximum size: {size}.",
@@ -2061,7 +2061,7 @@
     }
   },
   "importSuccessTitle": "Yay!",
-  "importTypeEnteEncrypted": "Ente encrypted export",
+  "importTypeEnteEncrypted": "Photovault encrypted export",
   "incorrectCode": "Incorrect code",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -2124,7 +2124,7 @@
       }
     }
   },
-  "inviteToEnte": "Invite to Ente",
+  "inviteToEnte": "Invite to Photovault",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -2512,7 +2512,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Login to Ente",
+  "loginToEnte": "Login to Photovault",
   "loginToExistingAccount": "Login to existing account",
   "loginWithAuthAccount": "Login with your Auth account",
   "loginWithTOTP": "Login with TOTP",
@@ -2562,7 +2562,7 @@
   "markAsReviewed": "Mark as reviewed",
   "markingAsImportant": "Marking as important...",
   "me": "Me",
-  "mediaManagementHintMessage": "Turn on media management for Ente in settings, and the prompts stop.",
+  "mediaManagementHintMessage": "Turn on media management for Photovault in settings, and the prompts stop.",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -2659,7 +2659,7 @@
   "mixedGrouping": "Mixed grouping?",
   "mlConsent": "Enable machine learning",
   "mlConsentConfirmation": "I understand, and wish to enable machine learning",
-  "mlConsentDescription": "If you enable machine learning, Ente will extract information like face geometry from files, including those shared with you.\n\nThis will happen on your device, and any generated biometric information will be end-to-end encrypted.",
+  "mlConsentDescription": "If you enable machine learning, Photovault will extract information like face geometry from files, including those shared with you.\n\nThis will happen on your device, and any generated biometric information will be end-to-end encrypted.",
   "mlConsentPrivacyDetails": "Please <policy>click here</policy> for more details about this feature in our privacy policy",
   "@mlConsentPrivacyDetails": {
     "description": "Machine learning consent screen sentence; only the text inside the policy tags is tappable and opens the privacy policy"
@@ -2765,11 +2765,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Unable to connect to Ente, please retry after sometime. If the error persists, please contact support.",
+  "networkConnectionRefusedErr": "Unable to connect to Photovault, please retry after sometime. If the error persists, please contact support.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Unable to connect to Ente, please check your network settings and contact support if the error persists.",
+  "networkHostLookUpErr": "Unable to connect to Photovault, please check your network settings and contact support if the error persists.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2942,12 +2942,12 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "You have one account across Ente Photos, Ente Auth, and Ente Locker.",
+  "oneAccountAcrossEnteApps": "You have one account across Photovault, Ente Auth, and Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
   "oneLineAboutTheIssue": "One line about the issue",
-  "onEnte": "On <branding>ente</branding>",
+  "onEnte": "On <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -3086,7 +3086,7 @@
       }
     }
   },
-  "permanentlyDeleteYourEnteAccount": "Permanently delete your Ente account?",
+  "permanentlyDeleteYourEnteAccount": "Permanently delete your Photovault account?",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -3109,7 +3109,7 @@
   },
   "pets": "Furry companions",
   "photoGridSize": "Photo grid size",
-  "photoLibraryAddPermissionRequired": "Ente needs permission to save photos and videos to Apple Photos. You can allow access in Settings.",
+  "photoLibraryAddPermissionRequired": "Photovault needs permission to save photos and videos to Apple Photos. You can allow access in Settings.",
   "photoLibraryAddPermissionRestricted": "Photo Library access is restricted on this device.",
   "photoOrder": "Photo order",
   "photoViewerFilmstripLabel": "Photo chooser",
@@ -3277,8 +3277,8 @@
     }
   },
   "publicLink": "Public link",
-  "publicCollectionLinkAccessDescription": "Anyone with the link can open the collection without an Ente account.",
-  "publicLinkAccessDescription": "Anyone with the link can open the album without an Ente account.",
+  "publicCollectionLinkAccessDescription": "Anyone with the link can open the collection without a Photovault account.",
+  "publicLinkAccessDescription": "Anyone with the link can open the album without a Photovault account.",
   "publicLinkCollectDescription": "Anyone with this link can add photos to your album.",
   "publicLinkEnabled": "Public link enabled",
   "publicLinkViewDescription": "Anyone with this link can access your album.",
@@ -3613,7 +3613,7 @@
   "resendInvite": "Resend invite",
   "reset": "Reset",
   "resetIgnoredFiles": "Reset ignored files",
-  "resetIgnoredFilesDescription": "Reset these ignored files to let Ente try uploading them again.",
+  "resetIgnoredFilesDescription": "Reset these ignored files to let Photovault try uploading them again.",
   "resetPasswordTitle": "Reset password",
   "@resetPasswordTitle": {
     "description": "Reset password title"
@@ -3830,7 +3830,7 @@
     "description": "Description text asking user if they want to save to storage or share with other apps"
   },
   "savePerson": "Save person",
-  "saveToEnte": "Save to Ente",
+  "saveToEnte": "Save to Photovault",
   "saveToLocker": "Save to Locker",
   "saveYourRecoveryKeyIfYouHaventAlready": "Save your recovery key if you haven't already",
   "saving": "Saving...",
@@ -3994,7 +3994,7 @@
   "seeAllCollections": "All collections",
   "seeLess": "See less",
   "seePublicAlbumLinksInApp": "See public album links in app",
-  "selectAlbumsToBackUpToEnte": "Select albums to back up to Ente",
+  "selectAlbumsToBackUpToEnte": "Select albums to back up to Photovault",
   "selectAlbumToLikePhoto": "Select the album to like this photo",
   "@selectAlbumToLikePhoto": {
     "description": "Instruction for liking photo"
@@ -4044,7 +4044,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Selected files are not on Ente",
+  "selectedFilesAreNotOnEnte": "Selected files are not on Photovault",
   "selectedFilesBackedUpToEnte": "These items will be deleted from all albums. You can recover them from Trash.",
   "@selectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that are backed up to Ente."
@@ -4214,7 +4214,7 @@
   "share": "Share",
   "shareALink": "Share a link",
   "shareAnAlbum": "Share an album",
-  "shareCodeEarnStorage": "Double your storage on Ente",
+  "shareCodeEarnStorage": "Double your storage on Photovault",
   "shareCodes": "Share codes",
   "shareCodesDuration": "Select the duration for which you want to share codes.",
   "shareCollection": "Share collection",
@@ -4273,17 +4273,17 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Download Ente so we can easily share original quality files\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Download Ente so I can add you to my family plan\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Ente so we can easily share original quality photos and videos\n\nhttps://ente.com",
-  "shareTextReferralInvite": "Get 20 GB free with Ente Photos! Download the app at https://ente.com/invite and use code {referralCode}.",
+  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos\n\nhttps://ente.com",
+  "shareTextReferralInvite": "Get 20 GB free with Photovault! Download the app at https://ente.com/invite and use code {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}
     }
   },
   "shareThisLink": "This link allows anyone who receives it to access your item. You can remove access at any time by deleting the link.",
-  "shareWithNonenteUsers": "Share with non-Ente users",
+  "shareWithNonenteUsers": "Share with non-Photovault users",
   "shareYourFeedbackHere": "Share your feedback here",
   "@shareYourFeedbackHere": {
     "description": "Placeholder for optional account deletion feedback"
@@ -4314,7 +4314,7 @@
   "showQRAuthMessage": "Authenticate to show QR code",
   "showTextOnWidget": "Show text on widget",
   "shuffle": "Shuffle",
-  "sigInBackupReminder": "Ente will automatically backup codes after sign-in.\n\nWe still recommend exporting codes as an extra backup.",
+  "sigInBackupReminder": "Photovault will automatically backup codes after sign-in.\n\nWe still recommend exporting codes as an extra backup.",
   "signInToBackup": "Sign in to backup your codes",
   "signOutFromOtherDevices": "Sign out from other devices",
   "@signOutFromOtherDevices": {
@@ -4348,7 +4348,7 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "This item is available on your device and Ente.",
+  "singleFileInBothLocalAndRemote": "This item is available on your device and Photovault.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
@@ -4367,7 +4367,7 @@
   "socialNotifications": "Likes and comments",
   "socialNotificationsExplanation": "Likes on your photos and comments on albums you are a part of",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "Someone sharing albums with you should see the same ID on their device.",
-  "someSelectedFilesBackedUpToEnte": "These items are available on device and Ente.",
+  "someSelectedFilesBackedUpToEnte": "These items are available on device and Photovault.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -4475,7 +4475,7 @@
   "@strongStrength": {
     "description": "Strong password strength label"
   },
-  "subAlreadyLinkedErrMessage": "Your {id} is already linked to another Ente account.\nIf you would like to use your {id} with this account, please contact our support.",
+  "subAlreadyLinkedErrMessage": "Your {id} is already linked to another Photovault account.\nIf you would like to use your {id} with this account, please contact our support.",
   "@subAlreadyLinkedErrMessage": {
     "placeholders": {
       "id": {}
@@ -4534,7 +4534,7 @@
   "suggestions": "Suggestions",
   "sunrise": "On the horizon",
   "support": "Support",
-  "supportEnte": "Support <bold-green>ente</bold-green>",
+  "supportEnte": "Support <bold-green>Photovault</bold-green>",
   "syncing": "Syncing...",
   "syncProgress": "{completed}/{total} memories preserved",
   "@syncProgress": {
@@ -4605,7 +4605,7 @@
   "@thisEmailIsAlreadyInUse": {
     "description": "Error message when email is already in use"
   },
-  "thisHelpsUsImproveEnte": "This helps us improve Ente",
+  "thisHelpsUsImproveEnte": "This helps us improve Photovault",
   "@thisHelpsUsImproveEnte": {
     "description": "Subtitle under account deletion reason prompt"
   },
@@ -4724,7 +4724,7 @@
     }
   },
   "trustedContacts": "Trusted contacts",
-  "trustedContactsEmptyDescription": "Nominate another Ente user as a trusted contact to recover your account",
+  "trustedContactsEmptyDescription": "Nominate another Photovault user as a trusted contact to recover your account",
   "trustedContactStatusAccepted": "Accepted",
   "@trustedContactStatusAccepted": {
     "description": "Short status label shown for an accepted trusted contact"
@@ -4889,7 +4889,7 @@
   "@uploadStorageLimitErrorTitle": {
     "description": "Title shown when uploads fail due to running out of storage"
   },
-  "uploadSubscriptionExpiredErrorBody": "Your Ente Photos subscription has expired. Renew your subscription to continue uploading.",
+  "uploadSubscriptionExpiredErrorBody": "Your Photovault subscription has expired. Renew your subscription to continue uploading.",
   "@uploadSubscriptionExpiredErrorBody": {
     "description": "Body shown when uploads fail because the Photos subscription is expired"
   },
@@ -5269,7 +5269,7 @@
       }
     }
   },
-  "noEnteAccountWithThisEmail": "No Ente account with this email.",
+  "noEnteAccountWithThisEmail": "No Photovault account with this email.",
   "shareALinkInline": "Share a link.",
   "personAlreadyHasAccess": "This person already has access.",
   "removePersonTitle": "Remove {name}?",
@@ -5305,5 +5305,5 @@
     }
   },
   "notEnoughStorageTitle": "Not enough storage",
-  "notEnoughStorageBody": "You do not have enough free space on Ente to add new photos. Free up space or upgrade to keep adding."
+  "notEnoughStorageBody": "You do not have enough free space on Photovault to add new photos. Free up space or upgrade to keep adding."
 }

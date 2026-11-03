@@ -295,7 +295,7 @@
   "@forgotPassword": {
     "description": "Forgot password link label"
   },
-  "freeStorageOffer": "10 % popust na <bold-green>ente</bold-green> fotografije",
+  "freeStorageOffer": "10 % popust na <bold-green>Photovault</bold-green> fotografije",
   "freeStorageOfferDescription": "Uporabite kupon \"AUTH\" za 10% popusta za prvo leto",
   "general": "Splošno",
   "generatingEncryptionKeys": "Ustvarjanje ključe za šifriranje",
@@ -308,7 +308,7 @@
   },
   "getStarted": "Začnite",
   "giveUsAStarOnGithub": "Dajte nam zvezdico na Githubu",
-  "hearUsWhereOptionalTitle": "Kako ste slišali o Ente? (izbirno)",
+  "hearUsWhereOptionalTitle": "Kako ste slišali o Photovault? (izbirno)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -341,7 +341,7 @@
   "importBitwardenGuide": "V orodjih Bitwarden Tools uporabite možnost \"Izvozi trezor\" (\"Export vault\") in uvozite nešifrirano datoteko JSON.",
   "importCodeDelimiterInfo": "Kode so lahko ločene z vejico ali novo vrstico.",
   "importCodes": "Uvozi kode",
-  "importEnteEncGuide": "Izberi šifrirano JSON datoteko izvoženo iz Ente",
+  "importEnteEncGuide": "Izberi šifrirano JSON datoteko izvoženo iz Photovault",
   "importEnterSetupKey": "Vnesite namestitveni ključ",
   "importFailureDesc": "Izbrane datoteke ni bilo mogoče prebrati",
   "importInstruction": "Izberite datoteko, ki vsebuje seznam vaših kod v naslednji obliki",
@@ -366,7 +366,7 @@
     }
   },
   "importSuccessTitle": "Juhu!",
-  "importTypeEnteEncrypted": "Ente šifriran izvoz",
+  "importTypeEnteEncrypted": "Photovault šifriran izvoz",
   "incorrectCode": "Nepravilna koda",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -469,11 +469,11 @@
     }
   },
   "moveToAlbum": "Premakni v album",
-  "networkConnectionRefusedErr": "Ne morete se povezati z Ente, poskusite znova čez nekaj časa. Če se napaka nadaljuje, se obrnite na podporo.",
+  "networkConnectionRefusedErr": "Ne morete se povezati z Photovault, poskusite znova čez nekaj časa. Če se napaka nadaljuje, se obrnite na podporo.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Ne morete se povezati z Ente, preverite omrežne nastavitve in se obrnite na podporo, če se napaka nadaljuje.",
+  "networkHostLookUpErr": "Ne morete se povezati z Photovault, preverite omrežne nastavitve in se obrnite na podporo, če se napaka nadaljuje.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -793,7 +793,7 @@
   "success": "Uspešno",
   "suggestFeatures": "Predlagaj funkcije",
   "support": "Podpora",
-  "supportEnte": "Podpiraj <bold-green>ente</bold-green>",
+  "supportEnte": "Podpiraj <bold-green>Photovault</bold-green>",
   "systemTheme": "Sistemska",
   "tag": "Oznaka",
   "tags": "Oznake",

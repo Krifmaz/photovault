@@ -142,7 +142,7 @@
   "addTo": "Įtraukti į",
   "addToAlbum": "Įtraukti į albumą",
   "addToCollection": "Įtraukti į kolekciją",
-  "addToEnte": "Pridėti į „Ente“",
+  "addToEnte": "Pridėti į „Photovault“",
   "addToHiddenAlbum": "Įtraukti į paslėptą albumą",
   "addToPerson": "Pridėti prie asmens",
   "@addToPerson": {
@@ -201,8 +201,8 @@
   "allowAppToOpenSharedAlbumLinks": "Leisti programai atverti bendrinamų albumų nuorodas",
   "allowDownloads": "Leisti atsisiuntimus",
   "allowJoiningAlbum": "Leisti jungtis prie albumo",
-  "allowJoiningDescription": "Žiūrėtojai su „Ente“ paskyra gali prisijungti prie jūsų albumo ir išlikti informuoti.",
-  "allowPermBody": "Iš nustatymų leiskite prieigą prie nuotraukų, kad „Ente“ galėtų rodyti ir kurti atsargines bibliotekos kopijas.",
+  "allowJoiningDescription": "Žiūrėtojai su „Photovault“ paskyra gali prisijungti prie jūsų albumo ir išlikti informuoti.",
+  "allowPermBody": "Iš nustatymų leiskite prieigą prie nuotraukų, kad „Photovault“ galėtų rodyti ir kurti atsargines bibliotekos kopijas.",
   "allowPermTitle": "Leisti prieigą prie nuotraukų",
   "allPersonGroupingWillReset": "Visi šio asmens grupavimai bus iš naujo nustatyti, o jūs neteksite visų šiam asmeniui pateiktų pasiūlymų",
   "allTabEmptyHint": "Čia dar nieko nėra. Palieskite +, kad pridėtumėte kodą, arba atverkite šiukšlinę, kad jį atkurtumėte.",
@@ -236,10 +236,10 @@
       }
     }
   },
-  "aNewVersionOfEnteIsAvailable": "Yra nauja „Ente“ versija.",
+  "aNewVersionOfEnteIsAvailable": "Yra nauja „Photovault“ versija.",
   "appIcon": "Programos piktograma",
   "appleId": "„Apple ID“",
-  "applePhotosUnsupportedResource": "Šis failas negalėjo būti išsaugotas į „Apple“ nuotraukas“. Vis dėlto jį galite peržiūrėti programoje „Ente“.",
+  "applePhotosUnsupportedResource": "Šis failas negalėjo būti išsaugotas į „Apple“ nuotraukas“. Vis dėlto jį galite peržiūrėti programoje „Photovault“.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -340,7 +340,7 @@
   "autoAddPeople": "Automatiškai įtraukti asmenis",
   "autoAddToAlbum": "Automatiškai įtraukti į albumą",
   "autoCastDialogBody": "Čia matysite pasiekiamus perdavimo įrenginius.",
-  "autoCastiOSPermission": "Įsitikinkite, kad programai „Ente“ nuotraukos yra įjungti vietinio tinklo leidimai, nustatymuose.",
+  "autoCastiOSPermission": "Įsitikinkite, kad programai „Photovault“ nuotraukos yra įjungti vietinio tinklo leidimai, nustatymuose.",
   "autoLockFeatureDescription": "Laikas, po kurio programa užrakinama perkėlus ją į foną",
   "@autoLockFeatureDescription": {
     "description": "Description of auto lock feature"
@@ -365,7 +365,7 @@
   "backupLocationChoiceDescription": "Kur norite išsaugoti savo atsargines kopijas?",
   "backupMode": "Atsarginių kopijų režimas",
   "backupModeStart": "Pradėti atsarginės kopijos režimą",
-  "backupModeStayInEnte": "Likite programoje „Ente“. Perjungimas į programas sustabdo atsarginės kopijos kūrimą.",
+  "backupModeStayInEnte": "Likite programoje „Photovault“. Perjungimas į programas sustabdo atsarginės kopijos kūrimą.",
   "backupOverMobileData": "Kurti atsargines kopijas per mobiliuosius duomenis",
   "backupPasswordCleared": "Atsarginė slaptažodžio kopija išvalyta.",
   "backupPasswordHint": "Jūsų atsarginė kopija bus užšifruota šiuo slaptažodžiu.",
@@ -476,7 +476,7 @@
   "codeChangeLimitReached": "Atsiprašome, pasiekėte kodo pakeitimų ribą.",
   "codeCopiedToClipboard": "Nukopijuotas kodas į iškarpinę",
   "codeIssuerHint": "Išdavėjas",
-  "collabLinkSectionDescription": "Leiskite žmonėms pridėti nuotraukas be „Ente“ paskyros.",
+  "collabLinkSectionDescription": "Leiskite žmonėms pridėti nuotraukas be „Photovault“ paskyros.",
   "collaborator": "Bendradarbis",
   "collageLayout": "Išdėstymas",
   "collageSaved": "Koliažas išsaugotas į galeriją",
@@ -601,7 +601,7 @@
   "createAccountTitle": "Susikurkite paskyrą",
   "createAlbum": "Kurti albumą",
   "createAlbumActionHint": "Ilgai paspauskite, kad pasirinktumėte nuotraukas, ir spustelėkite +, kad sukurtumėte albumą",
-  "createAnEnteAccount": "Kurti „Ente“ paskyrą",
+  "createAnEnteAccount": "Kurti „Photovault“ paskyrą",
   "createBackupNow": "Kurti atsarginę kopiją dabar",
   "createCollaborativeLink": "Kurti bendradarbiavimo nuorodą",
   "createCollage": "Kurti koliažą",
@@ -672,7 +672,7 @@
   "@deletedComment": {
     "description": "Label for deleted comments"
   },
-  "deletedFromEnte": "Ištrinti iš „Ente“",
+  "deletedFromEnte": "Ištrinti iš „Photovault“",
   "deleteDuplicates": "Ištrinti dublikatus",
   "deleteEmptyAlbums": "Ištrinti tuščius albumus",
   "deleteEmptyAlbumsWithQuestionMark": "Ištrinti tuščius albumus?",
@@ -680,7 +680,7 @@
   "deleteFromBoth": "Ištrinti iš abiejų",
   "deleteFromDevice": "Ištrinti iš įrenginio",
   "deleteFromDeviceQuestion": "Ištrinti iš įrenginio?",
-  "deleteFromEnte": "Ištrinti iš „Ente“",
+  "deleteFromEnte": "Ištrinti iš „Photovault“",
   "deleteHiddenFilesFromDevice": "Ištrinti paslėptus failus iš įrenginio",
   "deleteHiddenFilesFromDeviceDescription": "Ištrinti paslėptų failų vietines kopijas iš savo įrenginio",
   "deleteLink": "Ištrinti nuorodą",
@@ -849,7 +849,7 @@
   "editOrder": "Redaguoti tvarką",
   "editPerson": "Redaguoti asmenį",
   "editsSaved": "Redagavimai išsaugoti",
-  "editsToLocationWillOnlyBeSeenWithinEnte": "Vietovės pakeitimai bus matomi tik per „Ente“",
+  "editsToLocationWillOnlyBeSeenWithinEnte": "Vietovės pakeitimai bus matomi tik per „Photovault“",
   "editStorageLimit": "Redaguoti saugyklos ribą",
   "editTag": "Redaguoti žymę",
   "editTime": "Redaguoti laiką",
@@ -875,7 +875,7 @@
     }
   },
   "emailHint": "Įveskite savo el. pašto adresą",
-  "emailNoEnteAccountPhotos": "{email} neturi „Ente“ paskyros.\n\nSiųskite jiems kvietimą bendrinti nuotraukas.",
+  "emailNoEnteAccountPhotos": "{email} neturi „Photovault“ paskyros.\n\nSiųskite jiems kvietimą bendrinti nuotraukas.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -1080,8 +1080,8 @@
     "description": "Forgot password link label"
   },
   "forgotRecoveryKey": "Pamiršote atkūrimo raktą?",
-  "free10GB": "10 GB nemokamai programai „<bold-green>ente</bold-green>“ nuotraukos",
-  "freeStorageOffer": "10 % nuolaida programai „<bold-green>ente</bold-green>“ nuotraukos",
+  "free10GB": "10 GB nemokamai programai „<bold-green>Photovault</bold-green>“ nuotraukos",
+  "freeStorageOffer": "10 % nuolaida programai „<bold-green>Photovault</bold-green>“ nuotraukos",
   "freeStorageOfferDescription": "Naudokite kodą „AUTH“, kad gautumėte 10 % nuolaidą pirmiesiems metams. ",
   "freeTrial": "Nemokamas bandomasis laikotarpis",
   "freeUpAmount": "Atlaisvinti {sizeInMBorGB}",
@@ -1116,7 +1116,7 @@
   "grantGalleryPermissionDesc": "Suteikite leidimą pasiekti ir tvarkyti nuotraukas su veido atpažinimu. Visas apdorojimas vyksta jūsų įrenginyje.",
   "grantGalleryPermissionTitle": "Suraskime jūsų mėgstamiausius",
   "grantPermission": "Suteikti leidimą",
-  "grantPermissionDesc": "Leiskite „Ente“ pasiekti jūsų biblioteką, kad galėtume ją sutvarkyti su veido atpažinimu. Visas apdorojimas vyksta jūsų įrenginyje.",
+  "grantPermissionDesc": "Leiskite „Photovault“ pasiekti jūsų biblioteką, kad galėtume ją sutvarkyti su veido atpažinimu. Visas apdorojimas vyksta jūsų įrenginyje.",
   "greenery": "Žaliasis gyvenimas",
   "groupBy": "Grupuoti pagal",
   "groupByDay": "Dieną",
@@ -1126,11 +1126,11 @@
   "guestView": "Svečio peržiūra",
   "guestViewEnablePreSteps": "Kad įjungtumėte svečio peržiūrą, sistemos nustatymuose nustatykite įrenginio prieigos kodą arba ekrano užraktą.",
   "happyBirthday": "Su gimtadieniu! 🥳",
-  "hearUsWhereOptionalTitle": "Kaip išgirdote apie „Ente“? (nebūtina)",
+  "hearUsWhereOptionalTitle": "Kaip išgirdote apie „Photovault“? (nebūtina)",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
-  "hearUsWhereTitle": "Kaip išgirdote apie „Ente“?",
+  "hearUsWhereTitle": "Kaip išgirdote apie „Photovault“?",
   "help": "Pagalba",
   "helpAndSupport": "Pagalba ir palaikymas",
   "hidden": "Paslėpti",
@@ -1186,7 +1186,7 @@
   "importBitwardenGuide": "Naudokite „Bitwarden“ įrankiuose esančią parinktį Eksportuoti saugyklą ir importuokite nešifruotą JSON failą.",
   "importCodeDelimiterInfo": "Kodus galima atskirti kableliu arba nauja eilute.",
   "importCodes": "Importuoti kodus",
-  "importEnteEncGuide": "Pasirinkite užšifruotą JSON failą, eksportuotą iš „Ente“",
+  "importEnteEncGuide": "Pasirinkite užšifruotą JSON failą, eksportuotą iš „Photovault“",
   "importEnterSetupKey": "Įvesti sąrankos raktą",
   "importFailureDesc": "Nepavyko išanalizuoti pasirinkto failo.",
   "importFromGallery": "Importuoti iš galerijos",
@@ -1225,7 +1225,7 @@
     }
   },
   "importSuccessTitle": "Valio!",
-  "importTypeEnteEncrypted": "„Ente“ užšifruotas eksportas",
+  "importTypeEnteEncrypted": "„Photovault“ užšifruotas eksportas",
   "incorrectCode": "Neteisingas kodas",
   "@incorrectCode": {
     "description": "Error message when code is incorrect"
@@ -1274,7 +1274,7 @@
   "invalidReferralCode": "Netinkamas kodas.",
   "invite": "Kviesti",
   "inviteMembers": "Kviesti narius",
-  "inviteToEnte": "Kviesti į „Ente“",
+  "inviteToEnte": "Kviesti į „Photovault“",
   "ok": "Gerai",
   "@ok": {
     "description": "Generic OK button label"
@@ -1482,7 +1482,7 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Prisijungti prie „Ente“",
+  "loginToEnte": "Prisijungti prie „Photovault“",
   "loginToExistingAccount": "Prisijungti prie esamos paskyros",
   "loginWithAuthAccount": "Prisijungti su jūsų „Auth“ paskyra",
   "loginWithTOTP": "Prisijungti su TOTP",
@@ -1523,7 +1523,7 @@
   "maps": "Žemėlapiai",
   "mapsPrivacyNotice": "Apytikslės koordinatės bus nusiųstos privatumą gerbiančioms trečiosioms šalims, pvz., „OpenStreetMap“, kad būtų galima parodyti žemėlapį ir vietą.",
   "me": "Aš",
-  "mediaManagementHintMessage": "Įjunkite medijos tvarkymą programai „Ente“ nustatymuose ir raginimai nustos.",
+  "mediaManagementHintMessage": "Įjunkite medijos tvarkymą programai „Photovault“ nustatymuose ir raginimai nustos.",
   "@mediaManagementHintMessage": {
     "description": "Message explaining that enabling Android media management permission avoids repeated delete confirmations."
   },
@@ -1572,7 +1572,7 @@
   "mixedGrouping": "Sumaišytas grupavimas?",
   "mlConsent": "Įjungti mašininį mokymąsi",
   "mlConsentConfirmation": "Suprantu ir noriu įjungti mašininį mokymąsi",
-  "mlConsentDescription": "Jei įjungsite mašininį mokymąsi, „Ente“ išsitrauks tokią informaciją kaip veido geometrija iš failų, įskaitant tuos, kuriais su jumis bendrinama.\n\nTai bus daroma jūsų įrenginyje, o visa sugeneruota biometrinė informacija bus visapusiškai užšifruota.",
+  "mlConsentDescription": "Jei įjungsite mašininį mokymąsi, „Photovault“ išsitrauks tokią informaciją kaip veido geometrija iš failų, įskaitant tuos, kuriais su jumis bendrinama.\n\nTai bus daroma jūsų įrenginyje, o visa sugeneruota biometrinė informacija bus visapusiškai užšifruota.",
   "mlCouldNotProcessItems": "{count, plural, one {Nepavyko apdoroti {count} elemento} few {Nepavyko apdoroti {count} elementų} many {Nepavyko apdoroti {count} elemento} other {Nepavyko apdoroti {count} elementų}}",
   "@mlCouldNotProcessItems": {
     "description": "Title shown when machine learning could not process one or more items",
@@ -1651,11 +1651,11 @@
   "moveToHiddenAlbum": "Perkelti į paslėptą albumą",
   "movingFilesToAlbum": "Perkeliami failai į albumą...",
   "name": "Pavadinimą",
-  "networkConnectionRefusedErr": "Nepavyksta prisijungti prie „Ente“. Bandykite dar kartą po kurio laiko. Jei klaida tęsiasi, susisiekite su palaikymo komanda.",
+  "networkConnectionRefusedErr": "Nepavyksta prisijungti prie „Photovault“. Bandykite dar kartą po kurio laiko. Jei klaida tęsiasi, susisiekite su palaikymo komanda.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nepavyksta prisijungti prie „Ente“. Patikrinkite tinklo nustatymus ir susisiekite su palaikymo komanda, jei klaida tęsiasi.",
+  "networkHostLookUpErr": "Nepavyksta prisijungti prie „Photovault“. Patikrinkite tinklo nustatymus ir susisiekite su palaikymo komanda, jei klaida tęsiasi.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1782,11 +1782,11 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Turite vieną paskyrą tarp „Ente“ nuotraukų, „Ente Auth“ ir „Ente“ spintelės.",
+  "oneAccountAcrossEnteApps": "Turite vieną paskyrą tarp „Photovault“ nuotraukų, „Ente Auth“ ir „Photovault“ spintelės.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
-  "onEnte": "Saugykloje <branding>ente</branding>",
+  "onEnte": "Saugykloje <branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1886,7 +1886,7 @@
   "people": "Asmenys",
   "period": "Laikotarpis",
   "permanentlyDelete": "Ištrinti negrįžtamai",
-  "permanentlyDeleteYourEnteAccount": "Negrįžtamai ištrinti savo „Ente“ paskyrą?",
+  "permanentlyDeleteYourEnteAccount": "Negrįžtamai ištrinti savo „Photovault“ paskyrą?",
   "@permanentlyDeleteYourEnteAccount": {
     "description": "Heading for final account deletion confirmation"
   },
@@ -1907,7 +1907,7 @@
   },
   "pets": "Furio draugai",
   "photoGridSize": "Nuotraukų tinklelio dydis",
-  "photoLibraryAddPermissionRequired": "„Ente“ reikia leidimo, kad išsaugotų nuotraukas ir vaizdo įrašus į „Apple“ nuotraukas“. Galite leisti prieigą nustatymuose.",
+  "photoLibraryAddPermissionRequired": "„Photovault“ reikia leidimo, kad išsaugotų nuotraukas ir vaizdo įrašus į „Apple“ nuotraukas“. Galite leisti prieigą nustatymuose.",
   "photoLibraryAddPermissionRestricted": "Šiame įrenginyje nuotraukų bibliotekos prieiga yra ribota.",
   "photos": "Nuotraukos",
   "photosAddedByYouWillBeRemovedFromTheAlbum": "Jūsų pridėtos nuotraukos bus pašalintos iš albumo",
@@ -2326,7 +2326,7 @@
     "description": "Description text asking user if they want to save to storage or share with other apps"
   },
   "savePerson": "Išsaugoti asmenį",
-  "saveToEnte": "Išsaugoti į „Ente“",
+  "saveToEnte": "Išsaugoti į „Photovault“",
   "saveYourRecoveryKeyIfYouHaventAlready": "Išsaugokite atkūrimo raktą, jei dar to nepadarėte",
   "saving": "Išsaugoma...",
   "savingEdits": "Išsaugomi redagavimai...",
@@ -2466,7 +2466,7 @@
       }
     }
   },
-  "selectedFilesAreNotOnEnte": "Pasirinkti failai nėra platformoje „Ente“",
+  "selectedFilesAreNotOnEnte": "Pasirinkti failai nėra platformoje „Photovault“",
   "selectedItemsWillBePermanentlyDeletedAndCannotBeRecovered": "Pasirinkti elementai bus negrįžtamai ištrinti ir negali būti atkurti.",
   "selectedItemsWillBeRemovedFromThisPerson": "Pasirinkti elementai bus pašalinti iš šio asmens, bet nebus ištrinti iš jūsų bibliotekos.",
   "selectedPhotos": "{count} pasirinkta",
@@ -2577,7 +2577,7 @@
   "setupFirstAccount": "Nustatykite savo pirmąją\npaskyrą",
   "share": "Bendrinti",
   "shareALink": "Bendrinkite nuorodą",
-  "shareCodeEarnStorage": "Padvigubinkite saugyklą platformoje „Ente“",
+  "shareCodeEarnStorage": "Padvigubinkite saugyklą platformoje „Photovault“",
   "shareCodes": "Bendrinti kodus",
   "shareCodesDuration": "Pasirinkite trukmę, kuriai norite bendrinti kodus.",
   "shareCollection": "Bendrinti kolekciją",
@@ -2610,15 +2610,15 @@
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Atsisiųsk „Ente“, kad galėčiau tave įtraukti į savo šeimos planą\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Atsisiųsk „Ente“, kad galėtume lengvai bendrinti originalios kokybės nuotraukas ir vaizdo įrašus.\n\nhttps://ente.com",
-  "shareTextReferralInvite": "Gaukite 20 GB nemokamai su „Ente“ nuotraukomis! Atsisiųskite programą adresu https://ente.com/invite ir naudokite kodą {referralCode}.",
+  "shareTextRecommendUsingEnteForFamily": "Atsisiųsk „Photovault“, kad galėčiau tave įtraukti į savo šeimos planą\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForPhotos": "Atsisiųsk „Photovault“, kad galėtume lengvai bendrinti originalios kokybės nuotraukas ir vaizdo įrašus.\n\nhttps://ente.com",
+  "shareTextReferralInvite": "Gaukite 20 GB nemokamai su „Photovault“ nuotraukomis! Atsisiųskite programą adresu https://ente.com/invite ir naudokite kodą {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}
     }
   },
-  "shareWithNonenteUsers": "Bendrinkite su ne „Ente“ naudotojais.",
+  "shareWithNonenteUsers": "Bendrinkite su ne „Photovault“ naudotojais.",
   "shareYourSubscription": "Bendrinkite savo prenumerata su artimaisiais",
   "sharing": "Bendrinima...",
   "shiftDatesAndTime": "Pastumti datas ir laiką",
@@ -2632,7 +2632,7 @@
   "showPerson": "Rodyti asmenį",
   "showQRAuthMessage": "Nustatykite tapatybę, kad būtų rodomas QR kodas.",
   "showTextOnWidget": "Rodyti tekstą valdiklyje",
-  "sigInBackupReminder": "„Ente“ automatiškai sukurs atsarginę kodų kopiją po prisijungimo.\n\nVis dėlto rekomenduojame eksportuoti kodus kaip papildomą atsarginę kopiją.",
+  "sigInBackupReminder": "„Photovault“ automatiškai sukurs atsarginę kodų kopiją po prisijungimo.\n\nVis dėlto rekomenduojame eksportuoti kodus kaip papildomą atsarginę kopiją.",
   "signInToBackup": "Prisijunkite, kad sukurtumėte atsargines kodų kopijas",
   "signOutFromOtherDevices": "Atsijungti iš kitų įrenginių",
   "@signOutFromOtherDevices": {
@@ -2746,7 +2746,7 @@
   "suggestions": "Pasiūlymai",
   "sunrise": "Akiratyje",
   "support": "Pagalba",
-  "supportEnte": "Paremti „<bold-green>ente</bold-green>“",
+  "supportEnte": "Paremti „<bold-green>Photovault</bold-green>“",
   "syncing": "Sinchronizuojama...",
   "syncProgress": "{completed} / {total} išsaugomi prisiminimai",
   "@syncProgress": {

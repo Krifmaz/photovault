@@ -1,6 +1,7 @@
 import "dart:typed_data";
 
 import "package:collection/collection.dart";
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
@@ -111,7 +112,7 @@ class _SparkleBadge extends StatelessWidget {
       size: const Size.square(targetSize + strokeWidth),
       painter: _SparklePainter(
         strokeColor: backgroundColor,
-        fillColor: const Color(0xFF08C225),
+        fillColor: encoreLightAccent2, // PHOTOVAULT: theme
         strokeWidth: strokeWidth,
       ),
     );

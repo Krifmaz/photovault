@@ -881,7 +881,7 @@
   "font": "フォント",
   "food": "料理を楽しむ",
   "forgotRecoveryKey": "リカバリーキーをお忘れですか？",
-  "freeStorageOffer": "<bold-green>ente</bold-green>の写真が10%オフ",
+  "freeStorageOffer": "<bold-green>Photovault</bold-green>の写真が10%オフ",
   "freeStorageOfferDescription": "クーポンコード \"AUTH\" の使用で初年度が10%オフになります",
   "freeTrial": "無料トライアル",
   "freeUpAmount": "{sizeInMBorGB} を解放する",
@@ -913,7 +913,7 @@
   "guestView": "ゲストビュー",
   "guestViewEnablePreSteps": "アプリのロックを有効にするには、システム設定でデバイスのパスコードまたは画面ロックを設定してください。",
   "happyBirthday": "お誕生日おめでとうございます! 🥳",
-  "hearUsWhereOptionalTitle": "Ente についてどのようにお聞きになりましたか？（任意）",
+  "hearUsWhereOptionalTitle": "Photovault についてどのようにお聞きになりましたか？（任意）",
   "@hearUsWhereOptionalTitle": {
     "description": "Title asking how user heard about Ente"
   },
@@ -981,7 +981,7 @@
     }
   },
   "importSuccessTitle": "やりました！",
-  "importTypeEnteEncrypted": "Ente 暗号化されたエクスポート",
+  "importTypeEnteEncrypted": "Photovault 暗号化されたエクスポート",
   "incorrectDetails": "不正な詳細",
   "incorrectRecoveryKeyBody": "リカバリーキーが間違っています",
   "incorrectRecoveryKeyTitle": "リカバリーキーの誤り",
@@ -1360,7 +1360,7 @@
   "offlineNameFaceBannerTitle": "この顔に名前を付けてください",
   "offlineSettingsBannerTitle": "あなたの写真を見ることはできません。",
   "oneLineAboutTheIssue": "問題の概要",
-  "onEnte": "<branding>Ente</branding>が保管",
+  "onEnte": "<branding>Photovault</branding>が保管",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -2154,7 +2154,7 @@
   "suggestions": "提案",
   "sunrise": "水平線",
   "support": "サポート",
-  "supportEnte": "<bold-green>ente</bold-green>をサポートする",
+  "supportEnte": "<bold-green>Photovault</bold-green>をサポートする",
   "syncing": "同期中...",
   "syncProgress": "{completed}/{total} のメモリが保存されました",
   "@syncProgress": {

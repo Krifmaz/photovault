@@ -5,7 +5,8 @@
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
-        <item name="android:windowSplashScreenBackground">#000000</item>
+        <!-- PHOTOVAULT: Encore dark bg -->
+        <item name="android:windowSplashScreenBackground">#161617</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/android12splash</item>
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">

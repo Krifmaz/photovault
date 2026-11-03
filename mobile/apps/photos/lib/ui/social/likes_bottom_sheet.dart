@@ -1,5 +1,6 @@
 import "dart:async";
 
+import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import "package:ente_icons/ente_icons.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:ente_ui/components/loading_widget.dart";
@@ -454,7 +455,8 @@ class _LikeListItem extends StatelessWidget {
                     ),
                   ),
           ),
-          const Icon(EnteIcons.likeFilled, color: Color(0xFF08C225), size: 20),
+          // PHOTOVAULT: theme
+          const Icon(EnteIcons.likeFilled, color: encoreLightAccent2, size: 20),
         ],
       ),
     );
