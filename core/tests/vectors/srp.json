@@ -1,0 +1,66 @@
+{
+  "description": "SRP-6a as the Ente web client does it (RFC 5054 4096-bit group, g=5, SHA-256; I = srpUserID string bytes; P = loginSubKey (16 bytes); x = H(s | H(I | ':' | P)); k = H(N | PAD(g)); u = H(PAD(A) | PAD(B)); M1 = H(PAD(A) | PAD(B) | PAD(S)); K = H(PAD(S)); M2 = H(PAD(A) | M1 | K); PAD = left-pad to 512 bytes). Wire values are standard base64; the client sends srpA PADDED to 512 bytes and expects srpM2 to verify against PADDED A.",
+  "provenance": {
+    "generator": "server/tests/vectors/generator (photovault-vecgen)",
+    "upstream": "https://github.com/ente-io/ente",
+    "upstreamCommit": "b2ed3dc93e49d6ac9831bf3550957816d3a0735d",
+    "clientCode": [
+      "rust/crates/accounts/src/auth/srp.rs (SrpSession: what web/packages/accounts/services/srp.ts calls via ente-prelogin-wasm)",
+      "rust/crates/accounts/src/auth/api.rs (derive_kek, derive_srp_login_key, generate_srp_setup_with_login_key)",
+      "rust/crates/accounts/src/auth/key_gen.rs (generate_keys_with_strength)",
+      "rust/crates/core/src/crypto/{argon,kdf,sealed,secretbox}.rs",
+      "rust/bindings/wasm/lib/src/prelogin.rs (wasm entry points authDeriveKek, authGenerateSrpSetup, authGenerateSignupKeys)"
+    ],
+    "srpCrate": "srp 0.7.0-rc.3 (RustCrypto), ClientG4096<Sha256>"
+  },
+  "group": {
+    "N_hex": "ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a92108011a723c12a787e6d788719a10bdba5b2699c327186af4e23c1a946834b6150bda2583e9ca2ad44ce8dbbbc2db04de8ef92e8efc141fbecaa6287c59474e6bc05d99b2964fa090c3a2233ba186515be7ed1f612970cee2d7afb81bdd762170481cd0069127d5b05aa993b4ea988d8fddc186ffb7dc90a6c08f4df435c934063199ffffffffffffffff",
+    "g": 5,
+    "hash": "SHA-256",
+    "k_hex": "3509477ea9fca66eadb7cf7b1bd0eb508f54d3989a9c988006a7d0b338374dd2"
+  },
+  "inputs": {
+    "email": "vectors@example.com",
+    "password": "correct horse battery staple",
+    "kekSalt": "AQIDBAUGBwgJCgsMDQ4PEA==",
+    "memLimit": 268435456,
+    "opsLimit": 16
+  },
+  "derived": {
+    "kek": "c50mTZtJwhGdABGbbjE2uZYSCIZWq9r2tsBk5+qEVrc=",
+    "loginSubKey": "OIslIWGw9pPkrRvQWSBkSQ==",
+    "loginSubKeyDerivation": "crypto_kdf_derive_from_key(32, id=1, ctx='loginctx', kek)[..16]"
+  },
+  "setup": {
+    "srpUserID": "4f9c2b1e-7d3a-4c5b-9e8f-0a1b2c3d4e5f",
+    "srpSalt": "MDEyMzQ1Njc4OTo7PD0+Pw==",
+    "srpVerifier": "Y8x1jsQX7Fzb2qYdb5S3n4la7u59t5sHzV4Jp0igOqzVWAh41Wwlci0O1UsZX2LJhZ/tOUUu8V6vIVQMt8fCeMxVVrnqYpRoJgxdruJUqaDISgn7z50ppephbM3ulB1RcoOQRIACuXnzsfOYPFoME6JxhfS5XR2pg2feTRsf6wy0e7ynIIb0ksg/ShF3bQobvCx7K8qfS5WfHXDx07mJVAqxVCQauUr3uHOkqcOQ+poPdNBo99gU0rx/JfWEBJbOv58mF/7rA+hIz1E9VzaOk90e+eRYH1hsVnVzdcaWNDZf+6LlPpJSRpaohIk7OFA0VfmfrF71j3oL/jqEVmhMwnjYffSv771iYcGrJ2r9yNLCvgS/pSpBeojn9EjNktfayMhSAtwscj0KRtnxa+Ax2EKaVeltea/1KDkKlmJQ54nffcaALhRQmwm9LHMeQaZlTi/GKmX65J7Hjbk2rSLzmqaJ8P48IoMhL9bO4+5HRjeCDVhMCN0hTrDhHB74WpNUBzKHKZpgfE/GbQA7eVt2erczK4l1cFXnaEhryJsQMFVEpxDOSvBvkSnOaueFE2cj9hH/VPMxz6mVnolcN0JnTNREqrXVFMW+tlgCVHvIeP3gxfNANYUyJasEfMWa/F3Yi+z6rB/+YcFex6lOzTAD2XuvD3XWDJ2LbuHA3mMxd1I=",
+    "note": "POST /users/srp/setup body: {srpUserID, srpSalt, srpVerifier, srpA} (srpA from a separate client session)"
+  },
+  "login": {
+    "a_hex": "404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+    "srpA": "1YiUtlyaR/cBINvmfqYmJFDqZzIxfKVKcVwY5qEb+Qx8LLyZH7BaHpbNmJjSnmmRWyhaqoGLlU8SC/hAS+FIZk5CMQUbaaNUFVhvhwiYNWLSBoLuu+Tr2JT392s4hZFkwJ3+y/v6wUem909zf/krhdhkeTmQVTRJypZbck+FY2Gz50x5z4l+6P5uTwqkqd7OiMvqdfNuJ3QIAmViB24O13PYl0/G8qDvOQaMX5AD4BrBkYN5RLslmKkknVLroD3ObrFYU19LobHa+VqTFztdAxbhsI9SuKC+cdYRgoR54yuO4v8IBvVjmJ9+bSFu9yGAweNn8MDiGWYjeBNzzFyMj8HsS+jWhNBKL5v5lSb2ze3gT5Er2ahH62z/boMZZKQnbbyT5czrmYSC5yoKH5xt0JTlBY0I6xeaJRNJPjdwIgW9X0GkpclKioGWTpxvIE272tfQWm2HbH42ZlLKqJaXb0QFuBUrwKaJCJmkLvHrNoNzGuOITK/p3OtK3frMHOZ2BJFfY99DOAuB5neaRWO542PSh37rTSLyyDRCKiaSjk+r+bAFp/5SL0cFfdl3prWhdGrfbJHlabi3f+cZH2L8+MdNmdvL7lxogErqKdxI8I2R2ccCgSYQEXW0oIYHTAPbrGy7xt8nVnI9Su7X0YimWBmwjl3jXjaRckFlR92KNUM=",
+    "srpA_unpadded": "1YiUtlyaR/cBINvmfqYmJFDqZzIxfKVKcVwY5qEb+Qx8LLyZH7BaHpbNmJjSnmmRWyhaqoGLlU8SC/hAS+FIZk5CMQUbaaNUFVhvhwiYNWLSBoLuu+Tr2JT392s4hZFkwJ3+y/v6wUem909zf/krhdhkeTmQVTRJypZbck+FY2Gz50x5z4l+6P5uTwqkqd7OiMvqdfNuJ3QIAmViB24O13PYl0/G8qDvOQaMX5AD4BrBkYN5RLslmKkknVLroD3ObrFYU19LobHa+VqTFztdAxbhsI9SuKC+cdYRgoR54yuO4v8IBvVjmJ9+bSFu9yGAweNn8MDiGWYjeBNzzFyMj8HsS+jWhNBKL5v5lSb2ze3gT5Er2ahH62z/boMZZKQnbbyT5czrmYSC5yoKH5xt0JTlBY0I6xeaJRNJPjdwIgW9X0GkpclKioGWTpxvIE272tfQWm2HbH42ZlLKqJaXb0QFuBUrwKaJCJmkLvHrNoNzGuOITK/p3OtK3frMHOZ2BJFfY99DOAuB5neaRWO542PSh37rTSLyyDRCKiaSjk+r+bAFp/5SL0cFfdl3prWhdGrfbJHlabi3f+cZH2L8+MdNmdvL7lxogErqKdxI8I2R2ccCgSYQEXW0oIYHTAPbrGy7xt8nVnI9Su7X0YimWBmwjl3jXjaRckFlR92KNUM=",
+    "b_hex": "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+    "srpB": "wZK1MYXxLW8M3LrVF4e/LqdFzJ6C8/CsRfovI9NQhKWwKFCQoEcosSCTOTPmbgLK7OI1dPYrP1GXF9/tzsWAtVWIdSNMS1MlFv55I0a+DIGwS49UrBDHdaSpT+9LtI4q0GDgwZn04Ox5lYBfexP27xYlBSX24PT8G6UF4CamODFoahUJVX0+8Smn7XdXecM4gnY7R4zOOxD95aXKZJHM0gZ7useIjlg4AwN5JkGFyPwzOJINOFHWY0zj5Hzu9c0nMOf2jM68I9FLIpAJO6kq8RSatcKGUa5GJrzEBv+3Juovj9LQibpjBUAcqqqEOKLrErhEaM615U4WNunZwW5c/W2tdwvkEAhuV1T0H04YeKiVfpUQHkcPmvLA2YoYe7va4/+fgmbOxNJ/bUiFqYJYGt5AD8hEYB5dt1fikjpXGorYGb59tLpkuTOacpDABoBIk0qLbVZbPuxYiQ+j2rnl/ffJv8/RVWpYE8LPRLUURqz78578w2xpHOEnO4xwUAfaosCCwG8P6MSIRqE3jh66D7apERvDOdPBF3j4pXpD03pyetnscK7rkbgW/gtvul16jXYvSNvMs5YpckivYyxb/ICupJxFQRMKv0XOVMTg01QIcCYZljCwHhMfANIgHB1j67WB+tBreLbCxdTKrKiHLAVUaQU+M52wa9ERjx9xXbQ=",
+    "u_hex": "a9b84ffd6d45218fd30981ca9f5132cc44c2867904585eb4e7a7a5127fca1d72",
+    "S_hex": "76f6ea77aa793bb009937653a0cd740b795bb6dce174b3d65bc8bce5e82f80da9fe82150dbee998718c5d1f5c4072d1dbaa6fcd7b50b4973d2cb9a0e7fd2ba7d2092ccff76692ec19cdbb5a560f4e9a0e0349aeae0d54b7c1fd4eeecba94612985d7492e329f2315ad4f4f51adf4373d7ec11143bf3c7afa34b6be0ed61961131104eb41c6a0596576e130d299819f36b43241efbe015921d7eb4e96d9736c62d4f0141c83064810c760ebd230f13f45e4177b36aa6fae7cf51d5f3945ad48134359f9c190c1d1fe9e411646c7d49fd31c8472518c5f0b526dc3b1c5a7dac5d5178751bf9264309f10e664ee3aaf3a9fd4aaff7deee5e126b6a1d60ce683cf5f47332a7977e9f24610bb3778eecbefa47d6cb197459b7c3622b8952c162b7028a8979814c50008242c406a2c2ee41080a6da432e600940ecad8ea0f50a19c243cfee2d3d8f0d871b32fb67a0f31759fad26120b61527963b1d238c28ff85e29473b14fdd169cb36548b041de3664283b34e99c204644c4beb43076a4c384c0bc377c7269730794787f05f35c0d2c2a266867c46e05c2c477f29520cee8de73eb126c7c94d8d79d005b23a1b8578558f10eba28d1e00915138f45f377e99088641f7c02835b0560af0eca7f48232834167eaedad1f5651be2ae8d89d7c364f1a23a84780fc07babfc7cd6e88d8ecc84d48f90aa4ab4af716763562edac8fe54d0",
+    "srpM1": "TcTcgPTWkNpGNdlPlYu72zVsTL/AvE2wVdnptc7Vg9I=",
+    "sessionKeyK": "QsAnalWdt8lvH6eiaJGdp3R5R+qlrKh7JRsopTL1iac=",
+    "srpM2": "FBvSlZmDre2p9kBaF2MuFQxPyvTGHw2/pX6nKt6hLqQ=",
+    "note": "create-session request {srpUserID, srpA}; response {sessionID, srpB}. verify-session request {srpUserID, sessionID, srpM1}; response includes srpM2 (standard base64)."
+  },
+  "goServerVector": {
+    "source": "upstream srp.rs test_known_vector_leading_zero_a_matches_go_server_m1 (checked against github.com/ente/go-srp)",
+    "srpUserID": "repro-user-id",
+    "srpSalt": "MDEyMzQ1Njc4OWFiY2RlZg==",
+    "loginSubKey": "MTIzNDU2Nzg5MGFiY2RlZg==",
+    "a_hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006de",
+    "b_hex": "42424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242",
+    "srpVerifier": "SEg9JCYfvbPSJVdo17lWC0FMIBcr+H89dUdWFuHzTHkLTo3YOxJWl671QjGfJSLWIKmFiYu8uFamhS2HR3AoYZLbpsN9K6ry/5cnNtU20nHXAwuWCte6VIUO/SrqDBbpS9Q817E1UtJm5YaPbxe6UDLL8VY4C2OH4b7zIqKdJxRQwt2orxiKztAyeg+shpRN9Db3ZjpDJR/dozGlPFqqsMfwo6DSzoQalaNNLpi7R6vVuOHnCRp0Dcm4r2tvzW1nECRflA3bAjwQGmkMCHQZbhAw+qG1Kxr568j9b6s/c+9UkPlij5RNW6NqN7nLq2X8Ji68gKjzv65JKPS718KOjiiHX3bMrAjF+PUEVcrQ4wgGrY1MlGfOSwAR6hxpYUpGcY+TjbKM7d8yiSWVtzwNIz8e/7sV0/rQx+2GQMZe/I1WRa3cavOMqGlIxrhXKlvoT3906LbMjYUd7aY3I/jNZNBuMGSOYQwkEQsQSwsMzaC5sGTBkO9S/TYh6mYynYZmqBhFQ1GuIMTuMPV1HCMONnxttRUG4izK8GN84+mHcfKFvWM3QWwviCMoVXNE2nP5q0cni/xpBj/TDClyjDN40Ji3mYuvRqyW1MDp0OUk/M64YMp2biXMGjsP8aWXXl7F/NWkO4VuDtRIf6lSUOYIGUgRw3pgVIjDdtdT8QfLOxk=",
+    "srpA": "AAPc1prINoqnf9iZT3rPTVwbtgTtWVzWP99hLMhzyxEuKpfPOJ9DU1i/Kd81bRng2G120Wjdvp7ykAVBcjxCuzswOFc2zRq0nOxCOH08pygmzvwZmcgiZs6YTIjoqP9qw1nhravmMRGyr1kZlq9s5zfHBMrhjY8zCJ0ujObJjm8o+c1+kcFxJqzYVU/HLOASIDt2OJst3QnRn+V2PLU7jrmcKiH8UtHFlOe/Mo9fBUUuqlqChkFuDGJtmTUWswpFA2KryhY3MPbsTyr/U/0WXzgxmrynY1QDDTU30aRLakeR92IU+OmqqcV2jdYabsljw+29v5x5scXRi2L96Qc0DRo0MBSTVK3a59TB4OSpaCtY7RJWIxAacJolN+y3jmlkPrFCz+SnJuLG4fLUT6yhs8phZg9OhfH8NGGaNoPKMaJD9AFzQ2EARfe2OrBdM8XVo/naD46UNRVHxqY46kRTBN2w+Ej17UByoQHmw2hqeUHCxosnG2EK2Q0THhZYnK+tUk2f/IskVnQWH6wBQbICYdch4LwSDR1+Q7bWJno4Oj/3ZkU4gBCfA6n+bmdqqlJTOk3vKVsQMgfbLQ5k/1/2JbVs6iYLplUWjLTsS6EADYFRAwYD/PUtg4cgpFAwIq0Sq3m4ZLaW5YqFbcOTMA/jb7Ijo6yyIMjpkHPRxl+kRKk=",
+    "srpB": "hDRugQAk9SuSMI7spA/KX/Oz5d/us3GPIYtarpXMCDRDr/5JBiBQTWYKKe6vAL2etXnP6U+Z4VkC6Vns0y45fagoSRjNY220//9I1Q+tFdRt14f0rF4U4dUFnlDQ1Flna2/iJVHOwq8Ej3cOva9cPjDPArXk0U+YF4zNI7gJMfMxzJi7zdKSfsWfBYIScYcS66jUEigA+xRJkEJz40y2r5PhkYQjSdC4lqkusiEWwYvcXelovST9gD7Mm1NGB2ec8I67L8OnpcXGo7QpqwJ2pJiPFsJ29xy/8NJPx6sXqR0E1smOGTKVd61m+NNVXnTbcdbAJFiXtHd55RN5+ntefPnRr4FmWq0yPxbwbKkprQcNyEKZdd89DYHbfFrXdRTVqG/XxzN8z0Y5302nCv47VBBtYYi1RNlAusaJ+4eY0lVG9hwrdSHfKqtbx2p1ATNYFNf4ohX5QZLwF3bO33XcWKyXHxTJgGl3GRvA6YAtIU3xJF/jJ8IXDwLTJ41lXJTTGUuusITgqojX4nQv+/eB2M2s0g3eXFDAoW9Uxx5prG9tKTu0ILg9fjXPYpOf3dYlLieLoyYAaf290py8GFU4nYibnEUUgdhKxD+cp3jdaacdHa2p7MoJPEEUQgGPMDGRKc074R49Aa1M+IMHDETTvbS8pqBDL465uwrDTLQwRBc=",
+    "srpM1": "wJU7jHTUAPv2ZKUV3rcA1ztlIx5+IHouIyb/jPcFZ6w=",
+    "srpM2": "hnAUZ4+pBhCwDaenfC7eWKrpmdYS9hWAuzqhmeYSpWE="
+  }
+}

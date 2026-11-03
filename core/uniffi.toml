@@ -1,0 +1,12 @@
+[bindings.kotlin]
+package_name = "app.photovault.core"
+cdylib_name = "photovault_core"
+
+# Kotlin exceptions inherit `message` from Throwable, so a variant field
+# named `message` would not compile. In Kotlin it is `detail`
+# (`e.message` still gives a readable text).
+[bindings.kotlin.rename]
+"CoreError.Network.message" = "detail"
+"CoreError.Server.message" = "detail"
+"CoreError.Crypto.message" = "detail"
+"CoreError.Storage.message" = "detail"

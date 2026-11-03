@@ -1,0 +1,60 @@
+[package]
+name = "photovault-core"
+description = "Photovault client core: Ente-compatible end-to-end encryption, login, sync, local store, downloads and uploads, exported to Kotlin with UniFFI. Based on Ente (ente.com)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "photovault_core"
+crate-type = ["cdylib", "staticlib", "lib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "src/bin/uniffi-bindgen.rs"
+required-features = ["bindgen"]
+
+[features]
+default = []
+# The `uniffi-bindgen` binary used by CI to generate the Kotlin bindings.
+bindgen = ["uniffi/cli"]
+# Kept for the contract's `cargo test -p photovault-core --features it`; the
+# real-server tests always run (they need no network).
+it = []
+
+[dependencies]
+uniffi = "0.32"
+# Ente's crypto, byte for byte.
+libsodium-sys-stable = "1.24"
+num-bigint-dig = "0.8"
+sha2 = "0.10"
+md-5 = "0.10"
+bip39 = "3"
+base64 = "0.22"
+hex = "0.4"
+# HTTP: rustls with the ring provider, Mozilla roots (no platform verifier
+# initialisation needed on Android).
+reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider", "http2", "json", "query"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+webpki-roots = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "io-util", "sync", "time"] }
+# Local store. 0.32 shares libsqlite3-sys 0.30 with the server's sqlx (the
+# `links = "sqlite3"` crate can only appear once in the workspace).
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+url = "2"
+bytes = "1"
+# Upload-time media handling (pure Rust).
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp", "tiff"] }
+kamadak-exif = "0.6"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+# Best-effort LAN discovery (`_photovault._tcp`).
+mdns-sd = "0.21"
+
+[dev-dependencies]
+photovault-server = { path = "../server" }
+tempfile = "3"
+axum = "0.8"
