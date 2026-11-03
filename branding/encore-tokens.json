@@ -1,0 +1,20 @@
+{
+  "$comment": "Photovault theme tokens, taken from Krifmaz/Encore@5c0bdcb web-rs/static/css/app.css (:root[data-theme=encore] + :root[data-brand] for dark, :root[data-theme=light] for light) and clients/android/.../ui/theme/Theme.kt (EncorePaletteLight accent). Every app's theme file mirrors these values; change them here first.",
+  "source": "https://github.com/Krifmaz/Encore/blob/5c0bdcba82307c522e4516d1bc51a81c8efa4026/web-rs/static/css/app.css",
+  "font": { "family": "Inter", "fallback": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif", "mono": "ui-monospace, SFMono-Regular, Menlo, monospace" },
+  "radius": { "card": 14, "control": 10, "small": 8, "pill": 99, "hero": 20 },
+  "dark": {
+    "bg": "#161617", "bg2": "#1c1c1e", "panel": "#222224", "panel2": "#2a2a2d", "border": "#353538",
+    "text": "#f0ead6", "muted": "#aaa493", "faint": "#77725f",
+    "accent": "#f0ead6", "accent2": "#d6c49a", "onAccent": "#16161f",
+    "ok": "#22c55e", "warn": "#f59e0b", "err": "#ef4444", "info": "#38bdf8"
+  },
+  "light": {
+    "bg": "#f6f6fb", "bg2": "#ffffff", "panel": "#ffffff", "panel2": "#f0f0f7", "border": "#e2e2ee",
+    "text": "#16161f", "muted": "#5d5d75", "faint": "#8d8da5",
+    "accent": "#2a2a2d", "accent2": "#8a7a4e", "onAccent": "#f0ead6",
+    "ok": "#22c55e", "warn": "#f59e0b", "err": "#ef4444", "info": "#38bdf8"
+  },
+  "primaryButton": "linear-gradient(135deg, accent, accent2) with onAccent text",
+  "brand": { "name": "Photovault", "credit": "Based on Ente (ente.com)" }
+}
