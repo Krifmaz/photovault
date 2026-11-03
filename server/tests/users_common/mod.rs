@@ -154,9 +154,19 @@ pub const OTT: &str = "123456";
 
 /// Start a server where `emails` get the hard-coded OTT.
 pub async fn server(emails: &[&str]) -> TestServer {
+    server_with(emails, |_| {}).await
+}
+
+/// [`server`] with a config tweak.
+#[allow(dead_code)]
+pub async fn server_with(
+    emails: &[&str],
+    tweak: impl FnOnce(&mut photovault_server::config::Config) + Send + 'static,
+) -> TestServer {
     init_logs();
     let emails: Vec<String> = emails.iter().map(|e| e.to_string()).collect();
     TestServer::start_with(move |c| {
+        tweak(c);
         for e in emails {
             c.hardcoded_ott.insert(e, OTT.to_string());
         }

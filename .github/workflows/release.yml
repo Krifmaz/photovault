@@ -129,7 +129,11 @@ jobs:
         with:
           key: ${{ matrix.target }}
       - name: Build
-        run: cargo build --release --locked --workspace --bins --target ${{ matrix.target }}
+        env:
+          PHOTOVAULT_COMMIT: ${{ github.sha }}
+        run: |
+          export PHOTOVAULT_COMMIT="${PHOTOVAULT_COMMIT:0:7}"
+          cargo build --release --locked --workspace --bins --target ${{ matrix.target }}
       - name: Package
         shell: bash
         run: |
@@ -172,7 +176,11 @@ jobs:
           path: .github/release
           merge-multiple: true
       - name: Image root filesystem
-        run: mkdir -p .github/release/rootfs/data .github/release/rootfs/db
+        # The web app's static export (web/apps/photos/out) is copied in when a
+        # earlier step or job has built it; the image serves it on the API port.
+        run: |
+          mkdir -p .github/release/rootfs/data .github/release/rootfs/config .github/release/rootfs/app/web
+          if [ -f web/apps/photos/out/index.html ]; then cp -r web/apps/photos/out/. .github/release/rootfs/app/web/; fi
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
         with:

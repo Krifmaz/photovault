@@ -29,7 +29,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "fs"
 tokio-util = { version = "0.7", features = ["io"] }
 toml = "0.9"
 tower = "0.5"
-tower-http = { version = "0.6", features = ["cors", "trace", "request-id", "limit", "compression-gzip"] }
+tower-http = { version = "0.6", features = ["cors", "trace", "request-id", "limit", "compression-gzip", "fs"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 futures-util = "0.3"
@@ -51,6 +51,12 @@ p256 = { version = "0.13", default-features = false, features = ["ecdsa", "std"]
 ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
 ciborium = "0.2"
 uuid = { version = "1", features = ["v4", "serde"] }
+# Free space (statvfs) and the running uid for startup checks; pure Rust.
+rustix = { version = "1", features = ["fs", "process"] }
+# SMTP for verification codes. rustls with ring, no OpenSSL.
+lettre = { version = "0.11", default-features = false, features = ["builder", "smtp-transport", "tokio1", "tokio1-rustls", "ring", "webpki-roots", "hostname"] }
+# LAN discovery (_photovault._tcp); pure Rust.
+mdns-sd = "0.21"
 
 [dev-dependencies]
 tempfile = "3"

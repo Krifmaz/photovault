@@ -215,7 +215,7 @@ pub(crate) async fn details_v2(
         None => None,
     };
     let bonus = users::active_bonus(db, bonus_user).await?;
-    let sub = users::subscription(db, u.id).await?;
+    let sub = crate::capacity::subscription(state, u.id).await?;
     let can_disable_mfa =
         sqlx::query_as::<_, (i64,)>("SELECT user_id FROM srp_auth WHERE user_id = $1")
             .bind(u.id)
