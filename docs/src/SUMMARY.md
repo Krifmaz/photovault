@@ -17,4 +17,5 @@
 
 - [Architecture](architecture.md)
 - [API compatibility matrix](api-compatibility.md)
+- [Mobile app API audit](mobile-api-audit.md)
 - [Keeping the app forks up to date](upstream.md)
