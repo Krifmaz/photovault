@@ -406,7 +406,7 @@
   "autoAddPeople": "Tambahkan orang secara otomatis",
   "autoAddToAlbum": "Tambahkan ke album secara otomatis",
   "autoCastDialogBody": "Perangkat Cast yang tersedia akan ditampilkan di sini.",
-  "autoCastiOSPermission": "Pastikan izin Jaringan Lokal untuk app Photovault Foto aktif di Pengaturan.",
+  "autoCastiOSPermission": "Pastikan izin Jaringan Lokal untuk app Photovault aktif di Pengaturan.",
   "autoLock": "Kunci otomatis",
   "@autoLock": {
     "description": "Auto lock setting title"

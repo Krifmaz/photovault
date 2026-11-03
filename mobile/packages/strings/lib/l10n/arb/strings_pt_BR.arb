@@ -657,7 +657,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Eu compreendo que isso excluirá todos os meus dados no Photovault Fotos, Ente Auth e Ente Locker.",
+  "confirmDeleteAccountAcrossApps": "Eu compreendo que isso excluirá todos os meus dados no Photovault, Ente Auth e Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -1257,7 +1257,7 @@
   "@enteLocker": {
     "description": "Product name"
   },
-  "entePhotos": "Photovault Fotos",
+  "entePhotos": "Photovault",
   "@entePhotos": {
     "description": "Product name"
   },

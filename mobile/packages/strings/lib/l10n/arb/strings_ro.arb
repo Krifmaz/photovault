@@ -151,7 +151,7 @@
   "authToViewYourMemories": "Vă rugăm să vă autentificați pentru a vă vizualiza amintirile",
   "authToViewYourRecoveryKey": "Vă rugăm să vă autentificați pentru a vedea cheia de recuperare",
   "autoCastDialogBody": "Veți vedea dispozitivele disponibile pentru Cast aici.",
-  "autoCastiOSPermission": "Asigurați-vă că permisiunile de rețea locală sunt activate pentru aplicația Photovault Foto, în Setări.",
+  "autoCastiOSPermission": "Asigurați-vă că permisiunile de rețea locală sunt activate pentru aplicația Photovault, în Setări.",
   "autoLockFeatureDescription": "Timpul după care aplicația se blochează după ce a fost pusă în fundal",
   "@autoLockFeatureDescription": {
     "description": "Description of auto lock feature"

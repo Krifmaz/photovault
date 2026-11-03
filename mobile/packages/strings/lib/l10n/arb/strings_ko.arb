@@ -386,7 +386,7 @@
   "autoAddPeople": "사람에 자동 추가",
   "autoAddToAlbum": "앨범에 자동 추가",
   "autoCastDialogBody": "여기에서 사용 가능한 Cast 기기를 확인할 수 있습니다.",
-  "autoCastiOSPermission": "설정에서 Photovault Photos의 Local 네트워크 권한이 있는지 확인하세요.",
+  "autoCastiOSPermission": "설정에서 Photovault의 Local 네트워크 권한이 있는지 확인하세요.",
   "autoLock": "자동 잠금",
   "@autoLock": {
     "description": "Auto lock setting title"
@@ -4084,7 +4084,7 @@
   "shareTextRecommendUsingEnte": "원본 화질 그대로 파일을 쉽게 공유할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
   "shareTextRecommendUsingEnteForFamily": "내 가족 요금제에 추가할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
   "shareTextRecommendUsingEnteForPhotos": "원본 화질 그대로 사진과 동영상을 쉽게 공유할 수 있게 Ente를 다운로드해 줘\n\nhttps://ente.com",
-  "shareTextReferralInvite": "Photovault Photos에서 20GB를 무료로 받으세요! https://ente.com/invite 에서 앱을 다운로드하고 코드 {referralCode}을 입력하세요.",
+  "shareTextReferralInvite": "Photovault에서 20GB를 무료로 받으세요! https://ente.com/invite 에서 앱을 다운로드하고 코드 {referralCode}을 입력하세요.",
   "@shareTextReferralInvite": {
     "placeholders": {
       "referralCode": {}

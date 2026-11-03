@@ -319,7 +319,7 @@
   "autoAddPeople": "Agregar personas automáticamente",
   "autoAddToAlbum": "Añadir al álbum automáticamente",
   "autoCastDialogBody": "Aquí verás los dispositivos de transmisión disponibles.",
-  "autoCastiOSPermission": "Asegúrate de que los permisos de la red local están activados para la aplicación Photovault Fotos, en Configuración.",
+  "autoCastiOSPermission": "Asegúrate de que los permisos de la red local están activados para la aplicación Photovault, en Configuración.",
   "autoLock": "Bloqueo automático",
   "@autoLock": {
     "description": "Auto lock setting title"
