@@ -66,5 +66,7 @@ ort = { version = "=2.0.0-rc.15", default-features = false, features = ["load-dy
 wiremock = "0.6"
 tempfile = "3"
 # Video tests: decrypt ffmpeg's AES-128-CBC HLS segments.
+# Real-server end-to-end test (tests/server_e2e.rs): the in-process harness.
+photovault-server = { path = "../server" }
 aes = "0.8"
 cbc = { version = "0.1", features = ["alloc"] }

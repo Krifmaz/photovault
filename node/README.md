@@ -101,7 +101,9 @@ both indexes.
   (unit test against a copy of its command); end-to-end tests decrypt and play
   the generated streams (`tests/video_hls.rs`).
 - **End to end**: `tests/backend_e2e.rs` runs a full pass against a mock
-  museum and decrypts every upload.
+  museum and decrypts every upload; `tests/server_e2e.rs` does the same
+  against the real Photovault server (sign-up, upload like the apps, node
+  pass, then fetch and decrypt every result through the API).
 
 ## Known limitations
 
