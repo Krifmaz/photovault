@@ -1,0 +1,26 @@
+# Guest-side workspace for Photovault plugins: the PDK and the example
+# plugins. It builds for wasm32-unknown-unknown by default (see
+# .cargo/config.toml) and is excluded from the root workspace.
+[workspace]
+resolver = "3"
+members = ["pdk", "examples/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+repository = "https://github.com/Krifmaz/photovault"
+rust-version = "1.90"
+
+[workspace.dependencies]
+photovault-plugin-pdk = { path = "pdk" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Small Wasm modules: plugins are downloaded to phones.
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

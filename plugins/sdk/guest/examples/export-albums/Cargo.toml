@@ -1,0 +1,20 @@
+[package]
+name = "photovault-plugin-export-albums"
+description = "Example Photovault plugin: export-albums."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+name = "export_albums"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+photovault-plugin-pdk.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

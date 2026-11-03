@@ -1,0 +1,46 @@
+[plugin]
+id = "dev.photovault.export-albums"
+name = "Export albums"
+version = "0.1.0"
+description = "Keeps decrypted copies of the albums you pick in a folder you choose, for example on a NAS or an external disk. Only new and changed files are copied on each run."
+authors = ["Photovault contributors"]
+license = "AGPL-3.0-only"
+homepage = "https://github.com/Krifmaz/photovault/tree/main/plugins/sdk/guest/examples/export-albums"
+api_version = 1
+
+[permissions]
+read = ["metadata"]
+write = ["export"]
+
+[hooks]
+schedule = { every_minutes = 1440 }
+on_demand = [{ id = "export_now", label = "Export now" }]
+
+[limits]
+memory_mb = 32
+timeout_ms = 300000
+
+[[settings]]
+key = "albums"
+label = "Albums to export"
+type = "album"
+multiple = true
+
+[[settings]]
+key = "layout"
+label = "Folder layout"
+type = "select"
+default = "album/file"
+options = [
+    { value = "album/file", label = "Album / file" },
+    { value = "album/year/file", label = "Album / year / file" },
+    { value = "album/year-month/file", label = "Album / year-month / file" },
+]
+help = "Changing the layout applies to files exported from now on."
+
+[[settings]]
+key = "overwrite"
+label = "Update changed files"
+type = "toggle"
+default = false
+help = "When a photo changes after it was exported (for example after an edit), copy it again over the old copy. When off, an exported copy is never replaced."
