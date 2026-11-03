@@ -128,7 +128,7 @@ PY
 json_field() { python3 -c 'import json,sys; v=json.load(open(sys.argv[1])).get(sys.argv[2]); print("" if v is None else v)' "$1" "$2"; }
 
 PREV_PEAK=""; PREV_MIN=""; FORCED=false
-# shellcheck disable=SC2329  # invoked by the EXIT trap
+# shellcheck disable=SC2317,SC2329  # invoked by the EXIT trap (SC2317 on older shellcheck, SC2329 on newer)
 restore_refresh() {
     if $FORCED && ! $KEEP_REFRESH; then
         log "Restoring refresh-rate settings"
