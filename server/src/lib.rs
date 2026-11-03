@@ -15,6 +15,7 @@ pub mod entities;
 pub mod error;
 pub mod jwt;
 pub mod legacy;
+pub mod library;
 pub mod mail;
 pub mod metrics;
 pub mod public;
