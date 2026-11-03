@@ -15,6 +15,7 @@ pub mod error;
 pub mod jwt;
 pub mod mail;
 pub mod metrics;
+pub mod public;
 pub mod routes;
 pub mod state;
 pub mod storage;
@@ -45,7 +46,12 @@ pub fn app(state: AppState) -> Router {
             Method::OPTIONS,
         ])
         .allow_headers(AllowHeaders::mirror_request())
-        .expose_headers([HeaderName::from_static("etag"), x_request_id.clone()])
+        .expose_headers([
+            HeaderName::from_static("etag"),
+            x_request_id.clone(),
+            // Public links hand device tokens back in this header (museum's CORS exposes it).
+            HeaderName::from_static("x-link-device-token"),
+        ])
         .max_age(std::time::Duration::from_secs(86400));
     routes::api()
         .layer(axum::middleware::from_fn_with_state(state.clone(), observe))
