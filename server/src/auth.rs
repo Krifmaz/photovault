@@ -144,17 +144,20 @@ impl FromRequestParts<AppState> for AuthUser {
             .and_then(|v| v.to_str().ok())
             .unwrap_or("")
             .to_string();
-        let db = state.db.pool.clone();
-        let th = token_hash.clone();
-        tokio::spawn(async move {
-            let _ = sqlx::query("UPDATE tokens SET last_used_at = $1, ip = $2, user_agent = $3 WHERE token_hash = $4")
-                .bind(now_micros())
-                .bind(ip)
-                .bind(ua)
-                .bind(th)
-                .execute(&db)
-                .await;
-        });
+        // Record session use inline (not in a detached task): on SQLite a concurrent
+        // writer can make the request's own transaction fail with SQLITE_BUSY. Writes
+        // are throttled to once a minute per session, so this is usually a no-op.
+        let now = now_micros();
+        let _ = sqlx::query(
+            "UPDATE tokens SET last_used_at = $1, ip = $2, user_agent = $3 WHERE token_hash = $4 AND last_used_at < $5",
+        )
+        .bind(now)
+        .bind(ip)
+        .bind(ua)
+        .bind(&token_hash)
+        .bind(now - 60_000_000)
+        .execute(&state.db.pool)
+        .await;
         Ok(AuthUser {
             user_id,
             app,
