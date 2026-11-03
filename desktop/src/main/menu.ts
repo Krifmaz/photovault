@@ -6,6 +6,8 @@ import {
     shell,
 } from "electron";
 import { allowWindowClose } from "../main";
+// PHOTOVAULT: brand name for native menu labels.
+import { appDisplayName } from "./photovault/brand";
 import { forceCheckForAppUpdates } from "./services/app-update";
 import { setShouldHideDockIcon, shouldHideDockIcon } from "./services/store";
 
@@ -27,9 +29,12 @@ export const createApplicationMenu = (mainWindow: BrowserWindow) => {
 
     return Menu.buildFromTemplate([
         {
-            label: "Ente Photos",
+            // PHOTOVAULT: brand name.
+            label: appDisplayName,
             submenu: [
-                ...macOSOnly([{ label: "About Ente", role: "about" }]),
+                ...macOSOnly([
+                    { label: `About ${appDisplayName}`, role: "about" },
+                ]),
                 { type: "separator" },
                 { label: "Check for Updates...", click: handleCheckForUpdates },
                 { type: "separator" },
@@ -50,7 +55,8 @@ export const createApplicationMenu = (mainWindow: BrowserWindow) => {
 
                 { type: "separator" },
                 ...macOSOnly([
-                    { label: "Hide Ente", role: "hide" },
+                    // PHOTOVAULT: brand name.
+                    { label: `Hide ${appDisplayName}`, role: "hide" },
                     { label: "Hide Others", role: "hideOthers" },
                     { type: "separator" },
                 ]),
@@ -98,11 +104,16 @@ export const createApplicationMenu = (mainWindow: BrowserWindow) => {
                     { type: "separator" },
                     { label: "Bring All to Front", role: "front" },
                     { type: "separator" },
-                    { label: "Ente Photos", role: "window" },
+                    // PHOTOVAULT: brand name.
+                    { label: appDisplayName, role: "window" },
                 ]),
             ],
         },
-        { label: "Help", submenu: [{ label: "Ente Help", click: handleHelp }] },
+        // PHOTOVAULT: brand name (the link still opens the upstream help docs).
+        {
+            label: "Help",
+            submenu: [{ label: `${appDisplayName} Help`, click: handleHelp }],
+        },
     ]);
 };
 
@@ -117,7 +128,8 @@ export const createTrayContextMenu = (mainWindow: BrowserWindow) => {
     };
 
     return Menu.buildFromTemplate([
-        { label: "Open Ente", click: handleOpen },
-        { label: "Quit Ente", click: handleClose },
+        // PHOTOVAULT: brand name.
+        { label: `Open ${appDisplayName}`, click: handleOpen },
+        { label: `Quit ${appDisplayName}`, click: handleClose },
     ]);
 };

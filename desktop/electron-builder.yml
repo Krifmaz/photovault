@@ -10,7 +10,8 @@ extraFiles:
 beforeBuild: scripts/beforeBuild.js
 beforePack: scripts/beforePack.js
 protocols:
-    - name: Ente
+    # PHOTOVAULT: brand name (the "ente" URL scheme is unchanged).
+    - name: Photovault
       schemes: ["ente"]
 win:
     target:

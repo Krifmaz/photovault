@@ -70,6 +70,8 @@ import {
 } from "./services/watch";
 import { triggerCreateUtilityProcess } from "./services/workers";
 import { userPreferences } from "./stores/user-preferences";
+// PHOTOVAULT: theme tokens for the title bar overlay.
+import { titleBarSymbolColor, windowBackgroundColor } from "./photovault/brand";
 
 const parsePersistedAppLockConfig = (
     config: unknown,
@@ -306,9 +308,10 @@ export const attachMainWindowIPCHandlers = (mainWindow: BrowserWindow) => {
             if (process.platform == "darwin") return;
 
             const isDark = nativeTheme.shouldUseDarkColors || isFileViewerOpen;
+            // PHOTOVAULT: theme (Encore bg/text tokens).
             mainWindow.setTitleBarOverlay({
-                color: isDark ? "black" : "white",
-                symbolColor: isDark ? "#cdcdcd" : "black",
+                color: windowBackgroundColor(isDark),
+                symbolColor: titleBarSymbolColor(isDark),
             });
         },
     );
