@@ -1,0 +1,225 @@
+//! Photovault: generate known-answer vectors from Ente's own Rust crypto.
+#![allow(clippy::all, clippy::pedantic, clippy::restriction)]
+use ente_accounts::auth::{self, KeyDerivationStrength};
+use ente_core::b64;
+use ente_core::crypto::{
+    self, Key, Salt, SecretKey, argon, blob, kdf, sealed, secretbox, stream,
+};
+use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
+use srp::ClientG4096;
+
+fn pattern(n: usize) -> Vec<u8> {
+    (0..n).map(|i| ((i * 31 + 7) % 251) as u8).collect()
+}
+
+fn h(b: &[u8]) -> String {
+    hex::encode(b)
+}
+
+fn main() {
+    let mut out = serde_json::Map::new();
+
+    // 1. argon2id
+    let salt = Salt::from_bytes(*b"photovault-salt!");
+    let mut argon_v = vec![];
+    for (pw, params) in [
+        ("correct horse battery staple", argon::Params::MIN),
+        ("пароль 密码 🔐", argon::Params::MIN),
+        ("password", argon::Params::INTERACTIVE),
+        ("password", argon::Params { mem_limit: 16 * 1024 * 1024, ops_limit: 3 }),
+    ] {
+        let k = argon::derive_key(pw, &salt, params).unwrap();
+        argon_v.push(json!({
+            "password": pw, "salt_b64": b64::encode(salt.as_bytes()),
+            "mem_limit": params.mem_limit, "ops_limit": params.ops_limit,
+            "key_hex": h(k.as_bytes()),
+        }));
+    }
+    out.insert("argon2id".into(), Value::Array(argon_v));
+
+    // 2. kdf / login subkey
+    let kek = Key::from_bytes([0x42; 32]);
+    let sub = kdf::derive_subkey(&kek, 32, 1, b"loginctx").unwrap();
+    let sub64 = kdf::derive_subkey(&kek, 64, 7, b"context0").unwrap();
+    out.insert("kdf".into(), json!({
+        "key_hex": h(kek.as_bytes()),
+        "login_subkey_hex": h(&kdf::derive_login_key(&kek)),
+        "subkey_32_1_loginctx_hex": h(&sub),
+        "subkey_64_7_context0_hex": h(&sub64),
+    }));
+
+    // 3. secretbox
+    let sb_key = Key::from_bytes([0x11; 32]);
+    let sb_pt = b"Ente secretbox known-answer vector".to_vec();
+    let sb = secretbox::encrypt(&sb_pt, &sb_key);
+    out.insert("secretbox".into(), json!({
+        "key_hex": h(sb_key.as_bytes()), "plaintext_hex": h(&sb_pt),
+        "nonce_b64": b64::encode(sb.nonce.as_bytes()),
+        "ciphertext_b64": b64::encode(&sb.encrypted_data),
+    }));
+
+    // 4. sealed box
+    let sk = SecretKey::from_seed(&[0x22; 32]).unwrap();
+    let pk = sk.public_key();
+    let sealed_pt = b"sealed box vector".to_vec();
+    let sealed_ct = sealed::seal(&sealed_pt, &pk).unwrap();
+    out.insert("sealed_box".into(), json!({
+        "secret_key_hex": h(sk.as_bytes()), "public_key_hex": h(pk.as_bytes()),
+        "plaintext_hex": h(&sealed_pt), "ciphertext_b64": b64::encode(&sealed_ct),
+    }));
+
+    // 5. blob
+    let blob_key = Key::from_bytes([0x33; 32]);
+    let blob_pt = br#"{"title":"IMG_0001.HEIC","fileType":0,"creationTime":1700000000000000}"#.to_vec();
+    let eb = blob::encrypt(&blob_pt, &blob_key).unwrap();
+    let eb_empty = blob::encrypt(&[], &blob_key).unwrap();
+    out.insert("blob".into(), json!([
+        {"key_hex": h(blob_key.as_bytes()), "plaintext_hex": h(&blob_pt),
+         "header_b64": b64::encode(eb.decryption_header.as_bytes()),
+         "ciphertext_b64": b64::encode(&eb.encrypted_data)},
+        {"key_hex": h(blob_key.as_bytes()), "plaintext_hex": "",
+         "header_b64": b64::encode(eb_empty.decryption_header.as_bytes()),
+         "ciphertext_b64": b64::encode(&eb_empty.encrypted_data)},
+    ]));
+
+    // 6. chunked file stream
+    let file_key = Key::from_bytes([0x44; 32]);
+    let mut files = vec![];
+    for size in [0usize, 1000, stream::ENCRYPTION_CHUNK_SIZE, 2 * stream::ENCRYPTION_CHUNK_SIZE + 1000] {
+        let pt = pattern(size);
+        let mut ct = Vec::new();
+        let header = stream::encrypt_file(&mut &pt[..], &mut ct, &file_key).unwrap();
+        let small = size <= 1000;
+        files.push(json!({
+            "key_hex": h(file_key.as_bytes()),
+            "plaintext_len": size,
+            "plaintext_sha256": h(&Sha256::digest(&pt)),
+            "header_b64": b64::encode(header.as_bytes()),
+            "ciphertext_len": ct.len(),
+            "ciphertext_sha256": h(&Sha256::digest(&ct)),
+            "ciphertext_b64": if small { Value::String(b64::encode(&ct)) } else { Value::Null },
+        }));
+    }
+    out.insert("stream_file".into(), Value::Array(files));
+
+    // 7. full account, as created by Ente signup (interactive strength)
+    let password = "photovault test password";
+    let keys = auth::generate_keys_with_strength(password, KeyDerivationStrength::Interactive).unwrap();
+    let master_key = b64::decode(keys.private_key_attributes.key.as_ref() as &str).unwrap();
+    let secret_key = b64::decode(keys.private_key_attributes.secret_key.as_ref() as &str).unwrap();
+    let account_sk = SecretKey::try_from_slice(&secret_key).unwrap();
+    let mut token = b"auth-token".to_vec();
+    token.extend_from_slice(&[0x5a; 32]);
+    let encrypted_token = sealed::seal(&token, &account_sk.public_key()).unwrap();
+    let srp_user_id = "8f5b0b8e-3f1c-4c5e-9a57-7d0f3e1c2b4a";
+    let srp_setup = auth::generate_srp_setup(&keys.key_encryption_key, srp_user_id).unwrap();
+
+    // library fixture: owned collection, shared collection, files
+    let mk = Key::try_from_slice(&master_key).unwrap();
+    let owned_ck = Key::from_bytes([0x61; 32]);
+    let shared_ck = Key::from_bytes([0x62; 32]);
+    let owned_ck_enc = secretbox::encrypt(owned_ck.as_bytes(), &mk);
+    let shared_ck_enc = sealed::seal(shared_ck.as_bytes(), &account_sk.public_key()).unwrap();
+    let name_enc = secretbox::encrypt(b"Holidays", &owned_ck);
+    let shared_name_enc = secretbox::encrypt(b"Family", &shared_ck);
+    let file_key1 = Key::from_bytes([0x71; 32]);
+    let file_key2 = Key::from_bytes([0x72; 32]);
+    let fk1_enc = secretbox::encrypt(file_key1.as_bytes(), &owned_ck);
+    let fk2_enc = secretbox::encrypt(file_key2.as_bytes(), &shared_ck);
+    let md1 = json!({"title":"IMG_0001.JPG","creationTime":1700000000000000i64,"modificationTime":1700000000000000i64,"fileType":0,"hash":"abc"});
+    let md2 = json!({"title":"VID_0002.MP4","creationTime":1700000001000000i64,"modificationTime":1700000001000000i64,"fileType":1,"duration":12});
+    let md1_enc = blob::encrypt(&serde_json::to_vec(&md1).unwrap(), &file_key1).unwrap();
+    let md2_enc = blob::encrypt(&serde_json::to_vec(&md2).unwrap(), &file_key2).unwrap();
+    let pmd1 = json!({"w": 4032, "h": 3024});
+    let pmd1_enc = blob::encrypt(&serde_json::to_vec(&pmd1).unwrap(), &file_key1).unwrap();
+    let orig1 = pattern(5000);
+    let mut orig1_ct = Vec::new();
+    let orig1_hdr = stream::encrypt_file(&mut &orig1[..], &mut orig1_ct, &file_key1).unwrap();
+    let thumb1 = pattern(300);
+    let thumb1_enc = blob::encrypt(&thumb1, &file_key1).unwrap();
+
+    out.insert("account".into(), json!({
+        "password": password,
+        "key_attributes": serde_json::to_value(&keys.key_attributes).unwrap(),
+        "kek_hex": h(&keys.key_encryption_key),
+        "login_key_hex": h(&keys.login_key),
+        "master_key_b64": keys.private_key_attributes.key.to_string(),
+        "secret_key_b64": keys.private_key_attributes.secret_key.to_string(),
+        "token_hex": h(&token),
+        "token_b64url": b64::encode_url_safe(&token),
+        "encrypted_token_b64": b64::encode(&encrypted_token),
+        "srp_user_id": srp_user_id,
+        "srp_salt_b64": b64::encode(&srp_setup.srp_salt),
+        "srp_verifier_b64": b64::encode(&srp_setup.srp_verifier),
+        "library": {
+            "collections": [
+                {"id": 10, "owner": {"id": 1, "email": "me@example.org"},
+                 "encryptedKey": b64::encode(&owned_ck_enc.encrypted_data),
+                 "keyDecryptionNonce": b64::encode(owned_ck_enc.nonce.as_bytes()),
+                 "name": "", "encryptedName": b64::encode(&name_enc.encrypted_data),
+                 "nameDecryptionNonce": b64::encode(name_enc.nonce.as_bytes()),
+                 "type": "album", "sharees": [], "publicURLs": [], "updationTime": 1000, "app": "photos"},
+                {"id": 20, "owner": {"id": 2, "email": "friend@example.org"},
+                 "encryptedKey": b64::encode(&shared_ck_enc),
+                 "name": "", "encryptedName": b64::encode(&shared_name_enc.encrypted_data),
+                 "nameDecryptionNonce": b64::encode(shared_name_enc.nonce.as_bytes()),
+                 "type": "album", "sharees": [], "publicURLs": [], "updationTime": 2000, "app": "photos"}
+            ],
+            "diffs": {
+                "10": [{"id": 100, "ownerID": 1, "collectionID": 10,
+                        "encryptedKey": b64::encode(&fk1_enc.encrypted_data),
+                        "keyDecryptionNonce": b64::encode(fk1_enc.nonce.as_bytes()),
+                        "file": {"decryptionHeader": b64::encode(orig1_hdr.as_bytes()), "size": orig1_ct.len()},
+                        "thumbnail": {"decryptionHeader": b64::encode(thumb1_enc.decryption_header.as_bytes()), "size": thumb1_enc.encrypted_data.len()},
+                        "metadata": {"encryptedData": b64::encode(&md1_enc.encrypted_data), "decryptionHeader": b64::encode(md1_enc.decryption_header.as_bytes())},
+                        "pubMagicMetadata": {"version": 1, "count": 2, "data": b64::encode(&pmd1_enc.encrypted_data), "header": b64::encode(pmd1_enc.decryption_header.as_bytes())},
+                        "isDeleted": false, "updationTime": 1500, "info": {"fileSize": 5000, "thumbSize": 300}}],
+                "20": [{"id": 200, "ownerID": 2, "collectionID": 20,
+                        "encryptedKey": b64::encode(&fk2_enc.encrypted_data),
+                        "keyDecryptionNonce": b64::encode(fk2_enc.nonce.as_bytes()),
+                        "file": {"decryptionHeader": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
+                        "thumbnail": {"decryptionHeader": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
+                        "metadata": {"encryptedData": b64::encode(&md2_enc.encrypted_data), "decryptionHeader": b64::encode(md2_enc.decryption_header.as_bytes())},
+                        "isDeleted": false, "updationTime": 2500}]
+            },
+            "file_keys_hex": {"100": h(file_key1.as_bytes()), "200": h(file_key2.as_bytes())},
+            "metadata": {"100": md1, "200": md2},
+            "original_100_b64": b64::encode(&orig1_ct),
+            "thumbnail_100_b64": b64::encode(&thumb1_enc.encrypted_data),
+            "thumbnail_100_plain_sha256": h(&Sha256::digest(&thumb1)),
+            "original_100_plain_sha256": h(&Sha256::digest(&orig1)),
+        }
+    }));
+
+    // 8. SRP: Ente client math with fixed a against a fixed b, for M1/M2 KATs.
+    let srp_salt = *b"0123456789abcdef";
+    let login_key = *b"1234567890abcdef";
+    let a_private = [0x44u8; 64];
+    let b_private = [0x33u8; 64];
+    let client = ClientG4096::<Sha256>::new();
+    let verifier = client.compute_verifier(b"test-user-id", &login_key, &srp_salt);
+    let server = srp::ServerG4096::<Sha256>::new();
+    let b_pub = server.compute_public_ephemeral(&b_private, &verifier);
+    let a_pub = client.compute_public_ephemeral(&a_private);
+    let mut session = auth::SrpSession::new("test-user-id", &srp_salt, &login_key).unwrap();
+    // SrpSession picks a random `a`; reproduce compute_m1 with the fixed one.
+    let _ = &mut session;
+    let v = client
+        .process_reply(&a_private, b"test-user-id", &login_key, &srp_salt, &b_pub)
+        .unwrap();
+    let pad = |x: &[u8]| { let mut o = vec![0u8; 512 - x.len().min(512)]; o.extend_from_slice(x); o };
+    let s = pad(v.key());
+    let m1 = Sha256::new().chain_update(pad(&a_pub)).chain_update(pad(&b_pub)).chain_update(&s).finalize().to_vec();
+    let k = Sha256::digest(&s).to_vec();
+    let m2 = Sha256::new().chain_update(pad(&a_pub)).chain_update(&m1).chain_update(&k).finalize().to_vec();
+    out.insert("srp".into(), json!({
+        "identity": "test-user-id", "salt_hex": h(&srp_salt), "login_key_hex": h(&login_key),
+        "a_private_hex": h(&a_private), "b_private_hex": h(&b_private),
+        "verifier_hex": h(&verifier), "A_hex": h(&pad(&a_pub)), "B_hex": h(&pad(&b_pub)),
+        "M1_hex": h(&m1), "M2_hex": h(&m2),
+    }));
+
+    let _ = crypto::random_bytes(1);
+    println!("{}", serde_json::to_string_pretty(&Value::Object(out)).unwrap());
+}

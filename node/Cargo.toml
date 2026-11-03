@@ -14,7 +14,7 @@ path = "src/main.rs"
 default = []
 # On-device ML via Ente's own Rust ML crate (vendored) on ONNX Runtime.
 # Pending approval for the ONNX Runtime C++ dependency; see README.
-ml = []
+ml = ["dep:ente-ml", "dep:ente-assets", "dep:ort"]
 
 [dependencies]
 anyhow = "1"
@@ -28,7 +28,8 @@ num-bigint-dig = "0.8"
 rand = "0.9"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream", "http2"] }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+# float_roundtrip: re-written mldata must keep every embedding value bit-exact.
+serde_json = { version = "1", features = ["float_roundtrip"] }
 sha2 = "0.10"
 thiserror = "2"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "fs", "io-util", "process", "time", "sync"] }
@@ -38,6 +39,29 @@ url = "2"
 zeroize = { version = "1", features = ["derive"] }
 sysinfo = "0.37"
 dirs = "6"
+# Compute-node orchestration (schedule/config/state/worker/cli).
+toml = "0.9"
+rpassword = "7"
+jiff = "0.2"
+tokio-util = "0.7"
+# Streamable video: Content-MD5 of preview upload parts.
+md-5 = "0.10"
+# API client: body chunks of downloads and presigned uploads.
+bytes = "1"
+
+# Vendored from ente-io/ente rust/crates (see vendor/ente/UPSTREAM_REV).
+# Only built with `--features ml`; they pull in ONNX Runtime via `ort`
+# (load-dynamic: nothing is downloaded or linked at build time).
+ente-ml = { path = "vendor/ente/ml", optional = true }
+ente-assets = { path = "vendor/ente/assets", optional = true }
+# Same pinned version as vendor/ente/ml; used only to load the ONNX Runtime
+# library up front with a proper error (ort::init_from).
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["load-dynamic"], optional = true }
 
 [dev-dependencies]
+# API tests: pure-Rust mock HTTP server.
+wiremock = "0.6"
 tempfile = "3"
+# Video tests: decrypt ffmpeg's AES-128-CBC HLS segments.
+aes = "0.8"
+cbc = { version = "0.1", features = ["alloc"] }

@@ -1,6 +1,10 @@
 [workspace]
 resolver = "3"
 members = ["server", "node"]
+# Vendored upstream Ente crates (node/scripts/sync-ente-ml.sh) are path
+# dependencies of photovault-node, not members: they keep Ente's own code
+# style and are not held to this workspace's clippy settings.
+exclude = ["node/vendor"]
 
 [workspace.package]
 version = "0.1.0"
