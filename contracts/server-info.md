@@ -15,7 +15,7 @@ A stock Ente museum returns 404 here; clients then fall back to `GET /ping` and 
   "apiVersion": 1,
   "publicUrl": "https://photos.example.com",
   "homeUrl": "http://10.0.1.7:8095",
-  "albumsUrl": "https://photos.example.com/shared-albums",
+  "albumsUrl": "https://photos.example.com",
   "castUrl": "https://photos.example.com/cast",
   "signupsAllowed": false,
   "emailVerification": "smtp",
@@ -33,7 +33,7 @@ A stock Ente museum returns 404 here; clients then fall back to `GET /ping` and 
 | `apiVersion` | int | this contract's version, `1` |
 | `publicUrl` | string | `PHOTOVAULT_PUBLIC_URL`, no trailing slash |
 | `homeUrl` | string \| null | `PHOTOVAULT_HOME_URL` (LAN address) |
-| `albumsUrl`, `castUrl` | string | where public album and cast pages are served (same origin by default) |
+| `albumsUrl`, `castUrl` | string | base that public share links use (`PHOTOVAULT_ALBUMS_URL`, else `publicUrl`); cast = `publicUrl/cast` |
 | `signupsAllowed` | bool | apps hide "Create account" when false |
 | `emailVerification` | `"smtp"` \| `"log"` \| `"skip"` | how codes are delivered |
 | `storage` | `"local"` \| `"s3"` | |
