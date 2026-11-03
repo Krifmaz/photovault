@@ -87,6 +87,7 @@ async fn main() -> anyhow::Result<()> {
             photovault_server::storage::spawn_maintenance(&state);
             photovault_server::library::spawn_background(state.clone());
             photovault_server::legacy::spawn_background(state.clone());
+            photovault_server::durability::spawn_background(&state);
             axum::serve(listener, photovault_server::app(state))
                 .with_graceful_shutdown(shutdown_signal())
                 .await?;

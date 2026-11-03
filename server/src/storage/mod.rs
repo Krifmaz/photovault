@@ -10,11 +10,58 @@
 //!
 //! [`open`] wraps the configured backend in [`metered::Metered`].
 
+pub mod journaled;
 pub mod local;
 pub mod metered;
 pub mod s3;
 
+use std::path::PathBuf;
+use std::pin::Pin;
+use std::sync::Arc;
 use std::time::Duration;
+
+/// A stream of object bytes (streaming reads and writes of large objects).
+pub type ByteStream =
+    Pin<Box<dyn futures_util::Stream<Item = std::io::Result<bytes::Bytes>> + Send>>;
+
+/// One object returned by [`ObjectStore::list`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ListedObject {
+    /// Object key.
+    pub key: String,
+    /// Size in bytes.
+    pub size: u64,
+}
+
+/// SHA-256 of an object.
+pub type Sha256Digest = [u8; 32];
+
+/// Told about every object write and delete the server performs, so the
+/// durability catalog can record checksums at write time
+/// ([`crate::durability::catalog::Catalog`] implements it). Calls are awaited
+/// inline; implementations log their own errors and never fail the write.
+#[async_trait::async_trait]
+pub trait WriteObserver: Send + Sync + std::fmt::Debug {
+    /// `key` now holds `size` bytes with SHA-256 `sha256`.
+    async fn written(&self, key: &str, size: u64, sha256: Sha256Digest);
+    /// `dst` is now a copy of `src`.
+    async fn copied(&self, src: &str, dst: &str);
+    /// `key` is about to be deleted on purpose (called before the delete,
+    /// so a crash in between never looks like data loss).
+    async fn deleting(&self, key: &str);
+}
+
+/// Chooses where the local backend creates **new** objects. Used by the
+/// FSView integration to keep writes off mergerfs branches that are failing
+/// ([`crate::durability::fsview`]).
+pub trait Placement: Send + Sync + std::fmt::Debug {
+    /// Directory corresponding to the store root on a healthy branch to
+    /// create a new object in, or `None` to write through the pool as usual.
+    fn write_root(&self) -> Option<PathBuf>;
+}
+
+/// Shared handle to an optional [`Placement`], settable after the store is built.
+pub type PlacementSlot = Arc<std::sync::RwLock<Option<Arc<dyn Placement>>>>;
 
 /// Errors from a storage backend.
 #[derive(Debug, thiserror::Error)]
@@ -124,6 +171,34 @@ pub trait ObjectStore: Send + Sync + std::fmt::Debug {
     async fn put_bytes(&self, key: &str, data: bytes::Bytes) -> StorageResult<()>;
     /// Read a whole object into memory (tests, small objects).
     async fn get_bytes(&self, key: &str) -> StorageResult<bytes::Bytes>;
+    /// List objects with keys strictly greater than `after` in byte order,
+    /// at most `limit`, sorted. Internal files (temp files, multipart parts)
+    /// are never listed.
+    async fn list(&self, after: Option<&str>, limit: usize) -> StorageResult<Vec<ListedObject>> {
+        let _ = (after, limit);
+        Err(StorageError::Backend(format!(
+            "{} backend cannot list objects",
+            self.name()
+        )))
+    }
+    /// Stream an object's bytes. The default reads it into memory.
+    async fn get_stream(&self, key: &str) -> StorageResult<ByteStream> {
+        let b = self.get_bytes(key).await?;
+        Ok(Box::pin(futures_util::stream::once(async move { Ok(b) })))
+    }
+    /// Write an object of exactly `size` bytes from a stream, atomically
+    /// (readers never see a partial object). The default buffers in memory.
+    async fn put_stream(&self, key: &str, size: u64, mut body: ByteStream) -> StorageResult<()> {
+        use futures_util::StreamExt;
+        let mut buf = bytes::BytesMut::with_capacity(size.min(64 << 20) as usize);
+        while let Some(chunk) = body.next().await {
+            buf.extend_from_slice(&chunk.map_err(|e| StorageError::Backend(e.to_string()))?);
+        }
+        if buf.len() as u64 != size {
+            return Err(StorageError::Backend("size mismatch".into()));
+        }
+        self.put_bytes(key, buf.freeze()).await
+    }
 }
 
 /// Validate an object key: non-empty, no `..`, no leading `/`, no NUL or
@@ -144,21 +219,26 @@ pub fn validate_key(key: &str) -> StorageResult<()> {
     Ok(())
 }
 
-/// Open the configured backend, wrapped in [`metered::Metered`] so every
-/// operation shows up in `/metrics`. `sign_key` signs local-store URLs.
+/// Open the configured backend, wrapped in [`journaled::Journaled`] (write
+/// checksums for the durability catalog, when `observer` is given) and
+/// [`metered::Metered`] so every operation shows up in `/metrics`.
+/// `sign_key` signs local-store URLs; `local` is the local store to use
+/// (shared with [`crate::state::Inner::local_store`]) when that backend is active.
 pub fn open(
     config: &crate::config::Config,
-    sign_key: &[u8],
+    local: Option<local::LocalStore>,
+    observer: Option<Arc<dyn WriteObserver>>,
 ) -> anyhow::Result<Box<dyn ObjectStore>> {
-    let inner: Box<dyn ObjectStore> = match &config.storage {
-        crate::config::StorageConfig::Local { path, public_url } => {
-            let base = public_url
-                .clone()
-                .unwrap_or_else(|| config.public_url.clone());
-            Box::new(local::LocalStore::new(path, base, sign_key.to_vec())?)
+    let mut inner: Box<dyn ObjectStore> = match (&config.storage, local) {
+        (crate::config::StorageConfig::Local { .. }, Some(l)) => Box::new(l),
+        (crate::config::StorageConfig::Local { .. }, None) => {
+            anyhow::bail!("local storage configured but no local store given")
         }
-        crate::config::StorageConfig::S3(cfg) => Box::new(s3::S3Store::new(cfg)?),
+        (crate::config::StorageConfig::S3(cfg), _) => Box::new(s3::S3Store::new(cfg)?),
     };
+    if let Some(o) = observer {
+        inner = Box::new(journaled::Journaled::new(inner, o));
+    }
     Ok(Box::new(metered::Metered::new(inner)))
 }
 

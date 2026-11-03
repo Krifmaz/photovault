@@ -42,6 +42,10 @@ pub struct Inner {
     pub keys: Keys,
     /// Prometheus metrics.
     pub metrics: Metrics,
+    /// Durability catalog (object checksums and states).
+    pub catalog: Arc<crate::durability::catalog::Catalog>,
+    /// Durability runtime: replication targets, FSView state, evacuations.
+    pub durability: crate::durability::Runtime,
 }
 
 impl std::ops::Deref for AppState {
@@ -69,20 +73,29 @@ pub async fn build_state(config: Config) -> anyhow::Result<AppState> {
         encryption: key(&config.secrets.encryption, 32)?,
         hashing: key(&config.secrets.hashing, 32)?,
     };
-    let store: Arc<dyn crate::storage::ObjectStore> =
-        Arc::from(crate::storage::open(&config, &keys.jwt)?);
+    let durability = crate::durability::Runtime::new(&config)?;
+    let catalog = Arc::new(crate::durability::catalog::Catalog::new(db.clone()));
+    let observer: Arc<dyn crate::storage::WriteObserver> = catalog.clone();
     let local_store = match &config.storage {
-        crate::config::StorageConfig::Local { path, public_url } => {
-            Some(crate::storage::local::LocalStore::new(
+        crate::config::StorageConfig::Local { path, public_url } => Some(
+            crate::storage::local::LocalStore::new(
                 path,
                 public_url
                     .clone()
                     .unwrap_or_else(|| config.public_url.clone()),
                 keys.jwt.clone(),
-            )?)
-        }
+            )?
+            .with_observer(observer.clone()),
+        ),
         _ => None,
     };
+    // The trait-level wrapper reports server-side writes; the local store
+    // itself reports signed-URL uploads. Clones share one placement slot.
+    let store: Arc<dyn crate::storage::ObjectStore> = Arc::from(crate::storage::open(
+        &config,
+        local_store.clone(),
+        Some(observer),
+    )?);
     Ok(AppState(Arc::new(Inner {
         config,
         db,
@@ -90,5 +103,7 @@ pub async fn build_state(config: Config) -> anyhow::Result<AppState> {
         local_store,
         keys,
         metrics: Default::default(),
+        catalog,
+        durability,
     })))
 }

@@ -1,7 +1,9 @@
 //! [`Metered`]: wraps any [`ObjectStore`] and records each operation in
 //! [`crate::metrics::STORAGE`]. Keys and URLs are never logged or labelled.
 
-use super::{MultipartUrls, ObjectStore, PartSpec, StorageError, StorageResult};
+use super::{
+    ByteStream, ListedObject, MultipartUrls, ObjectStore, PartSpec, StorageError, StorageResult,
+};
 use crate::metrics::{STORAGE, StorageLabels};
 use std::time::{Duration, Instant};
 
@@ -104,5 +106,14 @@ impl ObjectStore for Metered {
     }
     async fn get_bytes(&self, key: &str) -> StorageResult<bytes::Bytes> {
         metered!(self, "get_bytes", self.inner.get_bytes(key))
+    }
+    async fn list(&self, after: Option<&str>, limit: usize) -> StorageResult<Vec<ListedObject>> {
+        metered!(self, "list", self.inner.list(after, limit))
+    }
+    async fn get_stream(&self, key: &str) -> StorageResult<ByteStream> {
+        metered!(self, "get_stream", self.inner.get_stream(key))
+    }
+    async fn put_stream(&self, key: &str, size: u64, body: ByteStream) -> StorageResult<()> {
+        metered!(self, "put_stream", self.inner.put_stream(key, size, body))
     }
 }

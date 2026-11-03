@@ -34,6 +34,8 @@ pub struct Config {
     pub log_format: String,
     /// Companion web-app URLs and WebAuthn relying party (`[accounts]`).
     pub accounts: crate::users::settings::AccountsSettings,
+    /// Checksums, scrubbing, 3-2-1 replication, alerts and FSView (`[durability]`).
+    pub durability: crate::durability::config::DurabilityConfig,
 }
 
 /// Which object store backs the server.
@@ -148,6 +150,7 @@ impl Default for Config {
             hardcoded_ott: Default::default(),
             log_format: "json".into(),
             accounts: Default::default(),
+            durability: Default::default(),
         }
     }
 }

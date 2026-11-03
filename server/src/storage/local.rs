@@ -18,7 +18,10 @@
 //! into the final object; nothing is held in memory. [`LocalStore::cleanup_stale`]
 //! removes uploads older than [`STALE_MULTIPART_AGE`] and orphaned temp files.
 
-use super::{MultipartUrls, ObjectStore, PartSpec, StorageError, StorageResult, validate_key};
+use super::{
+    ByteStream, ListedObject, MultipartUrls, ObjectStore, PartSpec, PlacementSlot, Sha256Digest,
+    StorageError, StorageResult, WriteObserver, validate_key,
+};
 use base64::Engine;
 use bytes::Bytes;
 use futures_util::{Stream, StreamExt};
@@ -26,6 +29,7 @@ use hmac::{Hmac, Mac};
 use md5::{Digest, Md5};
 use sha2::Sha256;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Duration;
 use tokio::io::AsyncWriteExt;
 
@@ -66,6 +70,8 @@ pub struct LocalStore {
     root: PathBuf,
     public_url: String,
     key: Vec<u8>,
+    observer: Option<Arc<dyn WriteObserver>>,
+    placement: PlacementSlot,
 }
 
 impl std::fmt::Debug for LocalStore {
@@ -143,7 +149,53 @@ impl LocalStore {
             root,
             public_url: public_url.into().trim_end_matches('/').to_string(),
             key,
+            observer: None,
+            placement: PlacementSlot::default(),
         })
+    }
+
+    /// Report uploads completed through signed URLs ([`Self::write_object`],
+    /// [`Self::complete_multipart`]) to `observer`, with their SHA-256.
+    pub fn with_observer(mut self, observer: Arc<dyn WriteObserver>) -> Self {
+        self.observer = Some(observer);
+        self
+    }
+
+    /// Share `slot` as this store's write placement (clones of a store share
+    /// one slot; pass the same slot to every store over the same root).
+    pub fn with_placement_slot(mut self, slot: PlacementSlot) -> Self {
+        self.placement = slot;
+        self
+    }
+
+    /// The write placement slot ([`super::Placement`]).
+    pub fn placement_slot(&self) -> PlacementSlot {
+        self.placement.clone()
+    }
+
+    /// Where a write of `key` should land: the existing object (overwrites
+    /// stay in place), else under the placement's chosen branch root, else
+    /// under the store root.
+    pub fn write_path(&self, key: &str) -> StorageResult<PathBuf> {
+        let pooled = self.path(key)?;
+        if pooled.exists() {
+            return Ok(pooled);
+        }
+        let chosen = self
+            .placement
+            .read()
+            .ok()
+            .and_then(|p| p.as_ref().and_then(|p| p.write_root()));
+        Ok(match chosen {
+            Some(root) => root.join(key),
+            None => pooled,
+        })
+    }
+
+    async fn notify_written(&self, key: &str, size: u64, sha256: Sha256Digest) {
+        if let Some(o) = &self.observer {
+            o.written(key, size, sha256).await;
+        }
     }
 
     /// Root directory.
@@ -242,8 +294,10 @@ impl LocalStore {
     where
         S: Stream<Item = Result<Bytes, E>> + Unpin,
     {
-        let target = self.path(key).map_err(|_| WriteError::InvalidKey)?;
-        write_stream(&target, body, want_len, want_md5).await
+        let target = self.write_path(key).map_err(|_| WriteError::InvalidKey)?;
+        let w = write_stream(&target, body, want_len, want_md5).await?;
+        self.notify_written(key, w.len, w.sha256).await;
+        Ok(w.md5_hex)
     }
 
     /// Stream one multipart part to disk. Returns its MD5 hex (the part ETag).
@@ -270,7 +324,9 @@ impl LocalStore {
         {
             return Err(WriteError::NoSuchUpload);
         }
-        let etag = write_stream(&part_path(&dir, part), body, want_len, want_md5).await?;
+        let etag = write_stream(&part_path(&dir, part), body, want_len, want_md5)
+            .await?
+            .md5_hex;
         // The sidecar is written after the part; a part without one is re-hashed at completion.
         write_atomic(&part_md5_path(&dir, part), etag.as_bytes())
             .await
@@ -288,7 +344,7 @@ impl LocalStore {
         upload_id: &str,
         parts: &[(u32, Option<String>)],
     ) -> Result<String, WriteError> {
-        let target = self.path(key).map_err(|_| WriteError::InvalidKey)?;
+        let target = self.write_path(key).map_err(|_| WriteError::InvalidKey)?;
         let dir = self
             .multipart_dir(upload_id)
             .map_err(|_| WriteError::NoSuchUpload)?;
@@ -345,15 +401,28 @@ impl LocalStore {
         tokio::fs::create_dir_all(&parent).await?;
         let tmp = TmpFile::new(&target);
         let mut out = tokio::fs::File::create(&tmp.0).await?;
+        let mut sha = Sha256::new();
+        let mut total: u64 = 0;
+        let mut buf = vec![0u8; 256 * 1024];
         for (n, _) in &list {
+            use tokio::io::AsyncReadExt;
             let mut f = tokio::fs::File::open(part_path(&dir, *n)).await?;
-            tokio::io::copy(&mut f, &mut out).await?;
+            loop {
+                let r = f.read(&mut buf).await?;
+                if r == 0 {
+                    break;
+                }
+                sha.update(&buf[..r]);
+                out.write_all(&buf[..r]).await?;
+                total += r as u64;
+            }
         }
         out.flush().await?;
         out.sync_all().await?;
         drop(out);
         tmp.commit(&target).await?;
         let _ = tokio::fs::remove_dir_all(&dir).await;
+        self.notify_written(key, total, sha.finalize().into()).await;
         Ok(format!(
             "{}-{}",
             hex::encode(Md5::digest(&md5s)),
@@ -500,14 +569,20 @@ pub async fn write_atomic(path: &Path, data: &[u8]) -> StorageResult<()> {
     tmp.commit(path).await.map_err(io)
 }
 
+/// What [`write_stream`] wrote.
+struct Written {
+    md5_hex: String,
+    sha256: Sha256Digest,
+    len: u64,
+}
+
 /// Stream a body to `target` atomically, checking length and MD5 like S3.
-/// Returns the MD5 hex of what was written.
 async fn write_stream<S, E>(
     target: &Path,
     mut body: S,
     want_len: Option<i64>,
     want_md5: Option<&str>,
-) -> Result<String, WriteError>
+) -> Result<Written, WriteError>
 where
     S: Stream<Item = Result<Bytes, E>> + Unpin,
 {
@@ -527,6 +602,7 @@ where
     let tmp = TmpFile::new(target);
     let mut f = tokio::fs::File::create(&tmp.0).await?;
     let mut hasher = Md5::new();
+    let mut sha = Sha256::new();
     let mut n: i64 = 0;
     while let Some(chunk) = body.next().await {
         let chunk = chunk.map_err(|_| WriteError::Body)?;
@@ -535,6 +611,7 @@ where
             return Err(WriteError::LengthMismatch);
         }
         hasher.update(&chunk);
+        sha.update(&chunk);
         f.write_all(&chunk).await?;
     }
     if want_len.is_some_and(|w| n != w) {
@@ -554,7 +631,11 @@ where
     f.sync_all().await?;
     drop(f);
     tmp.commit(target).await?;
-    Ok(hex::encode(digest))
+    Ok(Written {
+        md5_hex: hex::encode(digest),
+        sha256: sha.finalize().into(),
+        len: n as u64,
+    })
 }
 
 #[async_trait::async_trait]
@@ -677,7 +758,7 @@ impl ObjectStore for LocalStore {
     }
 
     async fn copy(&self, src: &str, dst: &str) -> StorageResult<()> {
-        let (s, d) = (self.path(src)?, self.path(dst)?);
+        let (s, d) = (self.path(src)?, self.write_path(dst)?);
         if let Some(parent) = d.parent() {
             tokio::fs::create_dir_all(parent).await.map_err(io)?;
         }
@@ -694,7 +775,7 @@ impl ObjectStore for LocalStore {
     }
 
     async fn put_bytes(&self, key: &str, data: Bytes) -> StorageResult<()> {
-        write_atomic(&self.path(key)?, &data).await
+        write_atomic(&self.write_path(key)?, &data).await
     }
 
     async fn get_bytes(&self, key: &str) -> StorageResult<Bytes> {
@@ -703,6 +784,102 @@ impl ObjectStore for LocalStore {
             .map(Bytes::from)
             .map_err(io)
     }
+
+    async fn list(&self, after: Option<&str>, limit: usize) -> StorageResult<Vec<ListedObject>> {
+        let root = self.root.clone();
+        let after = after.map(str::to_string);
+        tokio::task::spawn_blocking(move || list_dir(&root, after.as_deref(), limit))
+            .await
+            .map_err(|e| StorageError::Backend(e.to_string()))?
+    }
+
+    async fn get_stream(&self, key: &str) -> StorageResult<ByteStream> {
+        let f = tokio::fs::File::open(self.path(key)?).await.map_err(io)?;
+        Ok(Box::pin(tokio_util::io::ReaderStream::with_capacity(
+            f,
+            256 * 1024,
+        )))
+    }
+
+    async fn put_stream(&self, key: &str, size: u64, body: ByteStream) -> StorageResult<()> {
+        let target = self.write_path(key)?;
+        write_stream(&target, body, Some(size as i64), None)
+            .await
+            .map(|_| ())
+            .map_err(|e| match e {
+                WriteError::InvalidKey => StorageError::InvalidKey,
+                other => StorageError::Backend(format!("{other:?}")),
+            })
+    }
+}
+
+/// Sorted listing of the object files under `root` with keys after `after`.
+///
+/// Walks the tree depth-first, ordering each directory's entries so that
+/// the walk yields keys in byte order (a directory `d` sorts as `d/`), and
+/// skips subtrees that end before `after`. Temp files and `.multipart/` are
+/// never listed.
+fn list_dir(root: &Path, after: Option<&str>, limit: usize) -> StorageResult<Vec<ListedObject>> {
+    let mut out = Vec::new();
+    walk(root, "", after, limit, &mut out)?;
+    Ok(out)
+}
+
+fn walk(
+    dir: &Path,
+    prefix: &str,
+    after: Option<&str>,
+    limit: usize,
+    out: &mut Vec<ListedObject>,
+) -> StorageResult<()> {
+    let rd = match std::fs::read_dir(dir) {
+        Ok(rd) => rd,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(e) => return Err(io(e)),
+    };
+    // (sort name, key or key prefix, is_dir)
+    let mut entries: Vec<(String, String, bool)> = Vec::new();
+    for e in rd {
+        let e = e.map_err(io)?;
+        let Some(name) = e.file_name().to_str().map(str::to_string) else {
+            continue;
+        };
+        let ft = e.file_type().map_err(io)?;
+        if name.contains(TMP_MARK) || (prefix.is_empty() && name == MULTIPART_DIR) {
+            continue;
+        }
+        let key = format!("{prefix}{name}");
+        if ft.is_dir() {
+            entries.push((format!("{key}/"), key, true));
+        } else if ft.is_file() {
+            entries.push((key.clone(), key, false));
+        }
+    }
+    entries.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+    for (sort, key, is_dir) in entries {
+        if out.len() >= limit {
+            return Ok(());
+        }
+        if is_dir {
+            // Skip a subtree whose keys all sort at or before `after`.
+            if let Some(a) = after
+                && sort.as_str() < a
+                && !a.starts_with(&sort)
+            {
+                continue;
+            }
+            walk(&dir.join(&key[prefix.len()..]), &sort, after, limit, out)?;
+        } else {
+            if after.is_some_and(|a| key.as_str() <= a) || validate_key(&key).is_err() {
+                continue;
+            }
+            let size = std::fs::metadata(dir.join(&key[prefix.len()..]))
+                .map_err(io)?
+                .len();
+            out.push(ListedObject { key, size });
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
