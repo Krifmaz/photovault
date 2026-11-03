@@ -1,31 +1,22 @@
-import {
-    app,
-    BrowserWindow,
-    Menu,
-    MenuItemConstructorOptions,
-    shell,
-} from "electron";
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions } from "electron";
 import { allowWindowClose } from "../main";
 // PHOTOVAULT: brand name for native menu labels.
 import { appDisplayName } from "./photovault/brand";
-import { forceCheckForAppUpdates } from "./services/app-update";
 import { setShouldHideDockIcon, shouldHideDockIcon } from "./services/store";
 
-export const createApplicationMenu = (mainWindow: BrowserWindow) => {
+// PHOTOVAULT: strip - `mainWindow` was only used by the removed update check;
+// the parameter stays so callers are unchanged.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createApplicationMenu = (_mainWindow: BrowserWindow) => {
     let hideDockIcon = shouldHideDockIcon();
 
     const macOSOnly = (options: MenuItemConstructorOptions[]) =>
         process.platform == "darwin" ? options : [];
 
-    const handleCheckForUpdates = () => forceCheckForAppUpdates(mainWindow);
-
     const toggleHideDockIcon = () => {
         setShouldHideDockIcon(!hideDockIcon);
         hideDockIcon = !hideDockIcon;
     };
-
-    const handleHelp = () =>
-        void shell.openExternal("https://ente.com/help/photos/");
 
     return Menu.buildFromTemplate([
         {
@@ -35,8 +26,8 @@ export const createApplicationMenu = (mainWindow: BrowserWindow) => {
                 ...macOSOnly([
                     { label: `About ${appDisplayName}`, role: "about" },
                 ]),
-                { type: "separator" },
-                { label: "Check for Updates...", click: handleCheckForUpdates },
+                // PHOTOVAULT: strip - no "Check for Updates..." (Ente's release
+                // feed); updates come with the Photovault release you install.
                 { type: "separator" },
 
                 ...macOSOnly([
@@ -109,11 +100,7 @@ export const createApplicationMenu = (mainWindow: BrowserWindow) => {
                 ]),
             ],
         },
-        // PHOTOVAULT: brand name (the link still opens the upstream help docs).
-        {
-            label: "Help",
-            submenu: [{ label: `${appDisplayName} Help`, click: handleHelp }],
-        },
+        // PHOTOVAULT: strip - Help menu (it only opened Ente's help site) removed.
     ]);
 };
 

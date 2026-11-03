@@ -126,15 +126,15 @@ const main = () => {
 };
 
 /**
- * PHOTOVAULT: show our name and the "Based on Ente (ente.com)" credit in the
- * native About panel (macOS "About" menu item; also used on Linux/Windows).
+ * PHOTOVAULT: show our name and the plain-text "Based on Ente" credit in the
+ * native About panel (macOS "About" menu item; also used on Linux/Windows). No
+ * website link.
  */
 const setAboutPanel = () =>
     app.setAboutPanelOptions({
         applicationName: appDisplayName,
         credits: upstreamCredit,
-        copyright: `${upstreamCredit}. Licensed under AGPL-3.0.`,
-        website: "https://ente.com",
+        copyright: "Licensed under AGPL-3.0.",
     });
 
 const logStartupBanner = () => {

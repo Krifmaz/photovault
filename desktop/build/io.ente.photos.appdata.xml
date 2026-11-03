@@ -6,16 +6,17 @@
   <project_license>AGPL-3.0</project_license>
 
   <!-- PHOTOVAULT: brand name, description and Encore colours. -->
+  <!-- PHOTOVAULT: strip - no Ente URLs, screenshot or credit here; the credit is in About. -->
   <name>Photovault</name>
   <summary>Safe home for your photos</summary>
 
-  <developer id="io.github.ente-io.ente">
-    <name>Photovault developers (based on Ente)</name>
+  <developer id="io.github.krifmaz.photovault">
+    <name>Photovault developers</name>
   </developer>
 
   <description>
     <p>
-      Photovault is an open-source, end-to-end encrypted (E2EE) photo storage app, that provides a secure way to backup your photos. Based on Ente (ente.com).
+      Photovault is an open-source, end-to-end encrypted (E2EE) photo storage app, that provides a secure way to backup your photos.
     </p>
   </description>
 
@@ -23,16 +24,9 @@
 
   <content_rating type="oars-1.0" />
 
-  <url type="bugtracker">https://github.com/ente/ente/issues</url>
-  <url type="homepage">https://ente.com</url>
-  <url type="vcs-browser">https://github.com/ente/ente</url>
-
-  <screenshots>
-    <screenshot type="default">
-      <image>https://raw.githubusercontent.com/ente/ente/main/.github/assets/photos.png</image>
-      <caption>Browse and search your encrypted photo library across desktop and mobile devices</caption>
-    </screenshot>
-  </screenshots>
+  <url type="bugtracker">https://github.com/Krifmaz/photovault/issues</url>
+  <url type="homepage">https://github.com/Krifmaz/photovault</url>
+  <url type="vcs-browser">https://github.com/Krifmaz/photovault</url>
 
   <branding>
     <color type="primary" scheme_preference="light">#f6f6fb</color>
@@ -41,7 +35,7 @@
 
   <releases>
     <release version="1.7" date="2025-01-13">
-      <url type="details">https://github.com/ente/photos-desktop/releases</url>
+      <url type="details">https://github.com/Krifmaz/photovault/releases</url>
     </release>
   </releases>
 </component>

@@ -3,8 +3,8 @@
     "version": "1.7.32-beta",
     "private": true,
     "description": "Desktop client for Photovault (based on Ente Photos)",
-    "repository": "github:ente/photos-desktop",
-    "author": "Ente <code@ente.com>",
+    "repository": "github:Krifmaz/photovault",
+    "author": "Photovault developers",
     "main": "app/main.js",
     "scripts": {
         "build": "npm run build-renderer && npm run build-main",

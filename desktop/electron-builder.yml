@@ -37,6 +37,9 @@ linux:
           arch: [x64, arm64]
     category: Photography
     icon: ./build/icon.icns
+    # PHOTOVAULT: strip - package.json's author no longer names Ente (or has an
+    # e-mail), so give the deb/rpm maintainer explicitly.
+    maintainer: Photovault developers
 # Remove this override when upgrading electron-builder to 27.0.0.
 pacman:
     depends:
