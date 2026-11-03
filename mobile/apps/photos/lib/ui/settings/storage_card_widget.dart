@@ -12,7 +12,6 @@ import 'package:photos/models/user_details.dart';
 import 'package:photos/service_locator.dart';
 import 'package:photos/states/user_details_state.dart';
 import 'package:photos/theme/colors.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/ui/settings/storage_progress_widget.dart';
 
 class StorageCardWidget extends StatefulWidget {
@@ -80,14 +79,8 @@ class _StorageCardWidgetState extends State<StorageCardWidget> {
           );
           return;
         }
-        // ignore: unawaited_futures
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return getSubscriptionPage();
-            },
-          ),
-        );
+        // PHOTOVAULT: payments removed. Ente opened the plan page here; the
+        // card now only shows real used/total numbers from the server.
       },
       child: containerForUserDetails(userDetails),
     );

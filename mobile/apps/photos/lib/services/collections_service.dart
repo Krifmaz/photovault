@@ -88,6 +88,9 @@ class CollectionsService {
   final _cachedPublicAlbumJWT = <int, String>{};
   final _cachedPublicCollectionID = <int>[];
   final _cachedPublicAlbumKey = <int, String>{};
+  // PHOTOVAULT: origin of the public link each album was opened from, so
+  // "Open in browser" goes back to the same server instead of Ente's site.
+  final _cachedPublicAlbumOrigin = <int, String>{};
   final _cachedPublicCollectionKeys = <int, Uint8List>{};
 
   static const int _maxRecentlyUsedCollections = 3;
@@ -224,6 +227,7 @@ class CollectionsService {
     _cachedPublicCollectionID.clear();
     _cachedKeys.clear();
     _cachedPublicAlbumKey.clear();
+    _cachedPublicAlbumOrigin.clear(); // PHOTOVAULT
     _cachedPublicCollectionKeys.clear();
   }
 
@@ -1702,6 +1706,7 @@ class CollectionsService {
     _cachedPublicAlbumJWT.remove(collectionID);
     _cachedPublicCollectionID.removeWhere((id) => id == collectionID);
     _cachedPublicAlbumKey.remove(collectionID);
+    _cachedPublicAlbumOrigin.remove(collectionID); // PHOTOVAULT
     _cachedPublicCollectionKeys.remove(collectionID);
   }
 
@@ -1753,6 +1758,9 @@ class CollectionsService {
       _cachedPublicCollectionID.removeWhere((id) => id == collection.id);
       _cachedPublicCollectionID.add(collection.id);
       _cachedPublicAlbumKey[collection.id] = albumKey;
+      // PHOTOVAULT: remember the link's base (origin + path, no query).
+      _cachedPublicAlbumOrigin[collection.id] = "${uri.origin}${uri.path}"
+          .replaceAll(RegExp(r"/+$"), "");
       _cachedPublicAlbumJWT.remove(collection.id);
       return collection;
     } on PublicCollectionInfoExpiredException catch (e, s) {
@@ -1861,6 +1869,11 @@ class CollectionsService {
 
   String? getSharedPublicAlbumToken(int collectionID) {
     return _cachedPublicAlbumToken[collectionID];
+  }
+
+  // PHOTOVAULT: see _cachedPublicAlbumOrigin.
+  String? getSharedPublicAlbumOrigin(int collectionID) {
+    return _cachedPublicAlbumOrigin[collectionID];
   }
 
   Map<String, String> publicCollectionHeaders(int collectionID) {

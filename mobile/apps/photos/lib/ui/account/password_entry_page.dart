@@ -14,7 +14,6 @@ import 'package:photos/events/subscription_purchased_event.dart';
 import 'package:photos/services/account/user_service.dart';
 import "package:photos/ui/account/onboarding_page_scaffold.dart";
 import 'package:photos/ui/account/recovery_key_page.dart';
-import 'package:photos/ui/common/web_page.dart';
 import "package:photos/ui/components/alert_bottom_sheet.dart";
 import "package:photos/ui/components/models/button_type.dart";
 import 'package:photos/ui/notification/toast.dart';
@@ -283,27 +282,7 @@ class _PasswordEntryPageState extends State<PasswordEntryPage> {
                     );
                   },
                 ),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ButtonComponent(
-                    variant: ButtonComponentVariant.link,
-                    label: context.strings.howItWorks,
-                    size: ButtonComponentSize.small,
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return WebPage(
-                              context.strings.howItWorks,
-                              "https://ente.com/architecture",
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                // PHOTOVAULT: removed "How it works" (a link to ente.com).
                 const SizedBox(height: 24),
                 ButtonComponent(
                   label: title,

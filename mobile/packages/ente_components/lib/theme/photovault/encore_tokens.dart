@@ -24,7 +24,8 @@ class EncoreTokens {
   static const String brandName = 'Photovault';
 
   /// Upstream credit line (`brand.credit`).
-  static const String credit = 'Based on Ente (ente.com)';
+  // PHOTOVAULT: the only user-visible mention of Ente (About page), no link.
+  static const String credit = 'Based on Ente';
 
   /// UI font family (`font.family`). The apps already bundle Inter.
   static const String fontFamily = 'Inter';

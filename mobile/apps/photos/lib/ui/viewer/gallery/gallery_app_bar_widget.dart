@@ -28,7 +28,6 @@ import 'package:photos/module/download/gallery.dart';
 import 'package:photos/service_locator.dart';
 import 'package:photos/services/collections_service.dart';
 import "package:photos/services/files_service.dart";
-import "package:photos/services/review_service.dart";
 import "package:photos/states/location_screen_state.dart";
 import "package:photos/theme/ente_theme.dart";
 import 'package:photos/ui/actions/collection/collection_sharing_actions.dart';
@@ -38,6 +37,7 @@ import "package:photos/ui/common/photo_library_add_permission.dart";
 import "package:photos/ui/common/web_page.dart";
 import 'package:photos/ui/components/action_sheet_widget.dart';
 import 'package:photos/ui/components/buttons/button_widget.dart';
+import 'package:photos/ui/components/dialog_widget.dart'; // PHOTOVAULT
 import 'package:photos/ui/components/models/button_type.dart';
 import "package:photos/ui/map/map_screen.dart";
 import 'package:photos/ui/notification/toast.dart';
@@ -574,24 +574,27 @@ class _GalleryAppBarWidgetState extends State<GalleryAppBarWidget> {
     }
   }
 
+  // PHOTOVAULT: removed the "Rate us" button (app store review link).
   void _showSpaceFreedDialog(FreeableSpaceInfo status) {
-    showChoiceDialog(
-      context,
+    showDialogWidget(
+      context: context,
       title: context.strings.success,
       body: context.strings.youHaveSuccessfullyFreedUp(
         storageSaved: formatBytes(status.size),
       ),
-      firstButtonLabel: context.strings.rateUs,
-      firstButtonOnTap: () async {
-        await ReviewService.launch();
-      },
-      firstButtonType: ButtonType.primary,
-      secondButtonLabel: context.strings.ok,
-      secondButtonOnTap: () async {
-        if (Platform.isIOS) {
-          showToast(context, context.strings.remindToEmptyDeviceTrash);
-        }
-      },
+      buttons: [
+        ButtonWidget(
+          buttonType: ButtonType.primary,
+          labelText: context.strings.ok,
+          isInAlert: true,
+          buttonAction: ButtonAction.first,
+          onTap: () async {
+            if (Platform.isIOS) {
+              showToast(context, context.strings.remindToEmptyDeviceTrash);
+            }
+          },
+        ),
+      ],
     );
   }
 
@@ -1484,6 +1487,13 @@ class _GalleryAppBarWidgetState extends State<GalleryAppBarWidget> {
         final albumKey = CollectionsService.instance.getSharedPublicAlbumKey(
           collection.id,
         );
+        // PHOTOVAULT: open the album on the server its link came from (Ente
+        // hard-coded albums.ente.com).
+        final albumOrigin =
+            CollectionsService.instance.getSharedPublicAlbumOrigin(
+              collection.id,
+            ) ??
+            endpointConfig.endpoint;
 
         final res = await showChoiceDialog(
           context,
@@ -1499,7 +1509,7 @@ class _GalleryAppBarWidgetState extends State<GalleryAppBarWidget> {
             MaterialPageRoute(
               builder: (context) => WebPage(
                 widget.title ?? "",
-                "https://albums.ente.com/?t=$authToken#$albumKey",
+                "$albumOrigin/?t=$authToken#$albumKey",
               ),
             ),
           );

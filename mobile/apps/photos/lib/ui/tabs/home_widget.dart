@@ -60,9 +60,7 @@ import "package:photos/ui/collections/collection_action_sheet.dart";
 import "package:photos/ui/components/buttons/button_widget.dart";
 import "package:photos/ui/components/models/button_type.dart";
 import "package:photos/ui/extents_page_view.dart";
-import "package:photos/ui/home/christmas/christmas_pull_animation.dart";
 import "package:photos/ui/home/christmas/christmas_utils.dart";
-import "package:photos/ui/home/christmas/snow_fall_overlay.dart";
 import "package:photos/ui/home/gallery_download_banner.dart";
 import "package:photos/ui/home/grant_permissions_widget.dart";
 import "package:photos/ui/home/header_widget.dart";
@@ -70,11 +68,9 @@ import "package:photos/ui/home/home_bottom_nav_bar.dart";
 import "package:photos/ui/home/home_gallery_widget.dart";
 import "package:photos/ui/home/landing_page_widget.dart";
 import "package:photos/ui/home/loading_photos_widget.dart";
-import "package:photos/ui/notification/update/change_log_page.dart";
 import "package:photos/ui/rituals/ritual_camera_page.dart";
 import "package:photos/ui/rituals/ritual_page.dart";
 import "package:photos/ui/rituals/ritual_privacy.dart";
-import "package:photos/ui/settings/app_update_sheet.dart";
 import "package:photos/ui/settings_page.dart";
 import "package:photos/ui/social/feed_screen.dart";
 import "package:photos/ui/tabs/albums_tab.dart";
@@ -118,7 +114,6 @@ class _HomeWidgetState extends State<HomeWidget> {
   bool _mediaViewFallbackNavigationScheduled = false;
   bool _personSyncTriggered = false;
   bool _collectionsSyncTriggered = false;
-  bool _isShowingChangeLog = false;
   bool _startWithoutAccount = localSettings.isLocalGalleryOnboardingPending;
   final isOnSearchTabNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isAlbumsSearchActiveNotifier = ValueNotifier<bool>(
@@ -309,18 +304,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           }
         });
     _initDeepLinks();
-    updateService.shouldShowUpdateNotification().then((value) {
-      Future.delayed(Duration.zero, () {
-        if (value) {
-          if (!mounted) return;
-          showAppUpdateSheet(
-            context,
-            latestVersionInfo: updateService.getLatestVersionInfo()!,
-          ).ignore();
-          updateService.resetUpdateAvailableShownTime();
-        }
-      });
-    });
+    // PHOTOVAULT: removed Ente's self-update check (ente.com release info).
 
     _initDeepLinkSubscriptionForPublicAlbums();
 
@@ -376,15 +360,9 @@ class _HomeWidgetState extends State<HomeWidget> {
     await MemoryHomeWidgetService.instance.checkPendingMemorySync();
   }
 
-  void _scheduleChangeLogCheck({required Duration delay}) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(delay, () {
-        if (mounted) {
-          showChangeLog(context);
-        }
-      });
-    });
-  }
+  // PHOTOVAULT: Ente's "What's new" changelog sheet is removed; kept as a
+  // no-op so the upstream call sites stay unchanged.
+  void _scheduleChangeLogCheck({required Duration delay}) {}
 
   final Map<Uri, (bool, int)> _linkedPublicAlbums = {};
   bool get _isGuestViewActive =>
@@ -954,35 +932,8 @@ class _HomeWidgetState extends State<HomeWidget> {
                   return _getBody(context);
                 },
               ),
-              if (isChristmasPeriod())
-                ValueListenableBuilder<double>(
-                  valueListenable: _christmasPullOffsetNotifier,
-                  builder: (context, pullOffset, child) {
-                    return ValueListenableBuilder<bool>(
-                      valueListenable: _christmasPullReleasedNotifier,
-                      builder: (context, isReleased, child) {
-                        if (pullOffset <= 0) {
-                          return const SizedBox.shrink();
-                        }
-                        return Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: ChristmasPullOverlay(
-                            pullOffset: pullOffset,
-                            isReleased: isReleased,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              if (isChristmasPeriod())
-                Positioned.fill(
-                  child: FadingSnowOverlay(
-                    pullOffsetNotifier: _christmasPullOffsetNotifier,
-                  ),
-                ),
+              // PHOTOVAULT: smoothness/branding. Ente's seasonal Christmas
+              // pull animation (Rive) and falling-snow overlay are removed.
             ],
           ),
 
@@ -1273,32 +1224,6 @@ class _HomeWidgetState extends State<HomeWidget> {
       return;
     }
     UserService.instance.verifyEmail(context, ott);
-  }
-
-  Future<void> showChangeLog(BuildContext context) async {
-    if (_isShowingChangeLog || !mounted) {
-      return;
-    }
-    _isShowingChangeLog = true;
-    try {
-      final action = await updateService.getChangeLogAction(
-        locale: Localizations.localeOf(context),
-        isLocalGallery: isLocalGalleryMode,
-        isSignedIn: Configuration.instance.isLoggedIn(),
-      );
-      if (!mounted || action == ChangeLogAction.skip) {
-        return;
-      }
-      if (action == ChangeLogAction.consumeWithoutShowing) {
-        updateService.hideChangeLog().ignore();
-        return;
-      }
-      if (!context.mounted) return;
-      await showChangeLogSheet(context);
-      await updateService.hideChangeLog();
-    } finally {
-      _isShowingChangeLog = false;
-    }
   }
 
   void _onDidReceiveNotificationResponse(

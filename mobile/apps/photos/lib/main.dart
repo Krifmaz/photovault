@@ -67,10 +67,8 @@ import "package:photos/src/rust/frb_generated.dart";
 import 'package:photos/ui/wallpaper/wallpaper_page.dart';
 import "package:photos/utils/bg_task_utils.dart";
 import "package:photos/utils/device_info.dart";
-import "package:photos/utils/email_util.dart";
 import "package:photos/utils/intent_util.dart";
 import "package:photos/utils/photos_crypto_api_adapter.dart";
-import 'package:rive/rive.dart' as rive;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final _logger = Logger("main");
@@ -124,7 +122,8 @@ void main() async {
       }
     });
   }
-  await rive.RiveNative.init();
+  // PHOTOVAULT: branding. Rive (only used for Ente's mascot animations) is
+  // removed, so there is no RiveNative.init().
   MediaKit.ensureInitialized();
 
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
@@ -359,7 +358,7 @@ Future<void> _runMinimally(
 
     if (shouldStop?.call() ?? false) return;
     _logger.info("[BG TASK] update notification");
-    updateService.showUpdateNotification().ignore();
+    // PHOTOVAULT: removed Ente's self-update notification (ente.com).
     _logger.info("[BG TASK] sync starting");
     await _sync('bgTaskActiveProcess');
     _logger.info("[BG TASK] sync completed");
@@ -448,12 +447,9 @@ Future<void> _init(
     final TimeLogger tlog = TimeLogger();
     Future.delayed(const Duration(seconds: 15), () {
       if (!initComplete && !isBackground) {
+        // PHOTOVAULT: no Ente support (Ente opened a mail to its support
+        // address with the logs here).
         _logger.severe("Stuck on splash screen for >= 15 seconds");
-        triggerSendLogs(
-          "support@ente.com",
-          "Stuck on splash screen for >= 15 seconds on ${Platform.operatingSystem}",
-          null,
-        );
       }
     });
     if (!isBackground) _heartBeatOnInit(0);

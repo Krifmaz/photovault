@@ -2,7 +2,6 @@ import "package:ente_components/ente_components.dart";
 import "package:ente_lock_screen/local_authentication_service.dart";
 import "package:ente_pure_utils/ente_pure_utils.dart";
 import "package:ente_strings/ente_strings.dart";
-import "package:ente_ui/components/settings/app_engagement_section.dart";
 import "package:ente_ui/pages/settings_search_page.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
@@ -12,13 +11,8 @@ import "package:photos/emergency/emergency_page.dart";
 import "package:photos/models/user_details.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/services/account/user_service.dart";
-import "package:photos/services/review_service.dart";
-import "package:photos/ui/account/email_entry_page.dart";
 import "package:photos/ui/account/login_page.dart";
-import "package:photos/ui/components/banners/offline_settings_banner.dart";
-import "package:photos/ui/growth/referral_screen.dart";
 import "package:photos/ui/notification/toast.dart";
-import "package:photos/ui/notification/update/change_log_page.dart";
 // PHOTOVAULT: branding (footer with upstream credit)
 import "package:photos/ui/photovault/photovault_settings_footer.dart";
 import "package:photos/ui/settings/about/about_us_page.dart";
@@ -37,7 +31,6 @@ import "package:photos/ui/settings/search/settings_search_registry.dart";
 import "package:photos/ui/settings/security/security_settings_page.dart";
 import "package:photos/ui/settings/storage_card_widget.dart";
 import "package:photos/ui/settings/streaming/video_streaming_settings_page.dart";
-import "package:photos/ui/settings/support/help_support_page.dart";
 import "package:photos/ui/settings/widget_settings_screen.dart";
 import "package:photos/ui/sharing/verify_identity_dialog.dart";
 import "package:photos/utils/dialog_util.dart";
@@ -84,19 +77,8 @@ class _SettingsBody extends StatelessWidget {
               : () => _showVerifyIdentityDialog(context),
           children: [
             if (showLoginEntry) ...[
-              OfflineSettingsBanner(
-                onGetStarted: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const EmailEntryPage(
-                        showReferralSourceField: false,
-                        referralSource: "Offline",
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
+              // PHOTOVAULT: removed Ente's promo card ("We can't see your
+              // photos. Ever." / get started).
               _buildOfflineLoginCard(context, colors),
               const SizedBox(height: 8),
             ],
@@ -146,16 +128,8 @@ class _SettingsBody extends StatelessWidget {
               _buildFeaturesAndPlansCard(context),
               const SizedBox(height: 8),
             ],
-            AppEngagementSection(reviewUrl: ReviewService.url),
-            const SizedBox(height: 8),
-            _buildMenuItem(
-              title: context.strings.helpAndSupport,
-              icon: HugeIcons.strokeRoundedHelpCircle,
-              onTap: () async {
-                await routeToPage(context, const HelpSupportPage());
-              },
-            ),
-            const SizedBox(height: 8),
+            // PHOTOVAULT: removed Merchandise, Rate us (AppEngagementSection)
+            // and Ente's Help & Support.
             _buildMenuItem(
               title: context.strings.about,
               icon: HugeIcons.strokeRoundedInformationCircle,
@@ -168,10 +142,9 @@ class _SettingsBody extends StatelessWidget {
               _buildLogoutCard(context),
             ],
             // PHOTOVAULT: branding. Was MoreFromEnteFooter (Ente's other apps
-            // and social links); now the upstream credit and app version.
-            PhotovaultSettingsFooter(
-              onVersionTap: () => showChangeLogSheet(context),
-            ),
+            // and social links); now just the app version (the credit line
+            // is in About; the version no longer opens Ente's changelog).
+            const PhotovaultSettingsFooter(),
             if (hasLoggedIn &&
                 !isLocalGalleryMode &&
                 (flagService.flags.internalUser || kDebugMode)) ...[
@@ -357,14 +330,7 @@ class _SettingsBody extends StatelessWidget {
             );
           },
         ),
-        _buildMenuItem(
-          title: context.strings.referrals,
-          icon: HugeIcons.strokeRoundedTicketStar,
-          showOnlyLoadingState: true,
-          onTap: () async {
-            await openReferralScreen(context);
-          },
-        ),
+        // PHOTOVAULT: removed Referrals.
       ],
     );
   }

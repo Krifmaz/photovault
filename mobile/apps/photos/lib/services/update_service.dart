@@ -5,10 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:photos/core/constants.dart';
-import 'package:photos/core/network/network.dart';
 import "package:photos/services/language_service.dart";
 import 'package:photos/services/notification_service.dart';
-import 'package:photos/ui/notification/update/change_log_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ChangeLogAction { skip, consumeWithoutShowing, show }
@@ -53,13 +51,8 @@ class UpdateService {
       return ChangeLogAction.skip;
     }
 
-    return ChangeLogStrings.hasContentForLocale(
-          locale,
-          isLocalGallery: isLocalGallery,
-          isAndroid: Platform.isAndroid,
-        )
-        ? ChangeLogAction.show
-        : ChangeLogAction.consumeWithoutShowing;
+    // PHOTOVAULT: Ente's changelog content is removed.
+    return ChangeLogAction.consumeWithoutShowing;
   }
 
   Future<bool> hideChangeLog() async {
@@ -149,23 +142,15 @@ class UpdateService {
     );
   }
 
+  // PHOTOVAULT: no phone-home. Ente fetched
+  // https://ente.com/release-info/independent.json here for its self-update
+  // check; Photovault has no update feed, so the check never runs.
   Future<LatestVersionInfo> _getLatestVersionInfo() async {
-    final response = await NetworkClient.instance.getDio().get(
-      "https://ente.com/release-info/independent.json",
-    );
-    return LatestVersionInfo.fromMap(response.data["latestVersion"]);
+    throw UnsupportedError("Photovault has no update feed");
   }
 
-  bool isIndependent() {
-    if (Platform.isIOS) {
-      return false;
-    }
-    if (!kDebugMode &&
-        _packageInfo.packageName != "io.ente.photos.independent") {
-      return false;
-    }
-    return true;
-  }
+  // PHOTOVAULT: never "independent" (Ente's self-updating APK channel).
+  bool isIndependent() => false;
 
   bool isIndependentFlavor() {
     if (Platform.isIOS) {

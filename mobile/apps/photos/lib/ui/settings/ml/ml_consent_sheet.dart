@@ -9,8 +9,6 @@ import "package:photos/events/notification_event.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/services/machine_learning/ml_service.dart";
 import "package:photos/services/machine_learning/semantic_search/semantic_search_service.dart";
-import "package:photos/ui/common/web_page.dart";
-import "package:styled_text/styled_text.dart";
 
 final _logger = Logger("MLConsentSheet");
 
@@ -153,34 +151,8 @@ class MLConsentDescription extends StatelessWidget {
         for (final paragraph in context.strings.mlConsentDescription.split(
           "\n\n",
         )) ...[Text(paragraph, style: textStyle), const SizedBox(height: 8)],
-        StyledText(
-          text: context.strings.mlConsentPrivacyDetails,
-          style: textStyle,
-          tags: {
-            'policy': StyledTextActionTag(
-              (String? text, Map<String?, String?> attrs) =>
-                  _openPrivacyPolicy(context),
-              style: textStyle.copyWith(
-                decoration: TextDecoration.underline,
-                decorationColor: textStyle.color,
-              ),
-            ),
-          },
-        ),
+        // PHOTOVAULT: removed the link to Ente's privacy policy.
       ],
-    );
-  }
-
-  Future<void> _openPrivacyPolicy(BuildContext context) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return WebPage(
-            context.strings.privacyPolicyTitle,
-            "https://ente.com/privacy",
-          );
-        },
-      ),
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:ente_pure_utils/ente_pure_utils.dart';
 import "package:ente_strings/ente_strings.dart";
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import "package:photos/core/constants.dart";
 import 'package:photos/core/event_bus.dart';
 import 'package:photos/ente_theme_data.dart';
 import 'package:photos/events/local_import_progress.dart';
@@ -32,7 +31,6 @@ class LoadingPhotosWidget extends StatefulWidget {
 }
 
 class _LoadingPhotosWidgetState extends State<LoadingPhotosWidget> {
-  static const int _preservedMemoriesCountInMillions = 500;
 
   late StreamSubscription<SyncStatusUpdate> _firstImportEvent;
   StreamSubscription<LocalImportProgressEvent>? _importProgressEvent;
@@ -279,19 +277,13 @@ class _LoadingPhotosWidgetState extends State<LoadingPhotosWidget> {
     );
   }
 
+  // PHOTOVAULT: only the tips that hold for a self-hosted server. Ente's
+  // company claims (family subscription, memories preserved, 3 copies incl.
+  // fallout shelter, audits, "photos.ente.com has a slick uploader") are
+  // removed.
   void _setupLoadingMessages(BuildContext context) {
-    _messages.add(context.strings.loadMessage1);
-    _messages.add(
-      context.strings.loadMessage2(
-        memoriesCountInMillions: _preservedMemoriesCountInMillions,
-      ),
-    );
-    _messages.add(context.strings.loadMessage3);
-    _messages.add(context.strings.loadMessage4);
-    _messages.add(context.strings.loadMessage5);
     _messages.add(context.strings.loadMessage6);
     _messages.add(context.strings.loadMessage7);
-    _messages.add(context.strings.loadMessage8(webUrl: kPhotosWebDomain));
     _messages.add(context.strings.loadMessage9);
   }
 

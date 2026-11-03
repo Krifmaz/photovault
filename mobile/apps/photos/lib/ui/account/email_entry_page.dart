@@ -10,8 +10,6 @@ import "package:photos/service_locator.dart";
 import 'package:photos/services/account/user_service.dart';
 import "package:photos/ui/account/login_page.dart";
 import "package:photos/ui/account/onboarding_page_scaffold.dart";
-import 'package:photos/ui/common/web_page.dart';
-import "package:styled_text/styled_text.dart";
 
 class EmailEntryPage extends StatefulWidget {
   const EmailEntryPage({
@@ -43,7 +41,6 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
   double _passwordStrength = 0.0;
   bool _emailIsValid = false;
   bool _showEmailValidation = false;
-  bool _hasAgreedToTOS = false;
   bool _hasInstallSource = false;
   bool _passwordsMatch = false;
   bool _passwordIsValid = false;
@@ -245,8 +242,9 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
               },
             ),
           ],
-          const SizedBox(height: Spacing.xl),
-          _getTOSAgreement(),
+          // PHOTOVAULT: removed the agreement to Ente's terms of service and
+          // privacy policy (links to ente.com); the account lives on the
+          // user's own server.
         ],
       ),
     );
@@ -324,83 +322,9 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
     }
   }
 
-  Widget _getTOSAgreement() {
-    final colors = context.componentColors;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _hasAgreedToTOS = !_hasAgreedToTOS;
-        });
-      },
-      behavior: HitTestBehavior.translucent,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: CheckboxComponent(
-              selected: _hasAgreedToTOS,
-              onChanged: (value) {
-                setState(() {
-                  _hasAgreedToTOS = value;
-                });
-              },
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: StyledText(
-              text: context.strings.signUpTerms,
-              style: TextStyles.body.copyWith(color: colors.textLighter),
-              tags: {
-                'u-terms': StyledTextActionTag(
-                  (String? text, Map<String?, String?> attrs) =>
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return WebPage(
-                              context.strings.termsOfServicesTitle,
-                              "https://ente.com/terms",
-                            );
-                          },
-                        ),
-                      ),
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    decorationColor: colors.textLighter,
-                    color: colors.textLighter,
-                  ),
-                ),
-                'u-policy': StyledTextActionTag(
-                  (String? text, Map<String?, String?> attrs) =>
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return WebPage(
-                              context.strings.privacyPolicyTitle,
-                              "https://ente.com/privacy",
-                            );
-                          },
-                        ),
-                      ),
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    decorationColor: colors.textLighter,
-                    color: colors.textLighter,
-                  ),
-                ),
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   bool _isFormValid() {
     return _emailIsValid &&
         _passwordsMatch &&
-        _hasAgreedToTOS &&
         _passwordIsValid;
   }
 }

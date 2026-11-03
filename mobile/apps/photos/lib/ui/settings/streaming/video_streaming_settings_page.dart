@@ -9,10 +9,7 @@ import "package:photos/core/event_bus.dart";
 import "package:photos/events/video_preview_state_changed_event.dart";
 import "package:photos/models/preview/preview_item_status.dart";
 import "package:photos/services/video_preview_service.dart";
-import "package:photos/ui/common/web_page.dart";
 
-const helpUrl =
-    "https://ente.com/help/photos/features/utilities/video-streaming#related-faqs";
 
 class VideoStreamingSettingsPage extends StatefulWidget {
   const VideoStreamingSettingsPage({super.key});
@@ -79,22 +76,7 @@ class _VideoStreamingSettingsPageState
             TextSpan(text: l10n.videoStreamingDescriptionLine1),
             const TextSpan(text: " "),
             TextSpan(text: l10n.videoStreamingDescriptionLine2),
-            const TextSpan(text: "\n"),
-            WidgetSpan(
-              alignment: PlaceholderAlignment.baseline,
-              baseline: TextBaseline.alphabetic,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: openHelp,
-                child: Text(
-                  l10n.moreDetails,
-                  style: TextStyles.bodyLink.copyWith(
-                    color: colors.primary,
-                    decorationColor: colors.primary,
-                  ),
-                ),
-              ),
-            ),
+            // PHOTOVAULT: removed "More details" (Ente help link).
           ],
         ),
         style: TextStyles.body.copyWith(color: colors.textLight),
@@ -130,22 +112,7 @@ class _VideoStreamingSettingsPageState
               TextSpan(text: l10n.videoStreamingDescriptionLine1),
               const TextSpan(text: "\n"),
               TextSpan(text: l10n.videoStreamingDescriptionLine2),
-              const TextSpan(text: "\n"),
-              WidgetSpan(
-                alignment: PlaceholderAlignment.baseline,
-                baseline: TextBaseline.alphabetic,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: openHelp,
-                  child: Text(
-                    l10n.moreDetails,
-                    style: TextStyles.bodyLink.copyWith(
-                      color: colors.primary,
-                      decorationColor: colors.primary,
-                    ),
-                  ),
-                ),
-              ),
+              // PHOTOVAULT: removed "More details" (Ente help link).
             ],
           ),
           style: TextStyles.body.copyWith(color: colors.textLight),
@@ -154,18 +121,6 @@ class _VideoStreamingSettingsPageState
       ),
       const SizedBox(height: 140),
     ];
-  }
-
-  Future<void> openHelp() async {
-    Navigator.of(context)
-        .push(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return WebPage(context.strings.help, helpUrl);
-            },
-          ),
-        )
-        .ignore();
   }
 
   Future<void> toggleVideoStreaming() async {

@@ -23,13 +23,13 @@ import "package:photos/theme/text_style.dart";
 import 'package:photos/ui/components/buttons/button_widget.dart';
 import "package:photos/ui/components/models/button_type.dart";
 import "package:photos/ui/components/toggle_switch_widget.dart";
+import "package:photos/ui/photovault/photovault_glyph.dart"; // PHOTOVAULT: branding
 import "package:photos/ui/tools/similar_image_file_info.dart";
 import "package:photos/ui/viewer/actions/select_all_status_icon.dart";
 import "package:photos/ui/viewer/file/detail_page.dart";
 import "package:photos/ui/viewer/file/thumbnail_widget.dart";
 import "package:photos/utils/delete_file_util.dart";
 import "package:photos/utils/dialog_util.dart";
-import 'package:rive/rive.dart' as rive;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 enum SimilarImagesPageState { setup, loading, results }
@@ -1257,15 +1257,10 @@ class _LoadingScreenState extends State<_LoadingScreen> {
   int _currentTextIndex = 0;
 
   late List<String> _loadingTexts;
-  late final rive.FileLoader _analysisAnimationLoader;
 
   @override
   void initState() {
     super.initState();
-    _analysisAnimationLoader = rive.FileLoader.fromAsset(
-      'assets/ducky_analyze_files.riv',
-      riveFactory: rive.Factory.flutter,
-    );
     _startTextCycling();
   }
 
@@ -1287,7 +1282,6 @@ class _LoadingScreenState extends State<_LoadingScreen> {
   @override
   void dispose() {
     _timer?.cancel();
-    _analysisAnimationLoader.dispose();
     super.dispose();
   }
 
@@ -1307,21 +1301,8 @@ class _LoadingScreenState extends State<_LoadingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 160,
-            child: rive.RiveWidgetBuilder(
-              fileLoader: _analysisAnimationLoader,
-              builder: (BuildContext context, rive.RiveState state) {
-                if (state is rive.RiveLoaded) {
-                  return rive.RiveWidget(
-                    controller: state.controller,
-                    fit: rive.Fit.contain,
-                  );
-                }
-                return const SizedBox.expand();
-              },
-            ),
-          ),
+          // PHOTOVAULT: branding. Static glyph instead of Ente's Rive duck.
+          const PhotovaultGlyph(width: 160, height: 160),
           const SizedBox(height: 16),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),

@@ -51,21 +51,11 @@ Future<void> sendLogs(
     icon: Icons.bug_report_outlined,
     body: context.strings.logsDialogBody,
     buttons: [
+      // PHOTOVAULT: no Ente support. The "Report a bug" button (emailing the
+      // logs to Ente) is removed and `toEmail` is ignored; users view or
+      // export their logs and pass them to whoever runs their server.
       ButtonWidget(
-        isInAlert: true,
         buttonType: ButtonType.neutral,
-        labelText: context.strings.reportABug,
-        buttonAction: ButtonAction.first,
-        shouldSurfaceExecutionStates: false,
-        onTap: () async {
-          await _sendLogs(context, toEmail, subject, body);
-          if (postShare != null) {
-            postShare();
-          }
-        },
-      ),
-      ButtonWidget(
-        buttonType: ButtonType.secondary,
         labelText: context.strings.viewLogs,
         buttonAction: ButtonAction.second,
         onTap: () async {
@@ -95,36 +85,6 @@ Future<void> sendLogs(
       ),
     ],
   );
-}
-
-Future<void> _sendLogs(
-  BuildContext context,
-  String toEmail,
-  String? subject,
-  String? body,
-) async {
-  final String zipFilePath = await getZippedLogsFile(
-    context,
-    reportText: buildSupportReportText(
-      to: toEmail,
-      subject: subject ?? '',
-      body: body ?? '',
-    ),
-  );
-  if (!context.mounted) return;
-  final didOpenComposer = await sendLogsWithSubjectAndBody(
-    context,
-    toEmail: toEmail,
-    subject: subject,
-    body: body,
-    zipFilePath: zipFilePath,
-  );
-  if (!didOpenComposer) {
-    if (!context.mounted) return;
-    Navigator.of(context).pop();
-    if (!context.mounted) return;
-    await shareLogs(context, toEmail, zipFilePath);
-  }
 }
 
 Future<bool> sendLogsWithSubjectAndBody(
@@ -255,7 +215,8 @@ Future<void> exportLogs(BuildContext context, String zipFilePath) async {
     final DateTime now = DateTime.now().toUtc();
     final String shortMonthName = DateFormat('MMM').format(now);
     final String logFileName =
-        'ente-logs-${now.year}-$shortMonthName-${now.day}-${now.hour}-${now.minute}';
+        // PHOTOVAULT: branding (file name was ente-logs-...)
+        'photovault-logs-${now.year}-$shortMonthName-${now.day}-${now.hour}-${now.minute}';
     await FileSaver.instance.saveAs(
       name: logFileName,
       filePath: zipFilePath,

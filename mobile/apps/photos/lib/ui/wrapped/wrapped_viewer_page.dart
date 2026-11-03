@@ -676,7 +676,8 @@ class _WrappedViewerPageState extends State<WrappedViewerPage>
     if (result == null || cardCount == 0) {
       scheduleMicrotask(() {
         if (mounted) {
-          showShortToast(context, "Ente Rewind data not available");
+          // PHOTOVAULT: branding
+          showShortToast(context, "Rewind data not available");
           Navigator.of(context).maybePop();
         }
       });
@@ -958,7 +959,7 @@ class _WrappedViewerPageState extends State<WrappedViewerPage>
           files: <XFile>[
             XFile.fromData(
               bytes,
-              name: "ente_rewind_${_currentIndex + 1}.png",
+              name: "rewind_${_currentIndex + 1}.png", // PHOTOVAULT: branding
               mimeType: "image/png",
             ),
           ],

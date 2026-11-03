@@ -91,9 +91,10 @@ dependencies:
   ffmpeg:
     path: plugins/ffmpeg
   figma_squircle: 0.6.3
+  # PHOTOVAULT: de-Google/telemetry/payments/mascot. Removed firebase_core,
+  # firebase_messaging, in_app_purchase, in_app_purchase_storekit, rive,
+  # sentry and sentry_flutter.
   file_saver: 0.3.1
-  firebase_core: 5.0.0
-  firebase_messaging: 17.0.0
   flutter:
     sdk: flutter
   flutter_animate: 4.5.2
@@ -129,8 +130,6 @@ dependencies:
   http: 1.6.0
   hugeicons: 1.1.7
   image: 4.7.0
-  in_app_purchase: 3.3.0
-  in_app_purchase_storekit: 0.4.11+1
   intl: 0.20.3
   just_audio: 0.10.5
   latlong2: 0.9.1
@@ -177,10 +176,7 @@ dependencies:
     git:
       url: https://github.com/KasemJaffer/receive_sharing_intent.git
       ref: 2cea396843cd3ab1b5ec4334be4233864637874e
-  rive: 0.14.0-dev.13
   scrollable_positioned_list: 0.3.8
-  sentry: 9.6.0
-  sentry_flutter: 9.6.0
   share_plus: 12.0.0
   shared_preferences: 2.5.4
   sqlite3_flutter_libs: 0.5.41
@@ -282,8 +278,8 @@ flutter:
     enable-uiscene-migration: false
 
   assets:
+    # PHOTOVAULT: assets/subscription/ (Ente Locker upsell art) removed.
     - assets/
-    - assets/subscription/
     - assets/rituals/
     - assets/rewind_badges/
     - assets/video-editor/

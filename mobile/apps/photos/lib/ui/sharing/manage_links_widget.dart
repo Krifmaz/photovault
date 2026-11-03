@@ -18,7 +18,6 @@ import 'package:photos/ui/components/buttons/button_widget.dart';
 import 'package:photos/ui/components/dialog_widget.dart';
 import 'package:photos/ui/components/models/button_type.dart';
 import 'package:photos/ui/notification/toast.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/ui/sharing/pickers/layout_picker_page.dart';
 import 'package:photos/ui/sharing/public_link_enabled_actions_widget.dart';
 import 'package:photos/ui/sharing/share_components.dart';
@@ -493,18 +492,12 @@ class _ManageSharedLinkWidgetState extends State<ManageSharedLinkWidget> {
   }
 
   Future<void> _showLinkEditNotAllowedDialog(BuildContext context) async {
-    final buttonResult = await showDialogWidget(
+    // PHOTOVAULT: payments removed (the "Subscribe" button and plan page).
+    await showDialogWidget(
       context: context,
       title: context.strings.sorry,
       body: context.strings.subscribeToChangeLinkSetting,
       buttons: [
-        ButtonWidget(
-          buttonType: ButtonType.primary,
-          isInAlert: true,
-          shouldStickToDarkTheme: true,
-          buttonAction: ButtonAction.first,
-          labelText: context.strings.subscribe,
-        ),
         ButtonWidget(
           buttonType: ButtonType.secondary,
           buttonAction: ButtonAction.cancel,
@@ -514,15 +507,5 @@ class _ManageSharedLinkWidgetState extends State<ManageSharedLinkWidget> {
         ),
       ],
     );
-    if (buttonResult?.action == ButtonAction.first) {
-      if (!context.mounted) return;
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (BuildContext context) {
-            return getSubscriptionPage();
-          },
-        ),
-      );
-    }
   }
 }

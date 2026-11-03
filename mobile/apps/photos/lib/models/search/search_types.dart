@@ -66,7 +66,7 @@ extension SectionTypeExtensions on SectionType {
       case SectionType.magic:
         return context.strings.discover;
       case SectionType.wrapped:
-        return "Ente Rewind";
+        return "Rewind"; // PHOTOVAULT: branding
       case SectionType.location:
         return context.strings.locations;
       case SectionType.ritual:

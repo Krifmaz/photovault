@@ -99,9 +99,10 @@ class PublicLinkEnabledActionsWidget extends StatelessWidget {
                     data: url,
                     title: collection.displayName,
                     accentColor: encoreLightAccent2, // PHOTOVAULT: theme
-                    shareFileName: 'ente_qr_${collection.displayName}.png',
+                    shareFileName: 'photovault_qr_${collection.displayName}.png',
                     shareText:
-                        'Scan this QR code to view my ${collection.displayName} album on ente',
+                        // PHOTOVAULT: branding
+                        'Scan this QR code to view my ${collection.displayName} album on Photovault',
                     dialogTitle: context.strings.qrCode,
                     shareButtonText: context.strings.share,
                     logoAssetPath: 'assets/qr_logo.png',

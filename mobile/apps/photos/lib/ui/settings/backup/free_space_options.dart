@@ -13,7 +13,8 @@ import "package:photos/service_locator.dart";
 import "package:photos/services/collections_service.dart";
 import "package:photos/services/deduplication_service.dart";
 import "package:photos/services/files_service.dart";
-import "package:photos/services/review_service.dart";
+import "package:photos/ui/components/buttons/button_widget.dart"; // PHOTOVAULT
+import "package:photos/ui/components/dialog_widget.dart"; // PHOTOVAULT
 import "package:photos/ui/components/models/button_type.dart";
 import "package:photos/ui/notification/toast.dart";
 import "package:photos/ui/tools/debug/app_storage_viewer.dart";
@@ -234,76 +235,57 @@ class _FreeUpSpaceOptionsScreenState extends State<FreeUpSpaceOptionsScreen> {
   }
 
   void _showSpaceFreedDialog(FreeableSpaceInfo status) {
-    if (localSettings.shouldPromptToRateUs()) {
-      localSettings.setRateUsShownCount(
-        localSettings.getRateUsShownCount() + 1,
-      );
-      showChoiceDialog(
-        context,
+    // PHOTOVAULT: never prompt "Rate us" (app store review link); Ente
+    // showed a rate-us dialog for the first few frees.
+    showBottomSheetComponent<void>(
+      context: context,
+      isDismissible: true,
+      builder: (_) => BottomSheetComponent(
         title: context.strings.success,
-        body: context.strings.youHaveSuccessfullyFreedUp(
+        message: context.strings.youHaveSuccessfullyFreedUp(
           storageSaved: formatBytes(status.size),
         ),
-        firstButtonLabel: context.strings.rateUs,
-        firstButtonOnTap: () async {
-          await ReviewService.launch();
-        },
-        firstButtonType: ButtonType.primary,
-        secondButtonLabel: context.strings.ok,
-        secondButtonOnTap: () async {
-          if (Platform.isIOS) {
-            showToast(context, context.strings.remindToEmptyDeviceTrash);
-          }
-        },
-      );
-    } else {
-      showBottomSheetComponent<void>(
-        context: context,
-        isDismissible: true,
-        builder: (_) => BottomSheetComponent(
-          title: context.strings.success,
-          message: context.strings.youHaveSuccessfullyFreedUp(
-            storageSaved: formatBytes(status.size),
-          ),
-          illustration: Icon(
-            Icons.download_done_rounded,
-            size: 64,
-            color: context.componentColors.primary,
-          ),
-          actions: [
-            ButtonComponent(
-              label: context.strings.ok,
-              variant: ButtonComponentVariant.neutral,
-              onTap: () async {
-                if (Platform.isIOS) {
-                  showToast(context, context.strings.remindToEmptyDeviceTrash);
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        illustration: Icon(
+          Icons.download_done_rounded,
+          size: 64,
+          color: context.componentColors.primary,
         ),
-      );
-    }
+        actions: [
+          ButtonComponent(
+            label: context.strings.ok,
+            variant: ButtonComponentVariant.neutral,
+            onTap: () async {
+              if (Platform.isIOS) {
+                showToast(context, context.strings.remindToEmptyDeviceTrash);
+              }
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
+  // PHOTOVAULT: removed the "Rate us" button (app store review link).
   void _showDuplicateFilesDeletedDialog(DeduplicationResult result) {
-    showChoiceDialog(
-      context,
+    showDialogWidget(
+      context: context,
       title: context.strings.success,
       body: context.strings.duplicateFileCountWithStorageSaved(
         count: result.count,
         storageSaved: formatBytes(result.size),
       ),
-      firstButtonLabel: context.strings.rateUs,
-      firstButtonOnTap: () async {
-        await ReviewService.launch();
-      },
-      firstButtonType: ButtonType.primary,
-      secondButtonLabel: context.strings.ok,
-      secondButtonOnTap: () async {
-        showShortToast(context, context.strings.remindToEmptyEnteTrash);
-      },
+      buttons: [
+        ButtonWidget(
+          buttonType: ButtonType.primary,
+          labelText: context.strings.ok,
+          isInAlert: true,
+          buttonAction: ButtonAction.first,
+          onTap: () async {
+            showShortToast(context, context.strings.remindToEmptyEnteTrash);
+          },
+        ),
+      ],
     );
   }
 }

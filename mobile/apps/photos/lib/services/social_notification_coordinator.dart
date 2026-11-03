@@ -288,7 +288,7 @@ class SocialNotificationCoordinator {
           title,
           _getSocialNotificationBody(candidate, s, fileType, isOwn),
           channelID: 'social_activity',
-          channelName: 'Ente Feed',
+          channelName: 'Feed', // PHOTOVAULT: branding (was 'Ente Feed')
           payload: _buildSocialNotificationPayload(candidate),
           id: _buildSocialNotificationId(candidate),
         );

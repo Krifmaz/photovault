@@ -1,6 +1,7 @@
 import "dart:async";
 
 import "package:ente_components/ente_components.dart";
+import "package:ente_components/theme/photovault/encore_tokens.dart"; // PHOTOVAULT
 import "package:ente_pure_utils/ente_pure_utils.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:ente_ui/pages/language_selector_page.dart";
@@ -20,9 +21,7 @@ import 'package:photos/ui/account/password_reentry_page.dart';
 import 'package:photos/ui/components/buttons/button_widget.dart';
 import 'package:photos/ui/components/dialog_widget.dart';
 import 'package:photos/ui/components/models/button_type.dart';
-import "package:photos/ui/settings/developer_settings_tap_area.dart";
-import "package:photos/ui/settings/developer_settings_widget.dart";
-import "package:rive/rive.dart" as rive;
+import "package:photos/ui/photovault/photovault_glyph.dart";
 
 class LandingPageWidget extends StatefulWidget {
   const LandingPageWidget({required this.onStartWithoutAccount, super.key});
@@ -33,22 +32,10 @@ class LandingPageWidget extends StatefulWidget {
 }
 
 class _LandingPageWidgetState extends State<LandingPageWidget> {
-  late final rive.FileLoader _onboardingAnimationLoader;
-
   @override
   void initState() {
     super.initState();
-    _onboardingAnimationLoader = rive.FileLoader.fromAsset(
-      "assets/onboarding.riv",
-      riveFactory: rive.Factory.flutter,
-    );
     Future(_showAutoLogoutDialogIfRequired);
-  }
-
-  @override
-  void dispose() {
-    _onboardingAnimationLoader.dispose();
-    super.dispose();
   }
 
   @override
@@ -63,12 +50,11 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
           final colorScheme = getEnteColorScheme(context);
           return Scaffold(
             backgroundColor: colorScheme.greenBase,
+            // PHOTOVAULT: removed the 7-tap developer settings (custom
+            // endpoint) area and the custom-endpoint label below.
             body: SafeArea(
-              child: DeveloperSettingsTapArea(
-                onSettingsChanged: () {
-                  setState(() {});
-                },
-                child: Padding(
+              child: Builder(
+                builder: (context) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
@@ -192,7 +178,6 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
                           ),
                         ),
                       ],
-                      const DeveloperSettingsWidget(),
                     ],
                   ),
                 ),
@@ -204,23 +189,14 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
     );
   }
 
+  // PHOTOVAULT: branding. Static glyph instead of Ente's Rive duck
+  // ("onboarding.riv"), in the same height-limited box.
   Widget _buildOnboardingAnimation() {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.325,
-      ),
-      child: rive.RiveWidgetBuilder(
-        fileLoader: _onboardingAnimationLoader,
-        builder: (BuildContext context, rive.RiveState state) {
-          if (state is rive.RiveLoaded) {
-            return rive.RiveWidget(
-              controller: state.controller,
-              fit: rive.Fit.contain,
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+    final size = MediaQuery.of(context).size.height * 0.325;
+    return PhotovaultGlyph(
+      width: size,
+      height: size,
+      color: encoreDarkAccent2,
     );
   }
 

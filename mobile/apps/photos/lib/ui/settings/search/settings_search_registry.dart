@@ -18,7 +18,6 @@ import "package:photos/ui/settings/ml/machine_learning_settings_page.dart";
 import "package:photos/ui/settings/notification_settings_screen.dart";
 import "package:photos/ui/settings/security/security_settings_page.dart";
 import "package:photos/ui/settings/streaming/video_streaming_settings_page.dart";
-import "package:photos/ui/settings/support/help_support_page.dart";
 import "package:photos/ui/settings/widget_settings_screen.dart";
 
 class SettingsSearchRegistry {
@@ -36,20 +35,12 @@ class SettingsSearchRegistry {
           sectionPath: l10n.account,
           icon: HugeIcons.strokeRoundedUser,
           routeBuilder: (_) => const AccountSettingsPage(),
-          keywords: ["email", "password", "delete", "subscription"],
+          keywords: ["email", "password", "delete"], // PHOTOVAULT
         ),
       );
 
       items.addAll([
-        SettingsSearchItem(
-          title: l10n.manageSubscription,
-          subtitle: l10n.account,
-          sectionPath: l10n.account,
-          icon: HugeIcons.strokeRoundedCreditCard,
-          routeBuilder: (_) => const AccountSettingsPage(),
-          isSubPage: true,
-          keywords: ["subscription", "plan", "billing", "payment"],
-        ),
+        // PHOTOVAULT: payments removed ("Manage subscription").
         SettingsSearchItem(
           title: l10n.changeEmail,
           subtitle: l10n.account,
@@ -77,15 +68,7 @@ class SettingsSearchRegistry {
           isSubPage: true,
           keywords: ["recovery", "key", "backup key"],
         ),
-        SettingsSearchItem(
-          title: l10n.exportYourData,
-          subtitle: l10n.account,
-          sectionPath: l10n.account,
-          icon: HugeIcons.strokeRoundedDownload04,
-          routeBuilder: (_) => const AccountSettingsPage(),
-          isSubPage: true,
-          keywords: ["export", "download", "data"],
-        ),
+        // PHOTOVAULT: removed "Export your data" (an Ente help link).
         SettingsSearchItem(
           title: l10n.deleteAccount,
           subtitle: l10n.account,
@@ -634,131 +617,19 @@ class SettingsSearchRegistry {
       ]);
     }
 
-    items.add(
-      SettingsSearchItem(
-        title: l10n.helpAndSupport,
-        sectionPath: l10n.helpAndSupport,
-        icon: HugeIcons.strokeRoundedHelpCircle,
-        routeBuilder: (_) => const HelpSupportPage(),
-        keywords: ["help", "faq", "contact", "feedback", "bug"],
-      ),
-    );
-
-    items.addAll([
-      SettingsSearchItem(
-        title: l10n.browseHelpPages,
-        subtitle: l10n.helpAndSupport,
-        sectionPath: l10n.helpAndSupport,
-        icon: HugeIcons.strokeRoundedHelpCircle,
-        routeBuilder: (_) => const HelpSupportPage(),
-        isSubPage: true,
-        keywords: ["help", "faq", "guide"],
-      ),
-      SettingsSearchItem(
-        title: l10n.reportAnIssue,
-        subtitle: l10n.helpAndSupport,
-        sectionPath: l10n.helpAndSupport,
-        icon: HugeIcons.strokeRoundedBug02,
-        routeBuilder: (_) => const HelpSupportPage(),
-        isSubPage: true,
-        keywords: ["bug", "issue", "crash"],
-      ),
-      SettingsSearchItem(
-        title: l10n.askAQuestion,
-        subtitle: l10n.helpAndSupport,
-        sectionPath: l10n.helpAndSupport,
-        icon: HugeIcons.strokeRoundedHelpCircle,
-        routeBuilder: (_) => const HelpSupportPage(),
-        isSubPage: true,
-        keywords: ["contact", "support", "email"],
-      ),
-      SettingsSearchItem(
-        title: l10n.requestAFeature,
-        subtitle: l10n.helpAndSupport,
-        sectionPath: l10n.helpAndSupport,
-        icon: HugeIcons.strokeRoundedIdea01,
-        routeBuilder: (_) => const HelpSupportPage(),
-        isSubPage: true,
-        keywords: ["suggest", "feature request", "feedback"],
-      ),
-      SettingsSearchItem(
-        title: l10n.exportLogs,
-        subtitle: l10n.helpAndSupport,
-        sectionPath: l10n.helpAndSupport,
-        icon: HugeIcons.strokeRoundedDownload04,
-        routeBuilder: (_) => const HelpSupportPage(),
-        isSubPage: true,
-        keywords: ["logs", "export", "diagnostics"],
-      ),
-    ]);
-
+    // PHOTOVAULT: removed Ente's Help & Support entries.
     items.add(
       SettingsSearchItem(
         title: l10n.about,
         sectionPath: l10n.about,
         icon: HugeIcons.strokeRoundedInformationCircle,
         routeBuilder: (_) => const AboutUsPage(),
-        keywords: ["version", "privacy", "terms", "license"],
+        keywords: ["version", "license"], // PHOTOVAULT
       ),
     );
 
-    items.addAll([
-      SettingsSearchItem(
-        title: l10n.whatsNew,
-        subtitle: l10n.about,
-        sectionPath: l10n.about,
-        icon: HugeIcons.strokeRoundedParty,
-        routeBuilder: (_) => const AboutUsPage(),
-        isSubPage: true,
-        keywords: ["changelog", "updates", "new"],
-      ),
-      SettingsSearchItem(
-        title: l10n.weAreOpenSource,
-        subtitle: l10n.about,
-        sectionPath: l10n.about,
-        icon: HugeIcons.strokeRoundedGithub,
-        routeBuilder: (_) => const AboutUsPage(),
-        isSubPage: true,
-        keywords: ["open source", "github", "code"],
-      ),
-      SettingsSearchItem(
-        title: l10n.blog,
-        subtitle: l10n.about,
-        sectionPath: l10n.about,
-        icon: HugeIcons.strokeRoundedPencilEdit01,
-        routeBuilder: (_) => const AboutUsPage(),
-        isSubPage: true,
-        keywords: ["blog", "news", "updates"],
-      ),
-      SettingsSearchItem(
-        title: l10n.privacy,
-        subtitle: l10n.about,
-        sectionPath: l10n.about,
-        icon: HugeIcons.strokeRoundedShield01,
-        routeBuilder: (_) => const AboutUsPage(),
-        isSubPage: true,
-        keywords: ["privacy", "policy"],
-      ),
-      SettingsSearchItem(
-        title: l10n.termsOfServicesTitle,
-        subtitle: l10n.about,
-        sectionPath: l10n.about,
-        icon: HugeIcons.strokeRoundedFile01,
-        routeBuilder: (_) => const AboutUsPage(),
-        isSubPage: true,
-        keywords: ["terms", "tos", "service"],
-      ),
-      if (updateService.isIndependent())
-        SettingsSearchItem(
-          title: l10n.checkForUpdates,
-          subtitle: l10n.about,
-          sectionPath: l10n.about,
-          icon: HugeIcons.strokeRoundedDownload04,
-          routeBuilder: (_) => const AboutUsPage(),
-          isSubPage: true,
-          keywords: ["updates", "version", "check"],
-        ),
-    ]);
+    // PHOTOVAULT: removed the About sub-entries (What's new, open source,
+    // blog, privacy, terms, check for updates): all were Ente links/services.
 
     return items;
   }

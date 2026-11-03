@@ -49,7 +49,7 @@ class WrappedBadgeSelector {
     if (candidates.isEmpty) {
       final WrappedCard fallbackCard = WrappedCard(
         type: WrappedCardType.badge,
-        title: "Ente Rewind ${context.year} is on its way",
+        title: "Rewind ${context.year} is on its way", // PHOTOVAULT: branding
         subtitle: "Full story coming soon.",
         meta: <String, Object?>{
           "generatedAt": context.now.toIso8601String(),
