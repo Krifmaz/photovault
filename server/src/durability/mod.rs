@@ -21,6 +21,7 @@
 
 pub mod alerts;
 pub mod catalog;
+pub mod cli;
 pub mod config;
 pub mod dbbackup;
 pub mod evacuate;
@@ -49,6 +50,22 @@ pub struct Runtime {
     pub fsview: Option<Arc<fsview::FsviewState>>,
     /// Running "move objects off this disk" jobs.
     pub evacuations: evacuate::Evacuations,
+    /// Wake-ups for "run now" requests (admin API, status page, CLI).
+    pub triggers: Triggers,
+}
+
+/// One [`tokio::sync::Notify`] per periodic job; `notify_one` makes the job
+/// start its next run immediately (still inside its window).
+#[derive(Debug, Default)]
+pub struct Triggers {
+    /// Catalog sweep.
+    pub sweep: tokio::sync::Notify,
+    /// Scrub.
+    pub scrub: tokio::sync::Notify,
+    /// Replication to every target.
+    pub replicate: tokio::sync::Notify,
+    /// Database snapshot.
+    pub dbbackup: tokio::sync::Notify,
 }
 
 impl Runtime {
@@ -66,6 +83,7 @@ impl Runtime {
             targets,
             fsview,
             evacuations: Default::default(),
+            triggers: Default::default(),
         })
     }
 

@@ -281,7 +281,7 @@ impl Default for AlertsConfig {
 
 /// `[durability.status]`: a small status page with a JSON API on its own
 /// listener, so it is never exposed through the public reverse proxy by accident.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize)]
 #[serde(default)]
 pub struct StatusConfig {
     /// Listen address, e.g. `0.0.0.0:8081`. Empty disables the page (the
@@ -291,16 +291,6 @@ pub struct StatusConfig {
     pub password: Secret,
     /// Read the password from this file instead.
     pub password_file: Option<PathBuf>,
-}
-
-impl Default for StatusConfig {
-    fn default() -> Self {
-        Self {
-            listen: String::new(),
-            password: Secret::default(),
-            password_file: None,
-        }
-    }
 }
 
 /// `[durability.fsview]`: read pool health from an FSView instance on the

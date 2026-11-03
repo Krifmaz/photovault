@@ -64,6 +64,9 @@ pub enum AdminCmd {
         #[arg(long)]
         revoke: bool,
     },
+    /// Checksums, scrubbing, replication, database backups and FSView.
+    #[command(subcommand)]
+    Durability(crate::durability::cli::DurabilityCmd),
 }
 
 /// Parse `123`, `1.5GB`, `500 MB`, `2TB` (binary units) into bytes.
@@ -216,6 +219,7 @@ pub async fn run(state: &AppState, cmd: AdminCmd) -> anyhow::Result<()> {
                 if revoke { "revoked" } else { "granted" }
             );
         }
+        AdminCmd::Durability(cmd) => crate::durability::cli::run(state, cmd).await?,
     }
     Ok(())
 }

@@ -23,3 +23,17 @@ impl FsviewState {
 pub fn spawn(state: AppState) {
     let _ = state;
 }
+
+impl FsviewState {
+    /// Latest pool health and placement decisions as JSON for the status
+    /// page and admin API (`null` before the first poll).
+    pub fn snapshot_json(&self) -> serde_json::Value {
+        serde_json::Value::Null
+    }
+}
+
+/// `photovault admin durability pool`.
+pub async fn cli_pool(state: &AppState) -> anyhow::Result<()> {
+    let _ = state;
+    anyhow::bail!("not implemented yet")
+}
