@@ -10,7 +10,9 @@ name: photovault
 
 services:
   photovault:
-    image: ${PHOTOVAULT_IMAGE:-photovault:latest}
+    # :edge follows every push to the default branch; switch to :latest once
+    # stable releases are cut, or pin a version like :0.1.0-alpha.2.
+    image: ${PHOTOVAULT_IMAGE:-ghcr.io/krifmaz/photovault:edge}
     # build: ..   # build from a checkout instead of pulling
     restart: unless-stopped
     depends_on:
@@ -37,6 +39,13 @@ services:
       - no-new-privileges:true
     cap_drop: [ALL]
     mem_limit: 256m
+    healthcheck:
+      # Built into the binary (the image has no shell or curl).
+      test: ["CMD", "/usr/local/bin/photovault", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
 
   db:
     image: postgres:16-alpine

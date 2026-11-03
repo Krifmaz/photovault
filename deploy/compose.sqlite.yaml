@@ -6,7 +6,7 @@ name: photovault
 
 services:
   photovault:
-    image: ${PHOTOVAULT_IMAGE:-photovault:latest}
+    image: ${PHOTOVAULT_IMAGE:-ghcr.io/krifmaz/photovault:edge}
     restart: unless-stopped
     environment:
       PHOTOVAULT_PUBLIC_URL: https://${PHOTOS_HOST:?set PHOTOS_HOST}
