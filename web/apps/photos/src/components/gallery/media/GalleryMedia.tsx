@@ -3,8 +3,7 @@ import type { FileListHeaderOrFooter } from "@/components/FileList";
 import { FileListWithViewer } from "@/components/FileListWithViewer";
 import { FixCreationTime } from "@/components/FixCreationTime";
 import { SelectedFileOptions } from "@/components/SelectedFileOptions";
-import { externalLink } from "@/utils/link";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { SingleInputDialog } from "ente-base/components/SingleInputDialog";
 import { ItemVisibility } from "ente-media/file-metadata";
 import { AssignPersonDialog } from "ente-new/photos/components/AssignPersonDialog";
@@ -25,7 +24,6 @@ import {
     useState,
     type ReactNode,
 } from "react";
-import { Trans } from "react-i18next";
 
 import type { GallerySectionProps } from "../sections/types";
 type GalleryMediaProps = Pick<
@@ -56,7 +54,7 @@ export const GalleryMedia = (props: GalleryMediaProps) => {
 const GalleryMediaContent = ({
     library,
     operations,
-    navigation,
+    // PHOTOVAULT: strip - `navigation` was only used by the removed footer.
     source,
     header,
     enableDateScrubber,
@@ -141,13 +139,7 @@ const GalleryMediaContent = ({
         [library.collectionFiles],
     );
 
-    const showAppDownloadFooter =
-        library.collectionFiles.length < 30 &&
-        navigation.overlay?.section !== "search";
-    const footer = useMemo(
-        () => (showAppDownloadFooter ? createAppDownloadFooter() : undefined),
-        [showAppDownloadFooter],
-    );
+    // PHOTOVAULT: strip - no "Install our mobile app" store-links footer.
     return (
         <>
             {showSelectionBar && (
@@ -229,7 +221,6 @@ const GalleryMediaContent = ({
                 header={header}
                 enableDateScrubber={enableDateScrubber}
                 onAddPhotos={onAddPhotos}
-                footer={footer}
                 enableDownload
                 enableSelect
                 isInIncomingSharedCollection={source.activeCollectionSummary?.attributes.has(
@@ -257,30 +248,3 @@ const GalleryMediaContent = ({
         </>
     );
 };
-const createAppDownloadFooter = (): FileListHeaderOrFooter => ({
-    component: (
-        <Typography
-            variant="small"
-            sx={{
-                alignSelf: "flex-end",
-                marginInline: "auto",
-                marginBlock: 0.75,
-                textAlign: "center",
-                color: "text.faint",
-            }}
-        >
-            <Trans
-                i18nKey="install_mobile_app"
-                components={{
-                    a: externalLink(
-                        "https://play.google.com/store/apps/details?id=io.ente.photos",
-                    ),
-                    b: externalLink(
-                        "https://apps.apple.com/in/app/ente-photos/id1542026904",
-                    ),
-                }}
-            />
-        </Typography>
-    ),
-    height: 90,
-});

@@ -37,7 +37,6 @@ import {
     ENTE_BRAND_TAG_IMAGE_PATH,
     EnteBrandTagImage,
     isInteractiveTapTarget,
-    JoinNowButton,
     type LaneMemoryViewerProps,
     MOBILE_LAYOUT_BREAKPOINT_PX,
     PhotoContainer,
@@ -1174,24 +1173,6 @@ const LaneTopActionSection = styled("div")({
     display: "flex",
     alignItems: "center",
 });
-
-const laneHeaderJoinNowButtonSx = {
-    fontSize: "17px",
-    paddingBlock: "14px",
-    paddingInline: "30px",
-    "@media (max-width: 900px)": {
-        fontSize: "15px",
-        paddingBlock: "11px",
-        paddingInline: "22px",
-    },
-    [`@media (max-width: ${MOBILE_LAYOUT_BREAKPOINT_PX}px)`]: {
-        borderRadius: "14px",
-        fontSize: "14px",
-        paddingBlock: "9px",
-        paddingInline: "18px",
-        minWidth: "auto",
-    },
-} as const;
 
 const LaneSliderTitle = styled("div")({
     display: "flex",

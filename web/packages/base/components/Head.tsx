@@ -23,7 +23,7 @@ export const CustomHead: React.FC<React.PropsWithChildren<CustomHeadProps>> = ({
     title,
     children,
     // PHOTOVAULT: branding
-    description = "Photovault - end-to-end encrypted photos, based on Ente",
+    description = "Photovault - end-to-end encrypted photos", // PHOTOVAULT: strip
     viewportContent = "width=device-width, initial-scale=1",
 }) => (
     <Head>
