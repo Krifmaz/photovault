@@ -2,8 +2,8 @@ import type { Component } from "chrono-node";
 import * as chrono from "chrono-node";
 import { expose } from "comlink";
 import { HTTPError } from "ente-base/http";
-import { staticAssetURL } from "ente-base/origins"; // PHOTOVAULT: strip
 import { logUnhandledErrorsAndRejectionsInWorker } from "ente-base/log-web";
+import { staticAssetURL } from "ente-base/origins"; // PHOTOVAULT: strip
 import type { Location } from "ente-base/types";
 import type { Collection } from "ente-media/collection";
 import type { EnteFile } from "ente-media/file";

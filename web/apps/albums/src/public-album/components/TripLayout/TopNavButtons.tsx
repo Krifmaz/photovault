@@ -103,4 +103,3 @@ const NavButton = styled(IconButton)({
     height: "44px",
     "&:hover": { backgroundColor: "rgba(255, 255, 255, 1)" },
 });
-

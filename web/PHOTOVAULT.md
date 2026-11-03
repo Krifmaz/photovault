@@ -1,8 +1,11 @@
 # Photovault patches to Ente's web apps
 
-This folder is Ente's `web/` (ente-io/ente) with a small, theme-only patch set
-for Photovault. Every changed hunk carries a `PHOTOVAULT` comment where the file
-format allows comments. Photovault is based on Ente (ente.com).
+This folder is Ente's `web/` (ente-io/ente) with a small patch set for
+Photovault: a retheme (`PHOTOVAULT: theme` / `branding`) and a strip of Ente's
+company features, links and phone-home calls (`PHOTOVAULT: strip`). Every
+changed hunk carries a `PHOTOVAULT` comment where the file format allows
+comments. Photovault is based on Ente; the only user-visible credit is the
+plain-text "Based on Ente" in Settings → Help → About.
 
 ## Where the theme lives
 
@@ -74,8 +77,9 @@ Logo, name, icons:
 
 Credit:
 
-- `apps/photos/src/components/sidebar/Help.tsx`: "Photovault — Based on Ente
-  (ente.com)" row in Settings → Help.
+- `apps/photos/src/components/sidebar/Help.tsx`: About block in Settings → Help
+  with the name, version (desktop) and the plain-text `pvCredit` "Based on Ente"
+  (no link, no logo). `pvCreditURL` was removed from `encore-tokens.ts`.
 
 Hard-coded Ente greens (`#08c225`, `#1db954`, `rgba(8, 194, 37, …)`) pointed at
 the tokens (`pvGold`, `pvGoldHover`, `pvOnGold`, `pvAlpha`), with dark text on
@@ -110,6 +114,129 @@ Strings:
   Photos" in values replaced by "Photovault" (scripted; keys, URLs, e-mail
   addresses and "Ente Auth/Locker/Legacy" untouched). These files are shared
   with Ente's other web apps.
+
+## Strip (company features, Ente links, phone-home)
+
+Kept exactly as upstream: backup, albums, timeline, search, ML, memories, map,
+sharing and public links, collect links, hidden albums, trash, free up space,
+Legacy, family, streamable videos, cast, export, app lock, 2FA and passkeys.
+
+Server and network:
+
+- `packages/base/origins.ts`: `customAPIOrigin()` always resolves (saved
+  server → `NEXT_PUBLIC_ENTE_ENDPOINT` → the page's own http(s) origin →
+  `http://localhost:8080`) and `isCustomAPIOrigin` is always true, so Ente's
+  existing self-hosted code paths run everywhere. The Ente-hosted branches
+  (thumbnails/files/public-albums/cast-albums CDN hosts, uploader worker,
+  ente.com redirects, Ente og:image metadata, join-album redirect to
+  photos.ente.com) are left in place upstream-style but are unreachable. Also
+  new: `staticAssetURL()` for data Ente loads from assets.ente.com.
+- `apps/photos/src/services/places.ts`, `packages/new/photos/services/search/worker.ts`,
+  `packages/gallery/services/ffmpeg/web.ts`: places index, world cities and the
+  ffmpeg.wasm core load from `/static-assets/` on our origin.
+  `scripts/photovault-vendor-assets.sh` (new) copies them into
+  `apps/photos/public/static-assets/` (git-ignored) before a build.
+- `packages/new/photos/services/settings.ts`: default cast/embed URLs and the
+  custom-domain CNAME point at this server instead of cast/embed/my.ente.com.
+- `packages/new/photos/services/user-details.ts`: plans, Stripe and payments-app
+  functions removed (`payments.ente.com`).
+- `apps/{photos,albums,embed}/public/_headers`: no CSP reports to
+  csp-reporter.ente.com and no Ente hosts in the (report-only) policy.
+- `apps/{photos,albums}/public/.well-known/{assetlinks.json,apple-app-site-association}`:
+  emptied (they granted Ente's Android/iOS apps credential sharing and link
+  handling for the domain). JSON, so no comment; listed here. Add Photovault's
+  app ids and signing fingerprints here when they exist.
+
+Photos app (settings and gallery):
+
+- `components/sidebar/Sidebar.tsx`: no Referrals row/screen, plan selector or
+  subscription status line. Where Ente opened the plan selector (storage card,
+  "subscription" action) we open family management, so family stays reachable.
+- `components/sidebar/accounts/{Account,subscription,ManageMemberSubscription}.tsx`,
+  `components/FamilyManagement.tsx`: "Manage plan" row becomes "Family" with
+  storage only (no billing period); no Stripe customer portal; families can be
+  created without a paid plan (the server decides).
+- Deleted: `components/PlanSelector.tsx`, `pages/plan.tsx`,
+  `components/sidebar/ReferralSettings.tsx`, `services/storage-bonus.ts`,
+  `components/{WhatsNew,DesktopWhatsNew}.tsx`, `services/changelog.ts`,
+  `components/gallery/hooks/use-subscription-completion-redirect.tsx`.
+- `components/gallery/hooks/use-gallery-library.ts`, `auth-page-config.ts`: no
+  plan page after sign-up (the "just signed up" flag is cleared as before).
+- `pages/gallery.tsx`: no "What's new" dialog.
+- `components/Upload.tsx`: quota/expiry notifications without "Upgrade" /
+  "Renew" (payments) actions.
+- `components/utils/download.tsx`: "desktop only" dialogs without download
+  links to ente.com.
+- `components/sidebar/Help.tsx`: Ente help centre, blog, feature requests and
+  support e-mail removed; View logs kept; About added (see Credit).
+- `components/sidebar/preferences/{Preferences,MLSettings}.tsx`,
+  `components/{FixCreationTime,TakeoutOptions}.tsx`,
+  `components/auth/DevSettingsDialog.tsx`: Ente help/privacy links removed;
+  "Faster upload" (Ente's Cloudflare upload proxy) toggle removed, and the
+  Advanced section is desktop-only (it only holds desktop options now).
+- `services/search/sidebar-search-registry.ts`: search entries for the removed
+  rows dropped.
+- `components/gallery/media/GalleryMedia.tsx`: no "install our mobile app"
+  Play Store / App Store footer.
+- `components/sidebar/{EnteAppIcon.tsx,account/DeleteAccount.tsx}`: Ente
+  Auth/Locker logos become plain icons, labels "Auth"/"Locker"; the logo PNGs
+  `public/images/app-icons/**/{auth,locker}.png` are deleted.
+- `components/collections/CollectionShare.tsx`: no embed.ente.com fallback.
+- `services/export.ts`: export folder "Photovault" instead of "Ente Photos".
+
+Shared packages and other apps:
+
+- `packages/base/components/Head.tsx`: no Ente-hosted og:image/og:video
+  metadata, no "based on Ente" meta description. Deleted the matching Ente
+  preview assets (`apps/{photos,albums,share}/public/images/preview.png`,
+  `apps/albums/public/videos/preview.mp4`, `apps/memories/public/images/memories-meta*.png`).
+- `packages/base/app.ts`: share app title "Photovault".
+- `packages/accounts/components/{SignUpContents.tsx,auth/SignUpForm.tsx}`: in
+  Photovault apps, no "How did you hear about us?" field and no Ente
+  terms/privacy checkbox (treated as accepted). Auth/Locker unchanged.
+- `packages/accounts/pages/two-factor/recover.tsx`: Photovault apps say to
+  contact the server's administrator instead of support@ente.com.
+- `packages/accounts/components/RecoveryKey.tsx`: recovery key file name
+  `photovault-recovery-key.txt` in Photovault apps.
+- `packages/gallery/components/upload/{DefaultOptions,CanvasReadbackBlockedDialog}.tsx`,
+  `packages/new/photos/components/DevSettings.tsx`: Ente help links removed.
+- `packages/gallery/components/viewer/photoswipe-core.ts`: the public-album
+  wordmark is no longer a link to ente.com.
+- `packages/contacts/legacy/components/LegacyAddContactContent.tsx`: Legacy
+  texts without "Ente".
+- `apps/albums`: no "Join Ente" buttons (`page/PublicAlbumPage.tsx`,
+  `components/TripLayout/{TopNavButtons,MobileNavBar}.tsx`,
+  `viewer/components/PublicAlbumSingleFileViewer.tsx`), wordmark not linked;
+  `access/utils/external-links.ts` (ente.com/get) deleted.
+- `apps/embed/src/components/EmbedFileListWithViewer.tsx`: "powered by" wordmark
+  not linked.
+- `apps/memories`: no og:image, no "Join Ente"/"Get Ente Photos" buttons, brand
+  tag not linked, no redirect to ente.com for a missing token.
+- `apps/cast/src/pages/index.tsx`: no "Visit ente.com/cast for help".
+- `apps/share`: our wordmark (unlinked) instead of the Ente Locker logo (logo
+  SVGs deleted); no redirect to ente.com/locker; title "Photovault".
+- `apps/accounts/src/pages/{index,family,recover-account}.tsx`: no redirect to
+  ente.com; "Open Photovault" goes to this server's web app (`/`).
+
+Images (no comments possible in PNGs; SVGs carry one): duck mascot art replaced
+by the Photovault glyph at the same canvas size, keeping file names so code
+paths are unchanged: `apps/{photos,albums}/public/images/upload-{complete,progress-sleeping}-duck.svg`,
+`apps/photos/public/images/empty-album/duck.svg`,
+`apps/photos/public/images/empty-state/{ente_empty_state_figma,no-matches}.svg`,
+`apps/photos/public/images/feed/empty.png`,
+`apps/accounts/public/images/family-invite{,-accepted,-invalid}.png` (rendered
+from `branding/icon-1024.png`).
+
+Locales (`packages/base/locales/*/translation.json`, scripted): removed the
+unused `referral_share_text` and `delete_account_multi_app_warning` keys
+everywhere and `auth_developer_settings_subtitle` outside en-US (it named
+api.ente.io; other languages fall back to English); replaced the brand word in
+forms the first pass missed (lowercase "ente", "Enteä", Ente attached to CJK,
+Hangul or Telugu text). `title_auth`/`title_locker` ("Ente Auth"/"Ente Locker")
+stay: only Ente's Auth and Locker apps use them. en-US `view_logs_message` no
+longer says "email to us".
+
+See `PHOTOVAULT-GREP.md` for the remaining grep hits and why each is left.
 
 ## Merging upstream
 

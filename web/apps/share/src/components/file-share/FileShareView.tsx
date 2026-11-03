@@ -1,7 +1,7 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 // PHOTOVAULT: strip
-import { PhotovaultLogo } from "ente-base/components/photovault/PhotovaultLogo";
 import { Notification } from "ente-base/components/Notification";
+import { PhotovaultLogo } from "ente-base/components/photovault/PhotovaultLogo";
 import Head from "next/head";
 import React from "react";
 import { useFileShare } from "../../hooks/use-file-share";

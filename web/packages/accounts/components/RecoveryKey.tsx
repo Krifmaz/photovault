@@ -6,6 +6,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
 import type { MiniDialogAttributes } from "ente-base/components/MiniDialog";
 import { SpacedRow } from "ente-base/components/containers";
 import { DialogCloseIconButton } from "ente-base/components/mui/DialogCloseIconButton";
@@ -13,9 +14,8 @@ import { FocusVisibleButton } from "ente-base/components/mui/FocusVisibleButton"
 import { errorDialogAttributes } from "ente-base/components/utils/dialog";
 import { useIsSmallWidth } from "ente-base/components/utils/hooks";
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
-import log from "ente-base/log";
-import { appName } from "ente-base/app"; // PHOTOVAULT: strip
 import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
+import log from "ente-base/log";
 import { saveStringAsFile } from "ente-base/utils/web";
 import { t } from "i18next";
 import { useCallback, useEffect, useState, type ComponentType } from "react";

@@ -91,12 +91,7 @@ export const Help: React.FC<HelpProps> = ({
                 break;
         }
         onActionHandled?.();
-    }, [
-        confirmViewLogs,
-        open,
-        onActionHandled,
-        pendingAction,
-    ]);
+    }, [confirmViewLogs, open, onActionHandled, pendingAction]);
 
     return (
         <TitledNestedSidebarDrawer

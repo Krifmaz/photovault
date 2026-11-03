@@ -105,7 +105,9 @@ export function SignUpForm({
                                         <InfoOutlinedIcon
                                             fontSize="inherit"
                                             tabIndex={0}
-                                            aria-label={t("referral_source_info")}
+                                            aria-label={t(
+                                                "referral_source_info",
+                                            )}
                                         />
                                     </Tooltip>
                                 </ReferralLabel>

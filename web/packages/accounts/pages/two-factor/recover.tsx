@@ -8,14 +8,14 @@ import {
     type TwoFactorRecovery,
     type TwoFactorType,
 } from "ente-accounts/services/user";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
 import { LoadingIndicator } from "ente-base/components/loaders";
 import type { MiniDialogAttributes } from "ente-base/components/MiniDialog";
 import type { SingleInputFormProps } from "ente-base/components/SingleInputForm";
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import { useBaseContext } from "ente-base/context";
 import { isNamedError } from "ente-base/error";
 import log from "ente-base/log";
-import { appName } from "ente-base/app"; // PHOTOVAULT: strip
-import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import { t } from "i18next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
