@@ -33,7 +33,7 @@ for HTTPS, reverse proxies and the Proxmox/Portainer setup, and
 | --- | --- |
 | `server/` | Rust server (replaces Ente's Go "museum") |
 | `node/` | Rust compute node (optional, later) |
-| `importers/` | Immich and iCloud import tools (later) |
+| `importers/` | Immich and iCloud import tools ([guide](docs/src/importers.md)) |
 | `mobile/`, `web/`, `desktop/` | Light forks of Ente's apps (later) |
 | `plugins/sdk/` | Plugin SDK and examples (later) |
 | `deploy/` | Docker Compose files (SQLite or PostgreSQL) and example config |

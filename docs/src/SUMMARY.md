@@ -12,6 +12,7 @@
 - [Storage backends](storage.md)
 - [Observability](observability.md)
 - [Admin CLI](admin-cli.md)
+- [Importing from Immich and iCloud](importers.md)
 
 # Internals
 

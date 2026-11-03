@@ -30,7 +30,12 @@ pub async fn run(
     let mut s = Summary::default();
     let total = source.total().await?;
     if let Some(t) = total {
-        tracing::info!(source = source.name(), total = t, already_done = journal.len(), "starting import");
+        tracing::info!(
+            source = source.name(),
+            total = t,
+            already_done = journal.len(),
+            "starting import"
+        );
     }
     loop {
         let skipped = std::sync::atomic::AtomicU64::new(0);
