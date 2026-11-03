@@ -6,6 +6,8 @@ mod account;
 mod srp;
 mod twofactor;
 
+pub(crate) use account::details_v2;
+
 use crate::auth::AuthUser;
 use crate::error::ApiResult;
 use crate::jwt::scope;
@@ -156,7 +158,7 @@ pub(crate) async fn update_email(state: &AppState, user_id: i64, email: &str) ->
     sqlx::query("UPDATE users SET encrypted_email = $1, email_decryption_nonce = $2, email_hash = $3 WHERE user_id = $4")
         .bind(ct)
         .bind(nonce)
-        .bind(users::email_hash(state, &email))
+        .bind(users::email_hash(&state.keys, &email))
         .bind(user_id)
         .execute(&state.db.pool)
         .await?;
@@ -209,7 +211,8 @@ pub(crate) fn pretty_ua(ua: &str) -> String {
 }
 
 async fn sessions(State(state): State<AppState>, user: AuthUser) -> ApiResult<Json<Value>> {
-    let rows: Vec<(String, i64, Option<String>, Option<String>, i64)> = sqlx::query_as(
+    type Row = (String, i64, Option<String>, Option<String>, i64);
+    let rows: Vec<Row> = sqlx::query_as(
         "SELECT token_hash, creation_time, ip, user_agent, last_used_at FROM tokens WHERE user_id = $1 AND app = $2 AND is_deleted = FALSE ORDER BY creation_time",
     )
     .bind(user.user_id)

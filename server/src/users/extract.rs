@@ -213,8 +213,9 @@ impl FromRequestParts<AppState> for PaymentJwtUser {
     }
 }
 
-/// Museum's `AdminAuthMiddleware`: user ids in `config.admins`; when none are configured,
-/// the lowest user id (the first account on the instance) is the admin.
+/// Museum's `AdminAuthMiddleware`: user ids in `config.admins` or marked with
+/// `photovault admin mark-admin`; when neither exists, the lowest user id (the first
+/// account on the instance) is the admin.
 #[derive(Debug, Clone)]
 pub struct Admin(pub AuthUser);
 
@@ -238,8 +239,22 @@ impl FromRequestParts<AppState> for Admin {
 
 /// Whether `user_id` may use `/admin/*`.
 pub async fn is_admin(state: &AppState, user_id: i64) -> bool {
-    if !state.config.admins.is_empty() {
-        return state.config.admins.contains(&user_id);
+    if state.config.admins.contains(&user_id) {
+        return true;
+    }
+    // Admins marked with `photovault admin mark-admin`.
+    let flagged: Vec<(i64,)> =
+        sqlx::query_as("SELECT user_id FROM users WHERE is_admin = $1 AND is_deleted = $2")
+            .bind(true)
+            .bind(false)
+            .fetch_all(&state.db.pool)
+            .await
+            .unwrap_or_default();
+    if flagged.iter().any(|f| f.0 == user_id) {
+        return true;
+    }
+    if !state.config.admins.is_empty() || !flagged.is_empty() {
+        return false;
     }
     let min: Option<(Option<i64>,)> = sqlx::query_as("SELECT MIN(user_id) FROM users")
         .fetch_optional(&state.db.pool)

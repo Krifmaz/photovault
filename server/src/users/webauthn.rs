@@ -132,7 +132,7 @@ pub fn parse_auth_data(d: &[u8]) -> Result<AuthData, WebauthnError> {
     })
 }
 
-fn map_get<'a>(m: &'a [(Value, Value)], k: i64) -> Option<&'a Value> {
+fn map_get(m: &[(Value, Value)], k: i64) -> Option<&Value> {
     m.iter().find_map(|(key, v)| match key {
         Value::Integer(i) if i128::from(*i) == k as i128 => Some(v),
         _ => None,

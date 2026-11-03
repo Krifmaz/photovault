@@ -72,10 +72,7 @@ pub async fn http_raw(
 
 fn dechunk(mut b: &[u8]) -> Vec<u8> {
     let mut out = Vec::new();
-    loop {
-        let Some(p) = b.windows(2).position(|w| w == b"\r\n") else {
-            break;
-        };
+    while let Some(p) = b.windows(2).position(|w| w == b"\r\n") {
         let n = usize::from_str_radix(std::str::from_utf8(&b[..p]).unwrap().trim(), 16).unwrap();
         if n == 0 {
             break;

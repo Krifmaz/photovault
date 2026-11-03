@@ -55,7 +55,7 @@ async fn create_session_row(
     let b_secret = random_bytes(32);
     let b = srp_math::server_b(&verifier, &b_secret);
     let id = users::new_uuid();
-    sqlx::query("INSERT INTO srp_sessions (id, srp_user_id, server_key, srp_a, created_at) VALUES ($1, $2, $3, $4, $5)")
+    sqlx::query("INSERT INTO srp_sessions (id, srp_user_id, server_key, srp_a, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $5)")
         .bind(&id)
         .bind(srp_user_id)
         .bind(b64(&b_secret))
@@ -395,7 +395,15 @@ pub(super) async fn attributes(
         // trips; normally an unknown account is a plain 404, which the apps handle.
         return Err(users::not_found_plain());
     };
-    let row: Option<(String, String, Option<i64>, Option<i64>, Option<String>, i64)> = sqlx::query_as(
+    type Row = (
+        String,
+        String,
+        Option<i64>,
+        Option<i64>,
+        Option<String>,
+        i64,
+    );
+    let row: Option<Row> = sqlx::query_as(
         "SELECT s.srp_user_id, s.salt, k.mem_limit, k.ops_limit, k.kek_salt, CASE WHEN u.email_mfa THEN 1 ELSE 0 END FROM srp_auth s \
          LEFT JOIN key_attributes k ON k.user_id = s.user_id JOIN users u ON u.user_id = s.user_id WHERE s.user_id = $1",
     )
@@ -466,7 +474,7 @@ pub(super) async fn create_session(
             return Err(users::bad_request("Invalid length for srpA"));
         }
         let id = users::new_uuid();
-        sqlx::query("INSERT INTO srp_sessions (id, srp_user_id, server_key, srp_a, is_fake, created_at) VALUES ($1, $2, $3, $4, TRUE, $5)")
+        sqlx::query("INSERT INTO srp_sessions (id, srp_user_id, server_key, srp_a, is_fake, created_at, updated_at) VALUES ($1, $2, $3, $4, TRUE, $5, $5)")
             .bind(&id)
             .bind(&srp_user_id)
             .bind(b64(&random_bytes(64)))

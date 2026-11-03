@@ -63,7 +63,7 @@ pub async fn add_ott(
     ott: &str,
     expiry: i64,
 ) -> ApiResult<()> {
-    let hash = email_hash(state, &normalize_email(email));
+    let hash = email_hash(&state.keys, &normalize_email(email));
     let exists: Option<(i64,)> =
         sqlx::query_as("SELECT 1 FROM otts WHERE email_hash = $1 AND app = $2 AND ott = $3")
             .bind(&hash)
@@ -96,7 +96,7 @@ pub async fn add_ott(
 
 /// Unexpired OTTs for an email (newest first), as `(ott, app, expiration_time)`.
 pub async fn pending_otts(state: &AppState, email: &str) -> ApiResult<Vec<(String, String, i64)>> {
-    let hash = email_hash(state, &normalize_email(email));
+    let hash = email_hash(&state.keys, &normalize_email(email));
     Ok(sqlx::query_as(
         "SELECT ott, app, expiration_time FROM otts WHERE email_hash = $1 AND expiration_time > $2 ORDER BY creation_time DESC",
     )
@@ -135,7 +135,7 @@ pub async fn send_email_ott(
         }
     }
     let app = client.app();
-    let hash = email_hash(state, &email);
+    let hash = email_hash(&state.keys, &email);
     let (active,): (i64,) = sqlx::query_as(
         "SELECT COUNT(*) FROM otts WHERE email_hash = $1 AND app = $2 AND expiration_time > $3",
     )
@@ -178,7 +178,7 @@ pub async fn send_email_ott(
 /// Museum `verifyEmailOtt`.
 pub async fn verify_email_ott(state: &AppState, app: App, email: &str, ott: &str) -> ApiResult<()> {
     let ott = ott.trim();
-    let hash = email_hash(state, email);
+    let hash = email_hash(&state.keys, email);
     let now = now_micros();
     let mut tx = state.db.pool.begin().await?;
     let rows: Vec<(String, i64)> = sqlx::query_as(

@@ -195,11 +195,23 @@ pub(super) async fn details(
         q.get("memoryCount"),
         "false" | "0" | "f" | "F" | "FALSE" | "False"
     );
-    let u = users::get_user_not_deleted(&state, user.user_id).await?;
+    Ok(Json(
+        details_v2(&state, user.user_id, user.app, fetch_count).await?,
+    ))
+}
+
+/// Museum `UserController.GetDetailsV2` (also attached to `/admin/user`).
+pub(crate) async fn details_v2(
+    state: &AppState,
+    user_id: i64,
+    app: crate::auth::App,
+    fetch_count: bool,
+) -> ApiResult<Value> {
+    let u = users::get_user_not_deleted(state, user_id).await?;
     let db = &state.db;
     let bonus_user = u.family_admin_id.unwrap_or(u.id);
     let mut family_data = match u.family_admin_id {
-        Some(admin) => Some(users::family::fetch_members_for_admin(&state, admin).await?),
+        Some(admin) => Some(users::family::fetch_members_for_admin(state, admin).await?),
         None => None,
     };
     let bonus = users::active_bonus(db, bonus_user).await?;
@@ -210,7 +222,7 @@ pub(super) async fn details(
             .fetch_optional(&db.pool)
             .await?
             .is_some();
-    let app = user.app.as_str();
+    let app_name = app.as_str();
     let now = now_micros();
     let mut plan_storage = if sub.expiry_time < now {
         0
@@ -226,7 +238,7 @@ pub(super) async fn details(
     }
     let (_, locker_bytes) = users::app_file_stats(db, u.id, "locker").await?;
     let mut usage = users::usage(db, u.id).await?;
-    if user.app != crate::auth::App::Auth {
+    if app != crate::auth::App::Auth {
         usage = (usage - locker_bytes).max(0);
     }
     let mut out = json!({
@@ -238,7 +250,7 @@ pub(super) async fn details(
             "canDisableEmailMFA": can_disable_mfa,
             "isEmailMFAEnabled": u.email_mfa,
             "isTwoFactorEnabled": u.is_two_factor_enabled,
-            "passkeyCount": users::passkeys::count(&state, u.id).await?,
+            "passkeyCount": users::passkeys::count(state, u.id).await?,
         },
         "bonusData": bonus,
     });
@@ -246,10 +258,10 @@ pub(super) async fn details(
         out["familyData"] = serde_json::to_value(f).map_err(crate::error::ApiError::internal)?;
     }
     if fetch_count {
-        out["fileCount"] = json!(users::file_count(db, u.id, app).await?);
+        out["fileCount"] = json!(users::file_count(db, u.id, app_name).await?);
         out["sharedCollectionsCount"] = json!(0);
     }
-    if user.app == crate::auth::App::Locker {
+    if app == crate::auth::App::Locker {
         let mut total = 0;
         let members = match u.family_admin_id {
             Some(a) => users::family::active_members(db, a)
@@ -264,7 +276,7 @@ pub(super) async fn details(
         }
         out["lockerFamilyUsage"] = json!({ "familyFileCount": total });
     }
-    Ok(Json(out))
+    Ok(out)
 }
 
 pub(super) async fn deletion_summary(

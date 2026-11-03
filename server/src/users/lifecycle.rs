@@ -14,6 +14,8 @@ const DAY: i64 = 24 * 3600 * 1_000_000;
 /// `isSubscriptionCancelled` (always true here: there is no payment provider to cancel).
 pub async fn delete_account(state: &AppState, user_id: i64, send_email: bool) -> ApiResult<bool> {
     let user = get_user(state, user_id).await?;
+    // TODO(integration): call `crate::legacy::emergency::handle_account_deletion` and
+    // `crate::public::memory::delete_for_user` here once those modules are merged in.
     family::reset_family_access(state, user_id).await?;
     revoke_tokens(&state.db, user_id, Revoke::All).await?;
     let now = now_micros();
@@ -145,10 +147,11 @@ pub async fn recovery_status(
     if row.is_none() {
         return Err(unavailable());
     }
-    if let Some(other) = user_id_for_email(state, email).await? {
-        if other != user_id {
-            return Err(email_in_use());
-        }
+    if user_id_for_email(state, email)
+        .await?
+        .is_some_and(|other| other != user_id)
+    {
+        return Err(email_in_use());
     }
     Ok("ready")
 }
@@ -164,7 +167,7 @@ pub async fn recover_account(
         return Ok("recovered");
     }
     let email = normalize_email(email);
-    let hash = email_hash(state, &email);
+    let hash = email_hash(&state.keys, &email);
     let (ct, nonce) = encrypt_email(state, &email)?;
     let mut tx = state.db.pool.begin().await?;
     let row: Option<(Option<String>,)> = sqlx::query_as(

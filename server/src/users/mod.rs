@@ -31,9 +31,13 @@ pub fn normalize_email(email: &str) -> String {
     email.trim().to_lowercase()
 }
 
-/// Keyed BLAKE2b-256 of the (already normalised) email, standard base64 (museum `crypto.GetHash`).
-pub fn email_hash(state: &AppState, email: &str) -> String {
-    keyed_hash(state, email)
+/// `users.email_hash`: hex of keyed BLAKE2b-256 (`keys.hashing`) over the normalised
+/// (trimmed, lower-cased) email. The single definition every workstream uses.
+pub fn email_hash(keys: &crate::state::Keys, email: &str) -> String {
+    hex::encode(crate::crypto::generichash(
+        normalize_email(email).as_bytes(),
+        &keys.hashing,
+    ))
 }
 
 /// Museum's `crypto.GetHash` for any string (also used for TOTP secret hashes).

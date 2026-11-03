@@ -71,7 +71,7 @@ pub async fn get_user_not_deleted(state: &AppState, user_id: i64) -> ApiResult<U
 
 /// Museum `GetUserIDWithEmailUnrestricted` (email is normalised here).
 pub async fn user_id_for_email(state: &AppState, email: &str) -> ApiResult<Option<i64>> {
-    let hash = email_hash(state, &normalize_email(email));
+    let hash = email_hash(&state.keys, &normalize_email(email));
     let row: Option<(i64,)> = sqlx::query_as("SELECT user_id FROM users WHERE email_hash = $1")
         .bind(hash)
         .fetch_optional(&state.db.pool)
@@ -101,7 +101,7 @@ pub async fn create_user(state: &AppState, email: &str, source: Option<&str>) ->
     )
     .bind(ct)
     .bind(nonce)
-    .bind(email_hash(state, &email))
+    .bind(email_hash(&state.keys, &email))
     .bind(now)
     .bind(state.config.default_storage_bytes)
     .bind(now + FREE_PLAN_YEARS * YEAR_MICROS)
