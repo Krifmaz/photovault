@@ -20,8 +20,8 @@ Precedence: environment variable > `--config` TOML > `/config/keys.toml` (keys o
 | `PHOTOVAULT_S3_*` | – | `ENDPOINT`, `PUBLIC_ENDPOINT`, `REGION`, `BUCKET`, `ACCESS_KEY`, `SECRET_KEY`, `SECRET_KEY_FILE`, `PATH_STYLE` (unchanged) |
 | `PHOTOVAULT_STORAGE_LIMIT` | unset | S3 total limit (size string, e.g. `4TB`); unset = unlimited |
 | `PHOTOVAULT_DEFAULT_QUOTA` | unset | Per-user default quota (size string); unset = none |
-| `PHOTOVAULT_WEB_DIR` | `/app/web` (image) | Built web app served on the API port |
-| `PHOTOVAULT_WEB_ORIGINS` | unset | Extra CORS origins, comma-separated |
+| `PHOTOVAULT_WEB_DIR` | `/app/web` (image) | Built web app served on the API port: `$uri`, `$uri.html`, `$uri/index.html`, then the nearest sub-app `index.html` (`/albums/`, `/cast/`, `/accounts/`, else root) for extension-less paths; `_next/static` cached immutable |
+| `PHOTOVAULT_WEB_ORIGINS` | unset (= any origin) | When set, CORS is restricted to this comma-separated list; `/photovault/info` stays open |
 | `PHOTOVAULT_MDNS` | `true` | Announce `_photovault._tcp` |
 | `PHOTOVAULT_LOG_FORMAT` | `pretty` | `pretty` or `json`; one line per event |
 | `PHOTOVAULT_ALLOW_SIGNUPS` | `false` | Open sign-up |
@@ -31,7 +31,7 @@ Precedence: environment variable > `--config` TOML > `/config/keys.toml` (keys o
 | `PHOTOVAULT_JWT_SECRET`, `PHOTOVAULT_ENCRYPTION_KEY`, `PHOTOVAULT_HASHING_KEY` | from `keys.toml` | If set, used as-is and `keys.toml` is not written |
 | `PHOTOVAULT_WEBAUTHN_RP_ID`, `_RP_ORIGINS` | derived from public URL | Passkeys |
 
-Unchanged legacy URL variables (`PHOTOVAULT_ALBUMS_URL`, `_CAST_URL`, `_ACCOUNTS_URL`, `_FAMILY_URL`, …) default to paths under the public URL.
+Companion URLs default to `publicUrl` + `/accounts`, `/family`, `/cast`; albums default to `publicUrl/albums` (override `PHOTOVAULT_ALBUMS_URL`). Passkey rpId defaults to the public URL host.
 
 ## `/config/keys.toml` (mode 0600, created on first start if missing)
 
@@ -40,7 +40,7 @@ Unchanged legacy URL variables (`PHOTOVAULT_ALBUMS_URL`, `_CAST_URL`, `_ACCOUNTS
 # server-side fields cannot be read.
 jwt_secret = "<base64, 32 bytes>"
 encryption_key = "<base64, 32 bytes>"   # libsodium secretbox key (museum key.encryption)
-hashing_key = "<base64, 64 bytes>"      # museum key.hash
+hashing_key = "<base64, 64 bytes>"      # museum key.hash; 16–64 bytes accepted
 ```
 
 Encodings match museum's so an existing install's env values can be pasted in. On creation the server
@@ -48,8 +48,8 @@ logs once: `Generated new keys in /config/keys.toml. Back up this file; it canno
 
 ## Startup checks (exit code 78, one line, no restart loop)
 
-Run before serving, in order: config dir writable, storage path writable (local) or bucket reachable (S3),
-database reachable and migrated, keys valid (lengths, base64). Message format:
+Run before serving, in order: config dir writable, keys valid (lengths, base64), storage path writable
+(local) or bucket reachable (S3), database reachable and migrated. Message format:
 
 ```
 photovault: cannot write /data: owned by uid 0, running as uid 65532; fix: chown -R 65532:65532 <host path for /data>
@@ -61,9 +61,9 @@ server sleeps 30 s before exiting on a failed check so a restart policy does not
 ## Admin CLI (`photovault admin <verb>`)
 
 Existing: `list-users`, `set-storage`, `pending-ott`, `add-ott`, `disable-2fa`, `delete-user`, `mark-admin`.
-Added: `create-user <email> [--password-stdin]` (runs SRP setup and key generation server-side
-exactly as the web client does, see note), `reset-password <email>` (issues a one-time code and prints it;
-the user picks the password in the app, because the server never sees passwords or keys),
+Added: `create-user <email> [--quota <size>] [--admin]` (prints a sign-up code, see note),
+`reset-password <email> [--erase --yes]` (issues a one-time code; the user picks the password in the app,
+because the server never sees passwords or keys; `--erase` wipes the account's data for a fresh start),
 `quota <email> <size|none>` (alias of `set-storage`), `signups on|off`.
 Other: `photovault migrate-to-sqlite --from postgres://… [--to /config/photovault.db]`.
 

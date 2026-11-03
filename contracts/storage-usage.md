@@ -3,7 +3,7 @@
 ## Rule (server)
 
 * `used` = bytes the user has stored (family members: the family's total, as Ente does).
-* `free` = local storage: `statvfs(PHOTOVAULT_STORAGE_PATH)`: `f_bavail * f_frsize`, cached ≤ 60 s.
+* `free` = local storage: `statvfs(PHOTOVAULT_STORAGE_PATH)`: `f_bavail * f_frsize`, cached 10 s.
   S3: `PHOTOVAULT_STORAGE_LIMIT - used` if set, else unlimited.
 * `quota` = per-user quota (admin CLI) else `PHOTOVAULT_DEFAULT_QUOTA`; `0` / unset means none.
 * `limit = min(quota, used + free)` (either side dropped when it is "none"/unlimited).
