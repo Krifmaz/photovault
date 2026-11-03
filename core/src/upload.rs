@@ -630,7 +630,10 @@ impl Inner {
             state.thumb_obj = None;
             self.save_up_state(row, &state)?;
         }
-        let meta = state.metadata.clone().unwrap_or_else(|| unreachable!());
+        let meta = state
+            .metadata
+            .clone()
+            .ok_or_else(|| CoreError::storage("upload state without metadata"))?;
         let file_key = state.file_key.clone().unwrap_or_default();
 
         // 2. Target collection.
