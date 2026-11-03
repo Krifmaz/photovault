@@ -1,0 +1,53 @@
+{
+  "description": "Account key material exactly as the client generates it at signup (generate_keys_with_strength, Interactive argon2id params). Server stores keyAttributes verbatim; it can never decrypt them.",
+  "provenance": {
+    "generator": "server/tests/vectors/generator (photovault-vecgen)",
+    "upstream": "https://github.com/ente-io/ente",
+    "upstreamCommit": "b2ed3dc93e49d6ac9831bf3550957816d3a0735d",
+    "clientCode": [
+      "rust/crates/accounts/src/auth/srp.rs (SrpSession: what web/packages/accounts/services/srp.ts calls via ente-prelogin-wasm)",
+      "rust/crates/accounts/src/auth/api.rs (derive_kek, derive_srp_login_key, generate_srp_setup_with_login_key)",
+      "rust/crates/accounts/src/auth/key_gen.rs (generate_keys_with_strength)",
+      "rust/crates/core/src/crypto/{argon,kdf,sealed,secretbox}.rs",
+      "rust/bindings/wasm/lib/src/prelogin.rs (wasm entry points authDeriveKek, authGenerateSrpSetup, authGenerateSignupKeys)"
+    ],
+    "srpCrate": "srp 0.7.0-rc.3 (RustCrypto), ClientG4096<Sha256>"
+  },
+  "password": "correct horse battery staple",
+  "keyAttributes": {
+    "kekSalt": "kNL2L+NAmWVpZp08d+oYNA==",
+    "encryptedKey": "U6cLnnqSkuaT8Uk1CQoQScRLeiAz0PKchtvGma1qUHTJc/X5Rw9BMGQdTTmNz7wq",
+    "keyDecryptionNonce": "D46WmoXRPslL6yOf21Uvu8DlBJp2vHYX",
+    "publicKey": "Y1b65fCFNwl0tHR4usQFX21XZwphusdHxvwGleVXmBM=",
+    "encryptedSecretKey": "C3O6MrQyC+prqJlpoTXaF0z+i61vfTh1LwUQonH7E4KKpYSb6bumUBiXr2WNSvln",
+    "secretKeyDecryptionNonce": "njaPltkse56f5k4FnDLJMGex/uhmM4RU",
+    "memLimit": 67108864,
+    "opsLimit": 2,
+    "masterKeyEncryptedWithRecoveryKey": "gBGMXKJKcTycqLA+pSYbeFu5NZUoHGEhVNd+xpWfM3ILBRtEka0G4va2lHBRerw8",
+    "masterKeyDecryptionNonce": "r+3O3n0+5xlYlqdTB3u/eJIZKKSF8PLm",
+    "recoveryKeyEncryptedWithMasterKey": "VrH19ZpBhHvfQ2LTQHRCtaeBQ5XkFh2LYzZdioYIEJUiwPJbAafV07HZr0y0x8q+",
+    "recoveryKeyDecryptionNonce": "z4NjHb9OQIECRnNCmH9Ov3k0VaUVBWJm"
+  },
+  "plaintext": {
+    "kek": "kkRupQsJ9HT1ifTJrSoyjXLKdpzoSZIcCP2bs9VZz6M=",
+    "loginSubKey": "5kBCg4QpgcZpSzxybz+oHg==",
+    "masterKey": "NYTVvIWk6utbj19kLbTNYBmMj03yRxnYCctumFyIMSo=",
+    "secretKey": "2zaamPqlXOrAoH+0qrBgsjSfZ5lSRtl9n1saiLhiHZQ=",
+    "recoveryKeyHex": "7ff7055c91f2bc95456262bd9b79a3d835c5ac345e1275ba31430c9fca22a088",
+    "recoveryKeyMnemonic": "lend return fire catalog cloth enjoy better era rural swift happy race fox stock sphere seat interest spice express bomb witness bacon lion attitude"
+  },
+  "checks": [
+    "kek = crypto_pwhash(32, password, kekSalt, opsLimit, memLimit, ARGON2ID13)",
+    "masterKey = secretbox_open(encryptedKey, keyDecryptionNonce, kek)",
+    "secretKey = secretbox_open(encryptedSecretKey, secretKeyDecryptionNonce, masterKey)",
+    "publicKey = crypto_scalarmult_base(secretKey)",
+    "masterKey = secretbox_open(masterKeyEncryptedWithRecoveryKey, masterKeyDecryptionNonce, recoveryKey)",
+    "recoveryKey = secretbox_open(recoveryKeyEncryptedWithMasterKey, recoveryKeyDecryptionNonce, masterKey)"
+  ],
+  "collectionKeyBox": {
+    "key": "NYTVvIWk6utbj19kLbTNYBmMj03yRxnYCctumFyIMSo=",
+    "plaintext": "UZL4/787T+i1PVRQgupnfgw/7guEUjZW9MG1NsUzDgM=",
+    "encryptedData": "pbnBm7zQrdWl/jt4ZmHtxbOv1HfqchTBSjdaue1oDlXRPlguKs9TCWU9VWYutOu+",
+    "nonce": "b3innsVhhMZgYI0iCAaznUt3cflrsoIB"
+  }
+}
