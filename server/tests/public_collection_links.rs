@@ -525,7 +525,7 @@ async fn file_data_and_previews() {
     assert_eq!(r.status, 403);
 
     sqlx::query(
-        "INSERT INTO file_data (file_id, user_id, data_type, size, obj_id, updated_at) VALUES ($1, $2, $3, $4, $5, $6)",
+        "INSERT INTO file_data (file_id, user_id, data_type, size, obj_id, updated_at, latest_bucket, created_at) VALUES ($1, $2, $3, $4, $5, $6, 'local', $6)",
     )
     .bind(fid)
     .bind(owner)

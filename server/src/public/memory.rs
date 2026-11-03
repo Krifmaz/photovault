@@ -36,7 +36,7 @@ fn row(state: &AppState, r: &AnyRow) -> sqlx::Result<MemoryShare> {
         key_decryption_nonce: r.try_get(7)?,
         url: format!("{}/{}", memories_host(state), access_token),
         access_token,
-        is_deleted: super::library_sql::get_bool(r, 9)?,
+        is_deleted: r.try_get::<i64, _>(9)? != 0,
         created_at: r.try_get(10)?,
         updated_at: r.try_get(11)?,
     })

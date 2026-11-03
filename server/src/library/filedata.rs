@@ -956,7 +956,8 @@ pub async fn multipart_preview_upload_url(
     )
     .await?;
     temp.content_length = Some(req.content_length);
-    let m = objects::issue_multipart(state, temp, md5s.len() as u32).await?;
+    let specs = objects::part_specs(req.content_length, req.part_length, count, Some(md5s));
+    let m = objects::issue_multipart_with(state, temp, &specs).await?;
     Ok(PreviewUploadUrl {
         object_id: id,
         url: None,

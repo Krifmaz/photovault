@@ -8,6 +8,7 @@ use crate::auth::StorageUser;
 use crate::error::{ApiError, ApiResult};
 use crate::public::files::{self, ObjectType, parse_file_id};
 use crate::public::http::{PJson, bad_request_msg, new_access_token, url_redirect, url_v3};
+use crate::library::files as library_files;
 use crate::public::library_sql;
 use crate::public::links::MemoryShareLink;
 use crate::public::memory::{self, CreateError, MEMORY_SHARE_TTL, ShareFile};
@@ -104,11 +105,12 @@ async fn create(
     if file_ids.iter().collect::<HashSet<_>>().len() != file_ids.len() {
         return Err(bad());
     }
-    let db = &state.db.pool;
-    if !library_sql::can_access_files(db, user.user_id, &file_ids).await? {
-        return Err(ApiError::status(StatusCode::FORBIDDEN));
-    }
-    let owners = library_sql::file_owners(db, &file_ids).await?;
+    library_files::can_access_files(&state, user.user_id, &file_ids).await?;
+    let owners: HashMap<i64, i64> = library_files::owner_to_file_ids(&state, &file_ids)
+        .await?
+        .into_iter()
+        .flat_map(|(owner, ids)| ids.into_iter().map(move |f| (f, owner)))
+        .collect();
     if owners.len() != file_ids.len() {
         return Err(bad());
     }
@@ -198,14 +200,13 @@ async fn public_files(
     State(state): State<AppState>,
     link: MemoryShareLink,
 ) -> ApiResult<Json<Value>> {
-    let db = &state.db.pool;
     let mut out = Vec::new();
-    for sf in memory::files(db, link.share.id).await? {
+    for sf in memory::files(&state.db.pool, link.share.id).await? {
         // Skip files that left every collection, were deleted, or are placeholders.
-        if library_sql::active_collection_count(db, sf.file_id).await? == 0 {
+        if library_sql::active_collection_count(&state, sf.file_id).await? == 0 {
             continue;
         }
-        let Some(mut file) = library_sql::file_attributes(db, sf.file_id).await? else {
+        let Some(mut file) = library_sql::file_attributes(&state, sf.file_id).await? else {
             continue;
         };
         if file.metadata.encrypted_data == "-" {
@@ -228,7 +229,7 @@ async fn accessible_owner(state: &AppState, share_id: i64, file_id: i64) -> ApiR
     let owner = memory::file_owner_in_share(db, share_id, file_id)
         .await?
         .ok_or_else(|| ApiError::status(StatusCode::NOT_FOUND))?;
-    if library_sql::active_collection_count(db, file_id).await? == 0 {
+    if library_sql::active_collection_count(state, file_id).await? == 0 {
         return Err(ApiError::status(StatusCode::NOT_FOUND));
     }
     Ok(owner)
@@ -242,7 +243,7 @@ async fn file_url(
 ) -> ApiResult<String> {
     let file_id = parse_file_id(raw_id)?;
     accessible_owner(state, link.share.id, file_id).await?;
-    let file = library_sql::file_attributes(&state.db.pool, file_id)
+    let file = library_sql::file_attributes(state, file_id)
         .await?
         .ok_or_else(|| ApiError::status(StatusCode::NOT_FOUND))?;
     if file.metadata.encrypted_data == "-" {

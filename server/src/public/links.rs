@@ -10,7 +10,7 @@ use super::http::{
     client_ip, header_or_query, header_value, json_response, route_path, user_agent,
 };
 use super::jwt;
-use super::library_sql;
+use crate::library::links;
 use super::memory::{self, MEMORY_SHARE_TTL};
 use super::models::MemoryShare;
 use crate::db::now_micros;
@@ -211,10 +211,10 @@ impl FromRequestParts<AppState> for CollectionLink {
         let ip = client_ip(parts);
         let ua = user_agent(parts);
         let path = route_path(parts);
-        let link = library_sql::collection_link_by_token(&state.db.pool, &token)
+        let link = links::collection_link_by_token(state, &token)
             .await
             .map_err(|e| {
-                tracing::warn!(error = %e, "album link lookup failed");
+                tracing::warn!(error = ?e, "album link lookup failed");
                 invalid_token()
             })?
             .ok_or_else(invalid_token)?;
@@ -224,7 +224,7 @@ impl FromRequestParts<AppState> for CollectionLink {
         if expired(link.valid_till) {
             return Err(gone("LINK_EXPIRED", "expired token"));
         }
-        if let Some(hash) = link.pw_hash.as_deref().filter(|h| !h.is_empty())
+        if let Some(hash) = link.pass_hash.as_deref().filter(|h| !h.is_empty())
             && !COLLECTION_PASSWORD_WHITELIST.contains(&path.as_str())
         {
             // museum serialises a plain Go error here, which renders as `{}`.
@@ -296,10 +296,10 @@ impl FromRequestParts<AppState> for FileLink {
         let ip = client_ip(parts);
         let ua = user_agent(parts);
         let path = route_path(parts);
-        let link = library_sql::file_link_by_token(&state.db.pool, &token)
+        let link = links::file_link_by_token(state, &token)
             .await
             .map_err(|e| {
-                tracing::info!(error = %e, "file link lookup failed");
+                tracing::info!(error = ?e, "file link lookup failed");
                 invalid_token()
             })?
             .ok_or_else(invalid_token)?;

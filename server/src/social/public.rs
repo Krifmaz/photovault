@@ -296,7 +296,7 @@ async fn create_comment(
     check_comment_cipher(&b.cipher, &b.nonce)?;
     let actor = p.actor(&st, &b.anon).await?;
     let id = super::create_comment(
-        &st.db,
+        &st,
         &actor,
         NewComment {
             id: b.id,
@@ -347,7 +347,7 @@ async fn delete_comment(
             .await?
             .ok_or_else(not_found)?;
         if c.user_id != uid {
-            let role = library_sql::collection_role(&st.db, c.collection_id, uid, p.app).await?;
+            let role = library_sql::collection_role(&st, c.collection_id, uid, p.app).await?;
             if role < library_sql::Role::Admin {
                 return Err(permission_denied());
             }
@@ -452,7 +452,7 @@ async fn create_reaction(
     }
     let actor = p.actor(&st, &b.anon).await?;
     let id = super::upsert_reaction(
-        &st.db,
+        &st,
         &actor,
         NewReaction {
             id: b.id,

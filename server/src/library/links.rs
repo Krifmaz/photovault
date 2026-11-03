@@ -204,6 +204,25 @@ pub async fn active_collection_link(state: &AppState, cid: i64) -> ApiResult<Col
     CollectionLinkRow::from_row(&r).map_err(db_err)
 }
 
+/// `GetCollectionLinkRowByToken`: the link with this access token, disabled ones included
+/// (the public-link middleware reports those as gone).
+pub async fn collection_link_by_token(
+    state: &AppState,
+    token: &str,
+) -> ApiResult<Option<CollectionLinkRow>> {
+    let r = sqlx::query(&format!(
+        "SELECT {LINK_COLUMNS} FROM public_collection_tokens WHERE access_token = $1"
+    ))
+    .bind(token)
+    .fetch_optional(&state.db.pool)
+    .await
+    .map_err(db_err)?;
+    r.as_ref()
+        .map(CollectionLinkRow::from_row)
+        .transpose()
+        .map_err(db_err)
+}
+
 /// `GetCollectionToActivePublicURLMap`: every id in `cids` maps to its (possibly empty) links.
 pub async fn active_public_urls(
     state: &AppState,
@@ -685,6 +704,96 @@ async fn active_file_link_row(state: &AppState, file_id: i64) -> ApiResult<Optio
     .fetch_optional(&state.db.pool)
     .await
     .map_err(db_err)
+}
+
+/// A file link row (`ente.FileLinkRow`) as the public file-link endpoints need it,
+/// including the password hash.
+#[derive(Debug, Clone)]
+pub struct FileLinkRow {
+    /// Link id (`pft_…`).
+    pub link_id: String,
+    /// File.
+    pub file_id: i64,
+    /// File owner.
+    pub owner_id: i64,
+    /// Access token.
+    pub access_token: String,
+    /// Disabled.
+    pub is_disabled: bool,
+    /// Expiry (0 = never).
+    pub valid_till: i64,
+    /// Device limit (0 = unlimited).
+    pub device_limit: i64,
+    /// Password hash.
+    pub pw_hash: Option<String>,
+    /// KDF nonce for the password.
+    pub pw_nonce: Option<String>,
+    /// KDF memory limit for the password.
+    pub mem_limit: Option<i64>,
+    /// KDF ops limit for the password.
+    pub ops_limit: Option<i64>,
+    /// Downloads allowed.
+    pub enable_download: bool,
+    /// File key encrypted for the link.
+    pub encrypted_file_key: Option<String>,
+    /// Nonce for `encrypted_file_key`.
+    pub encrypted_file_key_nonce: Option<String>,
+    /// KDF nonce for the link secret.
+    pub kdf_nonce: Option<String>,
+    /// KDF memory limit for the link secret.
+    pub kdf_mem_limit: Option<i64>,
+    /// KDF ops limit for the link secret.
+    pub kdf_ops_limit: Option<i64>,
+}
+
+impl FileLinkRow {
+    fn from_row(r: &AnyRow) -> Result<Self, sqlx::Error> {
+        Ok(Self {
+            link_id: get_str(r, "id")?,
+            file_id: get_i64(r, "file_id")?,
+            owner_id: get_i64(r, "owner_id")?,
+            access_token: get_str(r, "access_token")?,
+            is_disabled: get_bool(r, "is_disabled")?,
+            valid_till: get_i64(r, "valid_till")?,
+            device_limit: get_i64(r, "device_limit")?,
+            pw_hash: get_opt_str(r, "pw_hash")?,
+            pw_nonce: get_opt_str(r, "pw_nonce")?,
+            mem_limit: get_opt_i64(r, "mem_limit")?,
+            ops_limit: get_opt_i64(r, "ops_limit")?,
+            enable_download: get_bool(r, "enable_download")?,
+            encrypted_file_key: get_opt_str(r, "encrypted_file_key")?,
+            encrypted_file_key_nonce: get_opt_str(r, "encrypted_file_key_nonce")?,
+            kdf_nonce: get_opt_str(r, "kdf_nonce")?,
+            kdf_mem_limit: get_opt_i64(r, "kdf_mem_limit")?,
+            kdf_ops_limit: get_opt_i64(r, "kdf_ops_limit")?,
+        })
+    }
+}
+
+/// `GetFileUrlRowByToken`: the active link with this token, else a disabled one.
+pub async fn file_link_by_token(state: &AppState, token: &str) -> ApiResult<Option<FileLinkRow>> {
+    let r = sqlx::query(&format!(
+        "SELECT {FILE_LINK_COLUMNS} FROM public_file_tokens WHERE access_token = $1
+         ORDER BY CASE WHEN is_disabled = FALSE THEN 0 ELSE 1 END, created_at DESC LIMIT 1"
+    ))
+    .bind(token)
+    .fetch_optional(&state.db.pool)
+    .await
+    .map_err(db_err)?;
+    r.as_ref()
+        .map(FileLinkRow::from_row)
+        .transpose()
+        .map_err(db_err)
+}
+
+/// `GetActiveFileUrlToken`: the file's active link, if any.
+pub async fn active_file_link(state: &AppState, file_id: i64) -> ApiResult<Option<FileLinkRow>> {
+    active_file_link_row(state, file_id)
+        .await?
+        .as_ref()
+        .map(FileLinkRow::from_row)
+        .transpose()
+        .map_err(db_err)
 }
 
 /// `POST /files/share-url` body (`ente.CreateFileUrl`).

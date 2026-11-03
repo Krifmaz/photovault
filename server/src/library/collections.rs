@@ -988,31 +988,16 @@ pub async fn unshare_user(state: &AppState, cid: i64, to: i64) -> ApiResult<&'st
     Ok(status)
 }
 
-/// Best-effort cleanup of a revoked participant's casting sessions, comments and
-/// reactions in tables owned by other workstreams.
+/// museum's `cleanupRevokedShare`: soft-delete the revoked participant's comments and
+/// reactions in the collection and revoke their cast sessions for it. Best effort: the
+/// share is already gone, so failures are logged rather than returned.
 pub async fn cleanup_revoked_share(state: &AppState, cid: i64, uid: i64) {
-    let now = now_micros();
-    users::best_effort(
-        state,
-        "cast",
-        "UPDATE casting SET is_deleted = TRUE WHERE collection_id = $1 AND cast_user = $2",
-        &[cid, uid],
-    )
-    .await;
-    users::best_effort(
-        state,
-        "comments",
-        "UPDATE comments SET is_deleted = TRUE, updated_at = $3 WHERE collection_id = $1 AND user_id = $2 AND is_deleted = FALSE",
-        &[cid, uid, now],
-    )
-    .await;
-    users::best_effort(
-        state,
-        "reactions",
-        "UPDATE reactions SET is_deleted = TRUE, updated_at = $3 WHERE collection_id = $1 AND user_id = $2 AND is_deleted = FALSE",
-        &[cid, uid, now],
-    )
-    .await;
+    if let Err(e) = crate::social::remove_user_social_activity(&state.db, cid, uid).await {
+        tracing::warn!(collection_id = cid, user_id = uid, error = ?e, "social cleanup after unshare failed");
+    }
+    if let Err(e) = crate::public::cast::revoke_for_user_and_collection(&state.db.pool, cid, uid).await {
+        tracing::warn!(collection_id = cid, user_id = uid, error = %e, "cast revoke after unshare failed");
+    }
 }
 
 /// `CollectionController.UnShare` (`{collectionID, email}`): returns the remaining sharees.
@@ -1601,6 +1586,36 @@ pub fn scrub_deleted(f: File) -> File {
     }
 }
 
+/// One page of a collection's raw diff (museum's `getDiff`, before any per-viewer
+/// post-processing): entries changed after `since`, oldest first, never splitting a version.
+/// No access check; public links and cast use it after authenticating the collection.
+pub async fn diff_page(state: &AppState, cid: i64, since: i64) -> ApiResult<(Vec<File>, bool)> {
+    let rows = diff_rows(state, cid, since, DIFF_LIMIT as i64 + 1).await?;
+    page_by_version(
+        rows,
+        DIFF_LIMIT,
+        |f| f.updation_time,
+        |v| files_with_version(state, cid, v),
+    )
+    .await
+}
+
+/// museum's `GetCollectionFileState == CollectionFileActive`: the file is in the collection,
+/// not deleted, and not pending removal (`action = 'REMOVE'`).
+pub async fn is_active_member(state: &AppState, cid: i64, file_id: i64) -> ApiResult<bool> {
+    let r = sqlx::query(
+        "SELECT is_deleted, action FROM collection_files WHERE collection_id = $1 AND file_id = $2",
+    )
+    .bind(cid)
+    .bind(file_id)
+    .fetch_optional(&state.db.pool)
+    .await
+    .map_err(db_err)?;
+    let Some(r) = r else { return Ok(false) };
+    Ok(!get_bool(&r, "is_deleted").map_err(db_err)?
+        && get_opt_str(&r, "action").map_err(db_err)?.as_deref() != Some(action::REMOVE))
+}
+
 /// `CollectionController.GetDiffV2`: files of a collection changed after `since`.
 pub async fn diff(
     state: &AppState,
@@ -1610,14 +1625,7 @@ pub async fn diff(
     since: i64,
 ) -> ApiResult<(Vec<File>, bool)> {
     access(state, cid, actor, app, false, false).await?;
-    let rows = diff_rows(state, cid, since, DIFF_LIMIT as i64 + 1).await?;
-    let (rows, has_more) = page_by_version(
-        rows,
-        DIFF_LIMIT,
-        |f| f.updation_time,
-        |v| files_with_version(state, cid, v),
-    )
-    .await?;
+    let (rows, has_more) = diff_page(state, cid, since).await?;
     let out = rows
         .into_iter()
         .map(|mut f| {
@@ -1719,13 +1727,9 @@ pub async fn trash_v3(
         .await
         .map_err(db_err)?;
     tx.commit().await.map_err(db_err)?;
-    users::best_effort(
-        state,
-        "cast",
-        "UPDATE casting SET is_deleted = TRUE WHERE collection_id = $1",
-        &[cid],
-    )
-    .await;
+    if let Err(e) = crate::public::cast::revoke_for_collection(&state.db.pool, cid).await {
+        tracing::warn!(collection_id = cid, error = %e, "cast revoke after collection delete failed");
+    }
     Ok(())
 }
 

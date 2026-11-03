@@ -6,8 +6,8 @@
 //! being referenced (replaced by an update, permanently deleted) are queued under
 //! [`DELETE_OBJECT_QUEUE`] and deleted by the same task once no `object_keys` row points at them.
 //!
-//! The public-collection workstream can reuse [`issue_put_url`] / [`issue_multipart`] for
-//! uploads into shared albums (pass its own `purpose`).
+//! [`upload_url_with_metadata`] / [`multipart_upload_url_with_metadata`] serve both the
+//! private v2 upload endpoints and public-link (collect) uploads.
 
 use super::errors;
 use super::sql::db_err;
@@ -15,8 +15,8 @@ use crate::auth::App;
 use crate::db::now_micros;
 use crate::error::ApiResult;
 use crate::state::AppState;
-use crate::storage::MultipartUrls;
-use serde::Serialize;
+use crate::storage::{MultipartUrls, PartSpec};
+use serde::{Deserialize, Serialize};
 use sqlx::AnyConnection;
 use std::time::Duration;
 
@@ -201,29 +201,170 @@ pub async fn issue_put_url(state: &AppState, temp: TempObject) -> ApiResult<Uplo
     })
 }
 
-/// Start a multipart upload of `parts` parts for `temp.object_key` and stage it.
+/// Start a multipart upload of `parts` unbound parts for `temp.object_key` and stage it
+/// (museum's legacy `GET /files/multipart-upload-urls`).
 pub async fn issue_multipart(
     state: &AppState,
-    mut temp: TempObject,
+    temp: TempObject,
     parts: u32,
+) -> ApiResult<MultipartUploadUrls> {
+    issue_multipart_with(state, temp, &vec![PartSpec::default(); parts as usize]).await
+}
+
+/// Start a multipart upload with one part URL per entry of `parts` (each binding its
+/// length/MD5 when given) and stage it with the backend's upload id, so a stale upload can
+/// later be aborted.
+pub async fn issue_multipart_with(
+    state: &AppState,
+    mut temp: TempObject,
+    parts: &[PartSpec],
 ) -> ApiResult<MultipartUploadUrls> {
     let m = state
         .store
-        .create_multipart(&temp.object_key, parts, URL_TTL)
+        .create_multipart_with(&temp.object_key, parts, URL_TTL)
         .await
         .map_err(errors::storage)?;
-    temp.upload_id = upload_id_from_url(&m.complete_url).or_else(|| Some(String::new()));
+    temp.upload_id = Some(m.upload_id.clone());
     add_temp_object(state, &temp).await?;
     Ok(m.into())
 }
 
-/// The `uploadId` query parameter of a multipart URL.
-pub fn upload_id_from_url(u: &str) -> Option<String> {
-    let parsed = url::Url::parse(u).ok()?;
-    parsed
-        .query_pairs()
-        .find(|(k, _)| k == "uploadId")
-        .map(|(_, v)| v.into_owned())
+/// museum's `computePartLengths`: `count` parts of `part_length` bytes, the last one
+/// holding the remainder.
+pub fn part_lengths(content_length: i64, part_length: i64, count: i64) -> Vec<i64> {
+    (0..count)
+        .map(|i| {
+            if i == count - 1 {
+                content_length - part_length * (count - 1)
+            } else {
+                part_length
+            }
+        })
+        .collect()
+}
+
+/// Part specs binding museum's computed part lengths and, when given, the part MD5s.
+pub fn part_specs(
+    content_length: i64,
+    part_length: i64,
+    count: i64,
+    md5s: Option<Vec<String>>,
+) -> Vec<PartSpec> {
+    let mut md5s = md5s.map(|v| v.into_iter());
+    part_lengths(content_length, part_length, count)
+        .into_iter()
+        .map(|len| PartSpec {
+            len: Some(len),
+            md5: md5s.as_mut().and_then(|m| m.next()),
+        })
+        .collect()
+}
+
+/// museum's `ente.UploadURLRequest` (`POST /files/upload-url`, `/public-collection/upload-url`).
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default)]
+pub struct UploadUrlRequest {
+    /// Exact object size.
+    #[serde(rename = "contentLength")]
+    pub content_length: i64,
+    /// Base64 MD5 of the object.
+    #[serde(rename = "contentMD5")]
+    pub content_md5: String,
+}
+
+/// museum's `ente.MultipartUploadURLRequest`.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default)]
+pub struct MultipartUploadUrlRequest {
+    /// Total size.
+    #[serde(rename = "contentLength")]
+    pub content_length: i64,
+    /// Size of every part but the last.
+    #[serde(rename = "partLength")]
+    pub part_length: i64,
+    /// Base64 MD5 of each part.
+    #[serde(rename = "partMd5s")]
+    pub part_md5s: Option<Vec<String>>,
+}
+
+/// A staged `file_upload` for `user_id` under a fresh object key.
+pub fn file_upload_temp(user_id: i64, app: App, client: &str) -> TempObject {
+    TempObject {
+        object_key: new_object_key(user_id),
+        user_id: Some(user_id),
+        app: Some(app.as_str().into()),
+        purpose: Some(PURPOSE_FILE_UPLOAD.into()),
+        client: Some(client.into()),
+        ..Default::default()
+    }
+}
+
+/// `FileController.GetUploadURLWithMetadata`: a single-PUT URL binding the declared length
+/// and MD5, staged for `user_id` (the uploader, or the album owner for public collect).
+pub async fn upload_url_with_metadata(
+    state: &AppState,
+    user_id: i64,
+    req: &UploadUrlRequest,
+    app: App,
+    client: &str,
+) -> ApiResult<UploadUrl> {
+    if req.content_length == 0 || req.content_md5.is_empty() {
+        return Err(errors::bad());
+    }
+    if req.content_length < 0 || req.content_length > MAX_FILE_SIZE {
+        return Err(errors::bad());
+    }
+    let md5 = normalize_md5(&req.content_md5)?;
+    super::usage::can_upload(state, user_id, Some(req.content_length), app).await?;
+    let mut t = file_upload_temp(user_id, app, client);
+    t.content_length = Some(req.content_length);
+    t.content_md5 = Some(md5);
+    issue_put_url(state, t).await
+}
+
+/// `FileController.GetMultipartUploadURLWithMetadata`: part URLs binding each part's
+/// length (and MD5 when `partMd5s` is given), staged with the upload id.
+pub async fn multipart_upload_url_with_metadata(
+    state: &AppState,
+    user_id: i64,
+    req: &MultipartUploadUrlRequest,
+    app: App,
+    client: &str,
+) -> ApiResult<MultipartUploadUrls> {
+    if req.content_length == 0 || req.part_length == 0 {
+        return Err(errors::bad());
+    }
+    if req.content_length < 0 || req.content_length > MAX_FILE_SIZE {
+        return Err(errors::bad());
+    }
+    if req.part_md5s.as_ref().is_some_and(|v| v.is_empty()) {
+        return Err(errors::bad());
+    }
+    if validate_part_length(req.content_length, req.part_length).is_err() {
+        return Err(errors::bad());
+    }
+    let count = (req.content_length - 1) / req.part_length + 1;
+    if count > MAX_PARTS {
+        return Err(errors::bad());
+    }
+    let md5s = match &req.part_md5s {
+        None => None,
+        Some(m) => {
+            if m.len() as i64 != count {
+                return Err(errors::bad());
+            }
+            Some(
+                m.iter()
+                    .map(|c| normalize_md5(c))
+                    .collect::<ApiResult<Vec<_>>>()?,
+            )
+        }
+    };
+    super::usage::can_upload(state, user_id, None, app).await?;
+    let specs = part_specs(req.content_length, req.part_length, count, md5s);
+    let mut t = file_upload_temp(user_id, app, client);
+    t.content_length = Some(req.content_length);
+    issue_multipart_with(state, t, &specs).await
 }
 
 /// `ConsumeFileUpload`: delete the staged row for a key used by a new file. Exactly one row

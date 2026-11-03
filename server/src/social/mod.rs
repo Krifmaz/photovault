@@ -19,6 +19,7 @@ pub mod repo;
 
 use crate::db::Db;
 use crate::error::{ApiError, ApiResult};
+use crate::state::AppState;
 use axum::http::StatusCode;
 use serde::Serialize;
 
@@ -265,13 +266,14 @@ pub struct NewComment {
 }
 
 /// museum `CommentsController.Create` after the access check.
-pub async fn create_comment(db: &Db, actor: &Actor, req: NewComment) -> ApiResult<String> {
+pub async fn create_comment(state: &AppState, actor: &Actor, req: NewComment) -> ApiResult<String> {
+    let db = &state.db;
     let id = normalize_id("cmt_", &req.id)?;
     if req.cipher.is_empty() || req.nonce.is_empty() {
         return Err(bad_request());
     }
     if let Some(fid) = req.file_id {
-        library_sql::require_file_in_collection(db, req.collection_id, fid).await?;
+        library_sql::require_file_in_collection(state, req.collection_id, fid).await?;
     }
     if let Some(pid) = &req.parent_comment_id {
         let p = repo::get_comment(db, pid).await?.ok_or_else(not_found)?;
@@ -335,13 +337,14 @@ pub struct NewReaction {
 
 /// museum `ReactionsController.Upsert` after the access check. Returns the id of the
 /// (possibly pre-existing) reaction of this actor on this target.
-pub async fn upsert_reaction(db: &Db, actor: &Actor, req: NewReaction) -> ApiResult<String> {
+pub async fn upsert_reaction(state: &AppState, actor: &Actor, req: NewReaction) -> ApiResult<String> {
+    let db = &state.db;
     let id = normalize_id("rct_", &req.id)?;
     if req.cipher.is_empty() || req.nonce.is_empty() {
         return Err(bad_request());
     }
     if let Some(fid) = req.file_id {
-        library_sql::require_file_in_collection(db, req.collection_id, fid).await?;
+        library_sql::require_file_in_collection(state, req.collection_id, fid).await?;
     }
     let mut file_id = req.file_id;
     if let Some(cid) = &req.comment_id {

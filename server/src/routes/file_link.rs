@@ -7,6 +7,7 @@
 use crate::error::{ApiError, ApiResult};
 use crate::public::files::{self, ObjectType};
 use crate::public::http::{PJson, url_redirect, url_v3};
+use crate::library::links;
 use crate::public::library_sql;
 use crate::public::links::FileLink;
 use crate::routes::public_collection::{VerifyPasswordRequest, verify_link_password};
@@ -35,11 +36,10 @@ fn not_found() -> ApiError {
 }
 
 async fn info(State(state): State<AppState>, link: FileLink) -> ApiResult<Response> {
-    let db = &state.db.pool;
-    let file = library_sql::file_attributes(db, link.file_id)
+    let file = library_sql::file_attributes(&state, link.file_id)
         .await?
         .ok_or_else(not_found)?;
-    let row = library_sql::active_file_link(db, link.file_id)
+    let row = links::active_file_link(&state, link.file_id)
         .await?
         .ok_or_else(not_found)?;
     // museum `ente.FileLinkSecret`: every field is omitted when unset.
@@ -67,7 +67,7 @@ async fn info(State(state): State<AppState>, link: FileLink) -> ApiResult<Respon
 }
 
 async fn pass_info(State(state): State<AppState>, link: FileLink) -> ApiResult<Json<Value>> {
-    let row = library_sql::active_file_link(&state.db.pool, link.file_id)
+    let row = links::active_file_link(&state, link.file_id)
         .await?
         .ok_or_else(not_found)?;
     Ok(Json(json!({
@@ -105,7 +105,7 @@ async fn verify_password(
     if req.pass_hash.is_empty() {
         return Err(ApiError::status(StatusCode::BAD_REQUEST));
     }
-    let row = library_sql::active_file_link(&state.db.pool, link.file_id)
+    let row = links::active_file_link(&state, link.file_id)
         .await?
         .ok_or_else(not_found)?;
     verify_link_password(&state, row.pw_hash.as_deref(), &req.pass_hash)

@@ -114,10 +114,10 @@ async fn delete_expired_temp_objects(state: &AppState) -> ApiResult<()> {
             tracing::error!(key = %key, error = %e, "failed to delete expired upload");
             continue;
         }
-        if let (Some(local), Some(id)) = (&state.local_store, upload_id.filter(|u| !u.is_empty()))
-            && let Ok(dir) = local.multipart_dir(&id)
+        if let Some(id) = upload_id.filter(|u| !u.is_empty())
+            && let Err(e) = state.store.abort_multipart(&key, &id).await
         {
-            let _ = tokio::fs::remove_dir_all(dir).await;
+            tracing::warn!(key = %key, error = %e, "failed to abort expired multipart upload");
         }
         sqlx::query("DELETE FROM temp_objects WHERE object_key = $1 AND expiration_time <= $2")
             .bind(key)

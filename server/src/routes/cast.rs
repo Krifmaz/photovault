@@ -11,7 +11,7 @@ use crate::public::files::{self, ObjectType, parse_file_id};
 use crate::public::http::{
     PJson, client_ip, not_found_code, parse_uuid, url_redirect, url_v3, user_agent,
 };
-use crate::public::library_sql;
+use crate::library::collections;
 use crate::state::AppState;
 use axum::extract::{FromRequestParts, Path, Query, State};
 use axum::http::StatusCode;
@@ -277,9 +277,7 @@ async fn diff(
 }
 
 async fn info(State(state): State<AppState>, session: CastSession) -> ApiResult<Json<Value>> {
-    let mut c = library_sql::collection(&state.db.pool, session.collection_id)
-        .await?
-        .ok_or_else(|| ApiError::status(StatusCode::NOT_FOUND))?;
+    let (_, mut c) = collections::get(&state, session.collection_id).await?;
     if c.is_deleted {
         return Err(ApiError::status(StatusCode::NOT_FOUND));
     }

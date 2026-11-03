@@ -13,7 +13,7 @@ use crate::library::http::{Empty200, JsonBody, QueryMap, empty_json, header, pat
 use crate::library::links::{self, CreateFileUrlRequest, UpdateFileUrlRequest};
 use crate::library::model::{File, FileAttributes};
 use crate::library::objects::{
-    self, MAX_FILE_SIZE, MAX_PARTS, MultipartUploadUrls, PURPOSE_FILE_UPLOAD, TempObject, URL_TTL,
+    self, MAX_PARTS, MultipartUploadUrls, TempObject, URL_TTL,
     UploadUrl,
 };
 use crate::library::usage;
@@ -74,14 +74,7 @@ pub fn router() -> Router<AppState> {
 }
 
 fn temp_object(user_id: i64, app: App, headers: &HeaderMap) -> TempObject {
-    TempObject {
-        object_key: objects::new_object_key(user_id),
-        user_id: Some(user_id),
-        app: Some(app.as_str().into()),
-        purpose: Some(PURPOSE_FILE_UPLOAD.into()),
-        client: Some(objects::client_info(headers)),
-        ..Default::default()
-    }
+    objects::file_upload_temp(user_id, app, &objects::client_info(headers))
 }
 
 async fn upload_eligibility(
@@ -127,81 +120,28 @@ async fn multipart_upload_urls(
     Ok(Json(json!({ "urls": urls })))
 }
 
-#[derive(Deserialize, Default)]
-#[serde(default)]
-struct UploadUrlRequest {
-    #[serde(rename = "contentLength")]
-    content_length: i64,
-    #[serde(rename = "contentMD5")]
-    content_md5: String,
-}
-
 async fn upload_url_v2(
     State(state): State<AppState>,
     StorageUser(u): StorageUser,
     headers: HeaderMap,
-    JsonBody(req): JsonBody<UploadUrlRequest>,
+    JsonBody(req): JsonBody<objects::UploadUrlRequest>,
 ) -> ApiResult<Json<UploadUrl>> {
-    if req.content_length == 0 || req.content_md5.is_empty() {
-        return Err(errors::bad());
-    }
-    if req.content_length < 0 || req.content_length > MAX_FILE_SIZE {
-        return Err(errors::bad());
-    }
-    let md5 = objects::normalize_md5(&req.content_md5)?;
-    usage::can_upload(&state, u.user_id, Some(req.content_length), u.app).await?;
-    let mut t = temp_object(u.user_id, u.app, &headers);
-    t.content_length = Some(req.content_length);
-    t.content_md5 = Some(md5);
-    Ok(Json(objects::issue_put_url(&state, t).await?))
-}
-
-#[derive(Deserialize, Default)]
-#[serde(default)]
-struct MultipartUploadUrlRequest {
-    #[serde(rename = "contentLength")]
-    content_length: i64,
-    #[serde(rename = "partLength")]
-    part_length: i64,
-    #[serde(rename = "partMd5s")]
-    part_md5s: Option<Vec<String>>,
+    let client = objects::client_info(&headers);
+    Ok(Json(
+        objects::upload_url_with_metadata(&state, u.user_id, &req, u.app, &client).await?,
+    ))
 }
 
 async fn multipart_upload_url_v2(
     State(state): State<AppState>,
     StorageUser(u): StorageUser,
     headers: HeaderMap,
-    JsonBody(req): JsonBody<MultipartUploadUrlRequest>,
+    JsonBody(req): JsonBody<objects::MultipartUploadUrlRequest>,
 ) -> ApiResult<Json<MultipartUploadUrls>> {
-    if req.content_length == 0 || req.part_length == 0 {
-        return Err(errors::bad());
-    }
-    if req.content_length < 0 || req.content_length > MAX_FILE_SIZE {
-        return Err(errors::bad());
-    }
-    if req.part_md5s.as_ref().is_some_and(|v| v.is_empty()) {
-        return Err(errors::bad());
-    }
-    if objects::validate_part_length(req.content_length, req.part_length).is_err() {
-        return Err(errors::bad());
-    }
-    let parts = (req.content_length - 1) / req.part_length + 1;
-    if parts > MAX_PARTS {
-        return Err(errors::bad());
-    }
-    if let Some(m) = &req.part_md5s {
-        if m.len() as i64 != parts {
-            return Err(errors::bad());
-        }
-        for c in m {
-            objects::normalize_md5(c)?;
-        }
-    }
-    usage::can_upload(&state, u.user_id, None, u.app).await?;
-    let mut t = temp_object(u.user_id, u.app, &headers);
-    t.content_length = Some(req.content_length);
+    let client = objects::client_info(&headers);
     Ok(Json(
-        objects::issue_multipart(&state, t, parts as u32).await?,
+        objects::multipart_upload_url_with_metadata(&state, u.user_id, &req, u.app, &client)
+            .await?,
     ))
 }
 
