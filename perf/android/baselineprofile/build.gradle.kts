@@ -21,7 +21,8 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        create("release") {
+            matchingFallbacks += listOf("release")
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
         }

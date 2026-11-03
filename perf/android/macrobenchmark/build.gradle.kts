@@ -23,7 +23,8 @@ android {
         // Release variant of the test APK, signed with the debug key so it can be
         // installed next to any app build. Both variants work for measuring:
         // Macrobenchmark only requires the *target app* to be non-debuggable.
-        getByName("release") {
+        create("release") {
+            matchingFallbacks += listOf("release")
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
         }
