@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- The target is chosen at run time (instrumentation arg targetPackage), so this
+         self-instrumenting test APK needs to see any installed package in order to
+         resolve its launch intent. Test-only APK, never distributed. -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <queries>
+        <package android:name="app.photovault" />
+        <package android:name="app.photovault.native" />
+    </queries>
+</manifest>
