@@ -1,0 +1,21 @@
+[package]
+name = "photovault-plugin"
+description = "Command-line tool to create signing keys and pack, verify and inspect Photovault plugin packages."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+# Wasmtime 49 (via Extism 1.41) needs Rust 1.96.
+rust-version = "1.96"
+
+[[bin]]
+name = "photovault-plugin"
+path = "src/main.rs"
+
+[dependencies]
+photovault-plugin-host = { path = "../host" }
+photovault-plugin-manifest = { path = "../manifest" }
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3"
