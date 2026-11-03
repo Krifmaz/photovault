@@ -14,6 +14,19 @@ thumbnail, file name, face or location.
 
 Section 1 (Rust server compatible with the stock Ente apps) is in progress.
 
+## Quick start
+
+```sh
+docker build -t photovault:latest .
+cp deploy/.env.example deploy/.env   # fill in hostnames and secrets
+docker compose -f deploy/compose.sqlite.yaml --env-file deploy/.env up -d
+```
+
+Objects can live on a local directory (a mergerfs pool is fine) or any
+S3-compatible service. See [docs/src/deployment.md](docs/src/deployment.md)
+for HTTPS, reverse proxies and the Proxmox/Portainer setup, and
+[UPSTREAM.md](UPSTREAM.md) for how the app forks track Ente.
+
 ## Repository layout
 
 | Path | Contents |
@@ -23,7 +36,8 @@ Section 1 (Rust server compatible with the stock Ente apps) is in progress.
 | `importers/` | Immich and iCloud import tools (later) |
 | `mobile/`, `web/`, `desktop/` | Light forks of Ente's apps (later) |
 | `plugins/sdk/` | Plugin SDK and examples (later) |
-| `docs/` | mdBook documentation |
+| `deploy/` | Docker Compose files (SQLite or PostgreSQL) and example config |
+| `docs/` | mdBook documentation (`mdbook build docs`) |
 | `scripts/` | Maintenance scripts, including the upstream merge |
 
 ## Licence

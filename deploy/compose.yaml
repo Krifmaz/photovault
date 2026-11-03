@@ -1,0 +1,62 @@
+# Photovault with PostgreSQL. Paste into a Portainer stack (or `docker compose up -d`).
+#
+# Host layout (inside the Proxmox LXC):
+#   /drivepool/photovault  encrypted objects (mergerfs pool bind-mounted into the LXC)
+#   /opt/photovault        database files
+#
+# Variables come from Portainer's "Environment variables" (or a .env file next
+# to this file); see deploy/.env.example.
+name: photovault
+
+services:
+  photovault:
+    image: ${PHOTOVAULT_IMAGE:-photovault:latest}
+    # build: ..   # build from a checkout instead of pulling
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PHOTOVAULT_PUBLIC_URL: https://${PHOTOS_HOST:?set PHOTOS_HOST}
+      PHOTOVAULT_STORAGE_PUBLIC_URL: https://${STORAGE_HOST:-${PHOTOS_HOST}}
+      PHOTOVAULT_STORAGE_PATH: /data
+      PHOTOVAULT_DATABASE_URL: postgres://photovault:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/photovault
+      PHOTOVAULT_JWT_SECRET: ${PHOTOVAULT_JWT_SECRET:?set it to the output of head -c 32 /dev/urandom | base64}
+      PHOTOVAULT_ENCRYPTION_KEY: ${PHOTOVAULT_ENCRYPTION_KEY:?set it to the output of head -c 32 /dev/urandom | base64}
+      PHOTOVAULT_HASHING_KEY: ${PHOTOVAULT_HASHING_KEY:?set it to the output of head -c 32 /dev/urandom | base64}
+      PHOTOVAULT_ALLOW_SIGNUPS: ${PHOTOVAULT_ALLOW_SIGNUPS:-false}
+      RUST_LOG: ${RUST_LOG:-info}
+    volumes:
+      - /drivepool/photovault:/data
+    networks:
+      - proxy_net
+      - internal
+    # No published ports: the reverse proxy on proxy_net reaches photovault:8080.
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    mem_limit: 256m
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: photovault
+      POSTGRES_DB: photovault
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - /opt/photovault/postgres:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U photovault -d photovault"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    shm_size: 128m
+
+networks:
+  proxy_net:
+    external: true
+  internal: {}
