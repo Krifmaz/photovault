@@ -58,8 +58,11 @@ jobs:
           export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME"
           cargo ndk --platform 28 -t arm64-v8a -t x86_64 -o native/android/core/build/jniLibs \
             build --locked --release -p photovault-core
+          # The release profile strips symbols, UniFFI's metadata included, so the
+          # bindings come from the host's (unstripped) build of the same crate.
+          cargo build --locked -p photovault-core --lib
           cargo run --locked -p photovault-core --features bindgen --bin uniffi-bindgen -- \
-            generate --library native/android/core/build/jniLibs/arm64-v8a/libphotovault_core.so \
+            generate --library target/debug/libphotovault_core.so \
             --language kotlin --out-dir native/android/core/build/generated/uniffi --no-format
       - if: steps.has.outputs.core == 'true'
         uses: actions/upload-artifact@v7

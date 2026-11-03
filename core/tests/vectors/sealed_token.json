@@ -1,0 +1,20 @@
+{
+  "description": "crypto_box_seal of an auth token as the client opens it (login.rs finish_unlock: sealed::open with the account keypair, then validate_auth_token). When the API host is api.ente.com, api.ente.in or localhost the client REQUIRES the plaintext to be b'auth-token' || 32 random bytes (auth/payload.rs). The client then uses the raw bytes; X-Auth-Token is their URL-safe base64 (museum generateAuthToken).",
+  "provenance": {
+    "generator": "server/tests/vectors/generator (photovault-vecgen)",
+    "upstream": "https://github.com/ente-io/ente",
+    "upstreamCommit": "b2ed3dc93e49d6ac9831bf3550957816d3a0735d",
+    "clientCode": [
+      "rust/crates/accounts/src/auth/srp.rs (SrpSession: what web/packages/accounts/services/srp.ts calls via ente-prelogin-wasm)",
+      "rust/crates/accounts/src/auth/api.rs (derive_kek, derive_srp_login_key, generate_srp_setup_with_login_key)",
+      "rust/crates/accounts/src/auth/key_gen.rs (generate_keys_with_strength)",
+      "rust/crates/core/src/crypto/{argon,kdf,sealed,secretbox}.rs",
+      "rust/bindings/wasm/lib/src/prelogin.rs (wasm entry points authDeriveKek, authGenerateSrpSetup, authGenerateSignupKeys)"
+    ],
+    "srpCrate": "srp 0.7.0-rc.3 (RustCrypto), ClientG4096<Sha256>"
+  },
+  "publicKey": "Y1b65fCFNwl0tHR4usQFX21XZwphusdHxvwGleVXmBM=",
+  "secretKey": "2zaamPqlXOrAoH+0qrBgsjSfZ5lSRtl9n1saiLhiHZQ=",
+  "plaintext": "YXV0aC10b2tlbhPBDfjhZx0RmKnVYtA0g7lS3LWAdU4OVjxRbb1NMihJ",
+  "encryptedToken": "i32bm2zbFGU9zZHNUEItvzdGXpj1KlvdpPXK1qlS2lRBi2SxL/R9P3lFd6gFvMysDfn8DnfOfOkFMD+4AjQrXZrBcDM9LZcnPfVT2aYaZRSKOYAOXn91iew5"
+}
