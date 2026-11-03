@@ -29,7 +29,7 @@ fun interface LanDiscovery {
  * on Android). Resolves run one at a time, as NsdManager requires before Android 14.
  */
 class NsdLanDiscovery(context: Context) : LanDiscovery {
-    private val nsd = context.applicationContext.getSystemService(NsdManager::class.java)
+    private val nsd: NsdManager = requireNotNull(context.applicationContext.getSystemService(NsdManager::class.java))
 
     override fun servers(): Flow<List<DiscoveredServer>> = callbackFlow {
         val found = LinkedHashMap<String, DiscoveredServer>()

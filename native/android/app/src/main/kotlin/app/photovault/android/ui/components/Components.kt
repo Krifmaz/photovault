@@ -125,7 +125,7 @@ fun PvTextField(
         onValueChange = onValueChange,
         modifier = modifier.fillMaxWidth(),
         label = { Text(label) },
-        placeholder = placeholder?.let { { Text(it, color = p.faint) } },
+        placeholder = placeholder?.let { text -> @Composable { Text(text, color = p.faint) } },
         singleLine = singleLine,
         minLines = minLines,
         enabled = enabled,

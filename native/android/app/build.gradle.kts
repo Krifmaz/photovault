@@ -73,7 +73,7 @@ android {
     sourceSets {
         getByName("main") {
             // exactly one CoreProvider: the UniFFI adapter or the in-memory fake
-            kotlin.srcDir(if (hasRealCore) "src/realCore/kotlin" else "src/fakeCore/kotlin")
+            kotlin.directories += file(if (hasRealCore) "src/realCore/kotlin" else "src/fakeCore/kotlin").path
         }
     }
 

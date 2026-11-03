@@ -26,8 +26,8 @@ android {
 
     sourceSets {
         getByName("main") {
-            kotlin.srcDir(uniffiDir)
-            jniLibs.srcDir(jniLibsDir)
+            kotlin.directories += uniffiDir.path
+            jniLibs.directories += jniLibsDir.path
         }
     }
 }
