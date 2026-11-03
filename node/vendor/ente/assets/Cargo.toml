@@ -1,0 +1,17 @@
+[package]
+name = "ente-assets"
+edition = "2024"
+
+[dependencies]
+flate2 = "1.1.10"
+futures-util = "0.3.32"
+reqwest = { version = "0.12.28", default-features = false, features = ["http2", "system-proxy", "rustls-tls-webpki-roots"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+tar = "0.4.46"
+thiserror = "2.0.21"
+tokio = { version = "1.53.1", features = ["macros", "rt", "sync"] }
+
+# [lints] inherited from Ente's workspace: removed by sync-ente-ml.sh because
+# Ente's workspace lints do not apply outside Ente's workspace.

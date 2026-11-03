@@ -1,0 +1,358 @@
+diff -ruN a/ml/Cargo.toml b/ml/Cargo.toml
+--- a/ml/Cargo.toml
++++ b/ml/Cargo.toml
+@@ -35,8 +35,10 @@
+ [target.'cfg(target_os = "macos")'.dependencies]
+ ort = { version = "=2.0.0-rc.15", default-features = false, features = ["ndarray", "half", "coreml", "api-31", "load-dynamic", "copy-dylibs"] }
+ 
++# PHOTOVAULT PATCH: add the cuda, rocm and migraphx ort features (desktop GPU
++# execution providers; no build-time effect with load-dynamic).
+ [target.'cfg(any(target_os = "linux", target_os = "windows"))'.dependencies]
+-ort = { version = "=2.0.0-rc.15", default-features = false, features = ["ndarray", "half", "api-31", "load-dynamic", "copy-dylibs", "webgpu"] }
++ort = { version = "=2.0.0-rc.15", default-features = false, features = ["ndarray", "half", "api-31", "load-dynamic", "copy-dylibs", "webgpu", "cuda", "rocm", "migraphx"] }
+ 
+ [target.'cfg(not(any(target_os = "ios", target_os = "android", target_os = "macos", target_os = "linux", target_os = "windows")))'.dependencies]
+ ort = { version = "=2.0.0-rc.15", default-features = false, features = ["ndarray", "half", "api-31", "load-dynamic", "copy-dylibs"] }
+diff -ruN a/ml/src/indexing.rs b/ml/src/indexing.rs
+--- a/ml/src/indexing.rs
++++ b/ml/src/indexing.rs
+@@ -45,6 +45,10 @@
+     pub pet_bodies: Option<Vec<PetBodyResult>>,
+     pub used_coreml: bool,
+     pub used_webgpu: bool,
++    // PHOTOVAULT PATCH: desktop GPU execution providers.
++    pub used_cuda: bool,
++    pub used_rocm: bool,
++    pub used_migraphx: bool,
+ }
+ 
+ #[derive(Clone, Debug)]
+@@ -64,6 +68,16 @@
+     onnx::set_webgpu_enabled(enable_webgpu);
+ }
+ 
++// PHOTOVAULT PATCH: desktop execution provider preference (Linux/Windows;
++// ignored elsewhere). Call before creating sessions, like
++// `set_ml_execution_config`.
++pub use crate::onnx::DesktopExecutionProvider;
++
++// PHOTOVAULT PATCH: desktop execution provider preference.
++pub fn set_desktop_execution_provider(provider: DesktopExecutionProvider) {
++    onnx::set_desktop_execution_provider(provider);
++}
++
+ pub fn init_ml_runtime(model_paths: ModelPaths) {
+     runtime::prepare_runtime(&model_paths);
+ }
+@@ -224,6 +238,10 @@
+             pet_bodies,
+             used_coreml: provider_usage.coreml,
+             used_webgpu: provider_usage.webgpu,
++            // PHOTOVAULT PATCH: desktop GPU execution providers.
++            used_cuda: provider_usage.cuda,
++            used_rocm: provider_usage.rocm,
++            used_migraphx: provider_usage.migraphx,
+         })
+     })
+ }
+diff -ruN a/ml/src/onnx/providers.rs b/ml/src/onnx/providers.rs
+--- a/ml/src/onnx/providers.rs
++++ b/ml/src/onnx/providers.rs
+@@ -25,6 +25,11 @@
+ };
+ #[cfg(target_os = "android")]
+ use std::num::NonZeroUsize;
++// PHOTOVAULT PATCH: desktop GPU execution providers (CUDA, ROCm, MIGraphX).
++#[cfg(any(target_os = "linux", target_os = "windows"))]
++use ort::ep::{CUDA, MIGraphX, ROCm};
++// PHOTOVAULT PATCH: process-wide desktop execution provider preference.
++use std::sync::atomic::{AtomicU8, Ordering};
+ 
+ #[cfg(any(target_os = "ios", target_os = "macos"))]
+ use super::coreml_cache;
+@@ -67,6 +72,59 @@
+     WebGpu,
+     Xnnpack,
+     Cpu,
++    // PHOTOVAULT PATCH: desktop GPU execution providers.
++    Cuda,
++    Rocm,
++    MiGraphX,
++}
++
++// PHOTOVAULT PATCH: desktop execution provider preference.
++/// Execution provider preference for Linux and Windows desktops.
++///
++/// `PlatformDefault` keeps Ente's upstream behaviour (WebGPU when enabled via
++/// `set_ml_execution_config`, then CPU). Every other value is a Photovault
++/// addition for the compute node. Each GPU choice falls back to CPU when the
++/// provider is missing from the loaded ONNX Runtime build, cannot create a
++/// session, or fails the golden self-test.
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++#[repr(u8)]
++pub enum DesktopExecutionProvider {
++    /// Ente's upstream provider order.
++    #[default]
++    PlatformDefault = 0,
++    /// Try CUDA, MIGraphX, ROCm and WebGPU in that order, then CPU.
++    Auto = 1,
++    /// NVIDIA CUDA (needs an ONNX Runtime GPU build), then CPU.
++    Cuda = 2,
++    /// AMD ROCm (needs an ONNX Runtime build with the ROCm EP), then MIGraphX, then CPU.
++    Rocm = 3,
++    /// AMD MIGraphX (needs an ONNX Runtime build with the MIGraphX EP), then CPU.
++    MiGraphX = 4,
++    /// WebGPU via Dawn (Vulkan on Linux, D3D12 on Windows), then CPU.
++    WebGpu = 5,
++    /// CPU only.
++    Cpu = 6,
++}
++
++// PHOTOVAULT PATCH: desktop execution provider preference.
++static DESKTOP_PROVIDER: AtomicU8 = AtomicU8::new(DesktopExecutionProvider::PlatformDefault as u8);
++
++// PHOTOVAULT PATCH: desktop execution provider preference.
++pub(crate) fn set_desktop_execution_provider(provider: DesktopExecutionProvider) {
++    DESKTOP_PROVIDER.store(provider as u8, Ordering::Relaxed);
++}
++
++// PHOTOVAULT PATCH: desktop execution provider preference.
++pub(crate) fn desktop_execution_provider() -> DesktopExecutionProvider {
++    match DESKTOP_PROVIDER.load(Ordering::Relaxed) {
++        1 => DesktopExecutionProvider::Auto,
++        2 => DesktopExecutionProvider::Cuda,
++        3 => DesktopExecutionProvider::Rocm,
++        4 => DesktopExecutionProvider::MiGraphX,
++        5 => DesktopExecutionProvider::WebGpu,
++        6 => DesktopExecutionProvider::Cpu,
++        _ => DesktopExecutionProvider::PlatformDefault,
++    }
+ }
+ 
+ #[derive(Debug)]
+@@ -200,6 +258,11 @@
+         },
+         #[cfg(target_os = "android")]
+         ExecutionProvider::Xnnpack => xnnpack_attempt(),
++        // PHOTOVAULT PATCH: desktop GPU execution providers.
++        #[cfg(any(target_os = "linux", target_os = "windows"))]
++        ExecutionProvider::Cuda | ExecutionProvider::Rocm | ExecutionProvider::MiGraphX => {
++            desktop_gpu_attempt(provider)
++        }
+         _ => unreachable!("provider is not available on this platform"),
+     }
+ }
+@@ -274,6 +337,10 @@
+     model_path: &str,
+     validation: AccelerationValidation,
+ ) -> Vec<ExecutionProvider> {
++    // PHOTOVAULT PATCH: honour the desktop execution provider preference.
++    if desktop_execution_provider() != DesktopExecutionProvider::PlatformDefault {
++        return desktop_preferred_providers(desktop_execution_provider(), model_path, validation);
++    }
+     let mut providers = Vec::new();
+     if webgpu::attempt_permitted(model_path)
+         && accelerated_provider_allowed(model_path, "WebGPU", validation)
+@@ -284,6 +351,80 @@
+     providers
+ }
+ 
++// PHOTOVAULT PATCH: provider order for an explicit desktop preference. GPU
++// providers stay subject to the golden-entry requirement, so a model without
++// goldens runs on CPU exactly as upstream would.
++#[cfg(any(target_os = "linux", target_os = "windows"))]
++fn desktop_preferred_providers(
++    preference: DesktopExecutionProvider,
++    model_path: &str,
++    validation: AccelerationValidation,
++) -> Vec<ExecutionProvider> {
++    use DesktopExecutionProvider as P;
++    let wanted: &[ExecutionProvider] = match preference {
++        P::PlatformDefault | P::Cpu => &[],
++        P::Auto => &[
++            ExecutionProvider::Cuda,
++            ExecutionProvider::MiGraphX,
++            ExecutionProvider::Rocm,
++            ExecutionProvider::WebGpu,
++        ],
++        P::Cuda => &[ExecutionProvider::Cuda],
++        P::Rocm => &[ExecutionProvider::Rocm, ExecutionProvider::MiGraphX],
++        P::MiGraphX => &[ExecutionProvider::MiGraphX],
++        P::WebGpu => &[ExecutionProvider::WebGpu],
++    };
++    let mut providers = Vec::new();
++    for &provider in wanted {
++        let permitted = match provider {
++            // The WebGPU crash-canary quarantine still applies.
++            ExecutionProvider::WebGpu => webgpu::model_not_quarantined(model_path),
++            _ => true,
++        };
++        if permitted
++            && accelerated_provider_allowed(model_path, provider_label(provider), validation)
++        {
++            providers.push(provider);
++        }
++    }
++    providers.push(ExecutionProvider::Cpu);
++    providers
++}
++
++// PHOTOVAULT PATCH: human-readable provider names for logs.
++#[cfg(any(target_os = "linux", target_os = "windows"))]
++fn provider_label(provider: ExecutionProvider) -> &'static str {
++    match provider {
++        ExecutionProvider::CoreMl => "CoreML",
++        ExecutionProvider::WebGpu => "WebGPU",
++        ExecutionProvider::Xnnpack => "XNNPACK",
++        ExecutionProvider::Cpu => "CPU",
++        ExecutionProvider::Cuda => "CUDA",
++        ExecutionProvider::Rocm => "ROCm",
++        ExecutionProvider::MiGraphX => "MIGraphX",
++    }
++}
++
++// PHOTOVAULT PATCH: desktop GPU attempt. The GPU provider must register
++// (`error_on_failure`), so an ONNX Runtime build without it fails this attempt
++// and the plan moves on; CPU stays registered for operators the GPU provider
++// does not cover, like Ente's WebGPU attempt.
++#[cfg(any(target_os = "linux", target_os = "windows"))]
++fn desktop_gpu_attempt(provider: ExecutionProvider) -> ProviderAttempt {
++    let gpu = match provider {
++        ExecutionProvider::Cuda => CUDA::default().build().error_on_failure(),
++        ExecutionProvider::Rocm => ROCm::default().build().error_on_failure(),
++        _ => MIGraphX::default().build().error_on_failure(),
++    };
++    ProviderAttempt {
++        providers: vec![gpu, CPU::default().with_arena_allocator(true).build()],
++        disable_intra_op_spinning: true,
++        disable_cpu_fallback: false,
++        coreml_cache_dir: None,
++        execution_provider: provider,
++    }
++}
++
+ #[cfg(not(any(
+     target_os = "ios",
+     target_os = "android",
+@@ -470,6 +611,10 @@
+                     ExecutionProvider::WebGpu => (true, 1),
+                     ExecutionProvider::Cpu => (false, 1),
+                     ExecutionProvider::Xnnpack => (false, 2),
++                    // PHOTOVAULT PATCH: desktop GPU providers are not in this list.
++                    ExecutionProvider::Cuda
++                    | ExecutionProvider::Rocm
++                    | ExecutionProvider::MiGraphX => (false, 2),
+                 };
+                 assert_eq!(ocr.disable_cpu_fallback, strict);
+                 assert_eq!(ocr.providers.len(), provider_count);
+diff -ruN a/ml/src/onnx/webgpu.rs b/ml/src/onnx/webgpu.rs
+--- a/ml/src/onnx/webgpu.rs
++++ b/ml/src/onnx/webgpu.rs
+@@ -63,6 +63,13 @@
+         && model_dir(model_path).is_some_and(|dir| !quarantined(&dir))
+ }
+ 
++// PHOTOVAULT PATCH: an explicit desktop WebGPU preference bypasses the
++// enable flag but still honours the crash-canary quarantine.
++#[cfg(any(target_os = "linux", target_os = "windows"))]
++pub(super) fn model_not_quarantined(model_path: &str) -> bool {
++    model_dir(model_path).is_some_and(|dir| !quarantined(&dir))
++}
++
+ // Mirrors Chromium's `gpu/config/webgpu_blocklist_impl.cc` Android 12+ policy
+ // as of 2026-07; revisit with pinned ONNX Runtime or Dawn upgrades.
+ #[cfg(any(target_os = "android", test))]
+diff -ruN a/ml/src/onnx.rs b/ml/src/onnx.rs
+--- a/ml/src/onnx.rs
++++ b/ml/src/onnx.rs
+@@ -14,6 +14,13 @@
+     webgpu::set_enabled(enabled);
+ }
+ 
++// PHOTOVAULT PATCH: desktop execution provider preference.
++pub use providers::DesktopExecutionProvider;
++// PHOTOVAULT PATCH: desktop execution provider preference.
++pub(crate) fn set_desktop_execution_provider(provider: DesktopExecutionProvider) {
++    providers::set_desktop_execution_provider(provider);
++}
++
+ pub(crate) use ort::session::Session as SessionHandle;
+ pub(crate) use providers::ExecutionMode;
+ use tensor::run_golden_tensor;
+@@ -41,6 +48,10 @@
+ pub(crate) struct ProviderUsage {
+     pub(crate) coreml: bool,
+     pub(crate) webgpu: bool,
++    // PHOTOVAULT PATCH: desktop GPU execution providers.
++    pub(crate) cuda: bool,
++    pub(crate) rocm: bool,
++    pub(crate) migraphx: bool,
+ }
+ 
+ impl ProviderUsage {
+@@ -48,6 +59,10 @@
+         Self {
+             coreml: provider == ExecutionProvider::CoreMl,
+             webgpu: provider == ExecutionProvider::WebGpu,
++            // PHOTOVAULT PATCH: desktop GPU execution providers.
++            cuda: provider == ExecutionProvider::Cuda,
++            rocm: provider == ExecutionProvider::Rocm,
++            migraphx: provider == ExecutionProvider::MiGraphX,
+         }
+     }
+ 
+@@ -55,6 +70,10 @@
+         Self {
+             coreml: self.coreml || other.coreml,
+             webgpu: self.webgpu || other.webgpu,
++            // PHOTOVAULT PATCH: desktop GPU execution providers.
++            cuda: self.cuda || other.cuda,
++            rocm: self.rocm || other.rocm,
++            migraphx: self.migraphx || other.migraphx,
+         }
+     }
+ }
+@@ -458,9 +477,31 @@
+         }
+     };
+ 
+-    #[cfg(any(target_os = "ios", target_os = "macos"))]
++    #[cfg(any(
++        target_os = "ios",
++        target_os = "macos",
++        // PHOTOVAULT PATCH: desktop GPU providers are self-tested too.
++        target_os = "linux",
++        target_os = "windows"
++    ))]
+     let mut session = session;
+ 
++    // PHOTOVAULT PATCH: validate desktop GPU sessions against Ente's goldens,
++    // like CoreML, so a provider that miscomputes falls back to the next one.
++    #[cfg(any(target_os = "linux", target_os = "windows"))]
++    if matches!(
++        execution_provider,
++        ExecutionProvider::Cuda | ExecutionProvider::Rocm | ExecutionProvider::MiGraphX
++    ) && _validation == AccelerationValidation::GoldenRequired
++    {
++        let label = match execution_provider {
++            ExecutionProvider::Cuda => "CUDA",
++            ExecutionProvider::Rocm => "ROCm",
++            _ => "MIGraphX",
++        };
++        run_session_self_test(model_path, &mut session, label)?;
++    }
++
+     #[cfg(any(target_os = "ios", target_os = "macos"))]
+     if execution_provider == ExecutionProvider::CoreMl
+         && _validation == AccelerationValidation::GoldenRequired
+@@ -578,6 +619,10 @@
+         ExecutionProvider::CoreMl => "CoreML",
+         ExecutionProvider::WebGpu => "WebGPU",
+         ExecutionProvider::Xnnpack => "XNNPACK",
++        // PHOTOVAULT PATCH: desktop GPU execution providers.
++        ExecutionProvider::Cuda => "CUDA",
++        ExecutionProvider::Rocm => "ROCm",
++        ExecutionProvider::MiGraphX => "MIGraphX",
+         ExecutionProvider::Cpu => return None,
+     };
+     Some(format!(
