@@ -1178,6 +1178,7 @@ dependencies = [
  "num-iter",
  "num-traits",
  "rand 0.8.8",
+ "serde",
  "smallvec",
  "zeroize",
 ]
@@ -1282,6 +1283,7 @@ dependencies = [
  "hmac",
  "http-body-util",
  "libsodium-sys-stable",
+ "num-bigint-dig",
  "prometheus-client",
  "rand 0.9.5",
  "serde",
