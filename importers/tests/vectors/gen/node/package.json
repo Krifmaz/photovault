@@ -1,0 +1,13 @@
+{
+  "name": "photovault-import-vectorgen",
+  "private": true,
+  "description": "Generates crypto test vectors for photovault-import with Ente's web crypto functions (libsodium-wrappers-sumo, same version Ente pins).",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "gen": "node gen.mjs ../../node.json"
+  },
+  "dependencies": {
+    "libsodium-wrappers-sumo": "0.7.15"
+  }
+}
