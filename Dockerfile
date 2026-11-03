@@ -6,7 +6,7 @@
 #   docker build -t photovault .
 #
 # Options:
-#   --build-arg RUST_IMAGE=mirror.gcr.io/library/rust:1.99-bookworm   (registry mirror)
+#   --build-arg RUST_IMAGE=rust:1.99-bookworm   (Docker Hub instead of Google's mirror)
 #   --secret id=ca,src=/path/ca.crt   (TLS-intercepting proxy; used only while building)
 #   --build-arg PHOTOVAULT_COMMIT=$(git rev-parse --short HEAD)   (shown in /photovault/info)
 #
@@ -16,7 +16,7 @@
 # libsodium is compiled from the source bundled in libsodium-sys-stable and
 # SQLite is bundled by sqlx, so the binary needs nothing beyond glibc.
 
-ARG RUST_IMAGE=rust:1.99-bookworm
+ARG RUST_IMAGE=mirror.gcr.io/library/rust:1.99-bookworm
 ARG RUNTIME_IMAGE=gcr.io/distroless/cc-debian12:nonroot
 
 FROM ${RUST_IMAGE} AS build

@@ -99,11 +99,11 @@ jobs:
           # and any distro with glibc >= 2.36.
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-24.04
-            container: rust:1-bookworm
+            container: mirror.gcr.io/library/rust:1-bookworm
             arch: amd64
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-24.04
-            container: rust:1-bookworm
+            container: mirror.gcr.io/library/rust:1-bookworm
             arch: arm64
           - target: aarch64-apple-darwin
             os: macos-15
