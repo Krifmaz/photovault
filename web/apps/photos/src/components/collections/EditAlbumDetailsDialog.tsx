@@ -38,6 +38,12 @@ import { useFormik } from "formik";
 import { t } from "i18next";
 import React, { useId, useState } from "react";
 import { CoverPickerDialog } from "./CoverPickerDialog";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 export interface AlbumDetails {
     name: string;
@@ -329,8 +335,8 @@ const CoverTile = styled("div")`
     }
 `;
 
-const green = "#08c225";
-const greenHover = "#07ad21";
+const green = pvGold; // PHOTOVAULT: theme
+const greenHover = pvGoldHover;
 const errorColor = "#fa1336";
 
 const paperSx = (theme: Theme) => ({
@@ -409,7 +415,7 @@ const coverBadgeSx: SxProps<Theme> = (theme) => ({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "50%",
-    color: "#fff",
+    color: pvOnGold, // PHOTOVAULT: theme
     backgroundColor: green,
     border: "1.5px solid #f4f4f4",
     ...theme.applyStyles("dark", { borderColor: "#1b1b1b" }),
@@ -467,7 +473,7 @@ const saveButtonSx = (theme: Theme) => ({
     lineHeight: "20px",
     fontWeight: 500,
     textTransform: "none",
-    color: "#fff",
+    color: pvOnGold, // PHOTOVAULT: theme
     backgroundColor: green,
     boxShadow: "none",
     "&:hover": { backgroundColor: greenHover, boxShadow: "none" },
@@ -482,5 +488,5 @@ const saveButtonSx = (theme: Theme) => ({
 });
 
 const saveButtonBusySx = {
-    "&.Mui-disabled": { color: "#fff", backgroundColor: green, opacity: 0.7 },
+    "&.Mui-disabled": { color: pvOnGold, backgroundColor: green, opacity: 0.7 }, // PHOTOVAULT: theme
 };

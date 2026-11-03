@@ -11,7 +11,8 @@ export const albumFilters: {
     label: () => string;
     title: () => string;
 }[] = [
-    { value: "ente", label: () => "Ente", title: () => "Ente" },
+    // PHOTOVAULT: branding
+    { value: "ente", label: () => "Photovault", title: () => "Photovault" },
     {
         value: "shared",
         label: () => t("shared_albums_label"),

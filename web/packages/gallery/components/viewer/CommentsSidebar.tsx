@@ -41,6 +41,8 @@ import React, {
     useRef,
     useState,
 } from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 const SendIcon: React.FC = () => (
     <svg
@@ -86,12 +88,12 @@ const HeartIcon: React.FC<HeartIconProps> = ({ filled, small }) => (
         width={small ? "13" : "16"}
         height={small ? "11" : "14"}
         viewBox="0 0 16 14"
-        fill={filled ? "#08C225" : "none"}
+        fill={filled ? pvGold : "none"} // PHOTOVAULT: theme
         xmlns="http://www.w3.org/2000/svg"
     >
         <path
             d="M6.63749 12.3742C4.66259 10.885 0.75 7.4804 0.75 4.41664C0.75 2.39161 2.22368 0.75 4.25 0.75C5.3 0.75 6.35 1.10294 7.75 2.51469C9.15 1.10294 10.2 0.75 11.25 0.75C13.2763 0.75 14.75 2.39161 14.75 4.41664C14.75 7.4804 10.8374 10.885 8.86251 12.3742C8.19793 12.8753 7.30207 12.8753 6.63749 12.3742Z"
-            stroke={filled ? "#08C225" : "currentColor"}
+            stroke={filled ? pvGold : "currentColor"} // PHOTOVAULT: theme
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -1569,7 +1571,7 @@ const CollectionThumbnail = styled("img")(() => ({
     height: 24,
     borderRadius: 5,
     objectFit: "cover",
-    backgroundColor: "#08C225",
+    backgroundColor: pvGold, // PHOTOVAULT: theme
 }));
 
 const CollectionBadge = styled(Box)(({ theme }) => ({
@@ -1594,7 +1596,7 @@ const CollectionThumbnailPlaceholder = styled(Box)(() => ({
     width: 24,
     height: 24,
     borderRadius: 5,
-    backgroundColor: "#08C225",
+    backgroundColor: pvGold, // PHOTOVAULT: theme
 }));
 
 const LoadingContainer = styled(Box)(() => ({

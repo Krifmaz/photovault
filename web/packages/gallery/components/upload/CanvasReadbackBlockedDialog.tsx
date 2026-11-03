@@ -12,6 +12,11 @@ import {
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
 import { t } from "i18next";
 import React from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 export type CanvasReadbackBlockedDialogProps = ModalVisibilityProps;
 
@@ -150,9 +155,9 @@ const HelpLink = styled(Link)(({ theme }) => ({
     fontWeight: "inherit",
     fontSize: 14,
     lineHeight: "20px",
-    color: "#08C225",
-    textDecorationColor: "#08C225",
-    "&:hover": { color: "#07A820", textDecorationColor: "#07A820" },
+    color: pvGold, // PHOTOVAULT: theme
+    textDecorationColor: pvGold,
+    "&:hover": { color: pvGoldHover, textDecorationColor: pvGoldHover }, // PHOTOVAULT: theme
     ...theme.applyStyles("dark", {
         color: "#22D840",
         textDecorationColor: "#22D840",

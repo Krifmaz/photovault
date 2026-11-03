@@ -274,7 +274,8 @@ const OptionsForm: React.FC<OptionsFormProps> = ({
                                                 height: 18,
                                                 borderRadius: "50%",
                                                 bgcolor: "accent.main",
-                                                color: "white",
+                                                // PHOTOVAULT: theme
+                                                color: "accent.contrastText",
                                                 display: "grid",
                                                 placeItems: "center",
                                             }}

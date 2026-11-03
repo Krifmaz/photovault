@@ -23,6 +23,11 @@ import {
     uploadSheetPaperSx,
     useIsUploadSheet,
 } from "./upload-progress/bottom-sheet";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 export function UploadCompletion({
     open,
@@ -254,9 +259,9 @@ const baseButtonSx = {
 
 const primaryButtonSx = {
     ...baseButtonSx,
-    color: "#fff",
+    color: pvOnGold, // PHOTOVAULT: theme
     backgroundColor: uploadStatColors.completed,
-    "&:hover": { backgroundColor: "#07ad21", boxShadow: "none" },
+    "&:hover": { backgroundColor: pvGoldHover, boxShadow: "none" }, // PHOTOVAULT: theme
 };
 
 const secondaryButtonSx = (theme: Theme) => ({

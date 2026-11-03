@@ -19,7 +19,23 @@ export interface AuthPresentationConfig {
         mobile: number;
         wide: number;
     };
+    /**
+     * PHOTOVAULT: theme - extra `--auth-ui-*` variables (without the prefix)
+     * that override the defaults below, per scheme. Also accepts the
+     * Photovault-only variables `page`, `card`, `brand`, `brand-text`,
+     * `brand-text-muted`, `on-primary` and `primary-gradient`.
+     */
+    photovault?: {
+        light: Record<string, string>;
+        dark: Record<string, string>;
+    };
 }
+
+// PHOTOVAULT: theme
+const pvAuthVars = (vars: Record<string, string> | undefined) =>
+    Object.fromEntries(
+        Object.entries(vars ?? {}).map(([k, v]) => [`--auth-ui-${k}`, v]),
+    );
 
 export const createAuthColorVariables = (theme: AuthPresentationConfig) => ({
     ":where(:root)": {
@@ -51,6 +67,7 @@ export const createAuthColorVariables = (theme: AuthPresentationConfig) => ({
         "--auth-ui-button-primary-stroke": "rgba(255, 255, 255, 0.14)",
         "--auth-ui-button-primary-stroke-hover": "rgba(255, 255, 255, 0.32)",
         "--auth-ui-button-primary-stroke-active": "rgba(255, 255, 255, 0.2)",
+        ...pvAuthVars(theme.photovault?.light), // PHOTOVAULT: theme
     },
     "*:where(.dark)": {
         "--auth-ui-focus": theme.focusDark,
@@ -72,6 +89,7 @@ export const createAuthColorVariables = (theme: AuthPresentationConfig) => ({
         "--auth-ui-button-secondary-stroke": "rgba(255, 255, 255, 0.07)",
         "--auth-ui-button-secondary-stroke-hover": "rgba(255, 255, 255, 0.18)",
         "--auth-ui-button-secondary-stroke-active": "rgba(255, 255, 255, 0.12)",
+        ...pvAuthVars(theme.photovault?.dark), // PHOTOVAULT: theme
     },
 });
 

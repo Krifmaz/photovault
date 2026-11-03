@@ -25,6 +25,8 @@ import React, {
     useRef,
     useState,
 } from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 const ChevronDownIcon: React.FC = () => (
     <svg
@@ -52,8 +54,8 @@ const HeartFilledIcon: React.FC = () => (
     >
         <path
             d="M12.4926 23.4794C8.64537 20.6025 1.02344 14.0254 1.02344 8.10676C1.02344 4.19475 3.89425 1.02344 7.84162 1.02344C9.88707 1.02344 11.9325 1.70526 14.6598 4.43253C17.3871 1.70526 19.4325 1.02344 21.478 1.02344C25.4253 1.02344 28.2962 4.19475 28.2962 8.10676C28.2962 14.0254 20.6743 20.6025 16.827 23.4794C15.5324 24.4474 13.7872 24.4474 12.4926 23.4794Z"
-            fill="#08C225"
-            stroke="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
+            stroke={pvGold}
             strokeWidth="2.04545"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -652,7 +654,7 @@ const CollectionThumbnailPlaceholder = styled(Box)(() => ({
     width: 24,
     height: 24,
     borderRadius: 5,
-    backgroundColor: "#08C225",
+    backgroundColor: pvGold, // PHOTOVAULT: theme
 }));
 
 const CollectionBadge = styled(Box)(({ theme }) => ({

@@ -1,8 +1,15 @@
 import { downloadManager } from "@/public-album/download/services/download-manager";
+import { appName } from "ente-base/app";
 import {
     enteWordmarkSVGHTML,
     enteWordmarkViewBox,
 } from "ente-base/components/ente-wordmark";
+// PHOTOVAULT: branding
+import {
+    pvWordmarkSVGHTML,
+    pvWordmarkViewBox,
+} from "ente-base/components/photovault/wordmark";
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens";
 import {
     FileViewerPhotoSwipe as FileViewerPhotoSwipeCore,
     moreButtonID,
@@ -45,7 +52,14 @@ const fileViewerPhotoSwipeDataSource = {
     updateFileInfoExifIfNeeded,
 } satisfies FileViewerPhotoSwipeDataSource;
 
-const publicAlbumLogoHTML = `
+// PHOTOVAULT: branding - Photovault wordmark instead of Ente's.
+const publicAlbumLogoHTML = isPhotovaultApp(appName)
+    ? `
+<svg class="pswp__ente-logo-svg" viewBox="${pvWordmarkViewBox}" xmlns="http://www.w3.org/2000/svg">
+  ${pvWordmarkSVGHTML("pv-pswp")}
+</svg>
+`
+    : `
 <svg class="pswp__ente-logo-svg" viewBox="${enteWordmarkViewBox}" xmlns="http://www.w3.org/2000/svg">
   ${enteWordmarkSVGHTML}
 </svg>

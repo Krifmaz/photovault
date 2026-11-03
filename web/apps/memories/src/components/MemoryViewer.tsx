@@ -642,7 +642,7 @@ export function MemoryViewer({
                         >
                             <EnteBrandTagImage
                                 src={ENTE_BRAND_TAG_IMAGE_PATH}
-                                alt="Ente Photos"
+                                alt="Photovault" // PHOTOVAULT: branding
                             />
                         </TopLeftBrandLink>
 
@@ -692,7 +692,7 @@ export function MemoryViewer({
                         >
                             <EnteBrandTagImage
                                 src={ENTE_BRAND_TAG_IMAGE_PATH}
-                                alt="Ente Photos"
+                                alt="Photovault" // PHOTOVAULT: branding
                             />
                         </BrandLink>
                         {joinEnteButton}

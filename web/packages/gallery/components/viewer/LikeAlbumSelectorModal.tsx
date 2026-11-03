@@ -3,10 +3,15 @@ import { Box, Dialog, IconButton, styled, Typography } from "@mui/material";
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
 import { t } from "i18next";
 import React from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvAlpha,
+    pvGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 const HeartFilledIcon: React.FC<{ size?: number; color?: string }> = ({
     size = 18,
-    color = "#08C225",
+    color = pvGold, // PHOTOVAULT: theme
 }) => (
     <svg
         width={size}
@@ -29,7 +34,7 @@ const HeartFilledIcon: React.FC<{ size?: number; color?: string }> = ({
 
 const HeartOutlineIcon: React.FC<{ size?: number; color?: string }> = ({
     size = 18,
-    color = "#08C225",
+    color = pvGold, // PHOTOVAULT: theme
 }) => (
     <svg
         width={size}
@@ -59,7 +64,7 @@ const LikePhotoIllustration: React.FC = () => (
     >
         <path
             d="M84.7129 23.0781C96.7222 23.0784 105.29 32.8476 105.29 44.499C105.29 53.3449 99.7258 62.2116 93.4453 69.4932C87.0622 76.8936 79.4391 83.2238 74.3574 87.0557C69.973 90.3616 64.031 90.3614 59.6465 87.0557C54.5648 83.2238 46.9408 76.8937 40.5576 69.4932C34.2771 62.2116 28.7129 53.3449 28.7129 44.499C28.713 32.8474 37.2813 23.0781 49.291 23.0781C54.9545 23.0782 60.4297 24.9062 67.001 30.9004C73.5726 24.9056 79.0491 23.0781 84.7129 23.0781Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
             stroke="#232323"
             strokeWidth="5.73358"
             strokeLinecap="round"
@@ -76,7 +81,7 @@ const LikePhotoIllustration: React.FC = () => (
         >
             <path
                 d="M61.3721 84.7662C51.3787 77.2306 31.5801 60.0026 31.5801 44.4993C31.5801 34.2522 39.0372 25.9453 49.2909 25.9453C54.6041 25.9453 59.9173 27.7313 67.0016 34.8751C74.086 27.7313 79.3992 25.9453 84.7124 25.9453C94.9659 25.9453 102.423 34.2522 102.423 44.4993C102.423 60.0026 82.6247 77.2306 72.6312 84.7662C69.2683 87.3019 64.735 87.3019 61.3721 84.7662Z"
-                fill="#08C225"
+                fill={pvGold} // PHOTOVAULT: theme
             />
         </mask>
         <g mask="url(#mask0_643_19218)">
@@ -99,15 +104,15 @@ const LikePhotoIllustration: React.FC = () => (
         </g>
         <path
             d="M20.9639 58.8477C14.9399 61.182 10.9104 66.0874 11.263 71.48C10.9104 66.0874 6.28324 61.7544 -9.80907e-05 60.2184C6.02383 57.884 10.0533 52.9787 9.70073 47.5861C10.0533 52.9787 14.6805 57.3117 20.9639 58.8477Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
         />
         <path
             d="M119.579 91.9746C111.591 92.7003 105.114 97.1692 103.689 103.722C105.114 97.1692 101.077 90.4145 94.1117 86.438C102.099 85.7122 108.576 81.2434 110.001 74.6902C108.576 81.2434 112.613 87.9981 119.579 91.9746Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
         />
         <path
             d="M112.728 9.21189C108.334 9.91374 104.912 12.6353 104.37 16.3181C104.912 12.6353 102.421 9.04853 98.4114 7.10627C102.806 6.40442 106.228 3.68284 106.77 7.55054e-05C106.228 3.68284 108.719 7.26962 112.728 9.21189Z"
-            fill="#08C225"
+            fill={pvGold} // PHOTOVAULT: theme
         />
     </svg>
 );
@@ -391,8 +396,8 @@ const HeartButton = styled(Box)(() => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(8, 194, 37, 0.06)",
+    backgroundColor: pvAlpha(pvGold, 0.06), // PHOTOVAULT: theme
     borderRadius: 9.6,
     cursor: "pointer",
-    "&:hover": { backgroundColor: "rgba(8, 194, 37, 0.12)" },
+    "&:hover": { backgroundColor: pvAlpha(pvGold, 0.12) }, // PHOTOVAULT: theme
 }));

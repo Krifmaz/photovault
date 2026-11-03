@@ -5,14 +5,16 @@ import { CssBaseline, GlobalStyles } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { CustomHead } from "ente-base/components/Head";
 import { useSetupLogs } from "ente-base/components/utils/hooks-app";
-import { shareTheme } from "ente-base/components/utils/theme";
+// PHOTOVAULT: theme - memories use the Photovault (Encore) theme.
+import { photosTheme } from "ente-base/components/utils/theme";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import React from "react";
 
 const memoriesAppStyle = { "--font-itim": "'Itim'" } as React.CSSProperties;
 const memoriesAppTitle = "Memories, shared with you";
-const memoriesAppDescription = "Tap to relive with Ente";
+// PHOTOVAULT: branding
+const memoriesAppDescription = "Tap to relive with Photovault";
 
 function MemoriesAppHead() {
     const previewImage =
@@ -42,7 +44,7 @@ const App: React.FC<AppProps> = ({ Component, pageProps }) => {
     return (
         <div style={memoriesAppStyle}>
             <ThemeProvider
-                theme={shareTheme}
+                theme={photosTheme} // PHOTOVAULT: theme
                 defaultMode="system"
                 // Avoid persisting a manual override; always follow the system theme.
                 storageManager={null}

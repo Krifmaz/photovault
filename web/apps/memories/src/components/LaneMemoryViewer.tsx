@@ -44,6 +44,8 @@ import {
     readViewport,
     ViewerRoot,
 } from "./PublicMemoryViewerShared";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 const LANE_PLAYBACK_SPEED_MULTIPLIER = 1.25;
 const LANE_FRAME_INTERVAL_MS = 1200;
@@ -57,7 +59,7 @@ const LANE_MOBILE_CARD_MIN_WIDTH_PX = 220;
 const LANE_DESKTOP_CARD_MAX_WIDTH_PX = 420;
 const LANE_DESKTOP_CARD_MIN_WIDTH_PX = 280;
 const LANE_GRID_CELL_SIZE_PX = 80;
-const LANE_GRID_LINE_COLOR = "#08c225";
+const LANE_GRID_LINE_COLOR = pvGold; // PHOTOVAULT: theme
 const LANE_GRID_LINE_OPACITY = 0.06;
 const LANE_GRID_DISPLACEMENT_SCALE = 9;
 const LANE_VERTICAL_STACK_GAP_PX = 32;
@@ -694,7 +696,7 @@ export function LaneMemoryViewer({
                         >
                             <EnteBrandTagImage
                                 src={ENTE_BRAND_TAG_IMAGE_PATH}
-                                alt="Ente Photos"
+                                alt="Photovault" // PHOTOVAULT: branding
                             />
                         </LaneHeaderBrandLink>
                     </LaneTopBrandSection>

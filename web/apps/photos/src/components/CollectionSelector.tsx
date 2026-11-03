@@ -280,7 +280,8 @@ export const CollectionSelector: React.FC<CollectionSelectorProps> = (
                         sx={categoryTabsSx}
                     >
                         <Tab value="all" label={t("all")} />
-                        <Tab value="mine" label="Ente" />
+                        {/* PHOTOVAULT: branding */}
+                        <Tab value="mine" label="Photovault" />
                         <Tab value="shared" label={t("shared_albums_label")} />
                         <Tab
                             value="received"

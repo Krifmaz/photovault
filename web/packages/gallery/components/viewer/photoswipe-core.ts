@@ -1129,7 +1129,7 @@ export class FileViewerPhotoSwipe<
                     name: "ente-logo",
                     order: 5,
                     isButton: true,
-                    title: "Ente",
+                    title: "Photovault", // PHOTOVAULT: branding
                     html: publicAlbumLogoHTML,
                     onClick: () => {
                         window.open("https://ente.com", "_blank", "noopener");

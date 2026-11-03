@@ -55,7 +55,8 @@ const Page: React.FC = () => {
         <Container>
             <EnteLogo height={45} />
             <Typography variant="h2" sx={{ marginBlock: "2rem" }}>
-                Enter this code on <b>Ente Photos</b> to pair this screen
+                {/* PHOTOVAULT: branding */}
+                Enter this code on <b>Photovault</b> to pair this screen
             </Typography>
             {pairingCode ? <PairingCode code={pairingCode} /> : <Spinner />}
             <Typography variant="h6" sx={{ fontWeight: "regular", mt: 3 }}>

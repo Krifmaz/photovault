@@ -3,6 +3,11 @@ import {
     TitledNestedSidebarDrawer,
     type NestedSidebarDrawerVisibilityProps,
 } from "ente-base/components/mui/SidebarDrawer";
+import {
+    pvBrandName,
+    pvCredit,
+    pvCreditURL,
+} from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: credit
 import { RowCard } from "ente-base/components/v2/RowCard";
 import { useBaseContext } from "ente-base/context";
 import log from "ente-base/log";
@@ -147,6 +152,12 @@ export const Help: React.FC<HelpProps> = ({
                     title={t("view_logs")}
                     subtitle="Share with support when something goes wrong"
                     onClick={confirmViewLogs}
+                />
+                {/* PHOTOVAULT: credit */}
+                <RowCard
+                    title={pvBrandName}
+                    subtitle={pvCredit}
+                    onClick={() => openURL(pvCreditURL)}
                 />
                 {appVersion && (
                     <RowCard

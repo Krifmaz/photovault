@@ -18,6 +18,8 @@ import {
 } from "ente-new/photos/services/user-details";
 import { t } from "i18next";
 import type React from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
 
 interface SubscriptionCardProps {
     userDetails: UserDetails | undefined;
@@ -201,7 +203,8 @@ const IndividualUsageSection: React.FC<IndividualUsageSectionProps> = ({
     // Use the unsuffixed key as the fallback for languages with more plural forms.
     <Stack sx={{ gap: 1.5 }}>
         <UsageBar>
-            <UsageBarSegment {...{ usage, storage }} fillColor="#08C225" />
+            {/* PHOTOVAULT: theme */}
+            <UsageBarSegment {...{ usage, storage }} fillColor={pvGold} />
         </UsageBar>
         <Stack direction="row" sx={{ justifyContent: "space-between" }}>
             <Typography variant="tiny">
@@ -286,12 +289,13 @@ const FamilyUsageSection: React.FC<FamilyUsageSectionProps> = ({
             <UsageBarSegment
                 {...{ storage }}
                 usage={userUsage}
-                fillColor="#08C225"
+                fillColor={pvGold} // PHOTOVAULT: theme
             />
         </UsageBar>
         <Stack direction="row" sx={{ justifyContent: "space-between" }}>
             <Stack direction="row" sx={{ gap: 1.5 }}>
-                <Legend label={t("you")} color="#08C225" />
+                {/* PHOTOVAULT: theme */}
+                <Legend label={t("you")} color={pvGold} />
                 <Legend label={t("family")} color="#F4D93B" />
             </Stack>
             <Typography

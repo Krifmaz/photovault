@@ -13,6 +13,12 @@ import log from "ente-base/log";
 import { useFormik } from "formik";
 import { t } from "i18next";
 import React from "react";
+// PHOTOVAULT: theme - Encore colours instead of Ente green.
+import {
+    pvGold,
+    pvGoldHover,
+    pvOnGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
 
 const ENTER_NAME_ILLUSTRATION_SRC = new URL(
     "./enter-name.svg",
@@ -221,7 +227,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
         backgroundColor: "#FAFAFA",
         borderRadius: 12,
         "&::before": { borderBottom: "1px solid #E0E0E0" },
-        "&::after": { borderBottom: "2px solid #08C225" },
+        "&::after": { borderBottom: `2px solid ${pvGold}` }, // PHOTOVAULT: theme
         "&:hover:not(.Mui-disabled)::before": {
             borderBottom: "1px solid #BDBDBD",
         },
@@ -265,22 +271,22 @@ const SubmitButton = styled(Button)<{ hasName: boolean }>(
         gap: 8,
         flex: 1,
         borderRadius: 20,
-        backgroundColor: hasName ? "#08C225" : "rgba(0, 0, 0, 0.04)",
+        backgroundColor: hasName ? pvGold : "rgba(0, 0, 0, 0.04)", // PHOTOVAULT: theme
         fontSize: 16,
         fontWeight: 500,
         textTransform: "none",
-        color: hasName ? "#fff" : "#999",
+        color: hasName ? pvOnGold : "#999", // PHOTOVAULT: theme
         boxShadow: "none",
         "&:hover": {
-            backgroundColor: hasName ? "#07A820" : "rgba(0, 0, 0, 0.08)",
+            backgroundColor: hasName ? pvGoldHover : "rgba(0, 0, 0, 0.08)", // PHOTOVAULT: theme
             boxShadow: "none",
         },
         ...theme.applyStyles("dark", {
-            backgroundColor: hasName ? "#08C225" : "rgba(255, 255, 255, 0.08)",
-            color: hasName ? "#fff" : "rgba(255, 255, 255, 0.5)",
+            backgroundColor: hasName ? pvGold : "rgba(255, 255, 255, 0.08)", // PHOTOVAULT: theme
+            color: hasName ? pvOnGold : "rgba(255, 255, 255, 0.5)",
             "&:hover": {
                 backgroundColor: hasName
-                    ? "#07A820"
+                    ? pvGoldHover // PHOTOVAULT: theme
                     : "rgba(255, 255, 255, 0.12)",
             },
         }),
