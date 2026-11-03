@@ -38,7 +38,7 @@ async fn info_is_public_and_complete() {
             .iter()
             .any(|f| f == "admin-cli")
     );
-    assert_eq!(v["albumsUrl"], srv.url.as_str());
+    assert_eq!(v["albumsUrl"], format!("{}/albums", srv.url));
 }
 
 #[tokio::test]

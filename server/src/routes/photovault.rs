@@ -69,8 +69,8 @@ pub async fn info_value(state: &AppState) -> Value {
         "apiVersion": API_VERSION,
         "publicUrl": public,
         "homeUrl": c.home_url,
-        // Same base the share links use (`public_albums_url`, else the public URL).
-        "albumsUrl": or_default(&c.accounts.public_albums_url, ""),
+        // Same base the share links use (`public_albums_url`; `<public>/albums` by default).
+        "albumsUrl": or_default(&c.accounts.public_albums_url, "/albums"),
         "castUrl": or_default(&c.accounts.cast_url, "/cast"),
         "signupsAllowed": crate::settings::signups_allowed(state).await,
         "emailVerification": email,

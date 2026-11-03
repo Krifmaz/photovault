@@ -31,7 +31,8 @@ RUN --mount=type=secret,id=ca,required=false \
     cargo build --release --locked -p photovault-server --bin photovault && \
     cp target/release/photovault /photovault && \
     mkdir -p /rootfs/data /rootfs/config /rootfs/app/web && \
-    if [ -f web/apps/photos/out/index.html ]; then cp -r web/apps/photos/out/. /rootfs/app/web/; fi
+    if [ -f web/apps/photos/out/index.html ]; then cp -r web/apps/photos/out/. /rootfs/app/web/; fi && \
+    for app in albums cast accounts; do if [ -f web/apps/$app/out/index.html ]; then mkdir -p /rootfs/app/web/$app && cp -r web/apps/$app/out/. /rootfs/app/web/$app/; fi; done
 
 FROM ${RUNTIME_IMAGE}
 LABEL org.opencontainers.image.title="photovault" \

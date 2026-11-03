@@ -255,6 +255,10 @@ impl Config {
         if a.cast_url.is_empty() {
             a.cast_url = format!("{public}/cast");
         }
+        // Share links: `<public>/albums/?t=<token>#<key>` (the albums export in the web dir).
+        if a.public_albums_url.is_empty() {
+            a.public_albums_url = format!("{public}/albums");
+        }
         if let Ok(u) = url::Url::parse(&public) {
             if a.webauthn_rp_id == d.webauthn_rp_id
                 && let Some(h) = u.host_str()

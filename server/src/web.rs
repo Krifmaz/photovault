@@ -1,7 +1,8 @@
 //! The built web app (`PHOTOVAULT_WEB_DIR`), served on the API port so one
 //! container is enough. API routes always win; any other `GET`/`HEAD` is looked
 //! up in the web folder as `<path>`, `<path>.html`, `<path>/index.html`, then
-//! falls back to `index.html` (client-side routes) or `404.html`.
+//! falls back to the nearest `index.html` above the path (client-side routes;
+//! sub-apps such as `albums/`, `cast/` and `accounts/` have their own) or `404.html`.
 
 use axum::body::Body;
 use axum::extract::Request;
@@ -29,6 +30,25 @@ pub fn resolve(root: &Path, uri_path: &str) -> Option<PathBuf> {
     candidates.into_iter().find(|p| p.is_file())
 }
 
+/// The `index.html` of the deepest folder above `uri_path` that has one
+/// (`/albums/abc` → `albums/index.html`, `/gallery` → `index.html`).
+pub fn nearest_index(root: &Path, uri_path: &str) -> Option<PathBuf> {
+    let decoded = percent_decode(uri_path)?;
+    let rel = Path::new(decoded.trim_start_matches('/'));
+    if rel.components().any(|c| !matches!(c, Component::Normal(_))) {
+        return None;
+    }
+    let mut dir = rel.parent();
+    while let Some(d) = dir {
+        let candidate = root.join(d).join("index.html");
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+        dir = d.parent();
+    }
+    Some(root.join("index.html")).filter(|p| p.is_file())
+}
+
 fn percent_decode(s: &str) -> Option<String> {
     let bytes: Vec<u8> =
         url::form_urlencoded::parse(format!("p={}", s.replace('+', "%2B")).as_bytes())
@@ -51,9 +71,9 @@ pub async fn serve(root: PathBuf, req: Request) -> Response {
             p if p.is_file() => (p, StatusCode::NOT_FOUND),
             _ => return StatusCode::NOT_FOUND.into_response(),
         },
-        None => match root.join("index.html") {
-            p if p.is_file() => (p, StatusCode::OK),
-            _ => return StatusCode::NOT_FOUND.into_response(),
+        None => match nearest_index(&root, &path) {
+            Some(p) => (p, StatusCode::OK),
+            None => return StatusCode::NOT_FOUND.into_response(),
         },
     };
     // Next.js puts content-hashed files under `_next/static`: cache those for a year.
@@ -105,5 +125,17 @@ mod tests {
         assert_eq!(resolve(r, "/../etc/passwd"), None);
         assert_eq!(resolve(r, "/%2e%2e/etc/passwd"), None);
         assert_eq!(resolve(r, "/missing"), None);
+        std::fs::create_dir_all(r.join("albums")).unwrap();
+        std::fs::write(r.join("albums/index.html"), "a").unwrap();
+        assert_eq!(
+            nearest_index(r, "/albums/tok123"),
+            Some(r.join("albums/index.html"))
+        );
+        assert_eq!(
+            nearest_index(r, "/albums/x/y"),
+            Some(r.join("albums/index.html"))
+        );
+        assert_eq!(nearest_index(r, "/gallery"), Some(r.join("index.html")));
+        assert_eq!(nearest_index(r, "/../x"), None);
     }
 }
