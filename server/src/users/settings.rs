@@ -26,6 +26,15 @@ pub struct AccountsSettings {
     /// Origin of the public paste web app; `/paste/consume` rejects other origins when set.
     /// Museum `apps.public-paste`.
     pub paste_url: String,
+    /// Public albums web app used in album and file share links (empty: `public_url`).
+    /// Museum `apps.public-albums`.
+    pub public_albums_url: String,
+    /// Public Locker share web app used in Locker links (empty: `public_url`).
+    /// Museum `apps.public-locker`.
+    pub public_locker_url: String,
+    /// Public memories web app used in memory share links (empty: `public_url`).
+    /// Museum `apps.public-memories`.
+    pub public_memories_url: String,
 }
 
 impl Default for AccountsSettings {
@@ -41,6 +50,9 @@ impl Default for AccountsSettings {
             webauthn_rp_origins: vec!["http://localhost:3001".into()],
             webauthn_rp_name: "Photovault".into(),
             paste_url: String::new(),
+            public_albums_url: String::new(),
+            public_locker_url: String::new(),
+            public_memories_url: String::new(),
         }
     }
 }
@@ -48,8 +60,9 @@ impl Default for AccountsSettings {
 impl AccountsSettings {
     /// `PHOTOVAULT_ACCOUNTS_URL`, `PHOTOVAULT_FAMILY_URL`, `PHOTOVAULT_CAST_URL`,
     /// `PHOTOVAULT_EMBED_ALBUMS_URL`, `PHOTOVAULT_CUSTOM_DOMAIN_CNAME`,
-    /// `PHOTOVAULT_PASTE_URL`, `PHOTOVAULT_WEBAUTHN_RP_ID`, `PHOTOVAULT_WEBAUTHN_RP_ORIGINS` (comma
-    /// separated).
+    /// `PHOTOVAULT_PASTE_URL`, `PHOTOVAULT_ALBUMS_URL`, `PHOTOVAULT_LOCKER_SHARE_URL`,
+    /// `PHOTOVAULT_PUBLIC_MEMORIES_URL`, `PHOTOVAULT_WEBAUTHN_RP_ID`,
+    /// `PHOTOVAULT_WEBAUTHN_RP_ORIGINS` (comma separated).
     pub fn apply_env(&mut self) {
         let env = |k: &str| std::env::var(k).ok().filter(|v| !v.is_empty());
         if let Some(v) = env("PHOTOVAULT_ACCOUNTS_URL") {
@@ -69,6 +82,15 @@ impl AccountsSettings {
         }
         if let Some(v) = env("PHOTOVAULT_PASTE_URL") {
             self.paste_url = v;
+        }
+        if let Some(v) = env("PHOTOVAULT_ALBUMS_URL") {
+            self.public_albums_url = v;
+        }
+        if let Some(v) = env("PHOTOVAULT_LOCKER_SHARE_URL") {
+            self.public_locker_url = v;
+        }
+        if let Some(v) = env("PHOTOVAULT_PUBLIC_MEMORIES_URL") {
+            self.public_memories_url = v;
         }
         if let Some(v) = env("PHOTOVAULT_WEBAUTHN_RP_ID") {
             self.webauthn_rp_id = v;

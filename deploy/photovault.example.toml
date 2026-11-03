@@ -32,6 +32,10 @@ public_url = "https://storage.photos.example.com"
 # secret_key_file = "/run/secrets/s3_secret"
 # path_style = true
 
+# [accounts]
+# Where the public albums web app is served; share links point here.
+# public_albums_url = "https://albums.photos.example.com"
+
 # [smtp]
 # host = "smtp.example.com"
 # port = 587

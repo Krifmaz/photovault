@@ -1,46 +1,33 @@
 //! SRP-6a server-side verification against a transcript computed by the real
 //! Ente client code (tests/vectors/srp.json; provenance in tests/vectors/README.md).
 //!
-//! ============================================================================
-//! ASSUMPTION (for the users workstream / integrator): the two adapter
-//! functions below are the only coupling to the server's SRP module. They are
-//! written against this expected API, which does not exist yet:
-//!
-//! ```ignore
-//! // photovault_server::users::srp
-//! /// Server half of an SRP session for one stored verifier.
-//! pub struct SrpServer { .. }
-//! impl SrpServer {
-//!     /// With an explicit private ephemeral `b` (tests); production uses random b.
-//!     pub fn with_private(verifier: &[u8], b: &[u8]) -> Self;
-//!     /// B = k*v + g^b mod N, big-endian, no padding (what museum sends as srpB).
-//!     pub fn public_b(&self) -> Vec<u8>;
-//!     /// Check the client's M1 for client public A (accept 512-byte padded A);
-//!     /// on success return M2 = H(PAD(A) | M1 | H(PAD(S))).
-//!     pub fn verify(&self, a_pub: &[u8], m1: &[u8]) -> Result<Vec<u8>, SrpError>;
-//! }
-//! ```
-//!
-//! When SRP lands: replace the `todo!()` bodies with the commented calls (or
-//! the real API), and remove the `#[ignore]`s.
-//! ============================================================================
+//! The adapters below call the SRP code the login routes use
+//! (`photovault_server::users::srp`: `server_b` for `srpB`, `server_check_m1` for
+//! `srpM1` → `srpM2`) and check that the legacy-recovery implementation
+//! (`photovault_server::legacy::srp`) gives the same answers.
 
 use photovault_server::crypto;
+use photovault_server::legacy::srp as legacy_srp;
+use photovault_server::users::srp;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
-/// Adapter: compute B for verifier `v` and private `b`.
-#[allow(unused_variables)]
+/// Adapter: compute B (sent as `srpB`, padded to 512 bytes) for verifier `v` and private `b`.
 fn server_public_b(v: &[u8], b: &[u8]) -> Vec<u8> {
-    // photovault_server::users::srp::SrpServer::with_private(v, b).public_b()
-    todo!("wire to photovault_server::users::srp once it exists")
+    let out = srp::server_b(v, b);
+    assert_eq!(out, legacy_srp::compute_b(v, b), "legacy::srp B differs");
+    out
 }
 
 /// Adapter: verify (A, M1) for verifier `v` and private `b`; Some(M2) on success.
-#[allow(unused_variables)]
 fn server_verify(v: &[u8], b: &[u8], a: &[u8], m1: &[u8]) -> Option<Vec<u8>> {
-    // photovault_server::users::srp::SrpServer::with_private(v, b).verify(a, m1).ok()
-    todo!("wire to photovault_server::users::srp once it exists")
+    let out = srp::server_check_m1(v, b, a, m1).ok();
+    assert_eq!(
+        out,
+        legacy_srp::verify_m1(v, b, a, m1),
+        "legacy::srp M2 differs"
+    );
+    out
 }
 
 fn fixture() -> Value {
@@ -87,7 +74,6 @@ fn srp_fixture_hash_layout() {
 }
 
 #[test]
-#[ignore = "needs photovault_server::users::srp (users workstream); see ASSUMPTION at top"]
 fn srp_server_accepts_client_transcript() {
     let f = fixture();
     let v = b64(&f["setup"]["srpVerifier"]);
@@ -118,7 +104,6 @@ fn srp_server_accepts_client_transcript() {
 }
 
 #[test]
-#[ignore = "needs photovault_server::users::srp (users workstream); see ASSUMPTION at top"]
 fn srp_server_matches_go_server_vector() {
     let g = &fixture()["goServerVector"];
     let v = b64(&g["srpVerifier"]);

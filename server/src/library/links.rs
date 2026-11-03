@@ -4,8 +4,8 @@
 //! The public-links workstream serves the anonymous side of these links and can reuse
 //! [`album_url`], [`file_url`], [`active_collection_link`] and [`verify_link_password_jwt`].
 //!
-//! Link hosts come from `PHOTOVAULT_ALBUMS_URL` (album and file links) and
-//! `PHOTOVAULT_LOCKER_SHARE_URL` (Locker links), each defaulting to the server's `public_url`.
+//! Link hosts come from `[accounts] public_albums_url` (album and file links) and
+//! `public_locker_url` (Locker links), each defaulting to the server's `public_url`.
 
 use super::errors;
 use super::model::{PublicUrl, role};
@@ -42,23 +42,25 @@ pub fn new_access_token() -> String {
     random_from(BASE57, ACCESS_TOKEN_LENGTH).to_uppercase()
 }
 
-fn host(state: &AppState, var: &str) -> String {
-    std::env::var(var)
-        .ok()
-        .filter(|s| !s.is_empty())
-        .unwrap_or_else(|| state.config.public_url.clone())
-        .trim_end_matches('/')
-        .to_string()
+/// `configured` (a `[accounts]` app URL), or the server's `public_url` when empty.
+pub fn app_host(state: &AppState, configured: &str) -> String {
+    if configured.is_empty() {
+        &state.config.public_url
+    } else {
+        configured
+    }
+    .trim_end_matches('/')
+    .to_string()
 }
 
-/// Base URL of the public albums web app.
+/// Base URL of the public albums web app (`accounts.public_albums_url`).
 pub fn albums_host(state: &AppState) -> String {
-    host(state, "PHOTOVAULT_ALBUMS_URL")
+    app_host(state, &state.config.accounts.public_albums_url)
 }
 
-/// Base URL of the public Locker share web app.
+/// Base URL of the public Locker share web app (`accounts.public_locker_url`).
 pub fn locker_host(state: &AppState) -> String {
-    host(state, "PHOTOVAULT_LOCKER_SHARE_URL")
+    app_host(state, &state.config.accounts.public_locker_url)
 }
 
 /// `GetAlbumUrl`: `{albums}/?t=TOKEN`, Locker `{locker}/c/TOKEN`.

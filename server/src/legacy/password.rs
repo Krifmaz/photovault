@@ -66,7 +66,7 @@ pub struct UpdateKeysRequest {
 #[derive(Debug, Clone, Deserialize)]
 pub struct UpdateSrpAndKeysRequest {
     /// Setup id from [`SetupSrpResponse`].
-    #[serde(rename = "setupID", default)]
+    #[serde(rename = "setupID", alias = "setupId", default)]
     pub setup_id: String,
     /// Client proof (base64, 32 bytes).
     #[serde(rename = "srpM1", default)]

@@ -90,14 +90,18 @@ same commit) with Postgres and an S3 mock (moto) using
 **21 passed, 1 skipped** of 22 (2026-11-03, full run about 3 min). Every failure against photovault is
 therefore a server incompatibility, not a harness problem.
 
-### Status against the current photovault core
+### Status against photovault
 
-Against the core scaffold (health/metrics only): `web_app_loads` passes;
-`signup` fails at `POST /users/ott` (404), everything depending on it is
-blocked, `dev_settings_custom_endpoint` fails because `GET /ping` is missing.
-Total: 1 passed, 3 failed (`dev_settings_custom_endpoint`, `signup`,
-`signup_second_user`), 17 blocked, 1 skipped; `run.sh` takes about 4.5 min
-(mostly the two 120 s signup timeouts; the debug server build is cached).
+2026-11-03, all workstreams merged: **21 passed, 1 skipped** of 22, the same
+as museum (`run.sh` about 4 min with a cached web build). `desktop-smoke.sh`
+passes against photovault too.
+
+| Test | museum | photovault |
+| --- | --- | --- |
+| `web_app_loads` … `active_sessions`, `delete_account` (19 tests) | pass | pass |
+| `public_link` | pass | pass (link points at the albums app via `[accounts] public_albums_url`) |
+| `change_password` | pass | pass (needed `setupId` accepted in `POST /users/srp/update`) |
+| `legacy_trusted_contact` | skipped | skipped |
 
 ### Server requirements the tests surfaced
 
@@ -108,10 +112,12 @@ Total: 1 passed, 3 failed (`dev_settings_custom_endpoint`, `signup`,
   token is not `b"auth-token" || 32 random bytes` (see
   `server/tests/vectors/README.md`).
 * Public links: the server returns the full link URL; for the test it must use
-  the albums app origin `http://localhost:13002` (museum: `apps.public-albums`).
-  Add the photovault config key with `PHOTOVAULT_E2E_EXTRA_CONFIG` once it
-  exists. The test falls back to the local albums app with the same token if
-  the link points elsewhere, and notes it.
+  the albums app origin `http://localhost:13002` (museum: `apps.public-albums`,
+  photovault: `[accounts] public_albums_url`, which `run.sh` sets). The test
+  falls back to the local albums app with the same token if the link points
+  elsewhere, and notes it.
+* JSON field names are matched case-insensitively by museum (Go): the apps'
+  Rust client sends `setupId` (not `setupID`) to `POST /users/srp/update`.
 * Object up/downloads happen from the browser at `http://localhost:13000`, so
   signed storage URLs need CORS (PUT, GET, ETag exposed).
 
@@ -132,14 +138,14 @@ To go back, open the dialog again and clear the field.
 `xvfb-run` with Playwright's Electron driver, sets the endpoint through
 Developer settings and checks that login requests go to the server. It needs
 a server already listening (`E2E_API_URL`, default `http://localhost:18080`)
-and fails early if `GET /ping` does not answer, so it cannot pass against the
-current core yet. Upstream's `postinstall` (vips, ffmpeg, Electron native deps,
+and fails early if `GET /ping` does not answer. Upstream's `postinstall` (vips, ffmpeg, Electron native deps,
 ONNX Runtime, and a release build of the app's napi Rust addon) is run
 explicitly after `npm ci`, so the build also works where npm is configured
 with `ignore-scripts=true` (as on this machine).
 
-Validated 2026-11-03 against museum: `PASS desktop smoke: app accepted
-http://localhost:18080 and called .../users/srp/attributes?...`. Cold build
+Validated 2026-11-03 against museum and against photovault: `PASS desktop
+smoke: app accepted http://localhost:18080 and called
+.../users/srp/attributes?...`. Cold build
 about 11 min on this machine (most of it the napi addon and Electron/vips/
 ffmpeg/ONNX downloads), reusing the web checkout; cached afterwards.
 

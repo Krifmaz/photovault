@@ -77,6 +77,7 @@ if [[ "${PHOTOVAULT_E2E_EXTERNAL_API:-0}" != 1 ]]; then
         printf 'log_format = "pretty"\n'
         printf 'allow_signups = true\n'
         printf '\n[storage]\nkind = "local"\npath = "%s/objects"\n' "$tmp"
+        printf '\n[accounts]\npublic_albums_url = "http://localhost:%s"\n' "$albums_port"
         printf '\n[hardcoded_ott]\n'
         printf '"e2e@example.com" = "123456"\n'
         printf '"e2e2@example.com" = "123456"\n'

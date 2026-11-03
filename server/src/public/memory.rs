@@ -9,15 +9,10 @@ use sqlx::{AnyPool, Row};
 /// Memory shares expire 7 days after creation (museum `MemoryShareTTL`, microseconds).
 pub const MEMORY_SHARE_TTL: i64 = 7 * 24 * 3600 * 1_000_000;
 
-/// Base URL of the public memories web app: `PHOTOVAULT_PUBLIC_MEMORIES_URL`
+/// Base URL of the public memories web app: `[accounts] public_memories_url`
 /// (museum `apps.public-memories`), defaulting to the server's public URL.
 pub fn memories_host(state: &AppState) -> String {
-    std::env::var("PHOTOVAULT_PUBLIC_MEMORIES_URL")
-        .ok()
-        .filter(|v| !v.is_empty())
-        .unwrap_or_else(|| state.config.public_url.clone())
-        .trim_end_matches('/')
-        .to_string()
+    crate::library::links::app_host(state, &state.config.accounts.public_memories_url)
 }
 
 const COLS: &str = "id, user_id, type, memory_hash, metadata_cipher, metadata_nonce, mem_enc_key, \

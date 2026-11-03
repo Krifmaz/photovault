@@ -66,9 +66,10 @@ recorded outputs, so regenerating changes the bytes but not the structure.
   server's libsodium (`photovault_server::crypto` and raw `libsodium-sys`).
   `srp_fixture_kek_matches_libsodium_pwhash` is `#[ignore]`d (256 MiB × 16
   argon2id); run it with `cargo test --test vectors_crypto -- --ignored`.
-* `server/tests/vectors_srp.rs`: `srp_fixture_hash_layout` runs now; the two
-  server-side SRP tests are `#[ignore]`d until the users workstream provides
-  `photovault_server::users::srp` (assumed API at the top of the file).
+* `server/tests/vectors_srp.rs`: checks the fixture's hash layout, then runs the
+  server's SRP code (`photovault_server::users::srp`, used by login and password
+  change, and `photovault_server::legacy::srp`, used by legacy recovery) on the
+  real client's transcript: it must produce exactly `srpB` and `srpM2`.
 
 ## Checking that the clients accept tokens sealed by OUR server
 

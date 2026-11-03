@@ -271,9 +271,11 @@ impl UpdateKeys {
     }
 }
 
+/// Go's JSON decoding matches field names case-insensitively, and the apps' Rust
+/// client sends `setupId` here (camelCase), so both spellings are accepted.
 #[derive(Deserialize)]
 pub(super) struct UpdateRequest {
-    #[serde(rename = "setupID")]
+    #[serde(rename = "setupID", alias = "setupId")]
     setup_id: String,
     #[serde(rename = "srpM1")]
     srp_m1: String,

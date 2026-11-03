@@ -494,3 +494,76 @@ async fn srp_password_change_logs_out_others() {
     assert_eq!(v["keyAttributes"]["kekSalt"], new_kek_salt);
     assert_eq!(v["keyAttributes"]["memLimit"], 1073741824);
 }
+
+/// The web/desktop apps' Rust client (`accounts::models::UpdateSrpAndKeysRequest`, serde
+/// camelCase) sends `setupId`, not `setupID`; museum accepts it because Go's JSON decoder
+/// matches field names case-insensitively. Found by the e2e `change_password` test.
+#[tokio::test]
+async fn srp_update_accepts_rust_client_body() {
+    let email = "dave@example.org";
+    let srv = server(&[email]).await;
+    let c = Client::new(&srv);
+    let acc = signup(&c, email).await;
+    let (_, v) = srp_login(&c, &acc).await;
+    let other = open_token(
+        &acc.public_key,
+        &acc.secret_key,
+        v["encryptedToken"].as_str().unwrap(),
+    );
+    let me = c.with_token(&acc.token);
+    let new_key = crypto::random_bytes(16);
+    let new_salt = crypto::random_bytes(16);
+    let verifier = photovault_server::users::srp::client::verifier(
+        acc.srp_user_id.as_bytes(),
+        &new_key,
+        &new_salt,
+    );
+    let a = crypto::random_bytes(32);
+    let (s, v) = me
+        .post(
+            "/users/srp/setup",
+            json!({
+                "srpUserID": acc.srp_user_id,
+                "srpSalt": crypto::b64(&new_salt),
+                "srpVerifier": crypto::b64(&verifier),
+                "srpA": crypto::b64(&photovault_server::users::srp::client::public_a(&a)),
+            }),
+        )
+        .await;
+    assert_eq!(s, 200);
+    let setup_id = v["setupID"].clone();
+    let b = crypto::unb64(v["srpB"].as_str().unwrap()).unwrap();
+    let (m1, _) = photovault_server::users::srp::client::proofs(
+        acc.srp_user_id.as_bytes(),
+        &new_key,
+        &new_salt,
+        &a,
+        &b,
+    )
+    .unwrap();
+    // Exactly the field names the client serializes.
+    let (s, v) = me
+        .post(
+            "/users/srp/update",
+            json!({
+                "setupId": setup_id,
+                "srpM1": crypto::b64(&m1),
+                "updatedKeyAttr": {
+                    "kekSalt": crypto::b64(&crypto::random_bytes(16)),
+                    "encryptedKey": crypto::b64(&crypto::random_bytes(48)),
+                    "keyDecryptionNonce": crypto::b64(&crypto::random_bytes(24)),
+                    "opsLimit": 4,
+                    "memLimit": 1073741824u64,
+                },
+                "logOutOtherDevices": false,
+            }),
+        )
+        .await;
+    assert_eq!(s, 200, "{v}");
+    assert_eq!(v["setupID"], setup_id);
+    assert!(v["srpM2"].is_string());
+    // logOutOtherDevices=false keeps the other session.
+    assert_eq!(c.with_token(&other).get("/users/details/v2").await.0, 200);
+    let (s, _) = srp_login_with(&c, email, &new_key).await;
+    assert_eq!(s, 200);
+}

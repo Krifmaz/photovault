@@ -74,6 +74,20 @@ Without SMTP, emails (including login codes) are written to the log.
 | `username`, `password` | Optional credentials. |
 | `from` | Sender address. |
 
+## `[accounts]`
+
+URLs of the companion web apps (museum's `apps.*` keys). Empty means the
+server's `public_url`.
+
+| Key | Env | Meaning |
+| --- | --- | --- |
+| `public_albums_url` | `PHOTOVAULT_ALBUMS_URL` | Public albums app; album and file share links point here (museum `apps.public-albums`). |
+| `public_locker_url` | `PHOTOVAULT_LOCKER_SHARE_URL` | Public Locker share app (museum `apps.public-locker`). |
+| `public_memories_url` | `PHOTOVAULT_PUBLIC_MEMORIES_URL` | Public memories app (museum `apps.public-memories`). |
+| `accounts_url` | `PHOTOVAULT_ACCOUNTS_URL` | Accounts app (passkeys, recovery); default `http://localhost:3001`. |
+| `family_url` | `PHOTOVAULT_FAMILY_URL` | Family app; default `http://localhost:3003`. |
+| `cast_url` | `PHOTOVAULT_CAST_URL` | Cast receiver app. |
+
 ## Other environment variables
 
 | Env | Meaning |

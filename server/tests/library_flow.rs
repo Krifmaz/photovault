@@ -877,3 +877,47 @@ async fn file_data_and_links() {
         .await;
     assert_eq!(r.status, 409, "file metadata versions are checked");
 }
+
+/// Album and file links use the configured public albums app origin (museum
+/// `apps.public-albums`), not the API origin. Found by the e2e `public_link` test.
+#[tokio::test]
+async fn share_links_use_configured_albums_origin() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("photovault.toml");
+    std::fs::write(
+        &path,
+        "[accounts]\npublic_albums_url = \"http://albums.example.org:13002/\"\n",
+    )
+    .unwrap();
+    let loaded = photovault_server::config::Config::load(Some(&path)).unwrap();
+    let srv = TestServer::start_with(|c| c.accounts = loaded.accounts)
+        .await
+        .unwrap();
+    let alice = add_user(&srv, 1, "alice@example.org").await;
+    let album = create_album(&alice).await;
+    let f = upload_file(&alice, album, 9).await;
+    let v = alice
+        .ok(
+            "POST",
+            "/collections/share-url",
+            Some(json!({"collectionID": album})),
+        )
+        .await;
+    let url = v["result"]["url"].as_str().unwrap();
+    assert!(
+        url.starts_with("http://albums.example.org:13002/?t="),
+        "{url}"
+    );
+    let v = alice
+        .ok(
+            "POST",
+            "/files/share-url",
+            Some(json!({"fileID": f["id"], "app": "photos"})),
+        )
+        .await;
+    let url = v["url"].as_str().unwrap();
+    assert!(
+        url.starts_with("http://albums.example.org:13002/file/?t="),
+        "{url}"
+    );
+}
