@@ -19,6 +19,7 @@ pub mod routes;
 pub mod state;
 pub mod storage;
 pub mod testing;
+pub mod users;
 
 use axum::Router;
 use axum::extract::{MatchedPath, Request};
