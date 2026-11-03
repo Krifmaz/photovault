@@ -26,7 +26,9 @@
       "abi": "arm64-v8a",
       "minSdk": 28,
       "targetSdk": 36,
-      "buildConfig": { "DEFAULT_SERVER_URL": "gradle property photovault.defaultServer, empty = none" },
+      "buildConfig": {
+        "DEFAULT_SERVER_URL": "gradle property photovault.defaultServer, empty = none"
+      },
       "deepLinkScheme": "photovault"
     },
     "photovault-web": {
@@ -35,7 +37,31 @@
       "path": "web/apps/photos",
       "staticExport": "web/apps/photos/out",
       "servedFrom": "PHOTOVAULT_WEB_DIR (/app/web in the image), same port as the API",
-      "buildEnv": { "NEXT_PUBLIC_ENTE_ENDPOINT": "default API origin; empty = same origin the page was served from" }
+      "buildEnv": {
+        "NEXT_PUBLIC_ENTE_ENDPOINT": "default API origin; empty = same origin the page was served from"
+      },
+      "subApps": {
+        "albums": {
+          "path": "web/apps/albums",
+          "basePath": "/albums",
+          "export": "web/apps/albums/out",
+          "servedAt": "<web dir>/albums/",
+          "shareLink": "publicUrl + /albums/?t=<token>#<key>"
+        },
+        "cast": {
+          "path": "web/apps/cast",
+          "basePath": "/cast",
+          "export": "web/apps/cast/out",
+          "servedAt": "<web dir>/cast/"
+        },
+        "accounts": {
+          "path": "web/apps/accounts",
+          "basePath": "/accounts",
+          "export": "web/apps/accounts/out",
+          "servedAt": "<web dir>/accounts/"
+        }
+      },
+      "serverFallback": "extension-less paths under /albums/, /cast/, /accounts/ fall back to that sub-app's index.html, not the root one"
     }
   },
   "core": {
@@ -45,7 +71,16 @@
     "kotlinPackage": "app.photovault.core",
     "uniffi": "0.32 proc-macros"
   },
-  "discovery": { "dnsSdService": "_photovault._tcp", "txt": ["name", "version", "public", "home", "info"] },
+  "discovery": {
+    "dnsSdService": "_photovault._tcp",
+    "txt": [
+      "name",
+      "version",
+      "public",
+      "home",
+      "info"
+    ]
+  },
   "qr": "photovault://connect?url=<publicUrl>&home=<homeUrl>&name=<name> (bare http(s) URL also accepted)",
   "aboutCredit": "Based on Ente",
   "signing": "Release APKs are signed in CI from secrets PHOTOVAULT_KEYSTORE_B64, PHOTOVAULT_KEYSTORE_PASSWORD, PHOTOVAULT_KEY_ALIAS, PHOTOVAULT_KEY_PASSWORD; unsigned debug-signed fallback when absent."

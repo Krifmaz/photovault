@@ -20,7 +20,7 @@ Precedence: environment variable > `--config` TOML > `/config/keys.toml` (keys o
 | `PHOTOVAULT_S3_*` | – | `ENDPOINT`, `PUBLIC_ENDPOINT`, `REGION`, `BUCKET`, `ACCESS_KEY`, `SECRET_KEY`, `SECRET_KEY_FILE`, `PATH_STYLE` (unchanged) |
 | `PHOTOVAULT_STORAGE_LIMIT` | unset | S3 total limit (size string, e.g. `4TB`); unset = unlimited |
 | `PHOTOVAULT_DEFAULT_QUOTA` | unset | Per-user default quota (size string); unset = none |
-| `PHOTOVAULT_WEB_DIR` | `/app/web` (image) | Built web app served on the API port: `$uri`, `$uri.html`, `$uri/index.html`, then `index.html` for extension-less paths; `_next/static` cached immutable |
+| `PHOTOVAULT_WEB_DIR` | `/app/web` (image) | Built web app served on the API port: `$uri`, `$uri.html`, `$uri/index.html`, then the nearest sub-app `index.html` (`/albums/`, `/cast/`, `/accounts/`, else root) for extension-less paths; `_next/static` cached immutable |
 | `PHOTOVAULT_WEB_ORIGINS` | unset (= any origin) | When set, CORS is restricted to this comma-separated list; `/photovault/info` stays open |
 | `PHOTOVAULT_MDNS` | `true` | Announce `_photovault._tcp` |
 | `PHOTOVAULT_LOG_FORMAT` | `pretty` | `pretty` or `json`; one line per event |
@@ -31,7 +31,7 @@ Precedence: environment variable > `--config` TOML > `/config/keys.toml` (keys o
 | `PHOTOVAULT_JWT_SECRET`, `PHOTOVAULT_ENCRYPTION_KEY`, `PHOTOVAULT_HASHING_KEY` | from `keys.toml` | If set, used as-is and `keys.toml` is not written |
 | `PHOTOVAULT_WEBAUTHN_RP_ID`, `_RP_ORIGINS` | derived from public URL | Passkeys |
 
-Companion URLs default to `publicUrl` + `/accounts`, `/family`, `/cast`; albums default to `publicUrl` (override `PHOTOVAULT_ALBUMS_URL`). Passkey rpId defaults to the public URL host.
+Companion URLs default to `publicUrl` + `/accounts`, `/family`, `/cast`; albums default to `publicUrl/albums` (override `PHOTOVAULT_ALBUMS_URL`). Passkey rpId defaults to the public URL host.
 
 ## `/config/keys.toml` (mode 0600, created on first start if missing)
 
