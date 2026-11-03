@@ -232,6 +232,10 @@ pub async fn run(config: &mut Config) -> Result<(), Failure> {
     check_keys(config)?;
     check_old_layout(config)?;
     if let StorageConfig::Local { path, .. } = &config.storage {
+        // Outside Docker a missing folder is created (as earlier versions did).
+        if !path.exists() {
+            let _ = std::fs::create_dir_all(path);
+        }
         check_writable_dir(path, "storage path")?;
     }
     if let StorageConfig::S3(c) = &config.storage {
