@@ -1,0 +1,35 @@
+{
+  "$comment": "Photovault theme tokens (contract v1), taken from Krifmaz/Encore@5c0bdcb web-rs/static/css/app.css (:root[data-theme=encore] + :root[data-brand] for dark, :root[data-theme=light] for light) and clients/android/.../ui/theme/Theme.kt + Type.kt (light accent, type scale, shapes). Every app's theme file mirrors these values; change them here first. Sizes are px on web and dp/sp on Android/Flutter.",
+  "source": "https://github.com/Krifmaz/Encore/blob/5c0bdcba82307c522e4516d1bc51a81c8efa4026/web-rs/static/css/app.css",
+  "font": { "family": "Inter", "fallback": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif", "mono": "ui-monospace, SFMono-Regular, Menlo, monospace", "androidFamily": "sans-serif" },
+  "radius": { "card": 14, "control": 10, "small": 8, "pill": 99, "hero": 20, "tile": 12, "circle": "50%" },
+  "dark": {
+    "bg": "#161617", "bg2": "#1c1c1e", "panel": "#222224", "panel2": "#2a2a2d", "border": "#353538",
+    "text": "#f0ead6", "muted": "#aaa493", "faint": "#77725f",
+    "accent": "#f0ead6", "accent2": "#d6c49a", "onAccent": "#16161f",
+    "ok": "#22c55e", "warn": "#f59e0b", "err": "#ef4444", "info": "#38bdf8"
+  },
+  "light": {
+    "bg": "#f6f6fb", "bg2": "#ffffff", "panel": "#ffffff", "panel2": "#f0f0f7", "border": "#e2e2ee",
+    "text": "#16161f", "muted": "#5d5d75", "faint": "#8d8da5",
+    "accent": "#2a2a2d", "accent2": "#8a7a4e", "onAccent": "#f0ead6",
+    "ok": "#22c55e", "warn": "#f59e0b", "err": "#ef4444", "info": "#38bdf8"
+  },
+  "primaryButton": "linear-gradient(135deg, accent, accent2) with onAccent text",
+  "spacing": { "xxs": 2, "xs": 4, "sm": 6, "md": 8, "base": 10, "lg": 12, "xl": 16, "xxl": 20, "section": 28 },
+  "type": {
+    "$comment": "Encore Type.kt / app.css scale: size, lineHeight, weight, letterSpacing (sp/px).",
+    "display":  { "size": 26, "lineHeight": 30, "weight": 700, "letterSpacing": -0.5 },
+    "h1":       { "size": 28, "lineHeight": 34, "weight": 700, "letterSpacing": -0.3 },
+    "h2":       { "size": 19, "lineHeight": 24, "weight": 700, "letterSpacing": -0.2 },
+    "h3":       { "size": 15, "lineHeight": 20, "weight": 600, "letterSpacing": 0 },
+    "bodyLarge":{ "size": 15, "lineHeight": 22, "weight": 400, "letterSpacing": 0 },
+    "body":     { "size": 14, "lineHeight": 21, "weight": 400, "letterSpacing": 0 },
+    "small":    { "size": 12, "lineHeight": 16, "weight": 400, "letterSpacing": 0 },
+    "label":    { "size": 14, "lineHeight": 20, "weight": 600, "letterSpacing": 0 },
+    "labelSmall": { "size": 11, "lineHeight": 14, "weight": 600, "letterSpacing": 0.5 }
+  },
+  "motion": { "$comment": "app.css transitions; no blur, heavy shadows or animated backgrounds", "fastMs": 150, "normalMs": 200 },
+  "elevation": { "$comment": "Flat. Encore's --shadow is only for menus/popovers; apps may drop it.", "popover": "0 10px 30px rgba(0,0,0,.35)" },
+  "brand": { "name": "Photovault", "credit": "Based on Ente" }
+}
