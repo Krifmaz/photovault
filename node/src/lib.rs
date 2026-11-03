@@ -17,6 +17,7 @@
 //! Based on Ente (ente.com).
 
 pub mod api;
+pub mod backend;
 pub mod cli;
 pub mod config;
 pub mod crypto;

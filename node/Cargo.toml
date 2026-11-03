@@ -48,6 +48,9 @@ tokio-util = "0.7"
 md-5 = "0.10"
 # API client: body chunks of downloads and presigned uploads.
 bytes = "1"
+# Live photos: read the still image out of Ente's live-photo zip. Pure Rust
+# (deflate through flate2's zlib-rs backend); no C libraries.
+zip = { version = "8", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 
 # Vendored from ente-io/ente rust/crates (see vendor/ente/UPSTREAM_REV).
 # Only built with `--features ml`; they pull in ONNX Runtime via `ort`

@@ -141,14 +141,10 @@ pub trait Backend: Send + Sync {
     async fn services(&self, cfg: &Config, provider: GpuProvider) -> Result<Services>;
 }
 
-/// The backend used by the binary.
-///
-/// TODO(lead): return the concrete backend built on `crate::api`,
-/// `crate::library`, `crate::ml` and `crate::video`. Until then every
-/// account command fails with a clear error, while `status`, `gpu` and
-/// `config` work.
+/// The backend used by the binary: [`crate::backend::EnteBackend`], built
+/// on `crate::api`, `crate::library`, `crate::ml` and `crate::video`.
 pub fn default_backend() -> Box<dyn Backend> {
-    Box::new(UnwiredBackend)
+    Box::new(crate::backend::EnteBackend::new())
 }
 
 /// Placeholder backend that reports it is not wired yet.

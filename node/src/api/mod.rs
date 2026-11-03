@@ -7,6 +7,7 @@
 //! - [`auth`]: sign in as a new device (SRP, email code, TOTP), [`Session`], logout.
 //! - [`files`]: collections, collection diffs, downloads, file data (ML data,
 //!   video previews) and presigned uploads.
+//! - [`magic`]: public magic metadata updates (e.g. the `sv` stream flag).
 //! - [`models`]: the JSON types, field-for-field as museum sends them.
 //! - [`srp`]: the SRP-6a client maths.
 //!
@@ -17,6 +18,7 @@
 
 pub mod auth;
 pub mod files;
+pub mod magic;
 pub mod models;
 pub mod srp;
 
