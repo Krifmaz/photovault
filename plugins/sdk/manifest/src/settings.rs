@@ -154,10 +154,8 @@ impl Field {
                     return bad("min is greater than max");
                 }
             }
-            FieldKind::Select { options, .. } => {
-                if options.is_empty() {
-                    return bad("select has no options");
-                }
+            FieldKind::Select { options, .. } if options.is_empty() => {
+                return bad("select has no options");
             }
             _ => {}
         }
