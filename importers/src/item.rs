@@ -112,7 +112,7 @@ pub trait Source: Send {
     /// before any download so already-imported items cost nothing.
     async fn next(
         &mut self,
-        skip: &(dyn Fn(&str) -> bool + Sync),
+        skip: &(dyn for<'a> Fn(&'a str) -> bool + Sync),
     ) -> anyhow::Result<Option<ImportItem>>;
 
     /// Called after an item was uploaded (or failed) so the source can delete
