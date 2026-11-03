@@ -1,0 +1,36 @@
+[plugin]
+id = "dev.photovault.auto-albums"
+name = "Auto albums"
+version = "0.1.0"
+description = "Sorts photos into albums by rules you write, such as \"Summer in Rome: near=41.9,12.5,30 and month=6-8\"."
+authors = ["Photovault contributors"]
+license = "AGPL-3.0-only"
+homepage = "https://github.com/Krifmaz/photovault/tree/main/plugins/sdk/guest/examples/auto-albums"
+api_version = 1
+
+[permissions]
+read = ["metadata"]
+write = ["albums"]
+
+[hooks]
+on_upload = true
+# Catch up once a day on files uploaded from devices where the plugin is not
+# installed.
+schedule = { every_minutes = 1440 }
+on_demand = [
+    { id = "apply_all", label = "Apply rules to the whole library" },
+    { id = "preview", label = "Check rules (changes nothing)" },
+]
+
+[limits]
+memory_mb = 32
+timeout_ms = 120000
+
+[[settings]]
+key = "rules"
+label = "Rules"
+type = "text"
+multiline = true
+max_length = 8000
+placeholder = "Screenshots: folder=Screenshots\nDogs: name=*dog*\nSummer 2024: year=2024 and month=6-8"
+help = "One rule per line: `Album name: condition and condition ...`. Conditions: type=image|video|live_photo, folder=<glob>, name=<glob>, year=YYYY, month=1-12, favorite, archived, near=<lat>,<lon>,<km>, and `not <condition>`. Lines starting with # are comments."
