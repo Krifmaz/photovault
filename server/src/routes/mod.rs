@@ -32,8 +32,9 @@ use crate::state::AppState;
 use axum::Router;
 
 /// All API routes (without global middleware).
-pub fn api() -> Router<AppState> {
+pub fn api(state: &AppState) -> Router<AppState> {
     Router::new()
+        .merge(public_collection::social_router(state.clone()))
         .merge(admin::router())
         .merge(authenticator::router())
         .merge(billing::router())

@@ -54,7 +54,7 @@ pub fn app(state: AppState) -> Router {
             HeaderName::from_static("x-link-device-token"),
         ])
         .max_age(std::time::Duration::from_secs(86400));
-    routes::api()
+    routes::api(&state)
         .layer(axum::middleware::from_fn_with_state(state.clone(), observe))
         .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
         .layer(SetRequestIdLayer::new(x_request_id, MakeRequestUuid))

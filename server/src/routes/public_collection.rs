@@ -292,3 +292,47 @@ pub fn verify_link_password(
         json!({ "jwtToken": jwt::new_password_token(&state.keys.jwt, given) }),
     ))
 }
+
+/// Comments/reactions under `/public-collection`: the social handlers, behind the same
+/// link validation as every other public-collection route.
+pub fn social_router(state: AppState) -> Router<AppState> {
+    Router::new().nest(
+        "/public-collection",
+        crate::social::public::public_router().layer(axum::middleware::from_fn_with_state(
+            state,
+            attach_social_ctx,
+        )),
+    )
+}
+
+/// Validate the link (incl. password JWT and expiry) and insert the
+/// [`crate::social::public::PublicCollectionCtx`] the social handlers expect.
+async fn attach_social_ctx(
+    axum::extract::State(state): axum::extract::State<AppState>,
+    req: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> axum::response::Response {
+    use axum::extract::FromRequestParts;
+    use axum::response::IntoResponse;
+    let (mut parts, body) = req.into_parts();
+    let link = match CollectionLink::from_request_parts(&mut parts, &state).await {
+        Ok(l) => l,
+        Err(rejection) => return rejection,
+    };
+    let owner_id = match library_sql::collection(&state.db.pool, link.collection_id).await {
+        Ok(Some(c)) if !c.is_deleted => c.owner.id,
+        Ok(_) => return ApiError::status(StatusCode::NOT_FOUND).into_response(),
+        Err(e) => return ApiError::from(e).into_response(),
+    };
+    let mut req = axum::extract::Request::from_parts(parts, body);
+    req.extensions_mut()
+        .insert(crate::social::public::PublicCollectionCtx {
+            id: link.id,
+            collection_id: link.collection_id,
+            owner_id,
+            enable_comment: link.enable_comment,
+            ip: link.ip,
+            user_agent: link.user_agent,
+        });
+    next.run(req).await
+}
