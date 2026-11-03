@@ -131,17 +131,10 @@ async fn add_user(srv: &TestServer, id: i64, email: &str) -> Client {
     .execute(&srv.state.db.pool)
     .await
     .unwrap();
-    exec(
-        srv,
-        "CREATE TABLE IF NOT EXISTS key_attributes (user_id BIGINT PRIMARY KEY, kek_salt TEXT NOT NULL,
-            kek_hash_bytes TEXT NOT NULL, encrypted_key TEXT NOT NULL, key_decryption_nonce TEXT NOT NULL,
-            public_key TEXT NOT NULL, encrypted_secret_key TEXT NOT NULL, secret_key_decryption_nonce TEXT NOT NULL)",
-    )
-    .await;
     sqlx::query(
-        "INSERT INTO key_attributes (user_id, kek_salt, kek_hash_bytes, encrypted_key, key_decryption_nonce,
-            public_key, encrypted_secret_key, secret_key_decryption_nonce)
-         VALUES ($1, 'x', 'x', 'x', 'x', 'x', 'x', 'x')",
+        "INSERT INTO key_attributes (user_id, kek_salt, encrypted_key, key_decryption_nonce,
+            public_key, encrypted_secret_key, secret_key_decryption_nonce, mem_limit, ops_limit, creation_time)
+         VALUES ($1, 'x', 'x', 'x', 'x', 'x', 'x', 1, 1, 1)",
     )
     .bind(id)
     .execute(&srv.state.db.pool)
