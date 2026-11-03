@@ -2,7 +2,7 @@
     "name": "ente",
     "version": "1.7.32-beta",
     "private": true,
-    "description": "Desktop client for Ente Photos",
+    "description": "Desktop client for Photovault (based on Ente Photos)",
     "repository": "github:ente/photos-desktop",
     "author": "Ente <code@ente.com>",
     "main": "app/main.js",
@@ -56,5 +56,5 @@
         "typescript-eslint": "8.61.0"
     },
     "packageManager": "npm@11.12.1",
-    "productName": "ente"
+    "productName": "Photovault"
 }

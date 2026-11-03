@@ -22,6 +22,13 @@ import {
 } from "./main/ipc";
 import log, { initLogging } from "./main/log";
 import { createApplicationMenu, createTrayContextMenu } from "./main/menu";
+// PHOTOVAULT: brand name, credit and window colours.
+import {
+    appDisplayName,
+    titleBarSymbolColor,
+    upstreamCredit,
+    windowBackgroundColor,
+} from "./main/photovault/brand";
 import { setupAutoUpdater } from "./main/services/app-update";
 import autoLauncher from "./main/services/auto-launcher";
 import { shouldHideDockIcon } from "./main/services/store";
@@ -79,6 +86,7 @@ const main = () => {
 
     void app.whenReady().then(() => {
         attachProcessHandlers();
+        setAboutPanel(); // PHOTOVAULT: brand name and upstream credit.
 
         void (async () => {
             if (isDev) await waitForRendererDevServer();
@@ -116,6 +124,18 @@ const main = () => {
 
     app.on("open-url", (_, url) => handleOpenEnteURLEnsuringWindow(url));
 };
+
+/**
+ * PHOTOVAULT: show our name and the "Based on Ente (ente.com)" credit in the
+ * native About panel (macOS "About" menu item; also used on Linux/Windows).
+ */
+const setAboutPanel = () =>
+    app.setAboutPanelOptions({
+        applicationName: appDisplayName,
+        credits: upstreamCredit,
+        copyright: `${upstreamCredit}. Licensed under AGPL-3.0.`,
+        website: "https://ente.com",
+    });
 
 const logStartupBanner = () => {
     const version = isDev ? "dev" : app.getVersion();
@@ -185,10 +205,12 @@ const createMainWindow = () => {
             process.platform == "darwin"
                 ? true
                 : {
-                      color: shouldUseDarkColors ? "black" : "white",
-                      symbolColor: shouldUseDarkColors ? "#cdcdcd" : "black",
+                      // PHOTOVAULT: theme (Encore bg/text tokens).
+                      color: windowBackgroundColor(shouldUseDarkColors),
+                      symbolColor: titleBarSymbolColor(shouldUseDarkColors),
                   },
-        backgroundColor: shouldUseDarkColors ? "black" : "white",
+        // PHOTOVAULT: theme (Encore bg token).
+        backgroundColor: windowBackgroundColor(shouldUseDarkColors),
         show: false,
     });
 
@@ -396,7 +418,7 @@ const setupTrayItem = (mainWindow: BrowserWindow) => {
     );
     const trayIcon = nativeImage.createFromPath(trayImgPath);
     const tray = new Tray(trayIcon);
-    tray.setToolTip("Ente Photos");
+    tray.setToolTip(appDisplayName); // PHOTOVAULT: brand name.
     tray.setContextMenu(createTrayContextMenu(mainWindow));
     if (process.platform === "linux") {
         tray.on("click", () => {
