@@ -1,0 +1,27 @@
+[package]
+name = "photovault-plugin-host"
+description = "Photovault plugin host runtime: signed packages, sandboxed Extism execution, permission checks and plugin registry."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+# Wasmtime 49 (via Extism 1.41) needs Rust 1.96.
+rust-version = "1.96"
+
+[features]
+default = []
+# In-memory `Library` (`MemoryLibrary`) for tests and examples.
+testing = []
+
+[dependencies]
+photovault-plugin-manifest = { path = "../manifest" }
+extism = { version = "1.41", default-features = false, features = ["http"] }
+libsodium-sys-stable = "1.24"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+ureq = "3.5"
+
+[dev-dependencies]
+photovault-plugin-host = { path = ".", features = ["testing"] }
+tempfile = "3"
