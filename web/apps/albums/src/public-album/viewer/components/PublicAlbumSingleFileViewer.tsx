@@ -1,5 +1,4 @@
 import { LazyNotification } from "@/app/lazy/global-ui";
-import { getEnteURL } from "@/public-album/access/utils/external-links";
 import { downloadManager } from "@/public-album/download/services/download-manager";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -11,7 +10,6 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import {
     Box,
-    Button,
     CircularProgress,
     GlobalStyles,
     IconButton,
@@ -35,12 +33,6 @@ import { FileType } from "ente-media/file-type";
 import { t } from "i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FileViewer } from "./FileViewer";
-// PHOTOVAULT: theme - Encore colours instead of Ente green.
-import {
-    pvGold,
-    pvGoldHover,
-    pvOnGold,
-} from "ente-base/components/utils/photovault/encore-tokens";
 
 export interface PublicAlbumSingleFileViewerProps {
     file: EnteFile;
@@ -501,10 +493,6 @@ export const PublicAlbumSingleFileViewer: React.FC<
         ).catch(onGenericError);
     }, [handleMenuClose, onGenericError]);
 
-    const handleGetEntePhotos = useCallback(() => {
-        window.location.href = getEnteURL();
-    }, []);
-
     const handleToggleLivePhotoPlay = useCallback(() => {
         document
             .querySelector<HTMLButtonElement>(
@@ -620,10 +608,8 @@ export const PublicAlbumSingleFileViewer: React.FC<
                                 }}
                             >
                                 <Box
-                                    component="a"
-                                    href="https://ente.com"
-                                    target="_blank"
-                                    rel="noopener"
+                                    // PHOTOVAULT: strip - our wordmark, not a link to Ente.
+                                    component="span"
                                     sx={{
                                         color: "white",
                                         opacity: 0.85,
@@ -750,26 +736,7 @@ export const PublicAlbumSingleFileViewer: React.FC<
                                 spacing={1}
                                 sx={{ alignItems: "center", flexShrink: 0 }}
                             >
-                                <Button
-                                    variant="contained"
-                                    onClick={handleGetEntePhotos}
-                                    sx={{
-                                        borderRadius: "16px",
-                                        paddingBlock: "11px",
-                                        paddingInline: "20px",
-                                        minHeight: "unset",
-                                        textTransform: "none",
-                                        fontWeight: "medium",
-                                        color: pvOnGold, // PHOTOVAULT: theme
-                                        backgroundColor: pvGold,
-                                        "&:hover": {
-                                            color: pvOnGold, // PHOTOVAULT: theme
-                                            backgroundColor: pvGoldHover,
-                                        },
-                                    }}
-                                >
-                                    {t("join_ente")}
-                                </Button>
+                                {/* PHOTOVAULT: strip - no "Join Ente" sign-up button. */}
                                 <IconButton
                                     onClick={(event) =>
                                         setMenuAnchorEl(event.currentTarget)

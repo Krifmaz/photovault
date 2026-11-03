@@ -2,6 +2,7 @@ import type { Component } from "chrono-node";
 import * as chrono from "chrono-node";
 import { expose } from "comlink";
 import { HTTPError } from "ente-base/http";
+import { staticAssetURL } from "ente-base/origins"; // PHOTOVAULT: strip
 import { logUnhandledErrorsAndRejectionsInWorker } from "ente-base/log-web";
 import type { Location } from "ente-base/types";
 import type { Collection } from "ente-media/collection";
@@ -353,7 +354,8 @@ const RemoteWorldCities = z.object({
 });
 
 const fetchCities = async () => {
-    const res = await fetch("https://assets.ente.com/world_cities.json");
+    // PHOTOVAULT: strip - served by our own origin, not Ente's CDN.
+    const res = await fetch(staticAssetURL("world_cities.json"));
     if (!res.ok) throw new HTTPError(res);
     return RemoteWorldCities.parse(await res.json()).data.map(
         ({ city, lat, lng }) => ({ name: city, latitude: lat, longitude: lng }),

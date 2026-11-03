@@ -9,7 +9,6 @@ import {
     CircularProgress,
     DialogTitle,
     IconButton,
-    Link,
     Stack,
     Typography,
 } from "@mui/material";
@@ -498,18 +497,7 @@ function ImportHelp(): React.JSX.Element {
                 textAlign: "center",
             }}
         >
-            <Link
-                href="https://ente.com/help/photos/migration/#import-your-photos-into-ente"
-                target="_blank"
-                rel="noopener"
-                sx={{
-                    color: "accent.main",
-                    fontWeight: 500,
-                    textDecoration: "underline",
-                }}
-            >
-                {t("need_help")}
-            </Link>{" "}
+            {/* PHOTOVAULT: strip - "Need help?" link to Ente help removed. */}
             <span style={{ opacity: 0.7 }}>{t("provider_not_listed")}</span>
         </Typography>
     );

@@ -2,6 +2,7 @@ import { FFFSType, FFmpeg } from "@ffmpeg/ffmpeg";
 import { joinPath } from "ente-base/file-name";
 import { newID } from "ente-base/id";
 import log from "ente-base/log";
+import { staticAssetURL } from "ente-base/origins"; // PHOTOVAULT: strip
 import type { FFmpegCommand } from "ente-base/types/ipc";
 import { ensureArrayBufferBacked } from "ente-utils/bytes";
 import { PromiseQueue } from "ente-utils/promise";
@@ -28,9 +29,9 @@ const createFFmpeg = () => {
     };
     const loading = ffmpeg
         .load({
-            coreURL: "https://assets.ente.com/ffmpeg-core-9.0.2/ffmpeg-core.js",
-            wasmURL:
-                "https://assets.ente.com/ffmpeg-core-9.0.2/ffmpeg-core.wasm",
+            // PHOTOVAULT: strip - served by our own origin, not Ente's CDN.
+            coreURL: staticAssetURL("ffmpeg-core-9.0.2/ffmpeg-core.js"),
+            wasmURL: staticAssetURL("ffmpeg-core-9.0.2/ffmpeg-core.wasm"),
         })
         .then(() => ffmpeg)
         .catch(failed);

@@ -23,15 +23,23 @@ export interface Settings {
     customDomainCNAME: string;
 }
 
+// PHOTOVAULT: strip - defaults point at this server (cast and embed pages are
+// served under the public URL, see contracts/server-info.md) instead of Ente's
+// hosts. The server can still override them through its feature flags.
+const pvServerOrigin = () =>
+    "location" in globalThis && /^https?:\/\//.test(globalThis.location.origin)
+        ? globalThis.location.origin
+        : "http://localhost:8080";
+
 const createDefaultSettings = (): Settings => ({
     isInternalUser: false,
     deferredMultipartChecksumsEnabled: false,
     previewUploadV2Enabled: false,
     mapEnabled: false,
     cfUploadProxyDisabled: false,
-    castURL: "https://cast.ente.com",
-    embedURL: "https://embed.ente.com",
-    customDomainCNAME: "my.ente.com",
+    castURL: `${pvServerOrigin()}/cast`,
+    embedURL: `${pvServerOrigin()}/embed`,
+    customDomainCNAME: new URL(pvServerOrigin()).host,
 });
 
 class SettingsState {

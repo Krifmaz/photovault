@@ -1,5 +1,3 @@
-import { InformationCircleIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { CircularProgress, styled } from "@mui/material";
 import {
     AuthDialog,
@@ -11,7 +9,6 @@ import { Button } from "ente-accounts/components/auth/Button";
 import {
     authBodyTypography,
     authDialogContentLayout,
-    authFocusRing,
 } from "ente-accounts/components/auth/styles";
 import { TextField } from "ente-accounts/components/auth/TextField";
 import type { DevSettingsPresentationProps } from "ente-new/photos/components/DevSettings";
@@ -62,21 +59,7 @@ export function DevSettingsDialog({
                               ? t("auth_endpoint_unreachable")
                               : undefined
                     }
-                    trailing={
-                        <InfoLink
-                            href="https://ente.com/help/self-hosting/installation/post-install/#step-6-configure-apps-to-use-your-server"
-                            target="_blank"
-                            rel="noopener"
-                            aria-label={t("more_information")}
-                        >
-                            <HugeiconsIcon
-                                icon={InformationCircleIcon}
-                                size={20}
-                                strokeWidth={2}
-                                aria-hidden="true"
-                            />
-                        </InfoLink>
-                    }
+                    // PHOTOVAULT: strip - info link to Ente's self-hosting docs removed.
                 />
                 {isChecking && (
                     <StatusPill role="status">
@@ -106,19 +89,6 @@ export function DevSettingsDialog({
 }
 
 const FormRoot = styled("form")(authDialogContentLayout);
-
-const InfoLink = styled("a")({
-    width: "20px",
-    height: "20px",
-    flex: "0 0 20px",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "4px",
-    color: "var(--auth-ui-text-faint)",
-    "&:hover": { color: "var(--auth-ui-text-muted)" },
-    "&:focus-visible": authFocusRing,
-});
 
 const StatusPill = styled("div")({
     ...authBodyTypography,

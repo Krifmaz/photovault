@@ -14,6 +14,8 @@ import type { SingleInputFormProps } from "ente-base/components/SingleInputForm"
 import { useBaseContext } from "ente-base/context";
 import { isNamedError } from "ente-base/error";
 import log from "ente-base/log";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import { t } from "i18next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -44,7 +46,11 @@ const Page: React.FC<RecoverPageProps> = ({ twoFactorType = "totp" }) => {
         (dialogContinue?: MiniDialogAttributes["continue"]) =>
             showMiniDialog({
                 title: t("contact_support"),
-                message: (
+                // PHOTOVAULT: strip - no Ente support e-mail; the server's
+                // administrator handles this.
+                message: isPhotovaultApp(appName) ? (
+                    "Please contact the administrator of your server."
+                ) : (
                     <Trans
                         i18nKey={"no_two_factor_recovery_key_message"}
                         components={{

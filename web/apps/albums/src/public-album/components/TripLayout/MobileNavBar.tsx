@@ -1,5 +1,4 @@
 import { LazyNotification } from "@/app/lazy/global-ui";
-import { getEnteURL } from "@/public-album/access/utils/external-links";
 import {
     AddPhotosIcon,
     DownloadIcon,
@@ -7,9 +6,8 @@ import {
     ShareIcon,
 } from "@/public-album/components/ActionIcons";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
-import { Box, Button, IconButton, styled } from "@mui/material";
+import { Box, IconButton, styled } from "@mui/material";
 import { EnteLogo } from "ente-base/components/EnteLogo";
-import { t } from "i18next";
 import { useState } from "react";
 
 interface MobileNavBarProps {
@@ -89,11 +87,7 @@ export const MobileNavBar: React.FC<MobileNavBarProps> = ({
                         </MobileNavButton>
                     )}
 
-                    <MobileSignUpButton
-                        onClick={() => (window.location.href = getEnteURL())}
-                    >
-                        {t("join_ente")}
-                    </MobileSignUpButton>
+                    {/* PHOTOVAULT: strip - no "Join Ente" sign-up button. */}
                 </ButtonGroup>
             </MobileNavContainer>
 
@@ -165,16 +159,3 @@ const MobileNavButton = styled(IconButton)({
     "&:hover": { backgroundColor: "rgba(255, 255, 255, 1)" },
 });
 
-const MobileSignUpButton = styled(Button)({
-    padding: "6px 10px",
-    fontSize: "13px",
-    fontWeight: "600",
-    whiteSpace: "nowrap",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    borderRadius: "6px",
-    color: "#000000",
-    transition: "background-color 0.2s",
-    backdropFilter: "blur(10px)",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-    "&:hover": { backgroundColor: "rgba(255, 255, 255, 1)" },
-});

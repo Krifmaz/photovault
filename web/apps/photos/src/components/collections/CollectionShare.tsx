@@ -1984,7 +1984,7 @@ export const ManagePublicShareOptions: React.FC<
     const embedURL = resolvedURL
         ? resolvedURL.replace(
               new URL(resolvedURL).origin,
-              embedBaseURL || "https://embed.ente.com",
+              embedBaseURL, // PHOTOVAULT: strip - no Ente embed host fallback
           )
         : undefined;
     const iframeHTML = embedURL

@@ -16,6 +16,8 @@ import {
     estimatePasswordStrength,
     type PasswordStrength,
 } from "ente-accounts/utils/password";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import { isNamedError } from "ente-base/error";
 import { JOIN_ALBUM_CONTEXT_KEY } from "ente-base/join-album";
 import log from "ente-base/log";
@@ -80,7 +82,8 @@ export const SignUpContents: React.FC<SignUpContentsProps> = ({
             password: "",
             confirmPassword: "",
             referral: "",
-            acceptedTerms: false,
+            // PHOTOVAULT: strip - no Ente terms to accept in Photovault apps.
+            acceptedTerms: isPhotovaultApp(appName),
         },
         onSubmit: async (
             { email, password, confirmPassword, referral },

@@ -5,7 +5,6 @@ import {
     PasswordUnlockScreen,
     type PasswordUnlockScreenProps,
 } from "@/public-album/access/components/PasswordUnlockScreen";
-import { getEnteURL } from "@/public-album/access/utils/external-links";
 import {
     AddPhotosIcon,
     DownloadIcon,
@@ -32,7 +31,6 @@ import { Tick02Icon } from "@hugeicons/core-free-icons";
 import CloseIcon from "@mui/icons-material/Close";
 import {
     Box,
-    Button,
     IconButton,
     Stack,
     styled,
@@ -97,12 +95,6 @@ import {
     type PropsWithChildren,
 } from "react";
 import type { FileWithPath } from "react-dropzone";
-// PHOTOVAULT: theme - Encore colours instead of Ente green.
-import {
-    pvGold,
-    pvGoldHover,
-    pvOnGold,
-} from "ente-base/components/utils/photovault/encore-tokens";
 
 const LazyPublicAlbumSingleFileViewer =
     dynamic<PublicAlbumSingleFileViewerProps>(
@@ -778,7 +770,8 @@ export default function PublicAlbumPage() {
                             />
                         ) : (
                             <SpacedRow sx={{ flex: 1 }}>
-                                <EnteLogoLink href="https://ente.com">
+                                {/* PHOTOVAULT: strip - wordmark, not a link to Ente. */}
+                                <EnteLogoLink>
                                     <EnteLogo height={17} />
                                 </EnteLogoLink>
                                 <Stack direction="row" spacing={2}>
@@ -1007,28 +1000,10 @@ const EnteLogoLink = styled("a")(({ theme }) => ({
     ":hover": { color: theme.vars.palette.accent.main },
 }));
 
-const GreenButton = styled(Button)(() => ({
-    backgroundColor: pvGold, // PHOTOVAULT: theme
-    color: pvOnGold, // PHOTOVAULT: theme
-    borderRadius: "16px",
-    paddingBlock: "11px",
-    paddingInline: "20px",
-    "&:hover": { backgroundColor: pvGoldHover }, // PHOTOVAULT: theme
-}));
-
 const navbarActionButtonSx = { borderRadius: "16px", paddingBlock: "11px" };
 
-const PrimaryActionButton: React.FC = () => {
-    const handleGetEnte = () => {
-        window.location.href = getEnteURL();
-    };
-
-    return (
-        <GreenButton color="accent" onClick={handleGetEnte}>
-            {t("join_ente")}
-        </GreenButton>
-    );
-};
+// PHOTOVAULT: strip - no "Join Ente" sign-up button.
+const PrimaryActionButton: React.FC = () => null;
 
 interface SecondaryActionButtonProps {
     onAddPhotos?: () => void;

@@ -1,12 +1,8 @@
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    IconButton,
-    InputAdornment,
-    Link,
     TextField,
     type ModalProps,
 } from "@mui/material";
@@ -181,27 +177,7 @@ const Form: React.FC<FormProps> = ({
                     onBlur={formik.handleBlur}
                     error={hasError}
                     helperText={hasError ? formik.errors.apiOrigin : " "}
-                    slotProps={{
-                        input: {
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <Link
-                                        href="https://ente.com/help/self-hosting/installation/post-install/#step-6-configure-apps-to-use-your-server"
-                                        target="_blank"
-                                        rel="noopener"
-                                    >
-                                        <IconButton
-                                            aria-label={t("more_information")}
-                                            color="secondary"
-                                            edge="end"
-                                        >
-                                            <InfoOutlinedIcon />
-                                        </IconButton>
-                                    </Link>
-                                </InputAdornment>
-                            ),
-                        },
-                    }}
+                    // PHOTOVAULT: strip - info link to Ente's self-hosting docs removed.
                 />
             </DialogContent>
             <DialogActions sx={{ "&&": { padding: "0 24px 24px 24px" } }}>

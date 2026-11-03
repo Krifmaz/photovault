@@ -1,5 +1,4 @@
 import { LazyNotification } from "@/app/lazy/global-ui";
-import { getEnteURL } from "@/public-album/access/utils/external-links";
 import {
     AddPhotosIcon,
     DownloadIcon,
@@ -7,8 +6,7 @@ import {
     ShareIcon,
 } from "@/public-album/components/ActionIcons";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
-import { Box, Button, IconButton, styled } from "@mui/material";
-import { t } from "i18next";
+import { Box, IconButton, styled } from "@mui/material";
 import { useState } from "react";
 
 interface TopNavButtonsProps {
@@ -65,11 +63,7 @@ export const TopNavButtons: React.FC<TopNavButtonsProps> = ({
                     </NavButton>
                 )}
 
-                <SignUpButton
-                    onClick={() => (window.location.href = getEnteURL())}
-                >
-                    {t("join_ente")}
-                </SignUpButton>
+                {/* PHOTOVAULT: strip - no "Join Ente" sign-up button. */}
             </ButtonContainer>
 
             {showCopiedMessage && (
@@ -110,17 +104,3 @@ const NavButton = styled(IconButton)({
     "&:hover": { backgroundColor: "rgba(255, 255, 255, 1)" },
 });
 
-const SignUpButton = styled(Button)({
-    padding: "12px 16px",
-    marginLeft: "12px",
-    fontSize: "16px",
-    fontWeight: "600",
-    whiteSpace: "nowrap",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    borderRadius: "8px",
-    color: "#1f2937",
-    transition: "background-color 0.2s",
-    backdropFilter: "blur(10px)",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-    "&:hover": { backgroundColor: "rgba(255, 255, 255, 1)" },
-});

@@ -209,13 +209,9 @@ const sidebarActions = (): SidebarAction[] => {
             label: t("advanced"),
             path: [preferencesCategory, t("advanced")],
             keywords: ["advanced", "proxy", "upload"],
+            available: () => isDesktop, // PHOTOVAULT: strip - desktop-only now
         },
-        {
-            id: "preferences.fasterUpload",
-            label: t("faster_upload"),
-            path: [preferencesCategory, t("advanced"), t("faster_upload")],
-            keywords: ["faster", "upload", "proxy"],
-        },
+        // PHOTOVAULT: strip - "preferences.fasterUpload" removed (Ente's upload proxy).
         {
             id: "preferences.openOnStartup",
             label: t("open_ente_on_startup"),

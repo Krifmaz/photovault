@@ -131,7 +131,8 @@ const Page: React.FC = () => {
                         title={t("account_recovery_success")}
                         description={t("account_recovery_success_description")}
                     />
-                    <FocusVisibleButton color="accent" href="https://ente.com">
+                    {/* PHOTOVAULT: strip - the web app on this server, not Ente's site. */}
+                    <FocusVisibleButton color="accent" href="/">
                         {t("open_ente")}
                     </FocusVisibleButton>
                 </RecoveryContents>

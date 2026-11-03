@@ -4,7 +4,6 @@ import {
     Box,
     Dialog,
     IconButton,
-    Link,
     styled,
     Typography,
     type DialogProps,
@@ -12,11 +11,6 @@ import {
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
 import { t } from "i18next";
 import React from "react";
-// PHOTOVAULT: theme - Encore colours instead of Ente green.
-import {
-    pvGold,
-    pvGoldHover,
-} from "ente-base/components/utils/photovault/encore-tokens";
 
 export type CanvasReadbackBlockedDialogProps = ModalVisibilityProps;
 
@@ -38,15 +32,8 @@ export const CanvasReadbackBlockedDialog: React.FC<
                 <TitleSection>
                     <Title>{t("canvas_blocked_upload_failed_title")}</Title>
                     <Subtitle>
-                        {t("canvas_blocked_upload_failed_description")}{" "}
-                        <HelpLink
-                            href="https://ente.com/help/photos/faq/troubleshooting#thumbnails"
-                            target="_blank"
-                            rel="noopener"
-                        >
-                            {t("learn_how")}
-                        </HelpLink>
-                        .
+                        {/* PHOTOVAULT: strip - "Learn how" link to Ente help removed. */}
+                        {t("canvas_blocked_upload_failed_description")}
                     </Subtitle>
                 </TitleSection>
             </ContentContainer>
@@ -151,16 +138,4 @@ const Subtitle = styled(Typography)(({ theme }) => ({
     ...theme.applyStyles("dark", { color: "rgba(255, 255, 255, 0.7)" }),
 }));
 
-const HelpLink = styled(Link)(({ theme }) => ({
-    fontWeight: "inherit",
-    fontSize: 14,
-    lineHeight: "20px",
-    color: pvGold, // PHOTOVAULT: theme
-    textDecorationColor: pvGold,
-    "&:hover": { color: pvGoldHover, textDecorationColor: pvGoldHover }, // PHOTOVAULT: theme
-    ...theme.applyStyles("dark", {
-        color: "#22D840",
-        textDecorationColor: "#22D840",
-        "&:hover": { color: "#4BE066", textDecorationColor: "#4BE066" },
-    }),
-}));
+// PHOTOVAULT: strip - HelpLink removed with its link.

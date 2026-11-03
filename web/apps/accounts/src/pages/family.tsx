@@ -133,7 +133,8 @@ const Page: React.FC = () => {
                     </FamilyInviteDescription>
                     <FocusVisibleButton
                         fullWidth
-                        href="https://photos.ente.com"
+                        // PHOTOVAULT: strip - the web app on this server, not Ente's.
+                        href="/"
                         sx={{
                             ...v2SubmitButtonSx,
                             flex: "none",

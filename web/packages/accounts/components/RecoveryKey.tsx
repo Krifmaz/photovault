@@ -14,6 +14,8 @@ import { errorDialogAttributes } from "ente-base/components/utils/dialog";
 import { useIsSmallWidth } from "ente-base/components/utils/hooks";
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
 import log from "ente-base/log";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import { saveStringAsFile } from "ente-base/utils/web";
 import { t } from "i18next";
 import { useCallback, useEffect, useState, type ComponentType } from "react";
@@ -147,4 +149,10 @@ export function RecoveryKeyContents({
 }
 
 const saveRecoveryKeyMnemonicAsFile = (key: string) =>
-    saveStringAsFile(key, "ente-recovery-key.txt");
+    // PHOTOVAULT: strip - file name without "ente" in Photovault apps.
+    saveStringAsFile(
+        key,
+        isPhotovaultApp(appName)
+            ? "photovault-recovery-key.txt"
+            : "ente-recovery-key.txt",
+    );
