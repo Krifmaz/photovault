@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Merge Ente's apps (mobile/, web/, desktop/ of ente-io/ente) into this repo.
+# Merge Ente's apps (mobile/, web/, desktop/ and the shared rust/ of ente-io/ente) into this repo.
 #
 # Mechanism (see UPSTREAM.md):
 #   1. Shallow-fetch the requested upstream commit into a cache repo
@@ -14,13 +14,13 @@
 # Exit status: 0 merged (or already up to date), 1 merge conflicts (merge left
 # in progress, report printed per directory), 2 usage or precondition error.
 #
-# Usage: scripts/upstream-merge.sh [--ref REF] [--repo URL] [--dirs "mobile web desktop"]
+# Usage: scripts/upstream-merge.sh [--ref REF] [--repo URL] [--dirs "mobile web desktop rust"]
 #                                  [--no-merge] [--abort-on-conflict]
 set -euo pipefail
 
 repo_url="https://github.com/ente-io/ente"
 ref="main"
-dirs="mobile web desktop"
+dirs="mobile web desktop rust"
 do_merge=1
 abort_on_conflict=0
 branch="upstream/ente"
