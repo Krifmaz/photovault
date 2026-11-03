@@ -252,6 +252,80 @@ impl Catalog {
         .rows_affected())
     }
 
+    /// For each of `keys` the catalog knows: `(state, size)`.
+    pub async fn lookup_many(
+        &self,
+        keys: &[String],
+    ) -> anyhow::Result<std::collections::HashMap<String, (String, u64)>> {
+        let mut out = std::collections::HashMap::new();
+        for chunk in keys.chunks(500) {
+            let ph: Vec<String> = (1..=chunk.len()).map(|i| format!("${i}")).collect();
+            let sql = format!(
+                "SELECT object_key, state, size FROM durability_objects WHERE object_key IN ({})",
+                ph.join(", ")
+            );
+            let mut q = sqlx::query(&sql);
+            for k in chunk {
+                q = q.bind(k);
+            }
+            for r in q.fetch_all(&self.db.pool).await? {
+                out.insert(
+                    r.try_get::<String, _>("object_key")?,
+                    (
+                        r.try_get::<String, _>("state")?,
+                        r.try_get::<i64, _>("size")?.max(0) as u64,
+                    ),
+                );
+            }
+        }
+        Ok(out)
+    }
+
+    /// Set `seen_at` of `keys` to `at` (the sweep saw them in storage).
+    pub async fn touch_seen(&self, keys: &[String], at: i64) -> anyhow::Result<()> {
+        for chunk in keys.chunks(500) {
+            let ph: Vec<String> = (2..=chunk.len() + 1).map(|i| format!("${i}")).collect();
+            let sql = format!(
+                "UPDATE durability_objects SET seen_at = $1 WHERE object_key IN ({})",
+                ph.join(", ")
+            );
+            let mut q = sqlx::query(&sql).bind(at);
+            for k in chunk {
+                q = q.bind(k);
+            }
+            q.execute(&self.db.pool).await?;
+        }
+        Ok(())
+    }
+
+    /// Live rows a complete sweep that started at `sweep_start` did not see
+    /// and that were not written or changed since: they vanished from
+    /// storage. Marks them `missing` and returns their keys.
+    pub async fn mark_unseen_missing(&self, sweep_start: i64) -> anyhow::Result<Vec<String>> {
+        let rows = sqlx::query(
+            "SELECT object_key FROM durability_objects WHERE state IN ('ok', 'unhashed', 'corrupt')              AND seen_at < $1 AND updated_at < $1",
+        )
+        .bind(sweep_start)
+        .fetch_all(&self.db.pool)
+        .await?;
+        let keys: Vec<String> = rows
+            .iter()
+            .map(|r| r.try_get::<String, _>("object_key"))
+            .collect::<Result<_, _>>()?;
+        for k in &keys {
+            sqlx::query(
+                "UPDATE durability_objects SET state = 'missing', last_error = 'not found by sweep', updated_at = $1 \
+                 WHERE object_key = $2 AND seen_at < $3 AND updated_at < $3",
+            )
+            .bind(now_micros())
+            .bind(k)
+            .bind(sweep_start)
+            .execute(&self.db.pool)
+            .await?;
+        }
+        Ok(keys)
+    }
+
     /// Counts and bytes per state.
     pub async fn stats(&self) -> anyhow::Result<CatalogStats> {
         let rows = sqlx::query(

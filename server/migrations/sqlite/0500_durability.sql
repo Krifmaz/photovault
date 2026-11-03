@@ -16,7 +16,9 @@ CREATE TABLE durability_objects (
     deleted_at BIGINT,
     repaired_at BIGINT,
     last_error TEXT,
-    updated_at BIGINT NOT NULL
+    updated_at BIGINT NOT NULL,
+    -- Last catalog sweep that listed the object in storage.
+    seen_at BIGINT NOT NULL DEFAULT 0
 );
 CREATE INDEX durability_objects_state ON durability_objects (state, verified_at);
 
