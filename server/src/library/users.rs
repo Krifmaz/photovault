@@ -17,12 +17,9 @@ pub fn normalize_email(email: &str) -> String {
     email.trim().to_lowercase()
 }
 
-/// `users.email_hash` for an email: base64 of keyed BLAKE2b-256 with the hashing key.
+/// `users.email_hash` for an email (delegates to [`crate::users::email_hash`], the single definition).
 pub fn email_hash(state: &AppState, email: &str) -> String {
-    crate::crypto::b64(&crate::crypto::generichash(
-        normalize_email(email).as_bytes(),
-        &state.keys.hashing,
-    ))
+    crate::users::email_hash(&state.keys, email)
 }
 
 /// Look up a user id by email without limits (`GetUserIDWithEmailUnrestricted`).

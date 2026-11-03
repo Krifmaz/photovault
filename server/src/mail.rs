@@ -16,3 +16,10 @@ pub async fn send(config: &Config, to: &str, subject: &str, body: &str) -> anyho
         }
     }
 }
+
+/// [`send`], logging (not returning) failures: museum sends notifications best-effort.
+pub async fn deliver(config: &Config, to: &str, subject: &str, body: &str) {
+    if let Err(e) = send(config, to, subject, body).await {
+        tracing::error!(error = %e, to = %to, subject = %subject, "failed to send email");
+    }
+}
