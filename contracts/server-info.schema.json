@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "photovault/contracts/server-info.schema.json",
+  "title": "GET /photovault/info",
+  "type": "object",
+  "required": ["product", "name", "version", "publicUrl", "homeUrl", "signupsAllowed"],
+  "properties": {
+    "product": { "const": "photovault" },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string" },
+    "commit": { "type": ["string", "null"] },
+    "apiVersion": { "type": "integer", "minimum": 1 },
+    "publicUrl": { "type": "string", "format": "uri" },
+    "homeUrl": { "type": ["string", "null"], "format": "uri" },
+    "albumsUrl": { "type": "string", "format": "uri" },
+    "castUrl": { "type": "string", "format": "uri" },
+    "signupsAllowed": { "type": "boolean" },
+    "emailVerification": { "enum": ["smtp", "log", "skip"] },
+    "storage": { "enum": ["local", "s3"] },
+    "features": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}
