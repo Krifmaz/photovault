@@ -77,10 +77,9 @@ pub fn token_from_parts(parts: &Parts) -> Option<String> {
         .headers
         .get("X-Auth-Token")
         .and_then(|v| v.to_str().ok())
+        .filter(|v| !v.is_empty())
     {
-        if !v.is_empty() {
-            return Some(v.to_string());
-        }
+        return Some(v.to_string());
     }
     parts.uri.query().and_then(|q| {
         url::form_urlencoded::parse(q.as_bytes())
