@@ -83,9 +83,20 @@ fn snapshot(inner: &Inner) -> Option<Arc<state::FacesState>> {
 /// Recluster and rebuild people after `mldata` or `cgroup` changes. Local
 /// only: changes to remote clusters are kept as pending until
 /// [`refresh`] pushes them. CPU and disk work: call it off the async
-/// workers (`crate::offload` / `spawn_blocking`).
+/// workers (`crate::offload` / `spawn_blocking`), with the op lock held
+/// (it rewrites the local clusters and rejections in kv `ml:clusters`,
+/// which the people changes read-modify-write), or use [`rebuild_now`].
 pub(crate) fn rebuild(inner: &Inner) -> Result<()> {
     state::rebuild(inner)
+}
+
+/// [`rebuild`] under the op lock, on the blocking pool.
+pub(crate) async fn rebuild_now(inner: &Arc<Inner>) -> Result<()> {
+    let _g = inner.ml.faces.op_lock.lock().await;
+    let me = inner.clone();
+    tokio::task::spawn_blocking(move || rebuild(&me))
+        .await
+        .map_err(|e| CoreError::storage(format!("task failed: {e}")))?
 }
 
 /// Pull `cgroup`s, recluster, and push the faces new to people's clusters
@@ -147,7 +158,11 @@ impl Core {
         }
         let inner = self.inner.clone();
         crate::runtime().spawn_blocking(move || {
+            // Not concurrently with a people change: both rewrite
+            // `ml:clusters`, and the older copy would win.
+            let g = inner.ml.faces.op_lock.blocking_lock();
             let _ = rebuild(&inner);
+            drop(g);
             inner.ml.faces.started.store(false, Ordering::Release);
         });
     }

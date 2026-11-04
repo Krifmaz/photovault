@@ -18,7 +18,7 @@
 //!   and stored. Mirrors web `services/ml/worker.ts` (`index`) and mobile
 //!   `ml_service.dart`.
 //! - After data changes: [`super::entity::sync`] (`cgroup`, `location`),
-//!   [`super::faces::rebuild`], [`super::search::invalidate`],
+//!   [`super::faces::refresh`], [`super::search::invalidate`],
 //!   [`super::memories::invalidate`].
 //!
 //! Local indexing state lives in `ml_local` ([`local_state`]): `pending`
@@ -521,8 +521,7 @@ async fn data_changed(inner: &Arc<Inner>) -> Result<()> {
     let result = match refreshed {
         Ok(()) => Ok(()),
         Err(e) => {
-            let me = inner.clone();
-            blocking(move || super::faces::rebuild(&me)).await??;
+            super::faces::rebuild_now(inner).await?;
             Err(e)
         }
     };
