@@ -12,8 +12,19 @@
 # Signing: with the repository secrets PHOTOVAULT_KEYSTORE_B64,
 # PHOTOVAULT_KEYSTORE_PASSWORD, PHOTOVAULT_KEY_ALIAS and PHOTOVAULT_KEY_PASSWORD
 # the APK is signed with the Photovault release key (Ente's SIGNING_* env
-# vars, read by android/app/build.gradle). Without them (forks, PRs from
-# forks) it is signed with a throwaway debug key and the artifact says so.
+# vars, read by android/app/build.gradle). Without them (PR builds, forks) it
+# is signed with a throwaway debug key and a warning says so. A release build
+# (release.yml passes release: true) fails instead, and also checks the
+# certificate against the Photovault key's fingerprint.
+#
+# Version: release.yml passes version (the tag without the v, the APK's
+# versionName) and build_number (versionCode, rises with every release).
+# Other builds use pubspec.yaml's version. The APK is
+# photovault-<version>-arm64.apk.
+#
+# Size: R8 + resource shrinking (build.gradle), --split-per-abi (arm64 only),
+# compressed native libraries, and Dart debug info split out of libapp.so
+# (uploaded as the photovault-android-symbols artifact, for stack traces).
 #
 # Toolchain mirrors Ente's photos-build.yml: Flutter 3.47.8 (archive SHA-256
 # from Ente's setup-flutter action), Temurin 17, rustup, the runner's Android
@@ -37,6 +48,19 @@ on:
     workflow_dispatch:
     # release.yml attaches the APK to every release
     workflow_call:
+        inputs:
+            version:
+                description: versionName, e.g. 0.1.5 (the release tag without the v)
+                type: string
+                default: ""
+            build_number:
+                description: versionCode; must rise with every release
+                type: string
+                default: ""
+            release:
+                description: Release build, the Photovault release key is required
+                type: boolean
+                default: false
 
 permissions:
     contents: read
@@ -48,6 +72,8 @@ concurrency:
     cancel-in-progress: true
 
 env:
+    # SHA-256 of the Photovault release certificate (photovault-fork/signing).
+    PHOTOVAULT_CERT_SHA256: 4a090dbac96381d4352c7b77bdc31edbc6750d139db9a20927e5b13f07a319eb
     FLUTTER_VERSION: 3.47.8
     FLUTTER_SHA256: baf7dcc5a3dbba60fe863bf493a6cf203195621f7786eaa5a1bba02cd0d87dd2
     NDK_VERSION: 28.2.13676358
@@ -149,17 +175,35 @@ jobs:
               shell: bash
               env:
                   PHOTOVAULT_KEYSTORE_B64: ${{ secrets.PHOTOVAULT_KEYSTORE_B64 }}
+                  RELEASE: ${{ inputs.release || false }}
               run: |
                   set -euo pipefail
                   if [ -n "${PHOTOVAULT_KEYSTORE_B64}" ]; then
                       printf '%s' "${PHOTOVAULT_KEYSTORE_B64}" | base64 -d > "$RUNNER_TEMP/photovault-release.jks"
                       echo "key_path=$RUNNER_TEMP/photovault-release.jks" >> "$GITHUB_OUTPUT"
-                      echo "suffix=release" >> "$GITHUB_OUTPUT"
+                  elif [ "$RELEASE" = true ]; then
+                      echo "::error::No PHOTOVAULT_KEYSTORE_B64 secret: a release APK must be signed with the Photovault release key (see photovault-fork/signing/README.md)."
+                      exit 1
                   else
                       echo "::warning::No PHOTOVAULT_KEYSTORE_B64 secret: the APK is signed with a debug key."
                       echo "key_path=" >> "$GITHUB_OUTPUT"
-                      echo "suffix=debugsigned" >> "$GITHUB_OUTPUT"
                   fi
+
+            - name: Version
+              id: version
+              shell: bash
+              env:
+                  VERSION: ${{ inputs.version || '' }}
+                  BUILD_NUMBER: ${{ inputs.build_number || '' }}
+              run: |
+                  set -euo pipefail
+                  pub=$(sed -n 's/^version: *\([^ ]*\).*/\1/p' pubspec.yaml)
+                  name="${VERSION:-${pub%%+*}}"
+                  code="${BUILD_NUMBER:-${pub#*+}}"
+                  [[ "$name" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::bad version: $name"; exit 1; }
+                  [[ "$code" =~ ^[0-9]+$ ]] || { echo "::error::bad build number: $code"; exit 1; }
+                  echo "versionName $name, versionCode $code"
+                  { echo "name=$name"; echo "code=$code"; } >> "$GITHUB_OUTPUT"
 
             - name: Build arm64 release APK
               shell: bash
@@ -168,27 +212,50 @@ jobs:
                   SIGNING_KEY_ALIAS: ${{ secrets.PHOTOVAULT_KEY_ALIAS }}
                   SIGNING_KEY_PASSWORD: ${{ secrets.PHOTOVAULT_KEY_PASSWORD }}
                   SIGNING_STORE_PASSWORD: ${{ secrets.PHOTOVAULT_KEYSTORE_PASSWORD }}
-                  APK_NAME: photovault-arm64-${{ steps.signing.outputs.suffix }}.apk
+                  VERSION_NAME: ${{ steps.version.outputs.name }}
+                  VERSION_CODE: ${{ steps.version.outputs.code }}
               run: |
                   set -euo pipefail
                   [ -n "$SIGNING_KEY_PATH" ] || unset SIGNING_KEY_PATH
                   flutter build apk --release --flavor independent \
-                      --target-platform android-arm64 \
+                      --target-platform android-arm64 --split-per-abi \
+                      --build-name="$VERSION_NAME" --build-number="$VERSION_CODE" \
+                      --split-debug-info=build/symbols \
                       --dart-define=cronetHttpNoPlay=true \
                       --dart-define=PHOTOVAULT_SERVER=
+                  apk_name="photovault-$VERSION_NAME-arm64.apk"
                   mkdir -p artifacts
-                  mv build/app/outputs/flutter-apk/app-independent-release.apk "artifacts/$APK_NAME"
-                  (cd artifacts && sha256sum "$APK_NAME" > SHA256SUMS)
+                  mv build/app/outputs/flutter-apk/app-arm64-v8a-independent-release.apk "artifacts/$apk_name"
+                  (cd artifacts && sha256sum "$apk_name" > SHA256SUMS)
                   rm -f "$RUNNER_TEMP/photovault-release.jks"
 
             - name: Check APK
               shell: bash
+              env:
+                  RELEASE: ${{ inputs.release || false }}
+                  VERSION_NAME: ${{ steps.version.outputs.name }}
+                  VERSION_CODE: ${{ steps.version.outputs.code }}
               run: |
                   set -euo pipefail
                   bt="$ANDROID_HOME/build-tools/35.0.0"
                   apk=$(ls artifacts/*.apk)
-                  "$bt/apksigner" verify --print-certs "$apk"
-                  "$bt/aapt2" dump badging "$apk" | grep -E "^package: name='app.photovault'"
+                  certs=$("$bt/apksigner" verify --print-certs "$apk")
+                  echo "$certs"
+                  if [ "$RELEASE" = true ] && ! grep -qi "SHA-256 digest: $PHOTOVAULT_CERT_SHA256" <<<"$certs"; then
+                      echo "::error::Release APK is not signed with the Photovault release key"
+                      exit 1
+                  fi
+                  badging=$("$bt/aapt2" dump badging "$apk")
+                  # --split-per-abi: Flutter adds 1000 * ABI index (arm64-v8a = 2)
+                  # to each split's versionCode, so arm64 is build_number + 2000.
+                  apk_code=$((VERSION_CODE + 2000))
+                  grep -E "^package: name='app.photovault' versionCode='$apk_code' versionName='$VERSION_NAME'" <<<"$badging" \
+                      || { echo "::error::unexpected package line: $(head -1 <<<"$badging")"; exit 1; }
+                  # arm64 only.
+                  if unzip -l "$apk" | grep -E ' lib/' | grep -v ' lib/arm64-v8a/'; then
+                      echo "::error::APK contains native libraries for other ABIs"
+                      exit 1
+                  fi
                   # No Firebase, Play services, Sentry or Play Billing classes.
                   tmp="$RUNNER_TEMP/apk"
                   mkdir -p "$tmp" && unzip -q -o "$apk" 'classes*.dex' -d "$tmp"
@@ -196,13 +263,23 @@ jobs:
                       echo "::error::APK contains Firebase, Play services, Sentry or Play Billing classes"
                       exit 1
                   fi
+                  size=$(stat -c %s "$apk")
+                  echo "APK size: $size bytes ($((size / 1048576)) MiB)"
+                  echo "**$(basename "$apk")**: $((size / 1048576)) MiB ($size bytes)" >> "$GITHUB_STEP_SUMMARY"
 
             - name: Upload APK
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
-                  name: photovault-android-arm64-${{ steps.signing.outputs.suffix }}
+                  name: photovault-android-arm64
                   path: mobile/apps/photos/artifacts/
                   if-no-files-found: error
+
+            - name: Upload Dart symbols
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: photovault-android-symbols
+                  path: mobile/apps/photos/build/symbols/
+                  if-no-files-found: warn
 
             - name: Strip report (source + APK)
               shell: bash

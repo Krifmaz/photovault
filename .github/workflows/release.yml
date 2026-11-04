@@ -10,8 +10,10 @@
 #      web      (alongside build) the web apps' static export (photos, albums, cast, accounts,
 #               embed) with web/scripts/photovault-build.sh, as photovault-web CI
 #   4. image    ghcr.io/<owner>/photovault (amd64 + arm64): server + web apps
-#      apks     (alongside build) both Android APKs: Photos (photovault-mobile.yml)
-#               and Photovault Native (android-native.yml)
+#      apks     (alongside build) both Android APKs: Photos (photovault-mobile.yml,
+#               photovault-<version>-arm64.apk, release key required) and
+#               Photovault Native (android-native.yml); versionName is the tag
+#               without the v, versionCode major*1000000 + minor*10000 + patch
 #   5. release  creates the tag and the GitHub Release with archives, APKs + SHA256SUMS
 #
 # The tag is only pushed once everything above succeeded. Pushes that only
@@ -64,6 +66,7 @@ jobs:
     outputs:
       tag: ${{ steps.next.outputs.tag }}
       version: ${{ steps.next.outputs.version }}
+      build_number: ${{ steps.next.outputs.build_number }}
       skip: ${{ steps.next.outputs.skip }}
     steps:
       - uses: actions/checkout@v7
@@ -80,10 +83,18 @@ jobs:
             exit 0
           fi
           tag=$(.github/release/next-version.sh "$BUMP")
-          echo "Next release: $tag"
+          # Android versionCode: major*1000000 + minor*10000 + patch, so it
+          # rises with every release (minor < 100, patch < 10000).
+          IFS=. read -r major minor patch <<<"${tag#v}"
+          if [ "$minor" -ge 100 ] || [ "$patch" -ge 10000 ]; then
+            echo "::error::$tag does not fit the Android versionCode scheme"; exit 1
+          fi
+          build_number=$((major * 1000000 + minor * 10000 + patch))
+          echo "Next release: $tag (Android versionCode $build_number)"
           {
             echo "tag=$tag"
             echo "version=${tag#v}"
+            echo "build_number=$build_number"
             echo "skip=false"
           } >> "$GITHUB_OUTPUT"
 
@@ -225,12 +236,19 @@ jobs:
     needs: version
     if: needs.version.outputs.skip == 'false'
     uses: ./.github/workflows/photovault-mobile.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+      build_number: ${{ needs.version.outputs.build_number }}
+      release: true
     secrets: inherit
 
   apk-native:
     needs: version
     if: needs.version.outputs.skip == 'false'
     uses: ./.github/workflows/android-native.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+      build_number: ${{ needs.version.outputs.build_number }}
     secrets: inherit
 
   image:
@@ -293,9 +311,8 @@ jobs:
           merge-multiple: true
       - uses: actions/download-artifact@v8
         with:
-          pattern: photovault-android-arm64-*
+          name: photovault-android-arm64
           path: apk/photos
-          merge-multiple: true
       - uses: actions/download-artifact@v8
         with:
           name: photovault-native-apk
@@ -305,14 +322,12 @@ jobs:
           TAG: ${{ needs.version.outputs.tag }}
         run: |
           set -euo pipefail
-          # photovault-arm64-release.apk (or -debugsigned without the signing secrets)
-          for f in apk/photos/*.apk; do
-            b=$(basename "$f"); mv "$f" "dist/photovault-photos-$TAG-${b#photovault-}"
-          done
+          # Photos: photovault-<version>-arm64.apk, already named by photovault-mobile.yml
+          mv apk/photos/*.apk dist/
           for f in apk/native/*.apk; do
             b=$(basename "$f" .apk); mv "$f" "dist/photovault-native-$TAG-${b#app-}.apk"
           done
-          ls dist/*photos*.apk dist/*native*.apk
+          ls -l dist/*.apk
       - name: Checksums
         run: cd dist && sha256sum * > SHA256SUMS
       - name: Tag and publish

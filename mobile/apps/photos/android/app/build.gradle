@@ -24,6 +24,9 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+// PHOTOVAULT: release size. Set by `flutter build apk --split-per-abi`.
+def splitPerAbi = project.hasProperty('split-per-abi')
+
 def keystoreProperties = new Properties()
 // PHOTOVAULT: signing. A key.properties path can also come from
 // $PHOTOVAULT_KEY_PROPERTIES (e.g. the signing folder outside the repo).
@@ -77,9 +80,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         consumerProguardFiles 'proguard-rules.pro'
-        ndk {
-            abiFilters.clear()
-            abiFilters "armeabi-v7a", "arm64-v8a"
+        // PHOTOVAULT: release size. `flutter build apk --split-per-abi` (what CI
+        // ships) turns on ABI splits, and AGP refuses ndk.abiFilters next to
+        // them, so the filter only applies to unsplit builds.
+        if (!splitPerAbi) {
+            ndk {
+                abiFilters.clear()
+                abiFilters "armeabi-v7a", "arm64-v8a"
+            }
         }
     }
 
@@ -119,7 +127,9 @@ android {
             // PHOTOVAULT: signing. Without a release key (no key.properties and
             // no SIGNING_* env vars) fall back to the debug key, e.g. in CI forks.
             signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
+            // PHOTOVAULT: release size. R8 (minify) plus resource shrinking.
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile(
                 "proguard-android-optimize.txt",
             ), "proguard-rules.pro"
@@ -127,8 +137,10 @@ android {
         debug {
           applicationIdSuffix '.debug'
           versionNameSuffix "-debug"
-          ndk {
-            abiFilters "x86_64"
+          if (!splitPerAbi) {
+            ndk {
+              abiFilters "x86_64"
+            }
           }
           externalNativeBuild {
             cmake {
@@ -141,7 +153,10 @@ android {
     packagingOptions {
         jniLibs {
             pickFirsts += ['**/libc++_shared.so']
-            useLegacyPackaging = false
+            // PHOTOVAULT: release size. Compress native libraries in the APK
+            // (about 150 MB stored vs about 63 MB deflated for arm64); Android
+            // extracts them at install. See docs/DECISIONS.md.
+            useLegacyPackaging = true
         }
     }
 

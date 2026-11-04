@@ -22,6 +22,15 @@ on:
       - ".github/workflows/android-native.yml"
   workflow_dispatch:
   workflow_call:
+    inputs:
+      version:
+        description: versionName (the release tag without the v)
+        type: string
+        default: ""
+      build_number:
+        description: versionCode; must rise with every release
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -120,10 +129,15 @@ jobs:
       - if: steps.has.outputs.app == 'true'
         name: Build and test
         working-directory: native/android
+        env:
+          PV_VERSION: ${{ inputs.version || '' }}
+          PV_BUILD_NUMBER: ${{ inputs.build_number || '' }}
         run: |
           # With core in the repo the APK must carry the real photovault-core, never the demo library.
           extra=()
           if [ -f ../../core/Cargo.toml ]; then extra+=(-Pphotovault.requireRealCore=true); fi
+          if [ -n "$PV_VERSION" ]; then extra+=(-Pphotovault.versionName="$PV_VERSION"); fi
+          if [ -n "$PV_BUILD_NUMBER" ]; then extra+=(-Pphotovault.versionCode="$PV_BUILD_NUMBER"); fi
           ./gradlew --no-daemon "${extra[@]}" testReleaseUnitTest lintRelease assembleRelease
           if [ -f ../../core/Cargo.toml ]; then
             unzip -l app/build/outputs/apk/release/*.apk > "$RUNNER_TEMP/apk-files.txt"
