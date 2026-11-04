@@ -9,7 +9,7 @@ Comments are not scanned. Terms marked *visible* only count in text a user can s
 
 ## Summary
 
-510 hits, 510 explained, **0 unexplained**.
+509 hits, 509 explained, **0 unexplained**.
 
 | Term | Context | Hits | Unexplained |
 | --- | --- | ---: | ---: |
@@ -22,7 +22,7 @@ Comments are not scanned. Terms marked *visible* only count in text a user can s
 | firebase | code | 3 | 0 |
 | play.google | code | 0 | 0 |
 | apps.apple | code | 0 | 0 |
-| ente | visible | 252 | 0 |
+| ente | visible | 251 | 0 |
 | duck | visible | 9 | 0 |
 | mascot | visible | 0 | 0 |
 | referral | visible | 31 | 0 |
@@ -33,7 +33,7 @@ Comments are not scanned. Terms marked *visible* only count in text a user can s
 | Category | Meaning | Hits |
 | --- | --- | ---: |
 | about-credit | The plain "Based on Ente" credit in About, the one allowed user-visible mention of Ente. | 3 |
-| internal-identifier | Identifiers that are never shown as text: URI schemes, package/app ids, enum values, storage keys, CSS hooks, file names. | 56 |
+| internal-identifier | Identifiers that are never shown as text: URI schemes, package/app ids, enum values, storage keys, CSS hooks, file names. | 55 |
 | api-field-name | Names in the Ente API that the Photovault server implements (paths, JSON fields, models); renaming them breaks the protocol. | 20 |
 | server-plan-wording | Generic plan/subscription wording for errors the Photovault server really returns (it keeps museum's per-user plan: quota and expiry, set by the admin). Not Ente branding. | 5 |
 | log-message | Developer log or diagnostic text (logs, adb dumps, exceptions caught and logged); not shown in the UI. | 26 |
@@ -107,7 +107,6 @@ None.
 | ente | `mobile/apps/photos/lib/ui/account/passkey_page.dart:60` | internal-identifier | ente:// deep links handled by the app itself (passkey return, notification payloads). |
 | ente | `mobile/apps/photos/lib/ui/account/passkey_page.dart:112` | internal-identifier | ente:// deep links handled by the app itself (passkey return, notification payloads). |
 | ente | `mobile/apps/photos/lib/ui/tabs/home_widget.dart:837` | internal-identifier | ente:// URI scheme in notification payloads and the deep-link scheme check. |
-| ente | `mobile/packages/ente_components/assets/ente_wordmark.svg:2` | internal-identifier | SVG group id inside the shared wordmark asset (Photos shows its own Photovault wordmark). |
 | ente | `rust/crates/legacy/src/error.rs:27` | internal-identifier | Display text of ContactNotOnEnte; Photos matches the variant (LegacyError_ContactNotOnEnte, web: contact_not_on_ente) and shows its own invite dialog, never this text. |
 | ente | `rust/crates/ml/src/onnx/coreml_cache.rs:153` | internal-identifier | Directory name of the Core ML compile cache (Library/Caches/ente/ml/coreml); never shown. |
 | ente | `web/apps/accounts/src/services/passkey.ts:177` | internal-identifier | ente: is an allowed passkey redirect scheme (the mobile app returns through ente://passkey). |
@@ -595,3 +594,9 @@ Not scanned at all (build output, tests, generated code):
 | `*/pubspec.lock` | dependency lockfile, not shipped |
 | `*/package-lock.json` | dependency lockfile, not shipped |
 | `web/packages/wasm/*/pkg/*` | generated wasm-bindgen output; its Rust source (rust/bindings/wasm/*) is scanned |
+
+## Allowlist entries that matched nothing
+
+Stale entries; delete them from `scripts/strip-allowlist.toml`.
+
+- entry 19: `mobile/packages/ente_components/assets/ente_wordmark.svg` (ente)
