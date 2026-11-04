@@ -148,7 +148,9 @@ Server and network:
   `packages/gallery/services/ffmpeg/web.ts`: places index, world cities and the
   ffmpeg.wasm core load from `/static-assets/` on our origin.
   `scripts/photovault-vendor-assets.mjs` (new; `.sh` is a wrapper) copies them into
-  `apps/photos/public/static-assets/` (git-ignored) before a build.
+  `apps/photos/public/static-assets/` (git-ignored) before a build. It also
+  copies `location/v2/{countries,disputes}.bin`, which only the mobile app
+  uses (it loads its location index from `<server>/static-assets/location/v2`).
 - `packages/new/photos/services/settings.ts`: default cast/embed URLs and the
   custom-domain CNAME point at this server instead of cast/embed/my.ente.com.
 - `packages/new/photos/services/user-details.ts`: plans, Stripe and payments-app

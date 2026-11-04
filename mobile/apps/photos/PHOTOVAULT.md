@@ -175,6 +175,10 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - `lib/ui/cast/pair_with_code.dart`: the cast URL shown for pairing is the
   remote flag, else the server's `castUrl` from `/photovault/info`, else
   `<publicUrl>/cast`, and only then `<endpoint>/cast`.
+- `lib/ui/cast/cast.dart`: no Chromecast "Auto pair" button (`showAutoPair`
+  is `false`): it launches Ente's registered receiver app, whose hosted cast
+  page talks to Ente and cannot pair with this server. The cast sheet offers
+  pair-by-code only, as the web app does.
 - `lib/core/configuration.dart`: `logout()` keeps the `photovault.*` keys and
   Ente's `endpoint` key across its `SharedPreferences.clear()`, so servers
   survive logout.
@@ -344,7 +348,10 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   `open_location_index(assetRoot, assetBaseUrl)`): the location data files
   (cities, urban centres, countries, disputes; pinned sizes and SHA-256s are
   unchanged) are downloaded from `<endpoint>/static-assets/location/v2`, the
-  server's web app, instead of Ente's assets CDN. `LocationIndex::open` keeps
+  server's web app, instead of Ente's assets CDN (the server must run with
+  `PHOTOVAULT_WEB_DIR` pointing at a web build made with
+  `web/scripts/photovault-vendor-assets.mjs`, which vendors all four files;
+  otherwise places and city search are unavailable). `LocationIndex::open` keeps
   the upstream CDN default for the CLI only. Regenerate the bindings with
   `cargo codegen frb photos` (output is git-ignored).
 - `lib/ui/tabs/home_widget.dart`: links on Ente's albums hosts are no longer
@@ -435,12 +442,6 @@ not ship):
   `rust/crates/ml/src/assets.rs`, `ml/src/ocr/assets.rs`, `ml/src/scan/mod.rs`).
   Memories/Rewind music is no longer fetched (no music). The map uses
   OpenStreetMap tiles.
-- Location data (places, city search) needs the server's web build to
-  include `static-assets/location/v2/{cities,urban-centres,countries,disputes}.bin`.
-  `web/scripts/photovault-vendor-assets.mjs` vendors only the first two today;
-  until it also copies `countries.bin` and `disputes.bin`, the app's location
-  index fails to load (logged, places and city search are then unavailable).
-  Files already downloaded by an earlier build keep working.
 - Shared code Photos does not use still names Ente defaults:
   `../../packages/configuration` (`api.ente.com` default for Auth/Locker's
   `BaseConfiguration`), `../../packages/legacy` (legacy kit PDF: Ente support
@@ -462,13 +463,12 @@ not ship):
   already in `NSBonjourServices`). The connect/settings text is English only.
 - Unused ARB keys still mention Ente Auth/Locker, referrals and support e-mail;
   they are never displayed by Photos (see `PHOTOVAULT-GREP.md`).
-- Shared `ente_ui`/`ente_utils` helpers still name support@ente.com; Photos
-  does not call those paths.
 - Chromecast uses Ente's registered receiver app id (`F5BCEC64` in
   `plugins/ente_cast/lib/src/service.dart`), which loads Ente's hosted cast
-  page. Pairing by code goes through the server and `<server>/cast` instead
-  (not tested here). Replacing
-  it needs a Photovault receiver registered with Google.
+  page. The id is kept (pending the owner's decision), but its only UI path,
+  "Auto pair", is hidden (`lib/ui/cast/cast.dart`). Pairing by code goes
+  through the server and `<server>/cast` instead (not tested here). Bringing
+  Auto pair back needs a Photovault receiver registered with Google.
 - Some non-mascot illustrations keep Ente's green (e.g. `assets/on_ente.png`,
   `lock_screen_icon.png`, `recovery_key.png`, rewind badge backdrops).
 - The alternate app icons (Settings > App icon) all show the Photovault icon.

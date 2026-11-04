@@ -11,6 +11,8 @@
 //
 // Without them the app still works; only these features degrade:
 //   - Places (photos grouped by city): location/v2/{cities,urban-centres}.bin
+//     (the mobile app also needs location/v2/{countries,disputes}.bin, and
+//     reads all four from this server's /static-assets/location/v2)
 //   - City names in search:            world_cities.json
 //   - Video processing in the browser: ffmpeg-core-9.0.2/ffmpeg-core.{js,wasm}
 //     (the desktop app uses its bundled native ffmpeg instead)
@@ -43,6 +45,10 @@ const dest = path.join(here, "../apps/photos/public/static-assets");
 const files = [
     "location/v2/cities.bin",
     "location/v2/urban-centres.bin",
+    // Not used by the web app, but the mobile app's location index loads all
+    // four location files from <server>/static-assets/location/v2.
+    "location/v2/countries.bin",
+    "location/v2/disputes.bin",
     "world_cities.json",
     "ffmpeg-core-9.0.2/ffmpeg-core.js",
     "ffmpeg-core-9.0.2/ffmpeg-core.wasm",
