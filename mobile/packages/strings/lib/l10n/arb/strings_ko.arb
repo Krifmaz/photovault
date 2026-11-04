@@ -1105,7 +1105,6 @@
   "doubleTapToViewHiddenCode": "코드를 보시려면 해당 칸을 두 번 눌러주세요",
   "download": "다운로드",
   "downloadApplicationUpdate": "업데이트 다운로드",
-  "downloadDecryptionFailedMessage": "이 항목을 다운로드할 수 없습니다. 저희에게 문의해 주시면 도와드리겠습니다.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -2098,7 +2097,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "선택 된 항목들은 이 앨범으로부터 삭제 됩니다",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "뭔가 잘못된 것 같습니다. 잠시 후에 다시 시도해주세요. 에러가 반복되는 경우, 저희 지원 팀에 문의해주세요.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2402,7 +2400,6 @@
   "localBackupSidebarTitle": "내부 백업",
   "localGallery": "로컬 갤러리",
   "localIndexing": "로컬 처리",
-  "localSyncErrorMessage": "로컬 사진 동기화가 예상보다 오래 걸려 문제가 생긴 것 같습니다. 지원팀에 문의해 주세요",
   "location": "위치",
   "locationName": "위치 이름",
   "locationPickerTip": "사진 정보 화면에서 해당 사진을 중심으로 위치를 추가할 수도 있습니다",
@@ -2601,7 +2598,6 @@
     }
   },
   "mlIndexingDescription": "모든 항목이 처리될 때까지 머신 러닝으로 인해 대역폭과 배터리 사용량이 늘어날 수 있습니다. 더 빠르게 처리하려면 데스크톱 앱을 사용해 보세요. 모든 결과는 자동으로 동기화됩니다.",
-  "mlItemsCouldNotBeProcessed": "{count, plural, one{항목 {count}개를 머신 러닝으로 처리할 수 없습니다. 저희에게 문의해 주시면 도와드리겠습니다.} other{항목 {count}개를 머신 러닝으로 처리할 수 없습니다. 저희에게 문의해 주시면 도와드리겠습니다.}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -2610,7 +2606,6 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "저희에게 문의해 주시면 도와드리겠습니다.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2691,11 +2686,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Photovault에 접속할 수 없습니다, 잠시 후에 다시 시도해주세요. 에러가 반복되는 경우, 저희 지원 팀에 문의해주세요.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Photovault에 접속할 수 없습니다, 네트워크 설정을 확인해주시고 에러가 반복되는 경우 저희 지원 팀에 문의해주세요.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -3127,7 +3120,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "support@ente.com으로 문의해 주시면 기꺼이 도와드리겠습니다!",
-  "pleaseContactSupportIfTheProblemPersists": "문제가 계속되면 지원팀에 문의해 주세요",
   "pleaseEmailUsAt": "{toEmail}(으)로 이메일을 보내 주세요",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -4342,7 +4334,6 @@
     }
   },
   "tellUsWhatYouThink": "저희에게 의견을 말해주세요",
-  "tempErrorContactSupportIfPersists": "뭔가 잘못된 것 같습니다. 잠시 후에 다시 시도해주세요. 에러가 반복되는 경우, 저희 지원 팀에 문의해주세요.",
   "terminate": "종료",
   "@terminate": {
     "description": "Terminate button label"
@@ -4875,7 +4866,6 @@
   },
   "yourMap": "내 지도",
   "yourPhotosLookUnique": "회원님의 사진은 모두 고유합니다",
-  "yourPlanSupportsFamily": "회원님의 요금제는 이미 가족을 지원합니다",
   "yourPlanWasSuccessfullyDowngraded": "요금제가 다운그레이드되었습니다",
   "yourPlanWasSuccessfullyUpgraded": "요금제가 업그레이드되었습니다",
   "yourPurchaseWasSuccessful": "구매가 완료되었습니다",

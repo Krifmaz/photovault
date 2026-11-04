@@ -1144,7 +1144,7 @@
   "doubleTapToViewHiddenCode": "You can double tap on an entry to view code",
   "download": "Download",
   "downloadApplicationUpdate": "Download update",
-  "downloadDecryptionFailedMessage": "This item could not be downloaded. Please reach out to us so we can help.",
+  "downloadDecryptionFailedMessage": "This item could not be downloaded. Please export the logs and share them with your server administrator.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -2161,7 +2161,7 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "Selected items will be removed from this album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "It looks like something went wrong. Please retry after some time. If the error persists, please contact our support team.",
+  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "It looks like something went wrong. Please retry after some time. If the error persists, ask your server administrator.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2469,7 +2469,7 @@
   "localBackupSidebarTitle": "Local backup",
   "localGallery": "Local gallery",
   "localIndexing": "Local processing",
-  "localSyncErrorMessage": "Looks like something went wrong since local photos sync is taking more time than expected. Please reach out to our support team",
+  "localSyncErrorMessage": "Looks like something went wrong since local photos sync is taking more time than expected. Please export the logs and share them with your server administrator.",
   "location": "Location",
   "locationName": "Location name",
   "locationPickerTip": "You can also add a location centered on a photo from the photo's info screen",
@@ -2675,7 +2675,7 @@
     }
   },
   "mlIndexingDescription": "Please note that machine learning will result in higher bandwidth and battery usage until all items are processed. Consider using the desktop app for faster processing, and all results will be synced automatically.",
-  "mlItemsCouldNotBeProcessed": "{count, plural, one{{count} item could not be processed for machine learning. Please reach out to us so we can help.} other{{count} items could not be processed for machine learning. Please reach out to us so we can help.}}",
+  "mlItemsCouldNotBeProcessed": "{count, plural, one{{count} item could not be processed for machine learning. Please export the logs and share them with your server administrator.} other{{count} items could not be processed for machine learning. Please export the logs and share them with your server administrator.}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -2684,7 +2684,7 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "Please reach out to us so we can help.",
+  "mlProcessingIssueReachOut": "Please export the logs and share them with your server administrator.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2766,11 +2766,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Unable to connect to Photovault, please retry after sometime. If the error persists, please contact support.",
+  "networkConnectionRefusedErr": "Unable to connect to your server, please retry after some time. If the error persists, ask your server administrator.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Unable to connect to Photovault, please check your network settings and contact support if the error persists.",
+  "networkHostLookUpErr": "Unable to connect to your server, please check your network settings and ask your server administrator if the error persists.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -3212,7 +3212,7 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Please contact support@ente.com and we will be happy to help!",
-  "pleaseContactSupportIfTheProblemPersists": "Please contact support if the problem persists",
+  "pleaseContactSupportIfTheProblemPersists": "Please ask your server administrator if the problem persists",
   "pleaseEmailUsAt": "Please email us at {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -4573,7 +4573,7 @@
     }
   },
   "tellUsWhatYouThink": "Tell us what you think",
-  "tempErrorContactSupportIfPersists": "It looks like something went wrong. Please retry after some time. If the error persists, please contact our support team.",
+  "tempErrorContactSupportIfPersists": "It looks like something went wrong. Please retry after some time. If the error persists, ask your server administrator.",
   "terminate": "Terminate",
   "@terminate": {
     "description": "Terminate button label"
@@ -5122,7 +5122,7 @@
   },
   "yourMap": "Your map",
   "yourPhotosLookUnique": "Your photos look unique",
-  "yourPlanSupportsFamily": "Your plan already supports a family",
+  "yourPlanSupportsFamily": "Your account already supports a family",
   "yourPlanWasSuccessfullyDowngraded": "Your plan was successfully downgraded",
   "yourPlanWasSuccessfullyUpgraded": "Your plan was successfully upgraded",
   "yourPurchaseWasSuccessful": "Your purchase was successful",

@@ -1283,7 +1283,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Bestanden tonen het aantal resterende dagen voordat ze permanent worden verwijderd",
   "itemsStored": "Items opgeslagen",
   "itemsWillBeRemovedFromAlbum": "Geselecteerde items zullen worden verwijderd uit dit album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Het lijkt erop dat er iets fout is gegaan. Probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met ons supportteam.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1404,7 +1403,6 @@
   "localBackupSidebarTitle": "Lokale back-up",
   "localGallery": "Lokale galerij",
   "localIndexing": "Lokale verwerking",
-  "localSyncErrorMessage": "Het lijkt erop dat er iets mis is gegaan omdat het synchroniseren van lokale foto's meer tijd kost dan verwacht. Neem contact op met ons supportteam",
   "location": "Locatie",
   "locationName": "Locatie naam",
   "locations": "Locaties",
@@ -1565,11 +1563,9 @@
   "moveToHiddenAlbum": "Verplaatsen naar verborgen album",
   "movingFilesToAlbum": "Bestanden verplaatsen naar album...",
   "name": "Naam",
-  "networkConnectionRefusedErr": "Kan geen verbinding maken met Photovault, probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met support.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Kan geen verbinding maken met Photovault, controleer uw netwerkinstellingen en neem contact op met ondersteuning als de fout zich blijft voordoen.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1866,7 +1862,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Neem alstublieft contact op met support@ente.com en we helpen u graag!",
-  "pleaseContactSupportIfTheProblemPersists": "Neem contact op met klantenservice als het probleem aanhoudt",
   "pleaseEmailUsAt": "Stuur ons een e-mail op {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2658,7 +2653,6 @@
     }
   },
   "tellUsWhatYouThink": "Vertel ons wat je vindt",
-  "tempErrorContactSupportIfPersists": "Het lijkt erop dat er iets fout is gegaan. Probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met ons supportteam.",
   "terminate": "Beëindigen",
   "@terminate": {
     "description": "Terminate button label"

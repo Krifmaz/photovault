@@ -428,7 +428,6 @@
     "description": "Generic OK button label"
   },
   "iosOnMyDeviceNotSupported": "Priečinok \"V mojom iPhone\" nie je možné použiť priamo. Prosím, vyberte vnútorný priečinok alebo vytvorte nový priečinok.",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Vyzerá to, že sa niečo pokazilo. Skúste znova v krátkom čase. Ak chyba pretrváva, kontaktujte náš tím podpory.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -479,11 +478,9 @@
       "count": {}
     }
   },
-  "networkConnectionRefusedErr": "Nemožno sa pripojiť k Photovault, skúste znova v krátkom čase. Ak chyba pretrváva, kontaktujte podporu.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nemožno sa pripojiť k Photovault, skontrolujte svoje nastavenia siete a kontaktujte podporu, ak chyba pretrváva.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -815,7 +812,6 @@
     "description": "Message prompting user to tap to unlock"
   },
   "tellUsWhatYouThink": "Povedzte nám čo si myslíte",
-  "tempErrorContactSupportIfPersists": "Vyzerá to, že sa niečo pokazilo. Skúste znova v krátkom čase. Ak chyba pretrváva, kontaktujte náš tím podpory.",
   "terminate": "Ukončiť",
   "@terminate": {
     "description": "Terminate button label"

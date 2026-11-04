@@ -1090,7 +1090,6 @@
   "doubleTapToViewHiddenCode": "Puoi toccare due volte una voce per visualizzare il codice",
   "download": "Scarica",
   "downloadApplicationUpdate": "Scarica l'aggiornamento",
-  "downloadDecryptionFailedMessage": "Impossibile scaricare questo elemento. Contattaci così possiamo aiutarti.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -1928,7 +1927,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Gli elementi mostrano il numero di giorni rimanenti prima della cancellazione permanente",
   "itemsStored": "Elementi memorizzati",
   "itemsWillBeRemovedFromAlbum": "Gli elementi selezionati saranno rimossi da questo album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Sembra che qualcosa sia andato storto. Riprova tra un po'. Se l'errore persiste, contatta il nostro team di supporto.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2066,7 +2064,6 @@
   "localBackupSidebarTitle": "Backup locale",
   "localGallery": "Galleria locale",
   "localIndexing": "Elaborazione locale",
-  "localSyncErrorMessage": "Sembra che qualcosa sia andato storto dal momento che la sincronizzazione delle foto locali richiede più tempo del previsto. Si prega di contattare il nostro team di supporto",
   "location": "Luogo",
   "locationName": "Nome della località",
   "locationPickerTip": "Puoi anche aggiungere una posizione centrata su una foto dalla schermata Info della foto",
@@ -2268,11 +2265,9 @@
   "moveToHiddenAlbum": "Sposta in album nascosto",
   "movingFilesToAlbum": "Spostamento dei file nell'album...",
   "name": "Nome",
-  "networkConnectionRefusedErr": "Impossibile connettersi a Photovault, riprova tra un po' di tempo. Se l'errore persiste, contatta l'assistenza.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Impossibile connettersi a Photovault, controlla le impostazioni di rete e contatta l'assistenza se l'errore persiste.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2626,7 +2621,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Contatta support@ente.com e saremo felici di aiutarti!",
-  "pleaseContactSupportIfTheProblemPersists": "Riprova. Se il problema persiste, ti invitiamo a contattare l'assistenza",
   "pleaseEmailUsAt": "Per favore invia un'email a {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3659,7 +3653,6 @@
     }
   },
   "tellUsWhatYouThink": "Dicci cosa ne pensi",
-  "tempErrorContactSupportIfPersists": "Sembra che qualcosa sia andato storto. Riprova tra un po'. Se l'errore persiste, contatta il nostro team di supporto.",
   "terminate": "Termina",
   "@terminate": {
     "description": "Terminate button label"
@@ -4117,7 +4110,6 @@
   },
   "yourMap": "La tua mappa",
   "yourPhotosLookUnique": "Le tue foto sembrano uniche",
-  "yourPlanSupportsFamily": "Il tuo piano supporta già una famiglia",
   "yourPlanWasSuccessfullyDowngraded": "Il tuo piano è stato aggiornato con successo",
   "yourPlanWasSuccessfullyUpgraded": "Il tuo piano è stato aggiornato con successo",
   "yourPurchaseWasSuccessful": "Acquisto andato a buon fine",

@@ -1139,7 +1139,6 @@
   "doubleTapToViewHiddenCode": "Ketuk dua kali untuk memasukkan kode baru",
   "download": "Unduh",
   "downloadApplicationUpdate": "Unduh pembaruan",
-  "downloadDecryptionFailedMessage": "Item ini tidak dapat diunduh. Silakan hubungi kami agar kami dapat membantu.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -2155,7 +2154,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "Item yang dipilih akan dihapus dari album ini",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Sepertinya terjadi kesalahan. Silakan coba lagi nanti. Jika masalah berlanjut, hubungi tim dukungan kami.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2459,7 +2457,6 @@
   "localBackupSidebarTitle": "Cadangan lokal",
   "localGallery": "Galeri lokal",
   "localIndexing": "Pemrosesan lokal",
-  "localSyncErrorMessage": "Sepertinya terjadi masalah karena sinkronisasi foto lokal membutuhkan waktu lebih lama dari yang diharapkan. Silakan hubungi tim dukungan kami",
   "location": "Lokasi",
   "locationName": "Nama tempat",
   "locationPickerTip": "Anda juga dapat menambahkan lokasi yang berpusat pada foto dari layar info foto.",
@@ -2662,7 +2659,6 @@
     }
   },
   "mlIndexingDescription": "Perlu diketahui, pembelajaran mesin akan meningkatkan penggunaan bandwidth dan baterai hingga semua item selesai diproses. Pertimbangkan untuk menggunakan aplikasi desktop agar pemrosesan lebih cepat; semua hasil akan disinkronkan secara otomatis.",
-  "mlItemsCouldNotBeProcessed": "{count, plural, one{{count} item tidak dapat diproses oleh pembelajaran mesin. Silakan hubungi kami agar kami dapat membantu.} other{{count} item tidak dapat diproses oleh pembelajaran mesin. Silakan hubungi kami agar kami dapat membantu.}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -2671,7 +2667,6 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "Silakan hubungi kami agar kami dapat membantu.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2753,11 +2748,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Tidak dapat terhubung dengan Photovault, silakan coba lagi setelah beberapa saat. Jika masalah berlanjut, harap hubungi dukungan.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Tidak dapat terhubung dengan Photovault, harap periksa pengaturan jaringan kamu dan hubungi dukungan jika masalah berlanjut.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -3193,7 +3186,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Hubungi support@ente.com, kami akan dengan senang hati membantu!",
-  "pleaseContactSupportIfTheProblemPersists": "Silakan hubungi tim bantuan jika masalah terus terjadi",
   "pleaseEmailUsAt": "Silakan kirimi kami email di {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -4448,7 +4440,6 @@
     }
   },
   "tellUsWhatYouThink": "Berikan pendapatmu",
-  "tempErrorContactSupportIfPersists": "Sepertinya terjadi kesalahan. Silakan coba lagi nanti. Jika kesalahan terus terjadi, hubungi tim dukungan kami.",
   "terminate": "Akhiri",
   "@terminate": {
     "description": "Terminate button label"
@@ -4996,7 +4987,6 @@
   },
   "yourMap": "Peta kamu",
   "yourPhotosLookUnique": "Foto Anda tampaknya tidak memiliki duplikat",
-  "yourPlanSupportsFamily": "Paket Anda sudah mendukung keluarga",
   "yourPlanWasSuccessfullyDowngraded": "Paket kamu berhasil di turunkan",
   "yourPlanWasSuccessfullyUpgraded": "Paket kamu berhasil ditingkatkan",
   "yourPurchaseWasSuccessful": "Pembelianmu berhasil",

@@ -669,7 +669,6 @@
   },
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Elementer viser gjenværende dager før de slettes for godt",
   "itemsWillBeRemovedFromAlbum": "Valgte elementer vil bli fjernet fra dette albumet",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Det ser ut til at noe gikk galt. Prøv på nytt etter en stund. Hvis feilen vedvarer, kan du kontakte kundestøtte.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -738,7 +737,6 @@
   },
   "loadMessage9": "Vi bruker Xcha20Poly1305 for å trygt kryptere dataene dine",
   "localGallery": "Lokalt galleri",
-  "localSyncErrorMessage": "Ser ut som noe gikk galt siden lokal synkronisering av bilder tar lengre tid enn forventet. Vennligst kontakt vårt supportteam",
   "location": "Plassering",
   "locationName": "Stedsnavn",
   "locations": "Plasseringer",
@@ -836,11 +834,9 @@
   "moveToHiddenAlbum": "Flytt til skjult album",
   "movingFilesToAlbum": "Flytter filer til album...",
   "name": "Navn",
-  "networkConnectionRefusedErr": "Kan ikke koble til Photovault, prøv igjen etter en stund. Hvis feilen vedvarer, vennligst kontakt kundestøtte.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Kan ikke koble til Photovault, kontroller nettverksinnstillingene og kontakt kundestøtte hvis feilen vedvarer.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1011,7 +1007,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Vennligst kontakt kundestøtte hvis problemet vedvarer",
   "pleaseEmailUsAt": "Vennligst send oss en e-post på {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -1478,7 +1473,6 @@
       }
     }
   },
-  "tempErrorContactSupportIfPersists": "Det ser ut som noe gikk galt. Prøv på nytt etter en stund. Hvis feilen vedvarer, kontakt kundestøtte.",
   "terminate": "Avslutte",
   "@terminate": {
     "description": "Terminate button label"

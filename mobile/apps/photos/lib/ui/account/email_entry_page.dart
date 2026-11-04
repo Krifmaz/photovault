@@ -250,8 +250,10 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
     );
   }
 
-  bool get _showReferralSourceField =>
-      widget.showReferralSourceField && !_hasInstallSource;
+  // PHOTOVAULT: Ente's "How did you hear about us?" growth-attribution field
+  // is hidden. Nothing is typed, so setRefSource still gets the route source
+  // or an empty string and the API is unchanged.
+  bool get _showReferralSourceField => false;
 
   String get _routeSource => widget.referralSource?.trim() ?? '';
 

@@ -1509,7 +1509,6 @@
   "localBackupSidebarTitle": "لوکل بیک اپ",
   "localGallery": "مقامی گیلری",
   "localIndexing": "مقامی پراسیسنگ",
-  "localSyncErrorMessage": "لگتا ہے کچھ غلط ہو گیا ہے کیونکہ مقامی تصاویر کی sync توقع سے زیادہ وقت لے رہی ہے. براہ کرم ہماری سپورٹ ٹیم سے رابطہ کریں",
   "location": "مقام",
   "locationName": "مقام کا نام",
   "locationPickerTip": "آپ تصویر کی معلوماتی اسکرین سے تصویر پر مرکوز مقام بھی شامل کر سکتے ہیں",
@@ -2004,7 +2003,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "از کرم support@ente.com پر رابطہ کریں اور ہمیں خوشی ہوگی مدد کر کے!",
-  "pleaseContactSupportIfTheProblemPersists": "اگر مسئلہ برقرار رہے تو براہ کرم سپورٹ سے رابطہ کریں",
   "pleaseEmailUsAt": "براہ کرم ہمیں {toEmail} پر ای میل کریں",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3262,7 +3260,6 @@
   },
   "yourMap": "آپ کا نقشہ",
   "yourPhotosLookUnique": "آپ کی تصاویر منفرد لگتی ہیں",
-  "yourPlanSupportsFamily": "آپ کا پلان پہلے ہی فیملی کو سپورٹ کرتا ہے",
   "yourPlanWasSuccessfullyDowngraded": "آپ کا پلان کامیابی سے ڈاؤن گریڈ ہو گیا",
   "yourPlanWasSuccessfullyUpgraded": "آپ کا پلان کامیابی سے اپ گریڈ ہو گیا",
   "yourPurchaseWasSuccessful": "آپ کی خریداری کامیاب رہی",

@@ -1134,7 +1134,6 @@
   "doubleTapToViewHiddenCode": "您可以双击条目来查看代码",
   "download": "下载",
   "downloadApplicationUpdate": "下载更新",
-  "downloadDecryptionFailedMessage": "无法下载此项目。请联系我们，我们会为您提供帮助。",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -2150,7 +2149,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "所选项目将从此相册中移除",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "看起来出了点问题。请稍后重试。如果错误仍然存在，请联系我们的支持团队。",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2454,7 +2452,6 @@
   "localBackupSidebarTitle": "本地备份",
   "localGallery": "本地相册",
   "localIndexing": "本地处理",
-  "localSyncErrorMessage": "似乎出了点问题，因为本地照片同步耗时比预期的要长。请联系我们的支持团队",
   "location": "地理位置",
   "locationName": "地点名称",
   "locationPickerTip": "您也可以在照片的详情界面上添加以照片为中心的定位",
@@ -2657,7 +2654,6 @@
     }
   },
   "mlIndexingDescription": "请注意，在所有项目处理完成之前，机器学习会导致更高的带宽和电池用量。建议使用桌面应用以加快处理速度，所有结果都会自动同步。",
-  "mlItemsCouldNotBeProcessed": "{count, plural, one{{count} 个项目无法进行机器学习处理。请联系我们，我们会为您提供帮助。} other{{count} 个项目无法进行机器学习处理。请联系我们，我们会为您提供帮助。}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -2666,7 +2662,6 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "请联系我们，我们会为您提供帮助。",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2748,11 +2743,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "无法连接到 Photovault，请稍后重试。如果错误仍然存在，请联系支持人员。",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "无法连接到 Photovault，请检查您的网络设置，如果错误仍然存在，请联系支持人员。",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -3188,7 +3181,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "请联系 support@ente.com，我们很乐意为您提供帮助！",
-  "pleaseContactSupportIfTheProblemPersists": "如果问题仍然存在，请联系支持团队",
   "pleaseEmailUsAt": "请给我们发送电子邮件至 {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -4418,7 +4410,6 @@
     }
   },
   "tellUsWhatYouThink": "告诉我们您的想法",
-  "tempErrorContactSupportIfPersists": "看起来出了点问题。请稍后重试。如果错误仍然存在，请联系我们的支持团队。",
   "terminate": "终止",
   "@terminate": {
     "description": "Terminate button label"
@@ -4966,7 +4957,6 @@
   },
   "yourMap": "您的地图",
   "yourPhotosLookUnique": "您的照片看起来很独特",
-  "yourPlanSupportsFamily": "您的方案已支持家庭功能",
   "yourPlanWasSuccessfullyDowngraded": "您的方案已成功降级",
   "yourPlanWasSuccessfullyUpgraded": "您的方案已成功升级",
   "yourPurchaseWasSuccessful": "您已购买成功。",

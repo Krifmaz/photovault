@@ -1142,7 +1142,6 @@
   "doubleTapToViewHiddenCode": "Bạn có thể nhấn đúp vào một mục để xem mã",
   "download": "Tải xuống",
   "downloadApplicationUpdate": "Tải xuống bản cập nhật",
-  "downloadDecryptionFailedMessage": "Không thể tải xuống mục này. Vui lòng liên hệ với chúng tôi để được hỗ trợ.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -2158,7 +2157,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "Các mục đã chọn sẽ bị xóa khỏi album này",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Có vẻ đã xảy ra sự cố. Vui lòng thử lại sau ít phút. Nếu lỗi vẫn tiếp diễn, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2462,7 +2460,6 @@
   "localBackupSidebarTitle": "Sao lưu trên thiết bị",
   "localGallery": "Thư viện cục bộ",
   "localIndexing": "Xử lý cục bộ",
-  "localSyncErrorMessage": "Có vẻ như có điều gì đó không ổn vì đồng bộ ảnh cục bộ đang tốn nhiều thời gian hơn mong đợi. Vui lòng liên hệ đội ngũ hỗ trợ của chúng tôi",
   "location": "Vị trí",
   "locationName": "Tên vị trí",
   "locationPickerTip": "Bạn cũng có thể thêm vị trí tập trung vào ảnh từ phần thông tin của ảnh",
@@ -2665,7 +2662,6 @@
     }
   },
   "mlIndexingDescription": "Lưu ý rằng việc học máy sẽ khiến tốn băng thông và pin nhiều hơn cho đến khi tất cả mục được xử lý. Hãy sử dụng ứng dụng máy tính để xử lý nhanh hơn. Mọi kết quả sẽ được tự động đồng bộ.",
-  "mlItemsCouldNotBeProcessed": "{count, plural, other{{count} mục không thể xử lý cho mục đích học máy. Vui lòng liên hệ với chúng tôi để được hỗ trợ.}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -2674,7 +2670,6 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "Vui lòng liên hệ với chúng tôi để được hỗ trợ.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2756,11 +2751,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Không thể kết nối với Photovault, vui lòng thử lại sau ít phút. Nếu lỗi vẫn tiếp diễn, hãy liên hệ với bộ phận hỗ trợ.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Không thể kết nối với Photovault, vui lòng kiểm tra cài đặt mạng của bạn và liên hệ với bộ phận hỗ trợ nếu lỗi vẫn tiếp diễn.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -3197,7 +3190,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Vui lòng liên hệ support@ente.com và chúng tôi rất sẵn sàng giúp đỡ!",
-  "pleaseContactSupportIfTheProblemPersists": "Vui lòng liên hệ bộ phận hỗ trợ nếu vấn đề vẫn tiếp diễn",
   "pleaseEmailUsAt": "Vui lòng gửi email cho chúng tôi tại {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -4452,7 +4444,6 @@
     }
   },
   "tellUsWhatYouThink": "Cho biết bạn nghĩ gì",
-  "tempErrorContactSupportIfPersists": "Có vẻ đã xảy ra sự cố. Vui lòng thử lại sau ít phút. Nếu lỗi vẫn tiếp diễn, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi.",
   "terminate": "Kết thúc",
   "@terminate": {
     "description": "Terminate button label"
@@ -5000,7 +4991,6 @@
   },
   "yourMap": "Bản đồ của bạn",
   "yourPhotosLookUnique": "Ảnh của bạn trông độc đáo",
-  "yourPlanSupportsFamily": "Gói của bạn hỗ trợ cả gia đình",
   "yourPlanWasSuccessfullyDowngraded": "Gói của bạn đã được hạ cấp thành công",
   "yourPlanWasSuccessfullyUpgraded": "Gói của bạn đã được nâng cấp thành công",
   "yourPurchaseWasSuccessful": "Bạn đã giao dịch thành công",

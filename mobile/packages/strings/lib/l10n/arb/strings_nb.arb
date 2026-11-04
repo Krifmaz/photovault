@@ -454,7 +454,6 @@
     "description": "Generic OK button label"
   },
   "iosOnMyDeviceNotSupported": "«På min iPhone» kan ikke brukes direkte. Velg eller lag ei mappe i den.",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Det ser ut til at noe gikk galt. Prøv på nytt etter en stund. Hvis feilen vedvarer, ta kontakt med kundestøtte.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -514,11 +513,9 @@
       "count": {}
     }
   },
-  "networkConnectionRefusedErr": "Klarte ikke koble til Photovault, prøv igjen etter en stund. Hvis feilen vedvarer, ta kontakt med kundestøtte.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Klarte ikke koble til Photovault, kontroller nettverksinnstillingene og ta kontakt med kundestøtte hvis feilen vedvarer.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -857,7 +854,6 @@
     "description": "Message prompting user to tap to unlock"
   },
   "tellUsWhatYouThink": "Fortell oss hva du mener",
-  "tempErrorContactSupportIfPersists": "Det ser ut som noe gikk galt. Prøv på nytt etter en stund. Hvis feilen vedvarer, ta kontakt med kundestøtte.",
   "terminate": "Avslutte",
   "@terminate": {
     "description": "Terminate button label"

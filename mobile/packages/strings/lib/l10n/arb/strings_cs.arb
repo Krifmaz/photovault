@@ -1453,7 +1453,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Položky zobrazují počet dní zbývajících do trvalého smazání",
   "itemsStored": "Uložené položky",
   "itemsWillBeRemovedFromAlbum": "Vybrané položky budou odstraněny z tohoto alba",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Zdá se, že došlo k chybě. Zkuste to prosím znovu později. Pokud chyba přetrvává, kontaktujte prosím náš tým podpory.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1587,7 +1586,6 @@
   "localBackupSidebarTitle": "Místní záloha",
   "localGallery": "Místní galerie",
   "localIndexing": "Lokální zpracování",
-  "localSyncErrorMessage": "Zdá se, že došlo k nějaké chybě, protože synchronizace místních fotografií trvá déle, než se očekávalo. Obraťte se prosím na náš tým podpory",
   "location": "Poloha",
   "locationName": "Název místa",
   "locationPickerTip": "Můžete také přidat polohu zaměřenou na fotografii z informační obrazovky fotografie",
@@ -1770,11 +1768,9 @@
   "moveToHiddenAlbum": "Přesunout do skrytého alba",
   "movingFilesToAlbum": "Přesouvání souborů do alba...",
   "name": "Název",
-  "networkConnectionRefusedErr": "Nelze se připojit k Photovault, zkuste to prosím znovu později. Pokud chyba přetrvává, kontaktujte prosím podporu.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nelze se připojit k Photovault. Zkontrolujte prosím nastavení sítě a pokud chyba přetrvává, kontaktujte podporu.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2099,7 +2095,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Kontaktujte nás na adrese support@ente.com a rádi Vám pomůžeme!",
-  "pleaseContactSupportIfTheProblemPersists": "Pokud problém přetrvává, kontaktujte prosím podporu",
   "pleaseEmailUsAt": "Prosím, pošlete nám e-mail na adresu {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3017,7 +3012,6 @@
     }
   },
   "tellUsWhatYouThink": "Sdělte nám svůj názor",
-  "tempErrorContactSupportIfPersists": "Zdá se, že došlo k chybě. Zkuste to prosím znovu později. Pokud chyba přetrvává, kontaktujte prosím náš tým podpory.",
   "terminate": "Ukončit",
   "@terminate": {
     "description": "Terminate button label"
@@ -3475,7 +3469,6 @@
   },
   "yourMap": "Vaše mapa",
   "yourPhotosLookUnique": "Vaše fotografie vypadají jedinečně",
-  "yourPlanSupportsFamily": "Váš plán již podporuje rodinu",
   "yourPlanWasSuccessfullyDowngraded": "Váš plán byl úspěšně změněn na nižší",
   "yourPlanWasSuccessfullyUpgraded": "Váš plán byl úspěšně změněn na vyšší",
   "yourPurchaseWasSuccessful": "Váš nákup byl úspěšný",

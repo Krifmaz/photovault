@@ -1064,7 +1064,6 @@
   "localBackupDailyManualCopy": "A aplicação cria uma cópia de segurança local por dia ao ser aberta. Utilize \"Fazer cópia de segurança agora\" para executar uma cópia de segurança manual. As cópias de segurança armazenam até 5 ficheiros.",
   "localBackupSidebarTitle": "Cópia de segurança local",
   "localGallery": "Galeria local",
-  "localSyncErrorMessage": "Parece que algo correu mal, uma vez que a sincronização de fotografias locais está a demorar mais tempo do que o esperado. Contacte a nossa equipa de apoio",
   "location": "Localização",
   "locationName": "Nome da localização",
   "locationPickerTip": "Pode também adicionar uma localização centrada numa foto, pelo ecrã de info da foto.",
@@ -1393,7 +1392,6 @@
   "playstoreSubscription": "Subscrição da PlayStore",
   "playStream": "Ver em direto",
   "pleaseCheckPasswordAndTryAgain": "Por favor, verifique a sua palavra-passe e tente novamente.",
-  "pleaseContactSupportIfTheProblemPersists": "Por favor, contate o suporte se o problema persistir",
   "pleaseEmailUsAt": "Por favor, envie-nos um e-mail para {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2283,7 +2281,6 @@
     }
   },
   "yourMap": "Seu mapa",
-  "yourPlanSupportsFamily": "O seu plano já permite uma família",
   "yourPlanWasSuccessfullyDowngraded": "O seu plano foi rebaixado com sucesso",
   "yourPlanWasSuccessfullyUpgraded": "O seu plano foi atualizado com sucesso",
   "yourPurchaseWasSuccessful": "Sua compra foi realizada com sucesso",

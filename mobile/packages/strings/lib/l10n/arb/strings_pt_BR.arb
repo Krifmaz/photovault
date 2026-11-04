@@ -1980,7 +1980,6 @@
   "localBackupSidebarTitle": "Backup local",
   "localGallery": "Galeria local",
   "localIndexing": "Processamento local",
-  "localSyncErrorMessage": "Ocorreu um erro devido à sincronização de localização das fotos estar levando mais tempo que o esperado. Entre em contato conosco.",
   "location": "Localização",
   "locationName": "Nome da localização",
   "locationPickerTip": "Você também pode adicionar um local centrado em uma foto através das informações da foto",
@@ -2175,7 +2174,6 @@
   "moveToHiddenAlbum": "Mover ao álbum oculto",
   "movingFilesToAlbum": "Movendo arquivos para o álbum...",
   "name": "Nome",
-  "networkHostLookUpErr": "Não foi possível conectar-se ao Photovault, verifique suas configurações de rede e entre em contato com o suporte se o erro persistir.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2500,7 +2498,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Por favor, entre em contato conosco em support@ente.com e estaremos felizes em ajudá-lo!",
-  "pleaseContactSupportIfTheProblemPersists": "Por favor, contate o suporte se o problema persistir",
   "pleaseEmailUsAt": "Envie-nos um e-mail para {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3840,7 +3837,6 @@
   },
   "yourMap": "Seu mapa",
   "yourPhotosLookUnique": "Suas fotos parecem únicas",
-  "yourPlanSupportsFamily": "Seu plano já suporta uma família",
   "yourPlanWasSuccessfullyDowngraded": "Seu plano foi rebaixado com sucesso",
   "yourPlanWasSuccessfullyUpgraded": "Seu plano foi atualizado com sucesso",
   "yourPurchaseWasSuccessful": "Sua compra foi efetuada com sucesso",

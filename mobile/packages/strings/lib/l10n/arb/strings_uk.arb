@@ -1498,7 +1498,6 @@
   "localBackupSidebarTitle": "Локальна резервна копія",
   "localGallery": "Локальна галерея",
   "localIndexing": "Локальна обробка",
-  "localSyncErrorMessage": "Схоже, щось пішло не так, оскільки локальна синхронізація фотографій займає більше часу, ніж очікувалося. Зверніться до нашої служби підтримки",
   "location": "Розташування",
   "locationName": "Назва місце розташування",
   "locations": "Розташування",
@@ -1645,7 +1644,6 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не вдалося під'єднатися до Photovault. Спробуйте знову через деякий час. Якщо помилка не зникне, зв'яжіться з нашою командою підтримки.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
@@ -1927,7 +1925,6 @@
   "playstoreSubscription": "Передплата Play Store",
   "playStream": "Відтворити потік",
   "pleaseCheckPasswordAndTryAgain": "Будь ласка, перевірте пароль і спробуйте ще раз.",
-  "pleaseContactSupportIfTheProblemPersists": "Зверніться до служби підтримки, якщо проблема не зникне",
   "pleaseEmailUsAt": "Напишіть нам на {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3147,7 +3144,6 @@
   },
   "yourMap": "Ваша мапа",
   "yourPhotosLookUnique": "Ваші фотографії виглядають унікально",
-  "yourPlanSupportsFamily": "Ваш план уже підтримує сім'ю",
   "yourPlanWasSuccessfullyDowngraded": "Ваш план був успішно знижено",
   "yourPlanWasSuccessfullyUpgraded": "Ваш план успішно покращено",
   "yourPurchaseWasSuccessful": "Ваша покупка пройшла успішно",

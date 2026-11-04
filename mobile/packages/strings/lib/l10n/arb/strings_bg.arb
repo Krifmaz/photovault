@@ -1923,7 +1923,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Items show the number of days remaining before permanent deletion",
   "itemsStored": "Items stored",
   "itemsWillBeRemovedFromAlbum": "Selected items will be removed from this album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Изглежда нещо се обърка. Моля, опитайте отново след известно време. Ако грешката продължава, моля, свържете се с нашия екип за поддръжка.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2109,7 +2108,6 @@
   "localBackupSidebarTitle": "Локално резервно копие",
   "localGallery": "Local gallery",
   "localIndexing": "Local processing",
-  "localSyncErrorMessage": "Looks like something went wrong since local photos sync is taking more time than expected. Please reach out to our support team",
   "location": "Location",
   "locationName": "Location name",
   "locationPickerTip": "You can also add a location centered on a photo from the photo's info screen",
@@ -2345,11 +2343,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не може да се свърже с Photovault, моля, опитайте отново след известно време. Ако проблемът продължава, моля, свържете се с поддръжката.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Не може да се свърже с Photovault, моля, проверете мрежовите си настройки и се свържете с поддръжката, ако проблемът продължава.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2759,7 +2755,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Please contact support@ente.com and we will be happy to help!",
-  "pleaseContactSupportIfTheProblemPersists": "Please contact support if the problem persists",
   "pleaseEmailUsAt": "Please email us at {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3855,7 +3850,6 @@
     }
   },
   "tellUsWhatYouThink": "Кажете ни какво мислите",
-  "tempErrorContactSupportIfPersists": "Изглежда нещо се обърка. Моля, опитайте отново след известно време. Ако грешката продължава, моля, свържете се с нашия екип за поддръжка.",
   "terminate": "Прекратяване",
   "@terminate": {
     "description": "Terminate button label"
@@ -4384,7 +4378,6 @@
   },
   "yourMap": "Your map",
   "yourPhotosLookUnique": "Your photos look unique",
-  "yourPlanSupportsFamily": "Your plan already supports a family",
   "yourPlanWasSuccessfullyDowngraded": "Your plan was successfully downgraded",
   "yourPlanWasSuccessfullyUpgraded": "Your plan was successfully upgraded",
   "yourPurchaseWasSuccessful": "Your purchase was successful",

@@ -807,7 +807,6 @@
   },
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Articolele afișează numărul de zile rămase până la ștergerea definitivă",
   "itemsWillBeRemovedFromAlbum": "Articolele selectate vor fi eliminate din acest album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Se pare că ceva nu a mers bine. Vă rugăm să încercați din nou după ceva timp. Dacă eroarea persistă, vă rugăm să contactați echipa noastră de asistență.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -881,7 +880,6 @@
   },
   "loadMessage9": "Folosim Xchacha20Poly1305 pentru a vă cripta datele în siguranță",
   "localGallery": "Galerie locală",
-  "localSyncErrorMessage": "Se pare că ceva nu a mers bine, deoarece sincronizarea fotografiilor locale durează mai mult decât ne așteptam. Vă rugăm să contactați echipa noastră de asistență",
   "location": "Locație",
   "locationName": "Numele locației",
   "locationPickerTip": "De asemenea, puteți adăuga o locație centrată pe o fotografie din ecranul cu informații despre fotografie",
@@ -964,11 +962,9 @@
   "moveToHiddenAlbum": "Mutați în albumul ascuns",
   "movingFilesToAlbum": "Se mută fișierele în album...",
   "name": "Nume",
-  "networkConnectionRefusedErr": "Nu se poate conecta la Photovault, vă rugăm să reîncercați după un timp. Dacă eroarea persistă, contactați asistența.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nu se poate conecta la Photovault, vă rugăm să verificați setările de rețea și să contactați asistenta dacă eroarea persistă.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1136,7 +1132,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Vă rugăm să contactați asistența dacă problema persistă",
   "pleaseEmailUsAt": "Vă rugăm să ne trimiteți un e-mail la {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -1549,7 +1544,6 @@
       }
     }
   },
-  "tempErrorContactSupportIfPersists": "Se pare că ceva nu a mers bine. Vă rugăm să încercați din nou după ceva timp. Dacă eroarea persistă, vă rugăm să contactați echipa noastră de asistență.",
   "terminate": "Terminare",
   "@terminate": {
     "description": "Terminate button label"

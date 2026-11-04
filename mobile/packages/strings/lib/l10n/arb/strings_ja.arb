@@ -1033,7 +1033,6 @@
   },
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "完全に削除されるまでの日数が項目に表示されます",
   "itemsWillBeRemovedFromAlbum": "選択したアイテムはこのアルバムから削除されます",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "問題が発生したようです。しばらくしてから再試行してください。エラーが解決しない場合は、サポートチームにお問い合わせください。",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1122,7 +1121,6 @@
   "localBackupSidebarTitle": "ローカルバックアップ",
   "localGallery": "デバイス上のギャラリー",
   "localIndexing": "ローカル処理",
-  "localSyncErrorMessage": "ローカルの写真の同期には予想以上の時間がかかっています。問題が発生したようです。サポートチームまでご連絡ください。",
   "location": "場所",
   "locationName": "場所の名前",
   "locations": "場所",
@@ -1235,11 +1233,9 @@
   "moveToHiddenAlbum": "隠しアルバムに移動",
   "movingFilesToAlbum": "アルバムにファイルを移動中",
   "name": "名前順",
-  "networkConnectionRefusedErr": "Photovaultに接続できませんでした。しばらくしてから再試行してください。エラーが解決しない場合は、サポートにお問い合わせください。",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Photovaultに接続できませんでした。ネットワーク設定を確認し、エラーが解決しない場合はサポートにお問い合わせください。",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1515,7 +1511,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "support@ente.comまでお問い合わせください。お手伝いします！",
-  "pleaseContactSupportIfTheProblemPersists": "問題が解決しない場合はサポートにお問い合わせください",
   "pleaseEmailUsAt": "{toEmail} にメールでご連絡ください",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2190,7 +2185,6 @@
     }
   },
   "tellUsWhatYouThink": "ご意見をお聞かせください",
-  "tempErrorContactSupportIfPersists": "問題が発生したようです。しばらくしてから再試行してください。エラーが解決しない場合は、サポートチームにお問い合わせください。",
   "terminateSession": "セッションを終了しますか？",
   "@terminateSession": {
     "description": "Title for terminate session dialog"

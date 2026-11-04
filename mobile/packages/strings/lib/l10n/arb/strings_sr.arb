@@ -623,7 +623,6 @@
   },
   "iosOnMyDeviceNotSupported": "\"On My iPhone\" не може се користити директно. Изаберите или креирајте фасциклу унутар њега.",
   "itemsWillBeRemovedFromAlbum": "Изабране ставке ће бити уклоњене из овог албума",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Изгледа да је нешто погрешно. Покушајте поново након неког времена. Ако грешка настави, обратите се нашем тиму за подршку.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -753,11 +752,9 @@
   "moveToAlbum": "Премести у албум",
   "movingFilesToAlbum": "Премештам фајлове у албум...",
   "name": "Име",
-  "networkConnectionRefusedErr": "Није могуће повезивање са Photovault-ом, покушајте поново мало касније. Ако грешка настави, обратите се подршци.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Није могуће повезивање са Photovault-ом, молимо вас да проверите мрежне поставке и контактирајте подршку ако грешка и даље постоји.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1236,7 +1233,6 @@
     "description": "Message prompting user to tap to unlock"
   },
   "tellUsWhatYouThink": "Реци нам шта мислиш",
-  "tempErrorContactSupportIfPersists": "Изгледа да је нешто погрешно. Покушајте поново након неког времена. Ако грешка настави, обратите се нашем тиму за подршку.",
   "terminate": "Прекини",
   "@terminate": {
     "description": "Terminate button label"

@@ -1518,7 +1518,6 @@
   "tags": "Címkék",
   "tapToCopy": "érintse meg a másoláshoz",
   "tellUsWhatYouThink": "Mondd el, mit gondolsz",
-  "tempErrorContactSupportIfPersists": "Úgy tűnik, valami hiba történt. Kérjük, próbáld újra egy idő után. Ha a hiba továbbra is fennáll, fordulj ügyfélszolgálatunkhoz.",
   "termsOfServicesTitle": "Használati feltételek",
   "@termsOfServicesTitle": {
     "description": "Terms of service title"
@@ -1746,7 +1745,6 @@
       }
     }
   },
-  "yourPlanSupportsFamily": "A csomagod már támogatja a családi megosztást",
   "yourPlanWasSuccessfullyDowngraded": "A csomagodat sikeresen visszaváltottuk",
   "yourPlanWasSuccessfullyUpgraded": "A csomagod sikeresen frissítve lett",
   "yourPurchaseWasSuccessful": "A vásárlás sikeres volt",

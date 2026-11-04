@@ -1006,7 +1006,6 @@
   },
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Elementlər həmişəlik silinməyə qalan günlərin sayını göstərir",
   "itemsWillBeRemovedFromAlbum": "Seçilmiş elementlər bu albomdan silinəcək",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Görünür, nəsə yanlış getdi. Zəhmət olmasa, bir müddət sonra yenidən cəhd edin. Xəta davam edərsə, dəstək komandamızla əlaqə saxlayın.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1090,7 +1089,6 @@
   },
   "loadMessage9": "Məlumatlarınızı təhlükəsiz şəkildə şifrələmək üçün Xchacha20Poly1305-dən istifadə edirik",
   "localGallery": "Yerli qalereya",
-  "localSyncErrorMessage": "Yerli şəkillərin sinxronizasiyası gözləniləndən çox vaxt apardığı üçün nəsə xəta baş verdi. Zəhmət olmasa, dəstək komandamızla əlaqə saxlayın",
   "location": "Məkan",
   "locationName": "Məkan adı",
   "locationPickerTip": "Siz həmçinin fotoşəkilin məlumat ekranından istifadə edərək həmin fotonun mərkəzində olduğu bir məkan əlavə edə bilərsiniz",
@@ -1238,11 +1236,9 @@
   "moveToHiddenAlbum": "Gizli alboma köçür",
   "movingFilesToAlbum": "Fayllar alboma köçürülür...",
   "name": "Ad",
-  "networkConnectionRefusedErr": "Photovault-yə qoşulmaq mümkün deyil, bir müddət sonra yenidən cəhd edin. Xəta davam edərsə, zəhmət olmasa, dəstək xidməti ilə əlaqə saxlayın.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Photovault-yə qoşulmaq mümkün deyil, zəhmət olmasa şəbəkə parametrlərinizi yoxlayın və xəta davam edərsə dəstək ilə əlaqə saxlayın.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1458,7 +1454,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Problem davam edərsə, dəstək xidməti ilə əlaqə saxlayın",
   "pleaseEmailUsAt": "Zəhmət olmasa, bizə {toEmail} ünvanından e-poçt yazın",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2184,7 +2179,6 @@
       }
     }
   },
-  "tempErrorContactSupportIfPersists": "Görünür, nəsə yanlış getdi. Zəhmət olmasa, bir müddət sonra yenidən cəhd edin. Xəta davam edərsə, dəstək komandamızla əlaqə saxlayın.",
   "terminate": "Dayandır",
   "@terminate": {
     "description": "Terminate button label"

@@ -1187,7 +1187,6 @@
   },
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Elementy pokazują liczbę dni pozostałych przed trwałym usunięciem",
   "itemsWillBeRemovedFromAlbum": "Wybrane elementy zostaną usunięte z tego albumu",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Wygląda na to, że coś poszło nie tak. Spróbuj ponownie po pewnym czasie. Jeśli błąd będzie się powtarzał, skontaktuj się z naszym zespołem pomocy technicznej.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1275,7 +1274,6 @@
   "localBackupDailyManualCopy": "Tworzy jedną lokalną kopię zapasową dziennie po uruchomieniu aplikacji. Użyj opcji „Utwórz kopię zapasową”, aby uruchomić ręczną kopię zapasową. Kopie zapasowe są przechowywane do 5 plików.",
   "localBackupSidebarTitle": "Lokalna kopia zapasowa",
   "localGallery": "Galeria lokalna",
-  "localSyncErrorMessage": "Wygląda na to, że coś poszło nie tak, ponieważ lokalna synchronizacja zdjęć zajmuje więcej czasu, niż oczekiwano. Skontaktuj się z naszym zespołem pomocy technicznej",
   "location": "Lokalizacja",
   "locationName": "Nazwa lokalizacji",
   "locationPickerTip": "Możesz również dodać lokalizację wyśrodkowaną na zdjęciu z ekranu informacji o zdjęciu",
@@ -1446,11 +1444,9 @@
   "moveToHiddenAlbum": "Przenieś do ukrytego albumu",
   "movingFilesToAlbum": "Przenoszenie plików do albumów...",
   "name": "Nazwa",
-  "networkConnectionRefusedErr": "Nie można połączyć się z Photovault, spróbuj ponownie po pewnym czasie. Jeśli błąd będzie się powtarzał, skontaktuj się z pomocą techniczną.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nie można połączyć się z Photovault, sprawdź ustawienia sieci i skontaktuj się z pomocą techniczną, jeśli błąd będzie się powtarzał.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1733,7 +1729,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Skontaktuj się z pomocą techniczną, jeśli problem będzie się powtarzał",
   "pleaseEmailUsAt": "Prosimy o kontakt mailowy pod adresem {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2428,7 +2423,6 @@
     }
   },
   "tellUsWhatYouThink": "Wyraź swoją opinię",
-  "tempErrorContactSupportIfPersists": "Wygląda na to, że coś poszło nie tak. Spróbuj ponownie po pewnym czasie. Jeśli błąd będzie się powtarzał, skontaktuj się z naszym zespołem pomocy technicznej.",
   "terminate": "Zakończ",
   "@terminate": {
     "description": "Terminate button label"
@@ -2816,7 +2810,6 @@
   },
   "yourMap": "Twoja mapa",
   "yourPhotosLookUnique": "Twoje zdjęcia wyglądają na unikalne",
-  "yourPlanSupportsFamily": "Twój plan już obsługuje rodzinę",
   "yourPlanWasSuccessfullyDowngraded": "Twój plan został pomyślnie obniżony",
   "yourPlanWasSuccessfullyUpgraded": "Twój plan został pomyślnie ulepszony",
   "yourPurchaseWasSuccessful": "Twój zakup zakończył się pomyślnie",

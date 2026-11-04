@@ -783,7 +783,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "Τα επιλεγμένα αντικείμενα θα αφαιρεθούν από αυτό το άλμπουμ",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Φαίνεται ότι κάτι πήγε στραβά. Παρακαλώ προσπαθήστε ξανά μετά από λίγο. Αν το σφάλμα παραμένει, παρακαλούμε επικοινωνήστε με την ομάδα υποστήριξης μας.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -844,7 +843,6 @@
     }
   },
   "loadMessage9": "Χρησιμοποιούμε το Xchacha20Poly1305 για την ασφαλή κρυπτογράφηση των δεδομένων σας",
-  "localSyncErrorMessage": "Φαίνεται ότι κάτι πήγε στραβά καθώς ο τοπικός συγχρονισμός φωτογραφιών παίρνει περισσότερο χρόνο από το αναμενόμενο. Επικοινωνήστε με την ομάδα υποστήριξης",
   "location": "Τοποθεσία",
   "locationName": "Όνομα τοποθεσίας",
   "locationPickerTip": "Μπορείτε επίσης να προσθέσετε μια τοποθεσία στο κέντρο μιας φωτογραφίας από την οθόνη πληροφοριών της φωτογραφίας",
@@ -919,11 +917,9 @@
   "movedToTrash": "Μετακίνηση στον κάδο",
   "moveToAlbum": "Μετακίνηση σε άλμπουμ",
   "name": "Όνομα",
-  "networkConnectionRefusedErr": "Δεν είναι δυνατή η σύνδεση με το Photovault, παρακαλώ προσπαθήστε ξανά μετά από λίγο. Εάν το σφάλμα παραμένει, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Δεν είναι δυνατή η σύνδεση με το Photovault, ελέγξτε τις ρυθμίσεις του δικτύου σας και επικοινωνήστε με την υποστήριξη αν το σφάλμα παραμένει.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1084,7 +1080,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Επικοινωνήστε με την υποστήριξη πελατών εάν το πρόβλημα επιμένει",
   "pleaseGrantPermissions": "Παρακαλούμε παραχωρήστε τα δικαιώματα",
   "pleaseLoginAgain": "Παρακαλούμε συνδεθείτε ξανά",
   "pleaseSelectQuickLinksToRemove": "Παρακαλώ επιλέξτε γρήγορους συνδέσμους για αφαίρεση",
@@ -1488,7 +1483,6 @@
   "@tapToUnlock": {
     "description": "Message prompting user to tap to unlock"
   },
-  "tempErrorContactSupportIfPersists": "Φαίνεται ότι κάτι πήγε στραβά. Παρακαλώ προσπαθήστε ξανά μετά από κάποιο χρονικό διάστημα. Αν το σφάλμα παραμένει, παρακαλούμε επικοινωνήστε με την ομάδα υποστήριξης μας.",
   "terminate": "Τερματισμός",
   "@terminate": {
     "description": "Terminate button label"

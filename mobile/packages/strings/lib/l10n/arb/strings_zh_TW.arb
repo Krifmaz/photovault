@@ -1526,7 +1526,6 @@
   "localBackupSidebarTitle": "本機備份",
   "localGallery": "本地相簿",
   "localIndexing": "本機處理",
-  "localSyncErrorMessage": "本機照片同步所花時間比預期長，似乎出了問題。請聯絡我們的客服支援團隊",
   "location": "位置",
   "locationName": "地點名稱",
   "locationPickerTip": "您也可以從照片的資訊畫面中，新增以相片為中心的位置",
@@ -2051,7 +2050,6 @@
   "playStream": "播放串流",
   "pleaseCheckPasswordAndTryAgain": "請檢查您的密碼並重試。",
   "pleaseContactSupportAndWeWillBeHappyToHelp": "請聯絡 support@ente.com，我們將樂意協助！",
-  "pleaseContactSupportIfTheProblemPersists": "如果問題持續存在，請聯絡客服支援",
   "pleaseEmailUsAt": "請寄信到 {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3386,7 +3384,6 @@
   },
   "yourMap": "您的地圖",
   "yourPhotosLookUnique": "您的照片看起來都很獨特",
-  "yourPlanSupportsFamily": "您的方案已支援家庭功能",
   "yourPlanWasSuccessfullyDowngraded": "您的方案已成功降級",
   "yourPlanWasSuccessfullyUpgraded": "您的方案已成功升級",
   "yourPurchaseWasSuccessful": "您的購買已成功",
