@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Memories and machine learning settings (contract v1.2). Kept apart from strings.xml so tracks merge cleanly. -->
+<resources>
+    <!-- Memories -->
+    <string name="memory_close">Close</string>
+    <string name="memory_open_photo">Open photo</string>
+
+    <!-- Machine learning settings -->
+    <string name="timeline_ml_settings">Machine learning</string>
+    <string name="ml_settings_title">Machine learning</string>
+    <string name="ml_settings_enable">Machine learning</string>
+    <string name="ml_settings_enable_body">Faces and magic search</string>
+    <string name="ml_settings_privacy">Everything runs on this phone and on your own server. Photos, faces and search data stay end-to-end encrypted and are never sent anywhere else. The setting is shared with your other devices.</string>
+    <string name="ml_settings_switch_failed">Couldn\'t change the setting: %1$s</string>
+    <string name="ml_settings_status">Status</string>
+    <string name="ml_settings_indexing">Indexing</string>
+    <string name="ml_settings_charging">Index only while charging</string>
+    <string name="ml_settings_charging_body">Photos are indexed in the background when the battery isn\'t low. The models download over Wi-Fi.</string>
+    <string name="ml_status_waiting">Waiting to start. Indexing begins after the next sync.</string>
+    <string name="ml_status_no_inference">This build can\'t run the models on this phone. Faces and search results from your other devices still show up here.</string>
+    <string name="ml_status_models">Downloading models: %1$d of %2$d MB</string>
+    <string name="ml_status_indexed">Indexed %1$d of %2$d photos</string>
+    <string name="ml_status_running">Indexing now…</string>
+    <string name="ml_status_error">Last problem: %1$s</string>
+</resources>

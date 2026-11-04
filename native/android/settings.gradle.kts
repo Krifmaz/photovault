@@ -12,6 +12,22 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Ente's ONNX Runtime build (WebGPU + XNNPACK) for ente-ml, exactly as Ente's photos app gets it
+        // (mobile/apps/photos/android/app/build.gradle): a plain GitHub release, so only this group may come from
+        // it and its SHA-256 is pinned in gradle/verification-metadata.xml.
+        exclusiveContent {
+            forRepository {
+                ivy {
+                    name = "enteOnnxRuntimePackaging"
+                    url = uri("https://github.com/ente/ort-packaging/releases/download")
+                    patternLayout {
+                        artifact("ort-[revision]/[artifact]-[revision].[ext]")
+                    }
+                    metadataSources { artifact() }
+                }
+            }
+            filter { includeGroup("io.ente.onnxruntime") }
+        }
     }
 }
 

@@ -42,6 +42,9 @@ sealed interface GridEntry {
 object GridContentType {
     const val HEADER = 0
     const val CELL = 1
+
+    /** The memories strip, the grid's first full-span item when there are memories (before entry 0). */
+    const val MEMORIES = 2
 }
 
 /** The grid at one zoom level. [entryIndexOfTimeline] maps a timeline index to its entry index. */

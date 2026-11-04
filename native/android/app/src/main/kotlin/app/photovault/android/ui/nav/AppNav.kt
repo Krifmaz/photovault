@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -17,6 +18,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import app.photovault.android.AppGraph
 import app.photovault.android.BuildConfig
+import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.ml.MlPrefs
+import app.photovault.android.data.ml.MlWork
+import app.photovault.android.ui.memories.AfterSync
+import app.photovault.android.ui.memories.MemoriesViewModel
+import app.photovault.android.ui.memories.MemoryStoryScreen
+import app.photovault.android.ui.memories.MemoryStoryViewModel
+import app.photovault.android.ui.memories.MemoryViewerSource
+import app.photovault.android.ui.memories.memoryFeed
+import app.photovault.android.ui.settings.MlSettingsScreen
+import app.photovault.android.ui.settings.MlSettingsViewModel
 import app.photovault.android.ui.connect.ConnectScreen
 import app.photovault.android.ui.connect.ConnectViewModel
 import app.photovault.android.ui.connect.QrScanScreen
@@ -31,6 +43,7 @@ import app.photovault.android.ui.timeline.TimelineScreen
 import app.photovault.android.ui.timeline.TimelineViewModel
 import app.photovault.android.ui.viewer.ViewerScreen
 import app.photovault.android.ui.viewer.ViewerViewModel
+import java.io.File
 
 /**
  * Where the app opens: the timeline when signed in to the active server, sign-in when a server is chosen,
@@ -124,6 +137,12 @@ fun AppNav(graph: AppGraph, start: Any) {
                     val vm = viewModel {
                         TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels(), clearDecrypted = graph::clearDecrypted)
                     }
+                    val memories = viewModel { MemoriesViewModel(graph.memoryFeed()) }
+                    val context = LocalContext.current
+                    AfterSync(vm.status) {
+                        memories.refresh()
+                        MlWork.scheduler(context).afterSync()
+                    }
                     val handle = entry.savedStateHandle
                     val returned = remember(handle) { handle.getStateFlow<Int?>(NavResults.VIEWER_INDEX, null) }
                     CompositionLocalProvider(LocalNavAnimatedScope provides this) {
@@ -134,8 +153,55 @@ fun AppNav(graph: AppGraph, start: Any) {
                             onOpen = { index, fileId -> nav.navigate(ViewerRoute(index, fileId)) },
                             onSignedOut = { nav.navigateClearing(AuthGraph) },
                             onSwitchServer = { nav.navigate(ConnectRoute) },
+                            memories = memories.memories,
+                            onOpenMemory = { nav.navigate(MemoryRoute(it.id)) },
+                            onOpenMlSettings = { nav.navigate(MlSettingsRoute) },
                         )
                     }
+                }
+                composable<MemoryRoute> { entry ->
+                    val route = entry.toRoute<MemoryRoute>()
+                    val vm = viewModel {
+                        // next to the viewer's cache (app-private cacheDir); created by the view model on IO
+                        val cacheDir = File(graph.viewerCache.parentFile, "memories")
+                        MemoryStoryViewModel(graph.memoryFeed(), graph.core, cacheDir, route.memoryId, route.index, cleanupScope = graph.appScope)
+                    }
+                    val handle = entry.savedStateHandle
+                    val returned = remember(handle) { handle.getStateFlow<Int?>(NavResults.MEMORY_INDEX, null) }
+                    CompositionLocalProvider(LocalNavAnimatedScope provides this) {
+                        MemoryStoryScreen(
+                            vm = vm,
+                            returnIndex = returned,
+                            onReturnConsumed = { handle[NavResults.MEMORY_INDEX] = null },
+                            onClose = { nav.popBackStack<MemoryRoute>(inclusive = true) },
+                            onOpenPhoto = { id, index, fileId -> nav.navigate(MemoryViewerRoute(id, index, fileId)) },
+                        )
+                    }
+                }
+                composable<MemoryViewerRoute> { entry ->
+                    val route = entry.toRoute<MemoryViewerRoute>()
+                    val vm = viewModel {
+                        val feed = graph.memoryFeed()
+                        val source = MemoryViewerSource(graph.core) { feed.findBlocking(route.memoryId)?.items.orEmpty() }
+                        ViewerViewModel(source, TimelineStore(source), graph.viewerCache, cleanupScope = graph.appScope, startIndex = route.index)
+                    }
+                    CompositionLocalProvider(LocalNavAnimatedScope provides this) {
+                        ViewerScreen(
+                            vm = vm,
+                            startIndex = route.index,
+                            onClose = { index ->
+                                nav.previousBackStackEntry?.savedStateHandle?.set(NavResults.MEMORY_INDEX, index)
+                                nav.popBackStack()
+                            },
+                        )
+                    }
+                }
+                composable<MlSettingsRoute> {
+                    val context = LocalContext.current
+                    val vm = viewModel {
+                        MlSettingsViewModel(graph.ml, MlPrefs(context), MlWork.scheduler(context))
+                    }
+                    MlSettingsScreen(vm, onBack = { nav.popBackStack() })
                 }
                 composable<ViewerRoute> { entry ->
                     val route = entry.toRoute<ViewerRoute>()

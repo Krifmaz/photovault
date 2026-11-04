@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -53,6 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -75,6 +77,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.photovault.android.R
 import app.photovault.android.data.FileKind
+import app.photovault.android.data.ml.Memory
+import app.photovault.android.ui.memories.MemoriesRow
 import app.photovault.android.ui.image.Thumb
 import app.photovault.android.ui.nav.sharedPhoto
 import app.photovault.android.ui.theme.EncoreRadius
@@ -85,6 +89,8 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.size.Scale
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -98,6 +104,10 @@ fun TimelineScreen(
     onOpen: (index: Int, fileId: Long) -> Unit,
     onSignedOut: () -> Unit,
     onSwitchServer: () -> Unit,
+    /** Today's memories, shown as a strip above the grid when not empty. */
+    memories: StateFlow<List<Memory>>? = null,
+    onOpenMemory: (Memory) -> Unit = {},
+    onOpenMlSettings: (() -> Unit)? = null,
 ) {
     val signedOut by rememberUpdatedState(onSignedOut)
     val switchServer by rememberUpdatedState(onSwitchServer)
@@ -111,6 +121,9 @@ fun TimelineScreen(
     }
     val gridState = rememberLazyGridState()
     val zoom = remember { GridZoomState() }
+    val memoryList by (memories ?: NoMemories).collectAsStateWithLifecycle()
+    // grid item index = entry index + lead (the memories strip comes first)
+    val lead by rememberUpdatedState(if (memoryList.isEmpty()) 0 else 1)
 
     // Back from the viewer: make sure the photo it ended on is on screen.
     LaunchedEffect(returnIndex) {
@@ -118,7 +131,7 @@ fun TimelineScreen(
             if (index == null) return@collect
             onReturnConsumed()
             val model = vm.grid.value
-            val entry = model.entryIndexOfTimeline.getOrNull(index) ?: return@collect
+            val entry = (model.entryIndexOfTimeline.getOrNull(index) ?: return@collect) + lead
             val visible = gridState.layoutInfo.visibleItemsInfo
             val first = visible.firstOrNull()?.index ?: 0
             val last = visible.lastOrNull()?.index ?: 0
@@ -128,10 +141,10 @@ fun TimelineScreen(
 
     Scaffold(
         containerColor = MaterialTheme.palette.bg,
-        topBar = { TimelineTopBar(vm, gridState) },
+        topBar = { TimelineTopBar(vm, gridState, onOpenMlSettings) },
     ) { padding ->
         RefreshBox(vm) {
-            PhotoGrid(vm, gridState, zoom, padding, onOpen)
+            PhotoGrid(vm, gridState, zoom, padding, onOpen, memoryList, onOpenMemory)
             StatusOverlay(vm, Modifier.padding(padding))
         }
     }
@@ -150,7 +163,7 @@ private fun RefreshBox(vm: TimelineViewModel, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
+private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState, onOpenMlSettings: (() -> Unit)?) {
     val status by vm.status.collectAsStateWithLifecycle()
     val p = MaterialTheme.palette
     var menu by remember { mutableStateOf(false) }
@@ -197,6 +210,13 @@ private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
                         leadingIcon = { Icon(painterResource(R.drawable.ic_refresh), contentDescription = null) },
                         onClick = { menu = false; vm.sync() },
                     )
+                    if (onOpenMlSettings != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.timeline_ml_settings)) },
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_ml_settings), contentDescription = null) },
+                            onClick = { menu = false; onOpenMlSettings() },
+                        )
+                    }
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.timeline_switch_server)) },
                         leadingIcon = { Icon(painterResource(R.drawable.ic_server), contentDescription = null) },
@@ -262,8 +282,20 @@ private fun PhotoGrid(
     zoom: GridZoomState,
     contentPadding: PaddingValues,
     onOpen: (Int, Long) -> Unit,
+    memoryList: List<Memory>,
+    onOpenMemory: (Memory) -> Unit,
 ) {
     val model by vm.grid.collectAsStateWithLifecycle()
+    val leadCount = if (memoryList.isEmpty()) 0 else 1
+    val lead by rememberUpdatedState(leadCount)
+    // The strip appearing above the first row would otherwise sit above the viewport (the grid keeps its
+    // first visible item); at the top, show it. Read without observation: no recomposition on scroll.
+    val shownLead = remember { intArrayOf(0) }
+    if (shownLead[0] != leadCount) {
+        val atTop = Snapshot.withoutReadObservation { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
+        if (leadCount == 1 && atTop) gridState.requestScrollToItem(0)
+        shownLead[0] = leadCount
+    }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val p = MaterialTheme.palette
@@ -279,7 +311,7 @@ private fun PhotoGrid(
         val top = info.beforeContentPadding
         val wantTop = zoom.pivot.y - zoom.anchorFraction * cellHeight
         // scrollToItem puts the anchor's row at the top; then move it down to where the fingers are
-        gridState.scrollToItem(entry)
+        gridState.scrollToItem(entry + lead)
         if (wantTop > top) gridState.scrollBy(-(wantTop - top))
     }
 
@@ -287,7 +319,7 @@ private fun PhotoGrid(
     LaunchedEffect(gridState, vm) {
         val loader = SingletonImageLoader.get(context)
         val prefetched = LinkedHashSet<Long>()
-        snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
+        snapshotFlow { (gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1) - lead }
             .distinctUntilChanged()
             .collect { last ->
                 if (last < 0) return@collect
@@ -347,7 +379,7 @@ private fun PhotoGrid(
                                         zoom.pivot.y >= it.offset.y && zoom.pivot.y < it.offset.y + it.size.height &&
                                         zoom.pivot.x >= it.offset.x && zoom.pivot.x < it.offset.x + it.size.width
                                 }
-                                val entry = cell?.let { vm.grid.value.entries.getOrNull(it.index) as? GridEntry.Cell }
+                                val entry = cell?.let { vm.grid.value.entries.getOrNull(it.index - lead) as? GridEntry.Cell }
                                 if (cell != null && entry != null) {
                                     zoom.anchorTimelineIndex = entry.timelineIndex
                                     zoom.anchorFraction = (zoom.pivot.y - cell.offset.y) / cell.size.height.coerceAtLeast(1)
@@ -394,6 +426,11 @@ private fun PhotoGrid(
             contentPadding = contentPadding,
             modifier = Modifier.fillMaxSize().testTag("timeline_grid"),
         ) {
+            if (memoryList.isNotEmpty()) {
+                item(key = MEMORIES_KEY, span = { GridItemSpan(maxLineSpan) }, contentType = GridContentType.MEMORIES) {
+                    MemoriesRow(memoryList, onOpenMemory)
+                }
+            }
             var i = 0
             while (i < entries.size) {
                 val header = entries[i] as? GridEntry.Header
@@ -424,6 +461,8 @@ private fun PhotoGrid(
 }
 
 private const val PREFETCH_ROWS = 6
+private const val MEMORIES_KEY = "memories"
+private val NoMemories: StateFlow<List<Memory>> = MutableStateFlow(emptyList())
 private const val PREFETCH_MEMORY = 1500
 
 @Composable
