@@ -28,12 +28,16 @@ on:
             - "rust/**"
             - ".github/workflows/photovault-mobile.yml"
     workflow_dispatch:
+    # release.yml attaches the APK to every release
+    workflow_call:
 
 permissions:
     contents: read
 
 concurrency:
-    group: photovault-mobile-${{ github.ref }}
+    # github.workflow is the caller's name when release.yml calls this, so the
+    # release build and a push build of the same ref never cancel each other.
+    group: ${{ github.workflow }}-photovault-mobile-${{ github.ref }}
     cancel-in-progress: true
 
 env:

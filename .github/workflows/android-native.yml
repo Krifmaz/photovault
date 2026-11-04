@@ -27,7 +27,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-native-${{ github.ref }}
+  # github.workflow is the caller's name when release.yml calls this, so the
+  # release build and a push build of the same ref never cancel each other.
+  group: ${{ github.workflow }}-android-native-${{ github.ref }}
   cancel-in-progress: true
 
 env:

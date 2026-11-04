@@ -1,8 +1,8 @@
 # Tags and publishes a GitHub Release automatically.
 #
-#   push to main            -> stable release vX.Y.Z, image :X.Y.Z, :X.Y, :latest
-#   push to default branch  -> pre-release vX.Y.Z-alpha.N, image :X.Y.Z-alpha.N, :edge
-#                              (while the default branch is not main)
+# Every push to the default branch (or main) is a normal release, like Encore's
+# hotfixes: plain vX.Y.Z (patch +1 each push), marked Latest, image :X.Y.Z,
+# :X.Y and :latest. No pre-releases.
 #
 #   1. test     cargo test for the whole workspace
 #   2. version  next tag from .github/release/next-version.sh
@@ -10,7 +10,9 @@
 #      web      (alongside build) the web apps' static export (photos, albums, cast, accounts,
 #               embed) with web/scripts/photovault-build.sh, as photovault-web CI
 #   4. image    ghcr.io/<owner>/photovault (amd64 + arm64): server + web apps
-#   5. release  creates the tag and the GitHub Release with archives + SHA256SUMS
+#      apks     (alongside build) both Android APKs: Photos (photovault-mobile.yml)
+#               and Photovault Native (android-native.yml)
+#   5. release  creates the tag and the GitHub Release with archives, APKs + SHA256SUMS
 #
 # The tag is only pushed once everything above succeeded. Pushes that only
 # touch docs are ignored; put [skip ci] in a commit message to skip one.
@@ -61,7 +63,6 @@ jobs:
       tag: ${{ steps.next.outputs.tag }}
       version: ${{ steps.next.outputs.version }}
       skip: ${{ steps.next.outputs.skip }}
-      prerelease: ${{ steps.next.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -70,23 +71,17 @@ jobs:
         env:
           BUMP: ${{ inputs.bump || 'patch' }}
         run: |
-          if [ "$GITHUB_REF" = refs/heads/main ]; then
-            label=""; pattern='^v[0-9]+\.[0-9]+\.[0-9]+$'; prerelease=false
-          else
-            label=alpha; pattern='^v[0-9]'; prerelease=true
-          fi
-          done=$(git tag --points-at HEAD | grep -E "$pattern" || true)
+          done=$(git tag --points-at HEAD | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true)
           if [ -n "$done" ]; then
             echo "HEAD is already released as $done"
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          tag=$(.github/release/next-version.sh "$BUMP" $label)
+          tag=$(.github/release/next-version.sh "$BUMP")
           echo "Next release: $tag"
           {
             echo "tag=$tag"
             echo "version=${tag#v}"
-            echo "prerelease=$prerelease"
             echo "skip=false"
           } >> "$GITHUB_OUTPUT"
 
@@ -223,6 +218,18 @@ jobs:
           path: dist/*.tar.gz
           if-no-files-found: error
 
+  apk-photos:
+    needs: version
+    if: needs.version.outputs.skip == 'false'
+    uses: ./.github/workflows/photovault-mobile.yml
+    secrets: inherit
+
+  apk-native:
+    needs: version
+    if: needs.version.outputs.skip == 'false'
+    uses: ./.github/workflows/android-native.yml
+    secrets: inherit
+
   image:
     needs: [test, version, build, web]
     runs-on: ubuntu-24.04
@@ -260,8 +267,7 @@ jobs:
           tags: |
             type=semver,pattern={{version}},value=${{ needs.version.outputs.tag }}
             type=semver,pattern={{major}}.{{minor}},value=${{ needs.version.outputs.tag }}
-            type=raw,value=latest,enable=${{ needs.version.outputs.prerelease == 'false' }}
-            type=raw,value=edge,enable=${{ needs.version.outputs.prerelease == 'true' }}
+            type=raw,value=latest
       - uses: docker/build-push-action@v7
         with:
           context: .github/release
@@ -272,7 +278,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   release:
-    needs: [version, build, web, image]
+    needs: [version, build, web, image, apk-photos, apk-native]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -282,19 +288,38 @@ jobs:
           pattern: dist-*
           path: dist
           merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: photovault-android-arm64-*
+          path: apk/photos
+          merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          name: photovault-native-apk
+          path: apk/native
+      - name: APKs
+        env:
+          TAG: ${{ needs.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # photovault-arm64-release.apk (or -debugsigned without the signing secrets)
+          for f in apk/photos/*.apk; do
+            b=$(basename "$f"); mv "$f" "dist/photovault-photos-$TAG-${b#photovault-}"
+          done
+          for f in apk/native/*.apk; do
+            b=$(basename "$f" .apk); mv "$f" "dist/photovault-native-$TAG-${b#app-}.apk"
+          done
+          ls dist/*photos*.apk dist/*native*.apk
       - name: Checksums
-        run: cd dist && sha256sum *.tar.gz > SHA256SUMS
+        run: cd dist && sha256sum * > SHA256SUMS
       - name: Tag and publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.version.outputs.tag }}
-          PRERELEASE: ${{ needs.version.outputs.prerelease }}
         run: |
-          flags=()
-          if [ "$PRERELEASE" = true ]; then flags+=(--prerelease --latest=false); fi
           gh release create "$TAG" dist/* \
             --repo "${{ github.repository }}" \
             --target "${{ github.sha }}" \
             --title "Photovault $TAG" \
-            --generate-notes "${flags[@]}" \
+            --generate-notes --latest \
             --notes "Docker image: \`${IMAGE,,}:${{ needs.version.outputs.version }}\`"
