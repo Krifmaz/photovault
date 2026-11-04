@@ -586,8 +586,13 @@ pub async fn can_upload(state: &AppState, user_id: i64, size: Option<i64>) -> Ap
     };
     let sub = subscription(db, admin).await?;
     let bonus = active_bonus(db, admin).await?;
+    // `storage_quota = 0` is "no quota": only the backend's free space limits uploads.
     let mut sub_storage = if sub.expiry_time > now_micros() {
-        sub.storage
+        if sub.storage > 0 {
+            sub.storage
+        } else {
+            i64::MAX / 4
+        }
     } else {
         if bonus.max_expiry() <= 0 {
             return Err(no_active_subscription());
@@ -608,6 +613,12 @@ pub async fn can_upload(state: &AppState, user_id: i64, size: Option<i64>) -> Ap
             return Err(storage_limit_exceeded());
         }
     }
+    // The backend must have room for the upload itself (no overflow allowance on disk).
+    if let (Some(s), Some(free)) = (size, crate::capacity::free_bytes(state).await?)
+        && s > free
+    {
+        return Err(storage_limit_exceeded());
+    }
     Ok(())
 }
 
@@ -623,7 +634,7 @@ pub async fn storage_limit(state: &AppState, user_id: i64) -> ApiResult<i64> {
     let admin = fam.and_then(|f| f.0).unwrap_or(user_id);
     let sub = subscription(db, admin).await?;
     let plan = if sub.expiry_time > now_micros() {
-        sub.storage
+        crate::capacity::effective_limit(state, admin, sub.storage).await?
     } else {
         0
     };

@@ -1,0 +1,67 @@
+# Photovault with PostgreSQL instead of SQLite. Optional: SQLite (compose.yaml)
+# is the default and is enough for a family. Use this for many active users,
+# or if you already run Postgres.
+#
+# Set POSTGRES_PASSWORD in a .env file next to this file or in Portainer's
+# "Environment variables" (see deploy/.env.example).
+#
+#   mkdir -p /drivepool/photovault /opt/photovault/config /opt/photovault/postgres
+#   chown -R 65532:65532 /drivepool/photovault /opt/photovault/config
+#
+# Moving to SQLite later (one time, keeps every account and photo):
+#   docker compose -f compose.postgres.yaml stop photovault
+#   docker compose -f compose.postgres.yaml run --rm photovault \
+#     migrate-to-sqlite --from postgres://photovault:PASSWORD@db:5432/photovault
+# This writes /config/photovault.db and, if keys.toml is missing, saves the keys
+# from the environment into /config/keys.toml. Then remove PHOTOVAULT_DATABASE_URL,
+# the PHOTOVAULT_*_KEY/SECRET lines, depends_on and the db service, and start again.
+# See docs/src/deployment.md.
+name: photovault
+services:
+  photovault:
+    image: ghcr.io/krifmaz/photovault:edge
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy    # wait until Postgres accepts connections
+    ports:
+      - "8095:8080"
+    environment:
+      PHOTOVAULT_PUBLIC_URL: http://10.0.1.7:8095
+      # Use Postgres instead of /config/photovault.db.
+      PHOTOVAULT_DATABASE_URL: postgres://photovault:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/photovault
+      # Keys are kept in /config/keys.toml (created on first start). An older install
+      # that set them here keeps them here: environment values win over keys.toml.
+      # PHOTOVAULT_JWT_SECRET: ${PHOTOVAULT_JWT_SECRET}
+      # PHOTOVAULT_ENCRYPTION_KEY: ${PHOTOVAULT_ENCRYPTION_KEY}
+      # PHOTOVAULT_HASHING_KEY: ${PHOTOVAULT_HASHING_KEY}
+    volumes:
+      - /drivepool/photovault:/data          # encrypted photos
+      - /opt/photovault/config:/config       # keys.toml (and photovault.db after a move)
+    networks:
+      - internal
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: photovault
+      POSTGRES_DB: photovault
+      # Read only when the data folder is empty; changing it later needs ALTER USER.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - /opt/photovault/postgres:/var/lib/postgresql/data   # local disk, not mergerfs
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U photovault -d photovault"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    shm_size: 128m
+
+networks:
+  internal: {}

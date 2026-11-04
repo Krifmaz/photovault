@@ -8,24 +8,31 @@
 
 pub mod admin_cli;
 pub mod auth;
+pub mod capacity;
 pub mod config;
 pub mod crypto;
 pub mod db;
+pub mod discovery;
 pub mod entities;
 pub mod error;
 pub mod gojson;
 pub mod jwt;
+pub mod keyfile;
 pub mod legacy;
 pub mod library;
 pub mod mail;
 pub mod metrics;
+pub mod migrate_db;
+pub mod preflight;
 pub mod public;
 pub mod routes;
+pub mod settings;
 pub mod social;
 pub mod state;
 pub mod storage;
 pub mod testing;
 pub mod users;
+pub mod web;
 
 use axum::Router;
 use axum::extract::{MatchedPath, Request};
@@ -43,8 +50,9 @@ pub fn app(state: AppState) -> Router {
     // museum's CORS: any origin, any request headers (the apps send X-Auth-Token,
     // X-Client-Package, Content-MD5, …), and ETag exposed so the web app can read
     // multipart part ETags from `/storage/*` PUTs. No credentials: auth is a header.
+    // `PHOTOVAULT_WEB_ORIGINS` narrows that to the listed web app origins.
     let cors = CorsLayer::new()
-        .allow_origin(AllowOrigin::mirror_request())
+        .allow_origin(allowed_origins(&state.config.web_origins))
         .allow_methods([
             Method::GET,
             Method::HEAD,
@@ -65,13 +73,65 @@ pub fn app(state: AppState) -> Router {
             HeaderName::from_static("x-link-device-token"),
         ])
         .max_age(std::time::Duration::from_secs(86400));
-    routes::api(&state)
+    let mut router = routes::api(&state);
+    if let Some(dir) = state
+        .config
+        .web_dir
+        .clone()
+        .filter(|d| d.join("index.html").is_file())
+    {
+        router = router.fallback(move |req: Request| web::serve(dir.clone(), req));
+    }
+    router
         .layer(axum::middleware::from_fn(gojson::middleware))
         .layer(axum::middleware::from_fn_with_state(state.clone(), observe))
         .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
         .layer(SetRequestIdLayer::new(x_request_id, MakeRequestUuid))
         .layer(cors)
         .with_state(state)
+}
+
+/// CORS origins: the configured list (plus any origin for `/photovault/info`, which
+/// the apps' connect screens call from anywhere), or any origin when the list is empty.
+fn allowed_origins(origins: &[String]) -> AllowOrigin {
+    if origins.is_empty() {
+        return AllowOrigin::mirror_request();
+    }
+    let list: Vec<axum::http::HeaderValue> = origins
+        .iter()
+        .filter_map(|o| match axum::http::HeaderValue::from_str(o) {
+            Ok(v) => Some(v),
+            Err(_) => {
+                tracing::warn!("ignoring invalid entry in PHOTOVAULT_WEB_ORIGINS: {o}");
+                None
+            }
+        })
+        .collect();
+    AllowOrigin::predicate(move |origin, parts| {
+        parts.uri.path() == "/photovault/info" || list.iter().any(|o| o == origin)
+    })
+}
+
+/// Resolve on Ctrl-C or SIGTERM (what `docker stop` sends).
+pub async fn shutdown_signal() {
+    let ctrl_c = async {
+        let _ = tokio::signal::ctrl_c().await;
+    };
+    #[cfg(unix)]
+    let term = async {
+        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+            Ok(mut s) => {
+                s.recv().await;
+            }
+            Err(_) => std::future::pending::<()>().await,
+        }
+    };
+    #[cfg(not(unix))]
+    let term = std::future::pending::<()>();
+    tokio::select! {
+        () = ctrl_c => {},
+        () = term => {},
+    }
 }
 
 /// Structured access log + Prometheus metrics, labelled by route template (never the raw path).
@@ -107,6 +167,12 @@ async fn observe(
         .http_latency
         .get_or_create(&labels)
         .observe(secs);
-    tracing::info!(target: "access", method = %method, route = %route, status, latency_ms = secs * 1000.0, req_id = %req_id);
+    let ms = (secs * 10_000.0).round() / 10.0;
+    // Docker's health probe every 30 s would drown the log at info level.
+    if route == "/healthz" && status == 200 {
+        tracing::debug!(target: "access", req_id = %req_id, "{method} {route} {status} {ms} ms");
+    } else {
+        tracing::info!(target: "access", req_id = %req_id, "{method} {route} {status} {ms} ms");
+    }
     res
 }

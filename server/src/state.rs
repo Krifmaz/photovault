@@ -42,6 +42,8 @@ pub struct Inner {
     pub keys: Keys,
     /// Prometheus metrics.
     pub metrics: Metrics,
+    /// Cached free space of the storage backend.
+    pub capacity: crate::capacity::Cache,
 }
 
 impl std::ops::Deref for AppState {
@@ -90,5 +92,6 @@ pub async fn build_state(config: Config) -> anyhow::Result<AppState> {
         local_store,
         keys,
         metrics: Default::default(),
+        capacity: Default::default(),
     })))
 }

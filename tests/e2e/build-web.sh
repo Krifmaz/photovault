@@ -60,7 +60,7 @@ binaryen_dir="$cache/tools/binaryen-$binaryen_ver"
 if ! command -v wasm-opt >/dev/null 2>&1; then
     if [[ ! -x "$binaryen_dir/bin/wasm-opt" ]]; then
         mkdir -p "$cache/tools"
-        curl -fsSL -o "$cache/tools/binaryen.tgz" \
+        curl -fsSL --retry 5 --retry-all-errors -o "$cache/tools/binaryen.tgz" \
             "https://github.com/WebAssembly/binaryen/releases/download/$binaryen_ver/binaryen-$binaryen_ver-x86_64-linux.tar.gz"
         tar -xzf "$cache/tools/binaryen.tgz" -C "$cache/tools"
         rm -f "$cache/tools/binaryen.tgz"
