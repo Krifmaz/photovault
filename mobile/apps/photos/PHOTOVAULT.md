@@ -386,6 +386,14 @@ not ship):
 - `../../packages/ente_components/example/lib/main.dart`: sample link uses
   example.com.
 
+### Ente logos in shared packages
+
+- `packages/ente_components/assets/ente_wordmark.svg` and the Ente Auth and
+  Locker logos in `assets/apps/` are deleted and dropped from its
+  `pubspec.yaml`, so they are not bundled in the APK. `assets/apps/photos.png`
+  (the account-deletion summary row) is the Photovault icon at 1x/2x/3x.
+  The More-from-Ente section that drew the wordmark is not used by Photos.
+
 ### Mascot
 
 - `assets/photovault_glyph.svg` and `lib/ui/photovault/photovault_glyph.dart`

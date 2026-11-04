@@ -625,11 +625,25 @@ line = "^https://api\\.ente\\.(com|io)$"
 category = "upstream-only-app-not-built"
 reason = "packages/configuration kDefault/kLegacyProductionEndpoint (BaseConfiguration default of Ente Auth/Locker); Photos uses its own EndpointConfig."
 [[allow]]
-path = "apk:res/xml/network_security_config.xml"
+# Resource shrinking renames res files (seen as res/8G.xml), so match any
+# res/*.xml; the line rule keeps it to the two bare domain names.
+path = ["apk:res/xml/network_security_config.xml", "apk:res/*.xml"]
 term = ["ente.io", "ente.com"]
 line = "^ente\\.(io|com)$"
 category = "inert-config"
 reason = "Compiled network_security_config.xml: upstream rule forcing TLS for Ente domains; makes no request."
+[[allow]]
+path = "apk:lib/*/libapp.so"
+term = "ente.com"
+line = "^ente\\.common\\.EVector&?$"
+category = "internal-identifier"
+reason = "Protobuf package name ente.common (lib/generated/protos/ente/common/vector.pb.dart); \"ente.com\" matches the start of \"ente.common\". Not a host, never shown."
+[[allow]]
+path = "apk:assets/flutter_assets/packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html"
+term = "duck"
+line = "function Runner\\(outerContainerId"
+category = "third-party-data"
+reason = "flutter_inappwebview's bundled offline T-Rex runner game (DUCKING sprite state); not the Ente mascot and never opened by Photovault."
 [[allow]]
 path = "apk:AndroidManifest.xml"
 term = "ente"

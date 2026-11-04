@@ -330,6 +330,26 @@ jobs:
               run: cargo codegen frb photos
               working-directory: rust
 
+            # numkong 7.8.6 (via usearch) forward-declares
+            # `extern "C" long syscall(long, ...) noexcept;` on Linux x86_64,
+            # which clashes with Android bionic's unistd.h (no noexcept) and
+            # stops the x86_64 Android build. arm64 never takes that branch.
+            # Drop the noexcept in the fetched copy, for this emulator-only
+            # debug build; the release APK job is untouched.
+            - name: Patch numkong header for Android x86_64
+              shell: bash
+              working-directory: .
+              run: |
+                  set -euo pipefail
+                  cargo fetch --manifest-path rust/bindings/frb/photos/Cargo.toml
+                  shopt -s nullglob
+                  hits=("$HOME"/.cargo/registry/src/*/numkong-*/include/numkong/capabilities.h)
+                  [ ${#hits[@]} -gt 0 ] || { echo "numkong header not found"; exit 1; }
+                  for f in "${hits[@]}"; do
+                      sed -i 's/^extern "C" long syscall(long, \.\.\.) noexcept;$/extern "C" long syscall(long, ...);/' "$f"
+                      grep -n 'long syscall' "$f"
+                  done
+
             - name: Build x86_64 debug APK
               shell: bash
               run: |
