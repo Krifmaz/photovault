@@ -42,7 +42,7 @@ pub(super) async fn setup(State(state): State<AppState>, user: AuthUser) -> ApiR
         .bind(now + login::TWO_FACTOR_VALIDITY)
         .execute(&state.db.pool)
         .await?;
-    let png = totp::qr_png(&totp::uri("ente", &u.email, &secret), 200)
+    let png = totp::qr_png(&totp::uri("Photovault", &u.email, &secret), 200)
         .ok_or_else(|| ApiError::internal("QR encoding failed"))?;
     Ok(Json(json!({ "secretCode": secret, "qrCode": b64(&png) })))
 }

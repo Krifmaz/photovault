@@ -118,9 +118,11 @@ async fn full_account_flow() {
     assert_eq!(v["email"], email);
     assert_eq!(v["usage"], 0);
     assert_eq!(v["subscription"]["productID"], "free");
-    assert_eq!(
-        v["subscription"]["storage"],
-        srv.state.config.default_storage_bytes
+    // Real numbers: no quota by default, so the limit is used + free disk space.
+    let storage = v["subscription"]["storage"].as_i64().unwrap();
+    assert!(
+        storage > 0 && storage != photovault_server::capacity::UNLIMITED,
+        "{v}"
     );
     assert_eq!(v["profileData"]["canDisableEmailMFA"], true);
     assert_eq!(v["profileData"]["isTwoFactorEnabled"], false);

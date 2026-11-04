@@ -1,98 +1,164 @@
 # Configuration
 
-Photovault reads an optional TOML file (`--config /path/photovault.toml` or
-`PHOTOVAULT_CONFIG`), then applies `PHOTOVAULT_*` environment variables on
-top. Everything has a default, so a container can run on environment
-variables alone. A commented example is in
+Photovault is configured with environment variables. `PHOTOVAULT_PUBLIC_URL`
+is the only one you must set; everything else has a default.
+
+An optional TOML file (`--config /path/photovault.toml` or
+`PHOTOVAULT_CONFIG`) takes the same settings. A commented example is in
 [`deploy/photovault.example.toml`](https://github.com/Krifmaz/photovault/blob/main/deploy/photovault.example.toml).
 
-> Sections added by other parts of the server (mail templates, push, limits…)
-> are documented next to the feature; this page lists the core keys.
+## Precedence
 
-## Top level
+For each setting the first of these that is set wins:
 
-| Key | Env | Default | Meaning |
-| --- | --- | --- | --- |
-| `listen` | `PHOTOVAULT_LISTEN` | `0.0.0.0:8080` | Address the HTTP API binds to. |
-| `public_url` | `PHOTOVAULT_PUBLIC_URL` | `http://localhost:8080` | API URL as the apps see it, e.g. `https://photos.example.com`. Enter this as the server endpoint in the apps. |
-| `database_url` | `PHOTOVAULT_DATABASE_URL` | `sqlite://photovault.sqlite?mode=rwc` | `postgres://user:pass@host/db` or `sqlite:///absolute/path.sqlite?mode=rwc`. |
-| `default_storage_bytes` | – | 100 TiB | Quota for new accounts (museum's self-hosted default). |
-| `admins` | `PHOTOVAULT_ADMINS` (comma separated) | `[]` | User IDs allowed to call `/admin/*`. |
-| `allow_signups` | `PHOTOVAULT_ALLOW_SIGNUPS` (`true`/`1`) | `true` | When false, only the admin CLI creates accounts. |
-| `hardcoded_ott` | – | `{}` | Fixed one-time codes per email (`"me@example.com" = "123456"`), like museum's `internal.hardcoded-ott`. For testing. |
-| `log_format` | `PHOTOVAULT_LOG_FORMAT` | `json` | `json` (one object per line) or `pretty`. Filter with `RUST_LOG` (default `info`). |
+1. environment variable (`PHOTOVAULT_*`);
+2. the `--config` TOML file;
+3. `/config/keys.toml` (only the three keys);
+4. the default.
 
-## `[secrets]`
+An empty environment variable counts as unset.
 
-All values are standard base64. **Set them in production.** If one is empty a
-random value is generated at start-up, which is fine for a test run but means
-every restart logs everyone out and — for `encryption`/`hashing` — makes stored
-email addresses unreadable.
+## Environment variables
 
-| Key | Env | Size | Used for |
-| --- | --- | --- | --- |
-| `jwt` | `PHOTOVAULT_JWT_SECRET` | 32 bytes | HMAC key for JWTs and for signing local-storage URLs. |
-| `encryption` | `PHOTOVAULT_ENCRYPTION_KEY` | 32 bytes | libsodium secretbox key for email addresses at rest. |
-| `hashing` | `PHOTOVAULT_HASHING_KEY` | 32+ bytes | libsodium generichash key for email lookup hashes. |
+Defaults are those of the container image. Sizes such as `500GB` or `2TB`
+use binary units (1 GB = 1024³ bytes); `none`, `unlimited` or `0` mean no
+limit. Flags accept `true`, `1`, `yes` or `on`; anything else is false.
 
-Generate each with `head -c 32 /dev/urandom | base64`.
+### Server
 
-## `[storage]`
-
-`kind` selects the backend. See [Storage backends](storage.md) for behaviour.
-
-### `kind = "local"` (default)
-
-| Key | Env | Default | Meaning |
-| --- | --- | --- | --- |
-| `path` | `PHOTOVAULT_STORAGE_PATH` | `data` | Directory for objects (a mergerfs pool is fine). |
-| `public_url` | `PHOTOVAULT_STORAGE_PUBLIC_URL` | `public_url` | Base URL put into signed upload/download URLs, e.g. `https://storage.example.com`. |
-
-### `kind = "s3"`
-
-| Key | Env | Default | Meaning |
-| --- | --- | --- | --- |
-| `endpoint` | `PHOTOVAULT_S3_ENDPOINT` | – (required) | URL the **server** uses, e.g. `https://s3.eu-central-003.backblazeb2.com` or `http://garage:3900`. |
-| `public_endpoint` | `PHOTOVAULT_S3_PUBLIC_ENDPOINT` | `endpoint` | URL put into presigned URLs for the **apps**, when it differs (internal Docker name vs public hostname). |
-| `region` | `PHOTOVAULT_S3_REGION` | `us-east-1` | Signing region (`garage` for Garage, the B2 region for B2, …). |
-| `bucket` | `PHOTOVAULT_S3_BUCKET` | – (required) | Bucket name. |
-| `access_key` | `PHOTOVAULT_S3_ACCESS_KEY` | – (required) | Access key id. |
-| `secret_key` | `PHOTOVAULT_S3_SECRET_KEY` | – | Secret access key. |
-| `secret_key_file` | `PHOTOVAULT_S3_SECRET_KEY_FILE` | – | Read the secret from a file instead (Docker secrets). |
-| `path_style` | `PHOTOVAULT_S3_PATH_STYLE` | `true` | `endpoint/bucket/key` URLs; set `false` for `bucket.endpoint/key`. |
-
-Setting `PHOTOVAULT_STORAGE_KIND=s3` (or `local`) switches backend from the
-environment; the other variables then patch that backend's settings.
-
-## `[smtp]`
-
-Without SMTP, emails (including login codes) are written to the log.
-
-| Key | Meaning |
-| --- | --- |
-| `host`, `port` | Relay (465 implicit TLS, 587 STARTTLS). |
-| `username`, `password` | Optional credentials. |
-| `from` | Sender address. |
-
-## `[accounts]`
-
-URLs of the companion web apps (museum's `apps.*` keys). Empty means the
-server's `public_url`.
-
-| Key | Env | Meaning |
+| Variable | Default | Meaning |
 | --- | --- | --- |
-| `public_albums_url` | `PHOTOVAULT_ALBUMS_URL` | Public albums app; album and file share links point here (museum `apps.public-albums`). |
-| `public_locker_url` | `PHOTOVAULT_LOCKER_SHARE_URL` | Public Locker share app (museum `apps.public-locker`). |
-| `public_memories_url` | `PHOTOVAULT_PUBLIC_MEMORIES_URL` | Public memories app (museum `apps.public-memories`). |
-| `accounts_url` | `PHOTOVAULT_ACCOUNTS_URL` | Accounts app (passkeys, recovery); default `http://localhost:3001`. |
-| `family_url` | `PHOTOVAULT_FAMILY_URL` | Family app; default `http://localhost:3003`. |
-| `cast_url` | `PHOTOVAULT_CAST_URL` | Cast receiver app. |
+| `PHOTOVAULT_PUBLIC_URL` | **required** | Address of the API, web app, public albums and cast, e.g. `https://photos.example.com` or `http://10.0.1.7:8095`. This is what you enter in the apps. |
+| `PHOTOVAULT_HOME_URL` | unset | LAN address, e.g. `http://10.0.1.7:8095`. Advertised in `/photovault/info` and mDNS; the apps use it when it answers. |
+| `PHOTOVAULT_SERVER_NAME` | `Photovault` | Name shown in the apps, in emails and on the LAN. |
+| `PHOTOVAULT_LISTEN` | `0.0.0.0:8080` | Address and port the server binds to. |
+| `PHOTOVAULT_CONFIG_DIR` | `/config` | Folder for `keys.toml` and the SQLite database `photovault.db`. |
+| `PHOTOVAULT_CONFIG` | unset | Path of an optional TOML file. |
+| `PHOTOVAULT_DATABASE_URL` | `sqlite:///config/photovault.db?mode=rwc` | Set `postgres://user:password@host:5432/db` to use PostgreSQL. |
+| `PHOTOVAULT_WEB_DIR` | `/app/web` | Built web app, served on the API port. Unset or missing folder: API only. |
+| `PHOTOVAULT_WEB_ORIGINS` | unset | Origins allowed by CORS, comma-separated. Unset: any origin. `/photovault/info` always allows any origin. |
+| `PHOTOVAULT_MDNS` | `true` | Announce `_photovault._tcp` on the LAN. See [LAN discovery](discovery.md). |
+| `PHOTOVAULT_LOG_FORMAT` | `pretty` | `pretty` (plain text) or `json`. One line per event. |
+| `RUST_LOG` | `info` | Log filter, e.g. `info,sqlx=warn`. |
 
-## Other environment variables
+### Accounts
 
-| Env | Meaning |
-| --- | --- |
-| `PHOTOVAULT_CONFIG` | Path of the TOML file. |
-| `PHOTOVAULT_HEALTHCHECK_URL` | URL probed by `photovault healthcheck` (default `http://127.0.0.1:8080/healthz`). |
-| `RUST_LOG` | Log filter, e.g. `info,sqlx=warn`. |
-| `SSL_CERT_FILE` | CA bundle used instead of the system store for HTTPS to an S3 endpoint (e.g. a private CA). |
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `PHOTOVAULT_ALLOW_SIGNUPS` | `false` | Let anyone create an account. `photovault admin signups on\|off` overrides it at run time. |
+| `PHOTOVAULT_ADMINS` | unset | User ids allowed to call the `/admin/*` API, comma-separated. |
+| `PHOTOVAULT_DEFAULT_QUOTA` | unset | Quota for new accounts (size). Unset: no quota, the free space is the limit. |
+| `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` | `false` | Accept any code at the email step and send no email. For single-user installs. |
+
+### Storage
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `PHOTOVAULT_STORAGE_KIND` | `local` | `local` or `s3`. |
+| `PHOTOVAULT_STORAGE_PATH` | `/data` | Folder for the encrypted objects (local backend). A mergerfs pool is fine. |
+| `PHOTOVAULT_STORAGE_PUBLIC_URL` | `PHOTOVAULT_PUBLIC_URL` | Base of the signed upload/download URLs (local backend), e.g. `https://storage.photos.example.com`. |
+| `PHOTOVAULT_STORAGE_LIMIT` | unset | Total the server may store (size). Gives real numbers on S3; also caps a local disk. Unset: free disk space (local) or unlimited (S3). |
+| `PHOTOVAULT_S3_ENDPOINT` | – | S3 URL the server uses, e.g. `https://s3.eu-central-003.backblazeb2.com` or `http://garage:3900`. Required for S3. |
+| `PHOTOVAULT_S3_PUBLIC_ENDPOINT` | `PHOTOVAULT_S3_ENDPOINT` | S3 URL put into presigned URLs for the apps, when it differs. |
+| `PHOTOVAULT_S3_REGION` | `us-east-1` | Signing region (`garage` for Garage). |
+| `PHOTOVAULT_S3_BUCKET` | – | Bucket name. Required for S3. |
+| `PHOTOVAULT_S3_ACCESS_KEY` | – | Access key id. |
+| `PHOTOVAULT_S3_SECRET_KEY` | – | Secret access key. |
+| `PHOTOVAULT_S3_SECRET_KEY_FILE` | – | Read the secret key from this file instead (Docker secrets). |
+| `PHOTOVAULT_S3_PATH_STYLE` | `true` | `false` for virtual-host URLs (`bucket.endpoint/key`). |
+
+See [Storage backends](storage.md) for how each backend behaves and how the
+storage numbers are worked out.
+
+### Email
+
+Setting `PHOTOVAULT_SMTP_HOST` turns email on. Without it nothing is sent and
+each sign-in code is written to the log as
+`Verification code for <email>: <code>`.
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `PHOTOVAULT_SMTP_HOST` | unset | SMTP relay host name. |
+| `PHOTOVAULT_SMTP_PORT` | `587` | Port. |
+| `PHOTOVAULT_SMTP_USERNAME` | unset | Login. |
+| `PHOTOVAULT_SMTP_PASSWORD` | unset | Password. |
+| `PHOTOVAULT_SMTP_PASSWORD_FILE` | unset | Read the password from this file instead. |
+| `PHOTOVAULT_SMTP_FROM` | `Photovault <username>` when the username is an address | Sender, e.g. `Photovault <photos@example.com>`. |
+| `PHOTOVAULT_SMTP_TLS` | `tls` on port 465, else `starttls` | `starttls`, `tls` (implicit TLS) or `none` (only for a relay on the same host). |
+
+At start the server tries to connect once and logs a warning if it cannot.
+
+### Keys
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `PHOTOVAULT_JWT_SECRET` | from `keys.toml` | Signs tokens and storage URLs. |
+| `PHOTOVAULT_ENCRYPTION_KEY` | from `keys.toml` | Encrypts email addresses at rest (32 bytes). |
+| `PHOTOVAULT_HASHING_KEY` | from `keys.toml` | Hashes email addresses for lookup. |
+
+If all three are set they are used as they are and `keys.toml` is not
+touched. `photovault gen-keys` prints three fresh values.
+
+### Companion app URLs and passkeys
+
+These default to museum's local values. You only need them if you host the
+accounts, family or cast apps somewhere else, or use passkeys.
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `PHOTOVAULT_ALBUMS_URL` | `PHOTOVAULT_PUBLIC_URL` + `/shared-albums` in `/photovault/info` | Public albums; share links point here. |
+| `PHOTOVAULT_CAST_URL` | `PHOTOVAULT_PUBLIC_URL` + `/cast` in `/photovault/info` | Cast receiver. |
+| `PHOTOVAULT_ACCOUNTS_URL` | `http://localhost:3001` | Accounts app (passkeys, recovery). |
+| `PHOTOVAULT_FAMILY_URL` | `http://localhost:3003` | Family app. |
+| `PHOTOVAULT_EMBED_ALBUMS_URL`, `PHOTOVAULT_PASTE_URL`, `PHOTOVAULT_LOCKER_SHARE_URL`, `PHOTOVAULT_PUBLIC_MEMORIES_URL`, `PHOTOVAULT_CUSTOM_DOMAIN_CNAME` | unset | Other companion apps (museum's `apps.*` keys). |
+| `PHOTOVAULT_WEBAUTHN_RP_ID` | `localhost` | Passkey relying party id: your domain, e.g. `photos.example.com`. |
+| `PHOTOVAULT_WEBAUTHN_RP_ORIGINS` | `http://localhost:3001` | Allowed passkey origins, comma-separated. |
+
+### Commands
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `PHOTOVAULT_HEALTHCHECK_URL` | `http://127.0.0.1:8080/healthz` | URL probed by `photovault healthcheck` (the image's `HEALTHCHECK`). |
+| `PHOTOVAULT_ANNOUNCE_SERVER` | `http://127.0.0.1:8080` | Server read by `photovault announce` (the mDNS sidecar). |
+| `PHOTOVAULT_ANNOUNCE_PORT` | port of the home address | Port announced by `photovault announce`. |
+| `SSL_CERT_FILE` | system store | CA bundle for HTTPS to an S3 endpoint (e.g. a private CA). |
+
+## `/config/keys.toml`
+
+On first start the server creates this file with mode `0600` and logs once:
+
+```
+Generated new keys in /config/keys.toml. Back up this file; it cannot be recreated.
+```
+
+```toml
+jwt_secret = "<base64, 32 bytes>"
+encryption_key = "<base64, 32 bytes>"   # libsodium secretbox key
+hashing_key = "<base64, 64 bytes>"      # generichash key
+```
+
+Back it up with the database. Without it no one can sign in and stored email
+addresses cannot be read. Photos stay safe either way: they are encrypted
+with keys that only your devices hold.
+
+The values use museum's encoding, so the `key.encryption`, `key.hash` and
+`jwt.secret` of an existing install can be pasted in. Environment variables
+override the file, one key at a time.
+
+## TOML file
+
+The file uses the same names in lower case, with these sections:
+
+* top level: `listen`, `public_url`, `home_url`, `server_name`,
+  `config_dir`, `database_url`, `web_dir`, `web_origins`, `mdns`,
+  `log_format`, `allow_signups`, `admins`, `skip_email_verification`,
+  `default_storage_bytes` and `storage_limit` (both in bytes),
+  `hardcoded_ott` (fixed one-time codes per email, for testing);
+* `[secrets]`: `jwt`, `encryption`, `hashing`;
+* `[storage]`: `kind = "local"` with `path`, `public_url`; or `kind = "s3"`
+  with `endpoint`, `public_endpoint`, `region`, `bucket`, `access_key`,
+  `secret_key`, `secret_key_file`, `path_style`;
+* `[smtp]`: `host`, `port`, `username`, `password`, `from`, `tls`;
+* `[accounts]`: `public_albums_url`, `cast_url`, `accounts_url`,
+  `family_url`, `public_locker_url`, `public_memories_url`,
+  `webauthn_rp_id`, `webauthn_rp_origins`.

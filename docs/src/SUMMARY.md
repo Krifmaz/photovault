@@ -10,6 +10,7 @@
   - [Optional mTLS device certificates](deployment/mtls.md)
 - [Configuration](configuration.md)
 - [Storage backends](storage.md)
+- [LAN discovery](discovery.md)
 - [Observability](observability.md)
 - [Admin CLI](admin-cli.md)
 
