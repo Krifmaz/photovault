@@ -1,3 +1,5 @@
+import "dart:async";
+
 import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:ente_components/theme/text_styles.dart';
 import 'package:ente_pure_utils/ente_pure_utils.dart';
@@ -6,8 +8,6 @@ import "package:ente_ui/components/loading_widget.dart";
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import "dart:async";
-
 import 'package:photos/core/constants.dart';
 import "package:photos/core/errors.dart";
 import "package:photos/core/event_bus.dart";
