@@ -57,8 +57,8 @@ podspec metadata, PHOTOVAULT comments and upstream comments.
 
 ## Known user-visible gaps (not fixed, by design or needing other work)
 
-- Chromecast receiver app id `F5BCEC64` (`apps/photos/plugins/ente_cast/lib/src/service.dart`, outside the grep scope) loads Ente's hosted cast receiver; needs a Photovault receiver registered with Google. Pair-by-code uses `<server>/cast`.
-- Network phone-home kept for a feature that must stay, pending the owner's decision: ML models (models.ente.com, set in `rust/crates/ml/src/assets.rs`). OpenStreetMap tiles for the map. (Memories/Rewind music is no longer fetched.)
+- Chromecast: Ente's receiver app id is gone; auto-pairing uses the server's own receiver (`castAppId`, see `docs/src/chromecast.md`), otherwise pair-by-code with `<server>/cast`.
+- ML models and memories music come from the server's mirror (`modelsUrl`, `musicManifestUrl`); `models.ente.com` / `music.ente.com` remain only as the fallback when a server advertises no mirror (`lib/services/photovault/server_assets.dart`, `rust/crates/ml/src/assets.rs` catalog URLs). OpenStreetMap tiles for the map.
 - iOS `Podfile.lock` / `project.pbxproj` embed phases still name Firebase and Sentry frameworks until `pod install` is re-run on macOS (the Dart dependencies are gone). iOS share-extension `NSHumanReadableCopyright` still reads "Ente Technologies" (Ente's copyright on the code; not normally displayed).
 - The "Contact support" / "Raise ticket" buttons in a few error dialogs remain; they now only export logs for the user to share (no Ente address). The error texts next to them no longer speak as a vendor ("contact our support team", "reach out to us", "Your plan already supports a family"): see the strings list in `PHOTOVAULT.md`.
 

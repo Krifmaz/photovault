@@ -48,6 +48,10 @@ class PhotovaultServerInfo {
     this.albumsUrl,
     this.castUrl,
     this.features = const [],
+    // PHOTOVAULT: asset mirror + Cast receiver (contracts/asset-mirror.md).
+    this.modelsUrl,
+    this.musicManifestUrl,
+    this.castAppId,
   });
 
   /// A server that answers Ente's `/ping` but has no `/photovault/info`:
@@ -80,6 +84,16 @@ class PhotovaultServerInfo {
   final String? albumsUrl;
   final String? castUrl;
   final List<String> features;
+
+  /// Replaces `https://models.ente.com`; null when the server has no mirror.
+  final String? modelsUrl;
+
+  /// Replaces `https://music.ente.com/tracks.json`; null when off.
+  final String? musicManifestUrl;
+
+  /// The server's own Google Cast receiver app id; null: no Chromecast
+  /// auto-pairing (pair with a code instead).
+  final String? castAppId;
 
   /// Parses a decoded `/photovault/info` body. Returns null when the body is
   /// not a Photovault description. Missing optional fields are tolerated;
@@ -120,6 +134,9 @@ class PhotovaultServerInfo {
       features: features is List
           ? features.whereType<String>().toList(growable: false)
           : const [],
+      modelsUrl: _trimSlash(_string(json["modelsUrl"])),
+      musicManifestUrl: _string(json["musicManifestUrl"]),
+      castAppId: _castAppId(json["castAppId"]),
     );
   }
 
@@ -155,6 +172,9 @@ class PhotovaultServerInfo {
     "albumsUrl": albumsUrl,
     "castUrl": castUrl,
     "features": features,
+    "modelsUrl": modelsUrl,
+    "musicManifestUrl": musicManifestUrl,
+    "castAppId": castAppId,
   };
 
   /// Reads [toJson] back.
@@ -164,6 +184,12 @@ class PhotovaultServerInfo {
       return url == null ? null : PhotovaultServerInfo.compatible(url);
     }
     return fromJson(json);
+  }
+
+  /// Cast app ids are 8 hex digits (Google Cast SDK developer console).
+  static String? _castAppId(Object? value) {
+    final id = _string(value)?.toUpperCase();
+    return id != null && RegExp(r"^[0-9A-F]{8}$").hasMatch(id) ? id : null;
   }
 
   static String? _string(Object? value) {

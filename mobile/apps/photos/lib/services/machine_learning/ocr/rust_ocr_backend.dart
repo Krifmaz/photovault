@@ -3,6 +3,8 @@ import "dart:ui";
 import "package:logging/logging.dart";
 import "package:path/path.dart" as p;
 import "package:path_provider/path_provider.dart";
+import "package:photos/services/machine_learning/ml_model_download_service.dart"
+    show syncModelsMirror; // PHOTOVAULT
 import "package:photos/services/machine_learning/ocr/ocr_backend.dart";
 import "package:photos/services/machine_learning/ocr/ocr_models.dart";
 import "package:photos/services/machine_learning/webgpu_execution_policy.dart";
@@ -76,6 +78,7 @@ class RustOcrBackend implements OcrBackend {
       await setMlExecutionConfig(
         enableWebgpu: await webGpuExecutionPolicy.isEligible(),
       );
+      await syncModelsMirror(); // PHOTOVAULT: server connection
       final engine = await OcrEngine.create(
         assetsDir: assetsDir,
         includeRecognizer: includeRecognizer,

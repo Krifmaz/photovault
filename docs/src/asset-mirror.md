@@ -27,4 +27,9 @@ Copy the model files into `/config/assets/models/` (same names as on
 serves them without going online. Or point `PHOTOVAULT_MODELS_UPSTREAM` and
 `PHOTOVAULT_MUSIC_UPSTREAM` at your own mirror.
 
-To turn the feature off: `PHOTOVAULT_ASSET_MIRROR=false`.
+The apps read `modelsUrl` and `musicManifestUrl` from `/photovault/info` and
+fetch through the address they use at that moment (the home address on your
+LAN). Music tracks may be plain `http` when they come from your server.
+
+To turn the feature off: `PHOTOVAULT_ASSET_MIRROR=false`. The apps then fall
+back to Ente's hosts for models and music, as Ente's apps do.

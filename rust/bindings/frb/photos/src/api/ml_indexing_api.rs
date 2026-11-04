@@ -136,6 +136,14 @@ pub fn set_ml_execution_config(enable_webgpu: bool) {
     indexing::set_ml_execution_config(enable_webgpu);
 }
 
+// PHOTOVAULT: server connection. Downloads of Ente's model files
+// (`https://models.ente.com/<file>`) go to the server's mirror
+// (`/photovault/info` `modelsUrl`) instead. `None` restores the upstream host.
+// Process-wide; the catalog's size and SHA-256 checks still apply.
+pub fn set_models_mirror(base_url: Option<String>) {
+    ente_assets::set_url_mirror("https://models.ente.com/", base_url.as_deref());
+}
+
 pub async fn init_ml_runtime(
     assets_dir: String,
     run_faces: bool,

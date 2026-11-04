@@ -75,6 +75,8 @@ pub async fn info_value(state: &AppState) -> Value {
         // Same base the share links use (`public_albums_url`; `<public>/albums` by default).
         "albumsUrl": or_default(&c.accounts.public_albums_url, "/albums"),
         "castUrl": or_default(&c.accounts.cast_url, "/cast"),
+        // The server's own Cast receiver; null = no Chromecast auto-pairing.
+        "castAppId": c.cast_app_id,
         // Present when the asset mirror is on (`crate::asset_mirror`).
         "modelsUrl": c.asset_mirror.then(|| format!("{public}/photovault/models")),
         "musicManifestUrl": c.asset_mirror.then(|| format!("{public}/photovault/music/tracks.json")),

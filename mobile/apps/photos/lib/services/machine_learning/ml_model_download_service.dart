@@ -7,9 +7,21 @@ import "package:path_provider/path_provider.dart";
 import "package:photos/service_locator.dart"
     show flagService, hasGrantedMLConsent, isLocalGalleryMode, localSettings;
 import "package:photos/services/machine_learning/ml_exceptions.dart";
+import "package:photos/services/photovault/server_assets.dart"; // PHOTOVAULT
 import "package:photos/src/rust/api/ml_indexing_api.dart" as rust_ml;
 import "package:photos/utils/network_util.dart";
 import "package:synchronized/synchronized.dart";
+
+// PHOTOVAULT: server connection. Points Rust's model downloads at the
+// server's mirror (`modelsUrl` in /photovault/info), or back at Ente's host
+// when the server has none. Process-wide, so ML isolates follow it too.
+// Isolates without a server leave the main isolate's setting alone.
+Future<void> syncModelsMirror() async {
+  if (!PhotovaultServerAssets.hasServer) return;
+  await rust_ml.setModelsMirror(
+    baseUrl: PhotovaultServerAssets.modelsMirrorUrl(),
+  );
+}
 
 class MLModelDownloadService {
   final _logger = Logger("MLModelDownloadService");
@@ -110,6 +122,8 @@ class MLModelDownloadService {
             : "Downloading all ML models",
       );
       try {
+        // PHOTOVAULT: server connection. Models come from the server's mirror.
+        await syncModelsMirror();
         await for (final update in rust_ml.preloadMlModels(
           assetsDir: await getAssetsDirectory(),
           runFaces: downloadIndexing,

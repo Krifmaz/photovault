@@ -161,7 +161,8 @@
 		<key>NSBonjourServices</key>
 		<array>
 			<string>_googlecast._tcp</string>
-			<string>_F5BCEC64._googlecast._tcp</string>
+			<!-- PHOTOVAULT: server connection. Ente's receiver (_F5BCEC64) removed;
+			     Chromecasts are found through _googlecast._tcp. -->
 			<!-- PHOTOVAULT: server connection (LAN discovery of the server). -->
 			<string>_photovault._tcp</string>
 		</array>

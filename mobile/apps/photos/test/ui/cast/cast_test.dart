@@ -87,6 +87,24 @@ void main() {
     expect(find.text("Stop casting"), findsNothing);
   });
 
+  // PHOTOVAULT: server connection. Without a receiver of our own (never
+  // Ente's), only pairing by code is offered.
+  testWidgets("auto pair is hidden without a Cast receiver", (tester) async {
+    final requests = _RevocationRequests();
+    final transport = _FakeCastService(
+      hasActiveSession: false,
+      canAutoPair: false,
+    );
+    await _pumpCastButton(tester, requests, transport);
+
+    await tester.tap(find.text("Cast"));
+    await tester.pump(const Duration(seconds: 1));
+    requests.succeed();
+    await tester.pumpAndSettle();
+    expect(find.text("Auto pair"), findsNothing);
+    expect(find.text("Pair using code"), findsOneWidget);
+  });
+
   testWidgets("pairing stays blocked until revocation succeeds after retry", (
     tester,
   ) async {
@@ -199,7 +217,11 @@ class _FakeCastService extends Fake implements CastService {
   bool hasActiveSession;
   int closeCount = 0;
 
-  _FakeCastService({required this.hasActiveSession});
+  // PHOTOVAULT: server connection. False: no Cast receiver configured.
+  @override
+  final bool canAutoPair;
+
+  _FakeCastService({required this.hasActiveSession, this.canAutoPair = true});
 
   @override
   bool get isSupported => true;

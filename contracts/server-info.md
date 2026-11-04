@@ -17,6 +17,7 @@ A stock Ente museum returns 404 here; clients then fall back to `GET /ping` and 
   "homeUrl": "http://10.0.1.7:8095",
   "albumsUrl": "https://photos.example.com/albums",
   "castUrl": "https://photos.example.com/cast",
+  "castAppId": "1A2B3C4D",
   "modelsUrl": "https://photos.example.com/photovault/models",
   "musicManifestUrl": "https://photos.example.com/photovault/music/tracks.json",
   "signupsAllowed": false,
@@ -36,6 +37,7 @@ A stock Ente museum returns 404 here; clients then fall back to `GET /ping` and 
 | `publicUrl` | string | `PHOTOVAULT_PUBLIC_URL`, no trailing slash |
 | `homeUrl` | string \| null | `PHOTOVAULT_HOME_URL` (LAN address) |
 | `albumsUrl`, `castUrl` | string | base that public share links use (`PHOTOVAULT_ALBUMS_URL`, else `publicUrl/albums`); cast = `publicUrl/cast` |
+| `castAppId` | string \| null | `PHOTOVAULT_CAST_APP_ID`: the server's own Google Cast receiver (registered to `castUrl`). Apps offer Chromecast auto-pairing only when set; they never launch Ente's receiver. null: pair with a code |
 | `modelsUrl` | string \| null | base for ML model files, replaces `https://models.ente.com` (see [asset-mirror.md](asset-mirror.md)); null when the mirror is off |
 | `musicManifestUrl` | string \| null | replaces `https://music.ente.com/tracks.json`; null when the mirror is off |
 | `signupsAllowed` | bool | apps hide "Create account" when false |

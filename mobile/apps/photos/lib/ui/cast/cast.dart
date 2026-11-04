@@ -25,7 +25,8 @@ Future<void> showCastSheet(
   final textStyle = getEnteTextTheme(context);
   final gw = gateway ?? CastGateway(NetworkClient.instance.enteDio);
   final service = transport ?? castService;
-  final showAutoPair = service.isSupported;
+  // PHOTOVAULT: server connection. Only with a receiver of our own.
+  final showAutoPair = service.canAutoPair;
   final logger = Logger("showCastSheet");
   if (!flagService.enableMultiCast) {
     final shouldStop = service.getActiveSessions().isNotEmpty;

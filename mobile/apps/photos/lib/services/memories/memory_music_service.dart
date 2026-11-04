@@ -2,9 +2,11 @@ import "dart:async";
 import "dart:convert";
 
 import "package:crypto/crypto.dart";
+import "package:dio/dio.dart";
 import "package:logging/logging.dart";
 import "package:photos/models/memories/memory_music_track.dart";
 import "package:photos/service_locator.dart";
+import "package:photos/services/photovault/server_assets.dart"; // PHOTOVAULT
 import "package:photos/services/remote_assets_service.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -17,18 +19,24 @@ class MemoryMusicService {
   static final _logger = Logger("MemoryMusicService");
   static final instance = MemoryMusicService(
     preferences: ServiceLocator.instance.prefs,
-    // PHOTOVAULT: strip - upstream fetched its track list from
-    // Ente's music host (tracks.json, Ente-hosted MP3s). Nothing is fetched: the
-    // manifest is always empty, so memories and Rewind play without music,
-    // and tracks cached by an earlier build are cleaned up.
-    fetchManifest: () async => <String, dynamic>{"tracks": <dynamic>[]},
+    // PHOTOVAULT: server connection. The track list and MP3s come from the
+    // server's music mirror (`musicManifestUrl` in /photovault/info), through
+    // the address in use (home or public); Ente's host only when the server
+    // has no mirror. Cache names stay keyed on the manifest URL.
+    fetchManifest: () async {
+      final response = await ServiceLocator.instance.nonEnteDio.get<Object?>(
+        PhotovaultServerAssets.musicManifestUrl(),
+        options: Options(receiveTimeout: const Duration(seconds: 15)),
+      );
+      return response.data;
+    },
     hasAsset: (url) => RemoteAssetsService.instance.hasAsset(
       url,
       cacheFileName: memoryMusicCacheFileName(url),
     ),
     cacheAsset: (url) async {
       await RemoteAssetsService.instance.getAsset(
-        url,
+        PhotovaultServerAssets.downloadUrl(url), // PHOTOVAULT
         cacheFileName: memoryMusicCacheFileName(url),
       );
     },
@@ -262,7 +270,11 @@ class MemoryMusicService {
   bool _isValidTrackURL(String value) {
     final url = Uri.tryParse(value);
     return url != null &&
-        url.scheme == "https" &&
+        // PHOTOVAULT: server connection. Plain http only for tracks on the
+        // server's own addresses (a LAN-only server).
+        (url.scheme == "https" ||
+            (url.scheme == "http" &&
+                PhotovaultServerAssets.isOnServer(value))) &&
         url.host.isNotEmpty &&
         url.path.toLowerCase().endsWith(".mp3");
   }

@@ -39,6 +39,22 @@ async fn info_is_public_and_complete() {
             .any(|f| f == "admin-cli")
     );
     assert_eq!(v["albumsUrl"], format!("{}/albums", srv.url));
+    // No Cast receiver configured: the apps pair by code only.
+    assert!(v["castAppId"].is_null());
+}
+
+#[tokio::test]
+async fn info_announces_the_servers_own_cast_receiver() {
+    let srv = TestServer::start_with(|c| {
+        c.mdns = false;
+        c.cast_app_id = Some("1A2B3C4D".into());
+    })
+    .await
+    .unwrap();
+    let (s, v) = Client::new(&srv).get("/photovault/info").await;
+    assert_eq!(s, 200, "{v}");
+    assert_eq!(v["castAppId"], "1A2B3C4D");
+    assert_eq!(v["castUrl"], format!("{}/cast", srv.url));
 }
 
 #[tokio::test]

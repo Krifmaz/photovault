@@ -51,6 +51,10 @@ pub struct Config {
     /// Ente's CDN, caching each file in `<config_dir>/assets` on first use
     /// (`PHOTOVAULT_ASSET_MIRROR`, default true). See `crate::asset_mirror`.
     pub asset_mirror: bool,
+    /// The server's own Google Cast receiver app id (`PHOTOVAULT_CAST_APP_ID`,
+    /// 8 hex digits, registered to `<public>/cast`). Announced as `castAppId`
+    /// so the apps can auto-pair Chromecasts; unset = pair with a code only.
+    pub cast_app_id: Option<String>,
     /// Where the mirror fetches models (`PHOTOVAULT_MODELS_UPSTREAM`).
     pub models_upstream: String,
     /// Where the mirror fetches the memory music (`PHOTOVAULT_MUSIC_UPSTREAM`).
@@ -224,6 +228,7 @@ impl Default for Config {
             web_origins: vec![],
             mdns: true,
             asset_mirror: true,
+            cast_app_id: None,
             models_upstream: "https://models.ente.com".into(),
             music_upstream: "https://music.ente.com".into(),
             free_space_override: None,
@@ -369,6 +374,18 @@ impl Config {
         }
         if let Some(v) = env("PHOTOVAULT_ASSET_MIRROR") {
             self.asset_mirror = flag(&v);
+        }
+        if let Some(v) = env("PHOTOVAULT_CAST_APP_ID") {
+            let id = v.trim().to_ascii_uppercase();
+            if id.is_empty() {
+                self.cast_app_id = None;
+            } else if id.len() == 8 && id.chars().all(|c| c.is_ascii_hexdigit()) {
+                self.cast_app_id = Some(id);
+            } else {
+                anyhow::bail!(
+                    "PHOTOVAULT_CAST_APP_ID={v:?} is not a Cast app id; fix: use the 8-character id from the Google Cast SDK developer console, or unset it"
+                );
+            }
         }
         if let Some(v) = env("PHOTOVAULT_MODELS_UPSTREAM") {
             self.models_upstream = v.trim().trim_end_matches('/').to_string();
@@ -558,6 +575,23 @@ mod tests {
         cfg.apply_storage_env(&|k| (k == "PHOTOVAULT_STORAGE_PATH").then(|| "/data".into()));
         assert!(
             matches!(&cfg.storage, StorageConfig::Local { path, .. } if path == std::path::Path::new("/data"))
+        );
+    }
+
+    #[test]
+    fn cast_app_id_env() {
+        let with = |v: &str| {
+            let mut cfg = Config::default();
+            let v = v.to_string();
+            cfg.apply_env_from(&|k| (k == "PHOTOVAULT_CAST_APP_ID").then(|| v.clone()))
+                .map(|()| cfg.cast_app_id)
+        };
+        assert_eq!(with(" 1a2b3c4d ").unwrap().as_deref(), Some("1A2B3C4D"));
+        assert_eq!(with("").unwrap(), None);
+        let err = with("https://cast.example.com").unwrap_err().to_string();
+        assert!(
+            err.contains("PHOTOVAULT_CAST_APP_ID") && err.contains("fix:"),
+            "{err}"
         );
     }
 }
