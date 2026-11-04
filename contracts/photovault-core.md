@@ -113,3 +113,38 @@ Tests the core track hands back with: SRP and key-derivation against `server/tes
 files/thumbnails/metadata produced by Ente's web client, a full sign-in + sync + upload + download round
 trip against the real server (`cargo test -p photovault-core --features it`), and `uniffi-bindgen` Kotlin
 generation in CI. Additive changes (new methods/fields) need a contracts commit; renames do not happen in v1.
+
+## v1.2: video (streamable videos)
+
+Ente's streamable videos (file data type `vid_preview`), played without the key or any decrypted byte
+leaving core except into the player's buffer. Code: `core/src/video/` (format notes with Ente source
+references in `playlist.rs`). Stream generation is not part of core (Ente's apps, the compute node).
+
+```rust
+#[derive(uniffi::Record)] pub struct VideoStream {
+  playlist_url: String,   // http://127.0.0.1:<port>/<token>/<stream>/index.m3u8
+  width: u32, height: u32, // stream size, 0 if unknown
+  duration_ms: u64,        // sum of the segment durations
+  size_bytes: u64,         // bytes of the encrypted segment object
+}
+#[uniffi::export] impl Core {
+  async fn video_stream(&self, file_id: i64) -> Result<Option<VideoStream>, CoreError>;
+  fn stop_streams(&self);                                   // viewer closed: end every stream
+  async fn sync_streams(&self) -> Result<u64, CoreError>;   // re-read stream status now; files with a stream
+}
+```
+
+* `stream_playlist(file_id)` (v1) now returns `video_stream(file_id)?.playlist_url`. `None`: no stream
+  (not a video, `sv: 1` in public magic metadata, none generated, or an invalid playlist): play the original
+  from `download`.
+* The URL is served by core's loopback HTTP server: bound to `127.0.0.1`, random port, a 32-byte random
+  token and a 16-byte random stream id in every path. The playlist has no key; segment `n` (`n.ts`) is fetched
+  from the preview object with an HTTP range request and decrypted (AES-128-CBC) in memory on request
+  (`Range: bytes=` honoured). At most 4 streams, 30 minutes idle expiry, `stop_streams` ends them all.
+* `TimelineItem.has_stream` (v1 field) is set from Ente's file data status diff
+  (`POST /files/data/status-diff`, type `vid_preview`), run at the end of every `sync` (best effort) and kept in
+  the `video_streams` table (store migration step 2). The diff covers the account's own files only: for a
+  video shared by someone else `has_stream` stays false and `video_stream` asks the server on demand (Ente's
+  apps do the same). Apps may therefore call `video_stream` for every video and fall back to `download`.
+* Server endpoints used: `GET /files/data/fetch?fileID&type=vid_preview&preferNoContent=true`,
+  `GET /files/data/preview?fileID&type=vid_preview`, `POST /files/data/status-diff`.

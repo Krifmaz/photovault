@@ -27,6 +27,7 @@ mod server;
 pub mod srp;
 mod store;
 mod upload;
+mod video;
 
 use std::future::Future;
 use std::sync::{Arc, OnceLock};
@@ -34,6 +35,7 @@ use std::sync::{Arc, OnceLock};
 uniffi::setup_scaffolding!();
 
 pub use crate::server::{normalize_address, parse_connect_qr_url};
+pub use crate::video::VideoStream;
 
 /// Errors of the core, as the apps see them.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, uniffi::Error)]

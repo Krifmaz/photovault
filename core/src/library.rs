@@ -518,6 +518,8 @@ impl Inner {
                 });
             }
         }
+        // Which videos have a stream (best effort: older servers lack the endpoint).
+        let _ = self.sync_stream_status(&api).await;
         self.rebuild_index()?;
         crate::offload(|| trim_dir(&self.cache_dir.join("thumbs"), THUMB_CACHE_MAX));
         let p = SyncProgress {
@@ -658,8 +660,9 @@ impl Inner {
             .into_iter()
             .map(|c| (c.id, c))
             .collect();
-        let (members, blobs) = {
+        let (members, blobs, streams) = {
             let st = self.store();
+            let streams = Inner::known_streams(st.conn())?;
             let mut members: HashMap<i64, Vec<i64>> = HashMap::new();
             {
                 let mut q = st.conn().prepare(
@@ -674,7 +677,7 @@ impl Inner {
             let blobs: Vec<Vec<u8>> = q
                 .query_map([], |r| r.get::<_, Vec<u8>>(0))?
                 .collect::<rusqlite::Result<_>>()?;
-            (members, blobs)
+            (members, blobs, streams)
         };
         let opener = self.store().opener();
         let files: Vec<FileRec> = blobs
@@ -701,7 +704,9 @@ impl Inner {
             {
                 hashes.entry(h).or_insert((f.id, in_cols.clone()));
             }
-            entries.push((f.item(rep), in_cols, in_timeline));
+            let mut item = f.item(rep);
+            item.has_stream = Inner::has_stream(&f, &streams);
+            entries.push((item, in_cols, in_timeline));
         }
         entries.sort_by_key(|e| std::cmp::Reverse((e.0.taken_at_us, e.0.id)));
         let mut idx = Index {
@@ -915,9 +920,8 @@ impl Inner {
     }
 
     pub async fn stream_playlist(&self, file_id: i64) -> Result<Option<String>> {
-        // Streamable (HLS) versions are not synced in this version of the core.
-        self.file_rec(file_id)?;
-        Ok(None)
+        // Ente's streamable videos: crate::video.
+        self.stream_playlist_url(file_id).await
     }
 }
 
