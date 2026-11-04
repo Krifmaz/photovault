@@ -37,9 +37,22 @@ class PhotovaultServerService {
   );
 
   final _logger = Logger("PhotovaultServerService");
-  final _client = PhotovaultServerInfoClient();
-  late final _selector = ServerAddressSelector(probe: _client.probe);
-  final discovery = const PhotovaultServerDiscovery();
+  PhotovaultServerInfoClient _client = PhotovaultServerInfoClient();
+  late final _selector = ServerAddressSelector(
+    probe: (baseUrl, timeout) => _client.probe(baseUrl, timeout),
+  );
+  PhotovaultServerDiscovery _discovery = const PhotovaultServerDiscovery();
+  PhotovaultServerDiscovery get discovery => _discovery;
+
+  /// Test seam: a fake HTTP client and/or LAN discovery (screenshot tests).
+  @visibleForTesting
+  void overrideForTesting({
+    PhotovaultServerInfoClient? client,
+    PhotovaultServerDiscovery? discovery,
+  }) {
+    if (client != null) _client = client;
+    if (discovery != null) _discovery = discovery;
+  }
 
   SharedPreferences? _prefs;
   EndpointConfig? _endpointConfig;

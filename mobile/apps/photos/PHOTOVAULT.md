@@ -282,6 +282,36 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   Android drawables/mipmap alias, iOS `IconDuckyHuggingE.appiconset`,
   `assets/launcher_icon/icon-ducky-hugging-e*.png`).
 
+### Build, signing, tests and CI
+
+- `android/app/build.gradle`: release signing still reads Ente's
+  `android/key.properties` or `SIGNING_KEY_PATH` / `SIGNING_KEY_ALIAS` /
+  `SIGNING_KEY_PASSWORD` / `SIGNING_STORE_PASSWORD`. It also reads a
+  `key.properties` at `$PHOTOVAULT_KEY_PROPERTIES`. With no release key, release
+  builds are signed with the debug key instead of failing. The Photovault
+  keystore and its passwords live outside the repo (see the signing README
+  in the project files); never commit them.
+- `../../../.github/workflows/photovault-mobile.yml` (new): on push/PR touching
+  `mobile/**` or `rust/**`, runs `flutter analyze` and `flutter test`, builds the
+  arm64 `independent` release APK (signed when the `PHOTOVAULT_KEYSTORE_BASE64`,
+  `PHOTOVAULT_KEYSTORE_PASSWORD`, `PHOTOVAULT_KEY_ALIAS` and `PHOTOVAULT_KEY_PASSWORD`
+  secrets exist, otherwise debug-signed), checks its applicationId, signature
+  and that no Firebase/Play services/Sentry/Billing classes are in the dex, and
+  uploads it with `SHA256SUMS`.
+- `lib/services/photovault/photovault_server_service.dart`: `overrideForTesting`
+  (fake HTTP client / LAN discovery) for widget tests.
+- Tests changed because of our patches: `test/ui/account/onboarding_pages_test.dart`
+  (no terms checkbox), `test/ui/home/memories/full_screen_memory_test.dart` (uses a
+  plain bottom sheet instead of the removed What's New sheet),
+  `test/utils/delete_file_util_test.dart` ("Delete from Photovault").
+- `test/photovault/screenshots_test.dart` (new): renders the connect screen
+  (empty, saved and found servers, server answered, unreachable), the top of
+  Settings (storage card and Server entry), Settings > Server and About, in light
+  and dark with the real themes and bundled fonts. With
+  `PHOTOVAULT_SCREENSHOT_DIR=<dir>` it writes `<screen>-<light|dark>.png` there.
+- `lib/main.dart`, `lib/ui/account/onboarding_page_scaffold.dart`: analyzer
+  fixes (unused imports left by the telemetry removal, a missing `const`).
+
 ## Known gaps
 
 - Still contacting Ente-run hosts for features we keep: ML model downloads

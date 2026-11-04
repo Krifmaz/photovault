@@ -786,3 +786,40 @@ Grouped per message key across all 57 locales. "used" means Photos or a package 
 - `yourReferralCode` (10 locales; `referral`×10): Unused key (Ente Auth/Locker or removed Photos UI); never displayed by Photovault.
 - `yourSubscriptionHasExpired` (32 locales; `subscription`×32): Unused key (Ente Auth/Locker or removed Photos UI); never displayed by Photovault.
 - `yourSubscriptionWasUpdatedSuccessfully` (33 locales; `subscription`×33): Unused key (Ente Auth/Locker or removed Photos UI); never displayed by Photovault.
+
+## Build output (APK) grep
+
+**The arm64 release APK has not been built yet**, so the planned grep of
+`classes*.dex`, `resources.arsc`, `assets/` and `lib/arm64-v8a/libapp.so` has
+not run. The build environment cannot reach `dl.google.com` (Android SDK, NDK
+and Google's Maven repository), so `flutter build apk` stops at "No Android SDK
+found". When an APK exists, `.github/workflows/photovault-mobile.yml` (step
+"Check APK") fails the build if the dex contains `com/google/firebase`,
+`com/google/android/gms`, `io/sentry` or `com/android/billingclient` classes,
+and checks the applicationId and signature.
+
+Done instead, as a partial check: `flutter build bundle --target-platform=linux-x64
+--dart-define=cronetHttpNoPlay=true --dart-define=PHOTOVAULT_SERVER=` gives the
+same `flutter_assets/` as the APK (images, fonts, shaders, JSON) and a debug
+`kernel_blob.bin` holding all Dart code and strings Photos imports. The
+debug kernel is a superset of the release `libapp.so`: it is not tree-shaken and
+it embeds Dart source text, comments included. Counts from `strings -n 4` over
+the kernel (case-insensitive):
+
+| pattern | hits | what they are |
+|---|---|---|
+| `play.google`, `apps.apple` | 0 | none |
+| `com.google.android.gms`, `billingclient` | 0 | none |
+| `firebase` | 6 | comments, plus the log tags `firebaseBgSync*` and `via: 'firebasePush'` in `lib/main.dart` (background-sync entry points that Ente's F-Droid stub also uses; no Firebase code) |
+| `sentry` | 64 | `// PHOTOVAULT: telemetry removed` comments, `logging`'s `sentryIsEnabled` field (always false), and unrelated identifiers (`entriesentry`, `SoundSentry` from `win32`) |
+| `ente.io` | 10 | `kLegacyProductionEndpoint` / `_isPublicAlbumHost` constants (recognize old Ente links, not used as defaults), `ente.io/local_auth_linux` (a plugin's channel name), pt_BR `supportEnte` (unused key, see above) |
+| `ente.com` | 267 | almost all from the ARB strings (all 57 locales are compiled in): the referral invite text, `support@ente.com` in subscription/support messages, both in unused keys listed above; `kDefaultProductionEndpoint` (only compared against, never a default); `sendLogs(context, "support@ente.com")` in shared `ente_ui` code Photos does not call |
+| `referral`, `subscription`, `merch`, `rate us`, `duck`, `mascot` | 1136, 3753, 89, 57, 171, 14 | identifiers, ARB keys and messages of removed screens, and asset file names; see the source sections above. `rate us` hits are the generated getters for the removed Rate us entry's strings, a `PHOTOVAULT` comment, and unrelated text such as "migrate using" |
+
+Assets in `flutter_assets/`: no JSON, SVG, XML, HTML or JS asset contains
+`ente.io`, `ente.com`, `firebase`, `sentry`, `play.google`, `apps.apple`,
+`referral` or `subscription`. File names still contain `ducky` (for example
+`assets/ducky_share.png` and `ducky_cleaning_static.svg`). They keep Ente's names so
+upstream code paths stay the same, but the images are the re-rendered
+Photovault glyph art (see "Mascot" in `PHOTOVAULT.md`). No `.riv` (Rive) file
+is bundled.
