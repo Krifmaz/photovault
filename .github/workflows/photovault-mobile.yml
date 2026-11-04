@@ -4,7 +4,7 @@
 #   2. arm64 release APK (flavor `independent`, applicationId app.photovault)
 #   3. uploads the APK and its SHA256SUMS as a workflow artifact
 #
-# Signing: with the repository secrets PHOTOVAULT_KEYSTORE_BASE64,
+# Signing: with the repository secrets PHOTOVAULT_KEYSTORE_B64,
 # PHOTOVAULT_KEYSTORE_PASSWORD, PHOTOVAULT_KEY_ALIAS and PHOTOVAULT_KEY_PASSWORD
 # the APK is signed with the Photovault release key (Ente's SIGNING_* env
 # vars, read by android/app/build.gradle). Without them (forks, PRs from
@@ -128,15 +128,15 @@ jobs:
               id: signing
               shell: bash
               env:
-                  PHOTOVAULT_KEYSTORE_BASE64: ${{ secrets.PHOTOVAULT_KEYSTORE_BASE64 }}
+                  PHOTOVAULT_KEYSTORE_B64: ${{ secrets.PHOTOVAULT_KEYSTORE_B64 }}
               run: |
                   set -euo pipefail
-                  if [ -n "${PHOTOVAULT_KEYSTORE_BASE64}" ]; then
-                      printf '%s' "${PHOTOVAULT_KEYSTORE_BASE64}" | base64 -d > "$RUNNER_TEMP/photovault-release.jks"
+                  if [ -n "${PHOTOVAULT_KEYSTORE_B64}" ]; then
+                      printf '%s' "${PHOTOVAULT_KEYSTORE_B64}" | base64 -d > "$RUNNER_TEMP/photovault-release.jks"
                       echo "key_path=$RUNNER_TEMP/photovault-release.jks" >> "$GITHUB_OUTPUT"
                       echo "suffix=release" >> "$GITHUB_OUTPUT"
                   else
-                      echo "::warning::No PHOTOVAULT_KEYSTORE_BASE64 secret: the APK is signed with a debug key."
+                      echo "::warning::No PHOTOVAULT_KEYSTORE_B64 secret: the APK is signed with a debug key."
                       echo "key_path=" >> "$GITHUB_OUTPUT"
                       echo "suffix=debugsigned" >> "$GITHUB_OUTPUT"
                   fi

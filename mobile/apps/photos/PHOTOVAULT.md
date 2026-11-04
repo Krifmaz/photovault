@@ -343,7 +343,7 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   in the project files); never commit them.
 - `../../../.github/workflows/photovault-mobile.yml` (new): on push/PR touching
   `mobile/**` or `rust/**`, runs `flutter analyze` and `flutter test`, builds the
-  arm64 `independent` release APK (signed when the `PHOTOVAULT_KEYSTORE_BASE64`,
+  arm64 `independent` release APK (signed when the `PHOTOVAULT_KEYSTORE_B64`,
   `PHOTOVAULT_KEYSTORE_PASSWORD`, `PHOTOVAULT_KEY_ALIAS` and `PHOTOVAULT_KEY_PASSWORD`
   secrets exist, otherwise debug-signed), checks its applicationId, signature
   and that no Firebase/Play services/Sentry/Billing classes are in the dex, and
