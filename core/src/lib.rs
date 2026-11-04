@@ -17,6 +17,7 @@
 
 pub mod api;
 mod auth;
+mod backup;
 mod client;
 pub mod crypto;
 mod library;

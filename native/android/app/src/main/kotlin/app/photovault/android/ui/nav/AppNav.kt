@@ -17,6 +17,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import app.photovault.android.AppGraph
 import app.photovault.android.BuildConfig
+import app.photovault.android.ui.backup.BackupScreen
+import app.photovault.android.ui.backup.BackupViewModel
 import app.photovault.android.ui.connect.ConnectScreen
 import app.photovault.android.ui.connect.ConnectViewModel
 import app.photovault.android.ui.connect.QrScanScreen
@@ -134,8 +136,16 @@ fun AppNav(graph: AppGraph, start: Any) {
                             onOpen = { index, fileId -> nav.navigate(ViewerRoute(index, fileId)) },
                             onSignedOut = { nav.navigateClearing(AuthGraph) },
                             onSwitchServer = { nav.navigate(ConnectRoute) },
+                            onBackup = { nav.navigate(BackupRoute) { launchSingleTop = true } },
                         )
                     }
+                }
+                composable<BackupRoute> {
+                    val vm = viewModel {
+                        val b = graph.backup
+                        BackupViewModel(graph.core, b.settings, b.media, b.scheduler, b.phase)
+                    }
+                    BackupScreen(vm, onBack = { nav.popBackStack() })
                 }
                 composable<ViewerRoute> { entry ->
                     val route = entry.toRoute<ViewerRoute>()

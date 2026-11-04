@@ -2,6 +2,7 @@ package app.photovault.android
 
 import android.app.Application
 import android.content.Context
+import app.photovault.android.backup.BackupGraph
 import app.photovault.android.data.CoreProvider
 import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.LanDiscovery
@@ -33,6 +34,9 @@ class AppGraph(private val context: Context) {
     }
     val discovery: LanDiscovery by lazy { NsdLanDiscovery(context) }
     val timeline: TimelineStore by lazy { TimelineStore(core) }
+
+    /** Camera backup (WorkManager): settings, media scan, ledger, scheduling. */
+    val backup: BackupGraph by lazy { BackupGraph(context) { core } }
 
     /** App-lifetime work that must not block the UI or die with a screen (file cleanup, network re-checks). */
     val appScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -72,6 +76,7 @@ class PhotovaultApp : Application(), SingletonImageLoader.Factory {
         graph = AppGraph(this).also {
             it.warmUp()
             it.watchNetwork()
+            it.appScope.launch { it.backup.start() }
         }
     }
 

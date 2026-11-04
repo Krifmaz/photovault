@@ -1,5 +1,6 @@
 package app.photovault.android.data
 
+import app.photovault.android.backup.BackupCore
 import app.photovault.core.Core
 import app.photovault.core.CoreException
 import app.photovault.core.SyncListener
@@ -22,7 +23,7 @@ import app.photovault.core.UploadStatus as CUploadStatus
  * Core's async functions run on core's own tokio runtime, so the `suspend` functions here are main-safe.
  * The plain ones read core's local store (or the in-memory index) and are called from Dispatchers.IO.
  */
-internal class RealCore(private val core: Core) : CoreRepository {
+internal class RealCore(private val core: Core) : CoreRepository, BackupCore {
 
     override fun discoverServers(timeoutMs: Int): List<String> = coreDiscoverServers(timeoutMs.coerceAtLeast(0).toUInt())
 
@@ -102,6 +103,9 @@ internal class RealCore(private val core: Core) : CoreRepository {
     override suspend fun runUploads(): UploadStatus = guard { core.runUploads().toApp() }
 
     override fun uploadStatus(): UploadStatus = core.uploadStatus().toApp()
+
+    // camera backup (contract v1.2)
+    override suspend fun backupAlbum(folderName: String): Long = guard { core.backupAlbum(folderName) }
 
     // ---- conversions ----
 
