@@ -54,6 +54,8 @@ class TimelineViewModel(
     autoSync: Boolean = true,
     /** Drops decrypted images held outside core (Coil's memory cache, viewer files); see AppGraph. */
     private val clearDecrypted: () -> Unit = {},
+    /** After a sync changed the library (home-screen widgets re-pick their photos). */
+    private val onSynced: () -> Unit = {},
 ) : ViewModel() {
 
     private val zoomIndex = MutableStateFlow(DEFAULT_ZOOM_INDEX)
@@ -112,6 +114,7 @@ class TimelineViewModel(
                 val result = core.sync { p -> _status.update { it.copy(progress = p) } }
                 _status.update { it.copy(progress = result) }
                 store.refresh()
+                onSynced()
             } catch (e: CoreError) {
                 _status.update { it.copy(syncError = e.message) }
                 if (e is CoreError.NotLoggedIn || e is CoreError.Unauthorized) events.send(TimelineEvent.SignedOut)

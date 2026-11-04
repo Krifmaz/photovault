@@ -98,6 +98,8 @@ fun TimelineScreen(
     onOpen: (index: Int, fileId: Long) -> Unit,
     onSignedOut: () -> Unit,
     onSwitchServer: () -> Unit,
+    onMap: () -> Unit = {},
+    onBackup: () -> Unit = {},
 ) {
     val signedOut by rememberUpdatedState(onSignedOut)
     val switchServer by rememberUpdatedState(onSwitchServer)
@@ -128,7 +130,7 @@ fun TimelineScreen(
 
     Scaffold(
         containerColor = MaterialTheme.palette.bg,
-        topBar = { TimelineTopBar(vm, gridState) },
+        topBar = { TimelineTopBar(vm, gridState, onMap, onBackup) },
     ) { padding ->
         RefreshBox(vm) {
             PhotoGrid(vm, gridState, zoom, padding, onOpen)
@@ -150,7 +152,7 @@ private fun RefreshBox(vm: TimelineViewModel, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
+private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState, onMap: () -> Unit, onBackup: () -> Unit) {
     val status by vm.status.collectAsStateWithLifecycle()
     val p = MaterialTheme.palette
     var menu by remember { mutableStateOf(false) }
@@ -179,6 +181,9 @@ private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
                 }
             },
             actions = {
+                IconButton(onClick = onMap, modifier = Modifier.testTag("timeline_map")) {
+                    Icon(painterResource(R.drawable.ic_map), contentDescription = stringResource(R.string.timeline_map), tint = p.text)
+                }
                 IconButton(onClick = { menu = true }) {
                     Icon(painterResource(R.drawable.ic_account), contentDescription = stringResource(R.string.timeline_account), tint = p.text)
                 }
@@ -196,6 +201,11 @@ private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
                         text = { Text(stringResource(R.string.timeline_sync_now)) },
                         leadingIcon = { Icon(painterResource(R.drawable.ic_refresh), contentDescription = null) },
                         onClick = { menu = false; vm.sync() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.timeline_backup)) },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_backup), contentDescription = null) },
+                        onClick = { menu = false; onBackup() },
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.timeline_switch_server)) },
