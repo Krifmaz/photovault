@@ -1,0 +1,104 @@
+import "package:ente_components/ente_components.dart";
+import "package:ente_strings/ente_strings.dart";
+import "package:flutter/material.dart";
+import "package:photos/theme/ente_theme.dart";
+import "package:photos/ui/components/buttons/icon_button_widget.dart";
+
+Future<bool?> showDeleteCommentConfirmationDialog(
+  BuildContext context, {
+  required String commentText,
+}) {
+  return showModalBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    isDismissible: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) =>
+        _DeleteCommentConfirmationSheet(commentText: commentText),
+  );
+}
+
+class _DeleteCommentConfirmationSheet extends StatelessWidget {
+  final String commentText;
+
+  const _DeleteCommentConfirmationSheet({required this.commentText});
+
+  String _truncateComment(String text, int maxLength) {
+    if (text.length <= maxLength) return text;
+    return "${text.substring(0, maxLength)}....";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.strings;
+    final textTheme = getEnteTextTheme(context);
+    final colorScheme = getEnteColorScheme(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final truncatedComment = _truncateComment(commentText, 30);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDarkMode
+            ? const Color(0xFF0E0E0E)
+            : colorScheme.backgroundElevated,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Center(
+                      child: Image.asset(
+                        "assets/ducky_garbage_bin_opened.png",
+                        height: 180,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 0,
+                    child: IconButtonWidget(
+                      iconButtonType: IconButtonType.rounded,
+                      icon: Icons.close_rounded,
+                      onTap: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                l10n.areYouSure,
+                style: textTheme.h3Bold,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.deleteCommentConfirmation(comment: truncatedComment),
+                style: textTheme.body.copyWith(color: colorScheme.textMuted),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ButtonComponent(
+                  onTap: () => Navigator.of(context).pop(true),
+                  label: l10n.deleteComment,
+                  variant: .critical,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

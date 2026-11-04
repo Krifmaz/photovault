@@ -1,0 +1,583 @@
+import "dart:async";
+
+import "package:ente_components/ente_components.dart";
+import "package:ente_pure_utils/ente_pure_utils.dart";
+import "package:ente_strings/ente_strings.dart";
+import 'package:flutter/material.dart';
+import "package:flutter_animate/flutter_animate.dart";
+import "package:hugeicons/hugeicons.dart";
+import "package:logging/logging.dart";
+import "package:photos/data/months.dart";
+import "package:photos/models/file/file_type.dart";
+import "package:photos/models/search/album_search_result.dart";
+import "package:photos/models/search/device_album_search_result.dart";
+import "package:photos/models/search/generic_search_result.dart";
+import "package:photos/models/search/index_of_indexed_stack.dart";
+import 'package:photos/models/search/search_result.dart';
+import "package:photos/models/search/search_types.dart";
+import "package:photos/services/collections_service.dart";
+import "package:photos/services/date_parse_service.dart";
+import "package:photos/theme/ente_theme.dart";
+import "package:photos/ui/components/thumbnail_list_item.dart";
+import "package:photos/ui/viewer/gallery/collection_page.dart";
+import "package:photos/ui/viewer/gallery/device/device_folder_page.dart";
+import "package:photos/ui/viewer/search/result/search_result_widget.dart";
+import "package:photos/ui/viewer/search/search_query_utils.dart";
+import "package:photos/ui/viewer/search/search_widget.dart";
+
+// StreamBuilder can skip rapid events. Queue results and surface them on a
+// timer.
+class SearchSuggestionsWidget extends StatefulWidget {
+  const SearchSuggestionsWidget({super.key});
+
+  @override
+  State<SearchSuggestionsWidget> createState() =>
+      _SearchSuggestionsWidgetState();
+}
+
+class _SearchSuggestionsWidgetState extends State<SearchSuggestionsWidget> {
+  Stream<List<SearchResult>>? resultsStream;
+  final queueOfSearchResults = <List<SearchResult>>[];
+  final Map<_SearchResultsSection, List<SearchResult>> _sectionedResults = {};
+  StreamSubscription<List<SearchResult>>? subscription;
+  Timer? timer;
+  late final VoidCallback _searchResultsStreamNotifierListener;
+  String? _cachedSectionOrderQuery;
+  Locale? _cachedSectionOrderLocale;
+  List<_SearchResultsSection>? _cachedSectionOrder;
+
+  static const _surfaceNewResultsInterval = 50;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchResultsStreamNotifierListener = () {
+      IndexOfStackNotifier().searchState = SearchState.searching;
+      final resultsStream = SearchWidgetState.searchResultsStreamNotifier.value;
+
+      _sectionedResults.clear();
+      releaseResources();
+
+      subscription = resultsStream!.listen(
+        (searchResults) {
+          // Empty results clear the suggestions when the query is cleared.
+          if (searchResults.isNotEmpty) {
+            IndexOfStackNotifier().searchState = SearchState.notEmpty;
+          }
+          queueOfSearchResults.add(searchResults);
+        },
+        onDone: () {
+          Future.delayed(
+            const Duration(milliseconds: _surfaceNewResultsInterval + 20),
+            () {
+              if (_resultsCount == 0) {
+                IndexOfStackNotifier().searchState = SearchState.empty;
+              }
+            },
+          );
+          SearchWidgetState.isLoading.value = false;
+        },
+      );
+
+      generateResultWidgetsInIntervalsFromQueue();
+    };
+    SearchWidgetState.searchResultsStreamNotifier.addListener(
+      _searchResultsStreamNotifierListener,
+    );
+  }
+
+  void releaseResources() {
+    subscription?.cancel();
+    timer?.cancel();
+    queueOfSearchResults.clear();
+  }
+
+  void generateResultWidgetsInIntervalsFromQueue() {
+    timer = Timer.periodic(
+      const Duration(milliseconds: _surfaceNewResultsInterval),
+      (timer) {
+        if (queueOfSearchResults.isNotEmpty) {
+          for (List<SearchResult> event in queueOfSearchResults) {
+            _addResultsToSections(event);
+          }
+          queueOfSearchResults.clear();
+          setState(() {});
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    releaseResources();
+    SearchWidgetState.searchResultsStreamNotifier.removeListener(
+      _searchResultsStreamNotifierListener,
+    );
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = getEnteColorScheme(context);
+    final textTheme = getEnteTextTheme(context);
+    final resultsBackground = EnteTheme.isDark(context)
+        ? colorScheme.backgroundColour
+        : colorScheme.backgroundElevated2;
+    final sectionWidgets = _buildSectionWidgets(context);
+    const bottomPadding = 124.0;
+    if (_resultsCount > 0) {
+      sectionWidgets.insert(
+        0,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
+          child: Text(
+            context.strings.searchResultCount(count: _resultsCount),
+            style: textTheme.smallBold.copyWith(color: colorScheme.textMuted),
+          ),
+        ),
+      );
+    }
+    return Scaffold(
+      backgroundColor: resultsBackground,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: bottomPadding),
+                children: sectionWidgets,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  int get _resultsCount {
+    int count = 0;
+    for (final results in _sectionedResults.values) {
+      count += results.length;
+    }
+    return count;
+  }
+
+  void _addResultsToSections(List<SearchResult> results) {
+    for (final result in results) {
+      final section = _sectionForResult(result);
+      _sectionedResults.putIfAbsent(section, () => <SearchResult>[]);
+      _sectionedResults[section]!.add(result);
+    }
+  }
+
+  List<Widget> _buildSectionWidgets(BuildContext context) {
+    final widgets = <Widget>[];
+    for (final section in _sectionOrderForCurrentQuery(context)) {
+      final results = _sectionedResults[section] ?? [];
+      if (results.isEmpty) {
+        continue;
+      }
+      if (widgets.isNotEmpty) {
+        widgets.add(const SizedBox(height: 18));
+      }
+      widgets.add(
+        _SearchResultsSectionWidget(
+          title: _sectionTitle(context, section),
+          icon: _sectionIcon(section),
+          results: results,
+        ),
+      );
+    }
+    return widgets;
+  }
+
+  List<_SearchResultsSection> _sectionOrderForCurrentQuery(
+    BuildContext context,
+  ) {
+    final query = SearchWidgetState.query;
+    final locale = Localizations.localeOf(context);
+    final cachedSectionOrder = _cachedSectionOrder;
+    if (_cachedSectionOrderQuery == query &&
+        _cachedSectionOrderLocale == locale &&
+        cachedSectionOrder != null) {
+      return cachedSectionOrder;
+    }
+
+    final sectionOrder = _sectionOrderForQuery(context, query);
+    _cachedSectionOrderQuery = query;
+    _cachedSectionOrderLocale = locale;
+    _cachedSectionOrder = sectionOrder;
+    return sectionOrder;
+  }
+}
+
+class SearchResultsWidgetGenerator extends StatelessWidget {
+  final SearchResult result;
+  final bool showTypeLabel;
+  const SearchResultsWidgetGenerator(
+    this.result, {
+    this.showTypeLabel = true,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (result is AlbumSearchResult) {
+      final AlbumSearchResult albumSearchResult = result as AlbumSearchResult;
+      return SearchResultWidget(
+        result,
+        resultCount: CollectionsService.instance.getFileCount(
+          albumSearchResult.collectionWithThumbnail.collection,
+        ),
+        showTypeLabel: showTypeLabel,
+        onResultTap: () => routeToPage(
+          context,
+          CollectionPage(
+            albumSearchResult.collectionWithThumbnail,
+            tagPrefix: result.heroTag(),
+          ),
+          useFadeTransition: true,
+        ),
+      );
+    } else if (result is DeviceAlbumSearchResult) {
+      final deviceResult = result as DeviceAlbumSearchResult;
+      return SearchResultWidget(
+        result,
+        resultCount: Future.value(deviceResult.deviceCollection.count),
+        showTypeLabel: showTypeLabel,
+        onResultTap: () => routeToPage(
+          context,
+          DeviceFolderPage(
+            deviceResult.deviceCollection,
+            coverHeroTag:
+                result.heroTag() + (result.previewThumbnail()?.tag ?? ""),
+          ),
+          useFadeTransition: true,
+        ),
+      );
+    } else if (result is GenericSearchResult) {
+      return SearchResultWidget(
+        result,
+        showTypeLabel: showTypeLabel,
+        onResultTap: (result as GenericSearchResult).onResultTap != null
+            ? () => (result as GenericSearchResult).onResultTap!(context)
+            : null,
+      );
+    } else {
+      Logger('SearchResultsWidgetGenerator').info("Invalid/Unsupported value");
+      return const SizedBox.shrink();
+    }
+  }
+}
+
+enum _SearchResultsSection {
+  people,
+  shared,
+  albums,
+  magic,
+  files,
+  locations,
+  moments,
+}
+
+const List<_SearchResultsSection> _defaultSectionOrder = [
+  _SearchResultsSection.magic,
+  _SearchResultsSection.people,
+  _SearchResultsSection.locations,
+  _SearchResultsSection.moments,
+  _SearchResultsSection.albums,
+  _SearchResultsSection.shared,
+  _SearchResultsSection.files,
+];
+
+final List<_SearchResultsSection> _fileIntentSectionOrder =
+    _sectionOrderPromoting(_SearchResultsSection.files);
+
+final List<_SearchResultsSection> _momentIntentSectionOrder =
+    _sectionOrderPromoting(_SearchResultsSection.moments);
+
+List<_SearchResultsSection> _sectionOrderPromoting(
+  _SearchResultsSection promotedSection,
+) {
+  return List.unmodifiable([
+    promotedSection,
+    ..._defaultSectionOrder.where((section) => section != promotedSection),
+  ]);
+}
+
+const Set<String> _commonFileExtensions = {
+  "3fr",
+  "arw",
+  "avi",
+  "avif",
+  "bmp",
+  "cr2",
+  "cr3",
+  "dcr",
+  "dng",
+  "erf",
+  "fff",
+  "gif",
+  "heic",
+  "heif",
+  "iiq",
+  "jpeg",
+  "jpg",
+  "kdc",
+  "m4v",
+  "mef",
+  "mkv",
+  "mov",
+  "mp4",
+  "mrw",
+  "nef",
+  "nrw",
+  "orf",
+  "pef",
+  "png",
+  "raf",
+  "raw",
+  "rwl",
+  "rw2",
+  "srw",
+  "tif",
+  "tiff",
+  "webp",
+  "x3f",
+};
+
+const Set<String> _filenamePrefixes = {
+  ".",
+  "img_",
+  "img-",
+  "pxl_",
+  "screenshot_",
+  "screenshot-",
+  "vid_",
+  "vid-",
+};
+
+final RegExp _cameraFilenamePrefixRegex = RegExp(
+  r"^(?:dsc(?:[_\d]|n|f)|\d{8}_)",
+);
+
+const Set<String> _fileTypeIntentAliases = {"live", "photo", "video"};
+
+const List<FileType> _fileTypesForIntent = [
+  FileType.image,
+  FileType.video,
+  FileType.livePhoto,
+];
+
+List<_SearchResultsSection> _sectionOrderForQuery(
+  BuildContext context,
+  String query,
+) {
+  final normalizedQuery = query.trim().toLowerCase();
+  if (_looksLikeFileQuery(context, normalizedQuery)) {
+    return _fileIntentSectionOrder;
+  }
+  if (_looksLikeMomentQuery(context, normalizedQuery)) {
+    return _momentIntentSectionOrder;
+  }
+  return _defaultSectionOrder;
+}
+
+bool _looksLikeFileQuery(BuildContext context, String query) {
+  if (query.isEmpty) {
+    return false;
+  }
+  if (_filenamePrefixes.any(query.startsWith) ||
+      _cameraFilenamePrefixRegex.hasMatch(query)) {
+    return true;
+  }
+
+  if (_commonFileExtensions.contains(query)) {
+    return true;
+  }
+
+  if (query.length < 3) {
+    return false;
+  }
+  return _isFileTypeQuery(context, query);
+}
+
+bool _isFileTypeQuery(BuildContext context, String query) {
+  if (_fileTypeIntentAliases.contains(query)) {
+    return true;
+  }
+  return _fileTypesForIntent.any((fileType) {
+    final typeName = getHumanReadableString(context, fileType).toLowerCase();
+    return typeName == query;
+  });
+}
+
+bool _looksLikeMomentQuery(BuildContext context, String query) {
+  if (query.isEmpty) {
+    return false;
+  }
+  return isYearSearchQuery(query) ||
+      _isParsedDateQuery(query) ||
+      _isLocalizedMonthQuery(context, query);
+}
+
+bool _isParsedDateQuery(String query) {
+  final parsedDate = DateParseService.instance.parse(query);
+  if (parsedDate.isEmpty) {
+    return false;
+  }
+  return parsedDate.day != null || parsedDate.month != null;
+}
+
+bool _isLocalizedMonthQuery(BuildContext context, String query) {
+  if (query.length < 3) {
+    return false;
+  }
+  return getMonthData(
+    context,
+  ).any((monthData) => monthData.name.toLowerCase().startsWith(query));
+}
+
+_SearchResultsSection _sectionForResult(SearchResult result) {
+  switch (result.type()) {
+    case ResultType.faces:
+      return _SearchResultsSection.people;
+    case ResultType.shared:
+      return _SearchResultsSection.shared;
+    case ResultType.collection:
+    case ResultType.deviceCollection:
+      return _SearchResultsSection.albums;
+    case ResultType.magic:
+      return _SearchResultsSection.magic;
+    case ResultType.location:
+    case ResultType.locationSuggestion:
+      return _SearchResultsSection.locations;
+    case ResultType.year:
+    case ResultType.month:
+    case ResultType.event:
+      return _SearchResultsSection.moments;
+    case ResultType.file:
+    case ResultType.fileType:
+    case ResultType.fileExtension:
+    case ResultType.fileCaption:
+    case ResultType.uploader:
+    case ResultType.cameraMake:
+    case ResultType.cameraModel:
+      return _SearchResultsSection.files;
+  }
+}
+
+String _sectionTitle(BuildContext context, _SearchResultsSection section) {
+  switch (section) {
+    case _SearchResultsSection.people:
+      return context.strings.people;
+    case _SearchResultsSection.shared:
+      return context.strings.shared;
+    case _SearchResultsSection.albums:
+      return context.strings.albums;
+    case _SearchResultsSection.magic:
+      return context.strings.magic;
+    case _SearchResultsSection.files:
+      return context.strings.files;
+    case _SearchResultsSection.locations:
+      return context.strings.locations;
+    case _SearchResultsSection.moments:
+      return context.strings.moments;
+  }
+}
+
+List<List<dynamic>> _sectionIcon(_SearchResultsSection section) {
+  switch (section) {
+    case _SearchResultsSection.people:
+      return HugeIcons.strokeRoundedUserMultiple;
+    case _SearchResultsSection.shared:
+      return HugeIcons.strokeRoundedShare08;
+    case _SearchResultsSection.albums:
+      return HugeIcons.strokeRoundedImage01;
+    case _SearchResultsSection.magic:
+      return HugeIcons.strokeRoundedSparkles;
+    case _SearchResultsSection.files:
+      return HugeIcons.strokeRoundedFile01;
+    case _SearchResultsSection.locations:
+      return HugeIcons.strokeRoundedMaping;
+    case _SearchResultsSection.moments:
+      return HugeIcons.strokeRoundedStar;
+  }
+}
+
+class _SearchResultsSectionWidget extends StatelessWidget {
+  final String title;
+  final List<List<dynamic>> icon;
+  final List<SearchResult> results;
+
+  const _SearchResultsSectionWidget({
+    required this.title,
+    required this.icon,
+    required this.results,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = getEnteColorScheme(context);
+    final colors = context.componentColors;
+    final showTypeLabel = results.length > 1;
+    final children = <Widget>[];
+    for (int i = 0; i < results.length; i++) {
+      final radius = BorderRadius.circular(20);
+      children.add(
+        Material(
+          color: colorScheme.backgroundElevated,
+          borderRadius: radius,
+          clipBehavior: Clip.antiAlias,
+          child:
+              SearchResultsWidgetGenerator(
+                results[i],
+                showTypeLabel: showTypeLabel,
+              ).animate().fadeIn(
+                duration: const Duration(milliseconds: 80),
+                curve: Curves.easeIn,
+              ),
+        ),
+      );
+      if (i != results.length - 1) {
+        children.add(
+          const SizedBox(height: ThumbnailListItem.defaultItemSpacing),
+        );
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 8, 4, 10),
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.strokeFainter,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.all(6),
+                child: HugeIcon(
+                  icon: icon,
+                  color: colorScheme.strokeBase,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: TextStyles.large.copyWith(color: colors.textBase),
+              ),
+            ],
+          ),
+        ),
+        Column(children: children),
+      ],
+    );
+  }
+}

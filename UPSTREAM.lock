@@ -1,0 +1,6 @@
+# Managed by scripts/upstream-merge.sh; do not edit by hand.
+repo = "https://github.com/ente-io/ente"
+ref = "main"
+commit = "b2ed3dc93e49d6ac9831bf3550957816d3a0735d"
+commit_date = "2026-11-03T16:00:23Z"
+dirs = "mobile web desktop rust"

@@ -1,0 +1,33 @@
+name: ente_configuration
+description: A Flutter package for shared configuration across ente apps
+
+resolution: workspace
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  ente_base:
+    path: ../../packages/base
+  ente_crypto_api:
+    path: ../ente_crypto_api
+  ente_events:
+    path: ../../packages/events
+  ente_logging:
+    path: ../../packages/logging
+  flutter:
+    sdk: flutter
+  # Version 9.2.4 leaves lock-screen keys behind after an app reinstall.
+  # Upgrade only after this is fixed or with a migration.
+  # https://github.com/juliansteenbakker/flutter_secure_storage/issues/870#issuecomment-2777447937
+  flutter_secure_storage: 9.0.0
+  path: 1.9.1
+  path_provider: 2.1.5
+  shared_preferences: 2.5.4
+
+dev_dependencies:
+  flutter_lints: 6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:

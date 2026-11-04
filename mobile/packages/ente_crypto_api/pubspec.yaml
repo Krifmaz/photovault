@@ -1,0 +1,11 @@
+name: ente_crypto_api
+description: Shared crypto abstraction layer for Ente apps.
+
+resolution: workspace
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dependencies:
+
+dev_dependencies:
+  flutter_lints: 6.0.0
