@@ -414,11 +414,11 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            Positioned.fill(
+            const Positioned.fill(
               bottom: -_cardRadius,
               // PHOTOVAULT: theme. Charcoal header (Encore) in both modes;
               // keeps the white back button readable.
-              child: const _OnboardingBackdrop(color: encoreLightAccent),
+              child: _OnboardingBackdrop(color: encoreLightAccent),
             ),
             if (hasHeaderBar)
               Positioned(
