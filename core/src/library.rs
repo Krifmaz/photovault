@@ -183,6 +183,7 @@ pub struct Index {
 
 impl Index {
     /// Every file once, newest first (used by search, faces and memories).
+    #[allow(dead_code)] // callers in the v1.2 search and faces tracks
     pub(crate) fn all_items(&self) -> &[TimelineItem] {
         &self.all
     }
@@ -198,6 +199,7 @@ impl Index {
     }
 
     /// Files of a collection, newest first.
+    #[allow(dead_code)] // callers in the v1.2 search track
     pub(crate) fn collection_items(&self, id: i64) -> impl Iterator<Item = &TimelineItem> {
         self.by_collection
             .get(&id)
