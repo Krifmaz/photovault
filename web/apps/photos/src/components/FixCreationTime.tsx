@@ -10,7 +10,6 @@ import {
     FormControlLabel,
     IconButton,
     LinearProgress,
-    Link,
     Radio,
     RadioGroup,
     Stack,
@@ -397,19 +396,7 @@ const OptionsForm: React.FC<OptionsFormProps> = ({
             >
                 {t("fix_creation_time")}
             </FocusVisibleButton>
-            <Link
-                href="https://ente.com/help/photos/faq/metadata-and-editing#fix-time-options"
-                target="_blank"
-                rel="noopener"
-                sx={{
-                    fontSize: 12,
-                    lineHeight: "16px",
-                    color: "text.muted",
-                    textAlign: "center",
-                }}
-            >
-                {t("fix_creation_time_options_help")}
-            </Link>
+            {/* PHOTOVAULT: strip - link to Ente help removed. */}
         </Stack>
     );
 };

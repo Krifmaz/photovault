@@ -17,7 +17,9 @@ import { z } from "zod";
 
 interface LoginContentsProps {
     host: string | undefined;
-    onSignUp: () => void;
+    // PHOTOVAULT: connect - omitted when the server refuses sign-ups
+    // (`signupsAllowed: false` from /photovault/info); the prompt is hidden.
+    onSignUp?: () => void;
 }
 
 export interface LoginPresentationProps {
@@ -31,7 +33,8 @@ export interface LoginPresentationProps {
         HTMLInputElement | HTMLTextAreaElement
     >;
     onSubmit: React.SubmitEventHandler<HTMLFormElement>;
-    onSignUp: () => void;
+    // PHOTOVAULT: connect - optional, see LoginContentsProps.
+    onSignUp?: () => void;
     onCancel: () => void;
 }
 

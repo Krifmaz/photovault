@@ -89,7 +89,8 @@ export const ManageMemberSubscription: React.FC<
                             fontWeight: 600,
                         }}
                     >
-                        {t("subscription")}
+                        {/* PHOTOVAULT: strip - "Family", not "Subscription". */}
+                        {t("family")}
                     </Typography>
                     <IconButton
                         aria-label={t("close")}

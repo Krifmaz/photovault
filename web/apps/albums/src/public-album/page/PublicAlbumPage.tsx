@@ -5,7 +5,6 @@ import {
     PasswordUnlockScreen,
     type PasswordUnlockScreenProps,
 } from "@/public-album/access/components/PasswordUnlockScreen";
-import { getEnteURL } from "@/public-album/access/utils/external-links";
 import {
     AddPhotosIcon,
     DownloadIcon,
@@ -32,7 +31,6 @@ import { Tick02Icon } from "@hugeicons/core-free-icons";
 import CloseIcon from "@mui/icons-material/Close";
 import {
     Box,
-    Button,
     IconButton,
     Stack,
     styled,
@@ -50,7 +48,7 @@ import { FocusVisibleButton } from "ente-base/components/mui/FocusVisibleButton"
 import { NavbarBase } from "ente-base/components/Navbar";
 import { useModalVisibility } from "ente-base/components/utils/modal";
 import { useBaseContext } from "ente-base/context";
-import { isDevBuild } from "ente-base/env";
+import { buildEnvBasePath } from "ente-base/env"; // PHOTOVAULT: connect
 import { isNamedError } from "ente-base/error";
 import {
     isHTTP401Error,
@@ -97,12 +95,6 @@ import {
     type PropsWithChildren,
 } from "react";
 import type { FileWithPath } from "react-dropzone";
-// PHOTOVAULT: theme - Encore colours instead of Ente green.
-import {
-    pvGold,
-    pvGoldHover,
-    pvOnGold,
-} from "ente-base/components/utils/photovault/encore-tokens";
 
 const LazyPublicAlbumSingleFileViewer =
     dynamic<PublicAlbumSingleFileViewerProps>(
@@ -144,8 +136,18 @@ const loadJoinPublicAlbumRedirect = () =>
 
 const publicAlbumAllFilesCollectionID = 0;
 
+// PHOTOVAULT: connect - ignore the /albums base path when the token is in
+// the path (see next.config.js).
 const accessTokenFromURL = (url: URL) =>
-    url.searchParams.get("t") || url.pathname.split("/").find(Boolean);
+    url.searchParams.get("t") ||
+    url.pathname
+        .slice(
+            buildEnvBasePath && url.pathname.startsWith(buildEnvBasePath)
+                ? buildEnvBasePath.length
+                : 0,
+        )
+        .split("/")
+        .find(Boolean);
 
 export default function PublicAlbumPage() {
     const { showMiniDialog, onGenericError } = useBaseContext();
@@ -590,9 +592,10 @@ export default function PublicAlbumPage() {
 
     const commentsEnabled =
         publicCollection?.publicURLs[0]?.enableComment ?? false;
-    const joinEnabled =
-        (isDevBuild || !isCustomAPIOrigin) &&
-        (publicCollection?.publicURLs[0]?.enableJoin ?? false);
+    // PHOTOVAULT: connect - Ente turns "Join album" off for self-hosted
+    // servers only because Photos lives on another origin there. Here Photos
+    // is served at the root of this origin (see join-public-album-redirect).
+    const joinEnabled = publicCollection?.publicURLs[0]?.enableJoin ?? false;
     const handleDrop = useCallback((files: FileWithPath[]) => {
         setShouldRenderUpload(true);
         setDragAndDropFiles(files);
@@ -778,7 +781,8 @@ export default function PublicAlbumPage() {
                             />
                         ) : (
                             <SpacedRow sx={{ flex: 1 }}>
-                                <EnteLogoLink href="https://ente.com">
+                                {/* PHOTOVAULT: strip - wordmark, not a link to Ente. */}
+                                <EnteLogoLink>
                                     <EnteLogo height={17} />
                                 </EnteLogoLink>
                                 <Stack direction="row" spacing={2}>
@@ -1007,28 +1011,10 @@ const EnteLogoLink = styled("a")(({ theme }) => ({
     ":hover": { color: theme.vars.palette.accent.main },
 }));
 
-const GreenButton = styled(Button)(() => ({
-    backgroundColor: pvGold, // PHOTOVAULT: theme
-    color: pvOnGold, // PHOTOVAULT: theme
-    borderRadius: "16px",
-    paddingBlock: "11px",
-    paddingInline: "20px",
-    "&:hover": { backgroundColor: pvGoldHover }, // PHOTOVAULT: theme
-}));
-
 const navbarActionButtonSx = { borderRadius: "16px", paddingBlock: "11px" };
 
-const PrimaryActionButton: React.FC = () => {
-    const handleGetEnte = () => {
-        window.location.href = getEnteURL();
-    };
-
-    return (
-        <GreenButton color="accent" onClick={handleGetEnte}>
-            {t("join_ente")}
-        </GreenButton>
-    );
-};
+// PHOTOVAULT: strip - no "Join Ente" sign-up button.
+const PrimaryActionButton: React.FC = () => null;
 
 interface SecondaryActionButtonProps {
     onAddPhotos?: () => void;

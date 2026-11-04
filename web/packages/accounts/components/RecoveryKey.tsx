@@ -6,6 +6,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
 import type { MiniDialogAttributes } from "ente-base/components/MiniDialog";
 import { SpacedRow } from "ente-base/components/containers";
 import { DialogCloseIconButton } from "ente-base/components/mui/DialogCloseIconButton";
@@ -13,6 +14,7 @@ import { FocusVisibleButton } from "ente-base/components/mui/FocusVisibleButton"
 import { errorDialogAttributes } from "ente-base/components/utils/dialog";
 import { useIsSmallWidth } from "ente-base/components/utils/hooks";
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import log from "ente-base/log";
 import { saveStringAsFile } from "ente-base/utils/web";
 import { t } from "i18next";
@@ -147,4 +149,10 @@ export function RecoveryKeyContents({
 }
 
 const saveRecoveryKeyMnemonicAsFile = (key: string) =>
-    saveStringAsFile(key, "ente-recovery-key.txt");
+    // PHOTOVAULT: strip - file name without "ente" in Photovault apps.
+    saveStringAsFile(
+        key,
+        isPhotovaultApp(appName)
+            ? "photovault-recovery-key.txt"
+            : "ente-recovery-key.txt",
+    );

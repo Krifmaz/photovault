@@ -1,4 +1,6 @@
 import { Box } from "@mui/material";
+// PHOTOVAULT: strip
+import { PhotovaultLogo } from "ente-base/components/photovault/PhotovaultLogo";
 import React, { type ReactNode } from "react";
 
 interface PublicShareScaffoldProps {
@@ -56,25 +58,10 @@ export const PublicShareScaffold: React.FC<PublicShareScaffoldProps> = ({
                         px: { xs: 3, md: 4.5 },
                     }}
                 >
-                    <a
-                        href="https://ente.com/locker"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ display: "block", lineHeight: 0 }}
-                    >
-                        <picture>
-                            <source
-                                srcSet="/images/ente-locker-white.svg"
-                                media="(prefers-color-scheme: dark)"
-                            />
-                            <Box
-                                component="img"
-                                src="/images/ente-locker.svg"
-                                alt="Ente Locker"
-                                sx={{ height: "56px", cursor: "pointer" }}
-                            />
-                        </picture>
-                    </a>
+                    {/* PHOTOVAULT: strip - our wordmark, unlinked, instead of the linked Ente Locker logo. */}
+                    <Box sx={{ lineHeight: 0, color: "text.base" }}>
+                        <PhotovaultLogo height={28} />
+                    </Box>
                 </Box>
                 <Box
                     sx={{

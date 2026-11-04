@@ -216,7 +216,8 @@ describe("sidebar album search across groups", () => {
 
     test("reveals matching Ente albums while Shared is selected", () => {
         const html = renderSearch("family", "shared");
-        expect(html).toContain('aria-label="Ente"');
+        // PHOTOVAULT: branding - the "Ente" album group is labelled Photovault.
+        expect(html).toContain('aria-label="Photovault"');
         expect(html).toContain("Family");
         expect(html).not.toContain('aria-label="shared_albums_title"');
         expect(html).not.toContain("no-matches.svg");
@@ -246,7 +247,8 @@ describe("sidebar album search across groups", () => {
         "restores all group headings for query %j",
         (query) => {
             const html = renderSearch(query);
-            expect(html).toContain('aria-label="Ente"');
+            // PHOTOVAULT: branding - the "Ente" album group is labelled Photovault.
+            expect(html).toContain('aria-label="Photovault"');
             expect(html).toContain('aria-label="shared_albums_title"');
             expect(html).toContain("Family");
             expect(html).toContain("Holiday album");

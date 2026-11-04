@@ -197,6 +197,10 @@ const isWhitelistedRedirect = (redirectURL: URL) => {
         redirectURL.protocol === "ente-cli:" ||
         (redirectURL.protocol === "tauri:" &&
             redirectURL.hostname === "localhost") ||
+        // PHOTOVAULT: connect - Photos is served from this app's own origin
+        // (e.g. http://localhost:8080 with Accounts under /accounts), so a
+        // same-origin redirect is always allowed, also in production builds.
+        redirectURL.origin === window.location.origin ||
         _isWhitelistedRedirect(redirectURL)
     );
 };

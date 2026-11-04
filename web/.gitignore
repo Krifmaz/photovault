@@ -11,3 +11,6 @@ out/
 next-env.d.ts
 
 packages/wasm/*/pkg/
+
+# PHOTOVAULT: vendored static data (scripts/photovault-vendor-assets.sh)
+/apps/photos/public/static-assets/

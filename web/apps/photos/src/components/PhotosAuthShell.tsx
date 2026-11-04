@@ -73,10 +73,12 @@ export function PhotosAuthShell({
             brand={{
                 headline: t("photos_auth_headline"),
                 subtitle: t("photos_auth_subtitle"),
+                // PHOTOVAULT: strip - instead of Ente's "10 GB free forever"
+                // plan and "Independently audited" (Ente's audit) claims.
                 bullets: [
-                    t("photos_auth_free_storage"),
+                    t("pv_auth_own_server"),
                     t("photos_auth_no_ads_no_spying"),
-                    t("auth_independently_audited"),
+                    t("pv_auth_your_keys"),
                 ],
             }}
             presentationConfig={photosAuthTheme}

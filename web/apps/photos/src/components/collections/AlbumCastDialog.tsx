@@ -34,6 +34,7 @@ import { isSxArray } from "ente-base/components/utils/sx";
 import { isNamedError } from "ente-base/error";
 import { ut } from "ente-base/i18n";
 import log from "ente-base/log";
+import { serverDisplayName } from "ente-base/photovault/server"; // PHOTOVAULT: connect
 import type { Collection } from "ente-media/collection";
 import { FocusVisibleUnstyledButton } from "ente-new/photos/components/UnstyledButton";
 import { useSettingsSnapshot } from "ente-new/photos/components/utils/use-snapshot";
@@ -108,17 +109,19 @@ const AlbumCastDialogContents: React.FC<AlbumCastDialogProps> = ({
 }) => {
     const { castURL } = useSettingsSnapshot();
 
+    // PHOTOVAULT: strip - Chromecast "Auto pair" launches Ente's registered
+    // receiver app (F5BCEC64, which loads cast.ente.com and Ente's API), so it
+    // can't pair with a Photovault server. The dialog opens on the PIN flow
+    // and the choice (and its "Go back") is never shown.
     const [view, setView] = useState<
         "choose" | "auto" | "pin" | "auto-cast-error"
-    >("choose");
+    >("pin");
 
-    const [browserCanCast, setBrowserCanCast] = useState(false);
+    const [browserCanCast] = useState(false);
 
-    const castHost = new URL(castURL).host;
-
-    useEffect(() => {
-        setBrowserCanCast(typeof window.chrome != "undefined");
-    }, []);
+    // PHOTOVAULT: connect - the receiver is served under a path (<server>/cast),
+    // so show host and path, not just the host.
+    const castHost = serverDisplayName(castURL);
 
     const onSubmit: SingleInputFormProps["onSubmit"] = useCallback(
         async (value, setFieldError) => {
@@ -289,27 +292,30 @@ const AlbumCastDialogContents: React.FC<AlbumCastDialogProps> = ({
             )}
             {view == "pin" && (
                 <Stack sx={{ gap: "20px" }}>
-                    <FocusVisibleUnstyledButton
-                        onClick={() => setView("choose")}
-                        sx={{
-                            display: "inline-flex",
-                            gap: 1,
-                            alignItems: "center",
-                            alignSelf: "flex-start",
-                            minHeight: 36,
-                            fontSize: 14,
-                            fontWeight: 500,
-                            color: "text.muted",
-                            "&:hover": { color: "text.base" },
-                        }}
-                    >
-                        <HugeiconsIcon
-                            icon={ArrowLeft02Icon}
-                            size={18}
-                            aria-hidden
-                        />
-                        {t("go_back")}
-                    </FocusVisibleUnstyledButton>
+                    {/* PHOTOVAULT: strip - nothing to go back to. */}
+                    {browserCanCast && (
+                        <FocusVisibleUnstyledButton
+                            onClick={() => setView("choose")}
+                            sx={{
+                                display: "inline-flex",
+                                gap: 1,
+                                alignItems: "center",
+                                alignSelf: "flex-start",
+                                minHeight: 36,
+                                fontSize: 14,
+                                fontWeight: 500,
+                                color: "text.muted",
+                                "&:hover": { color: "text.base" },
+                            }}
+                        >
+                            <HugeiconsIcon
+                                icon={ArrowLeft02Icon}
+                                size={18}
+                                aria-hidden
+                            />
+                            {t("go_back")}
+                        </FocusVisibleUnstyledButton>
+                    )}
                     <Stack
                         component="ol"
                         role="list"

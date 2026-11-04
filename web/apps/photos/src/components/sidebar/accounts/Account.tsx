@@ -26,7 +26,6 @@ import {
     isFamilyAdmin,
     isPartOfFamily,
     isPartOfFamilyWithOtherMembers,
-    isSubscriptionFree,
     pullUserDetails,
     userDetailsSnapshot,
 } from "ente-new/photos/services/user-details";
@@ -100,18 +99,8 @@ export const Account: React.FC<AccountProps> = ({
             storage = memberLimit ?? familyStorage;
         }
 
-        const period = userDetails.subscription.period;
-        const canShowBillingPeriod =
-            !isSubscriptionFree(userDetails.subscription) &&
-            (!isPartOfFamily(userDetails) || isFamilyAdmin(userDetails));
-        const billingLabel =
-            canShowBillingPeriod && period
-                ? t(period == "year" ? "yearly" : "monthly")
-                : undefined;
-
-        planSubtext = [formattedStorageByteSize(storage), billingLabel]
-            .filter(Boolean)
-            .join(" · ");
+        // PHOTOVAULT: strip - storage only, no billing period.
+        planSubtext = formattedStorageByteSize(storage);
     }
 
     const router = useRouter();
@@ -341,7 +330,8 @@ export const Account: React.FC<AccountProps> = ({
         >
             <Stack sx={{ px: 2, py: 1, gap: 1 }}>
                 <RowCard
-                    title={t("manage_plan")}
+                    // PHOTOVAULT: strip - "Manage plan" becomes the family entry.
+                    title={t("family")}
                     subtitle={planSubtext}
                     onClick={handleManageSubscription}
                 />

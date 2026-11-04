@@ -1981,11 +1981,19 @@ export const ManagePublicShareOptions: React.FC<
 
     const [copied, handleCopyLink] = useClipboardCopy(resolvedURL);
 
+    // PHOTOVAULT: connect - the embed app has its own base path (<server>/embed),
+    // so keep only the link's token and fragment (?t=<token>#<key>) instead of
+    // swapping the origin (which kept the /albums path). No Ente host fallback.
     const embedURL = resolvedURL
-        ? resolvedURL.replace(
-              new URL(resolvedURL).origin,
-              embedBaseURL || "https://embed.ente.com",
-          )
+        ? (() => {
+              const u = new URL(resolvedURL);
+              const token =
+                  u.searchParams.get("t") ??
+                  u.pathname.split("/").filter(Boolean).pop() ??
+                  "";
+              const base = embedBaseURL.replace(/\/+$/, "");
+              return `${base}/?t=${encodeURIComponent(token)}${u.hash}`;
+          })()
         : undefined;
     const iframeHTML = embedURL
         ? `<iframe src="${embedURL}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`

@@ -242,8 +242,9 @@ const NoWatches: React.FC<{ onChooseFolder: () => void }> = ({
                 color: "text.muted",
             }}
         >
+            {/* PHOTOVAULT: strip - brand name */}
             {ut(
-                "Point ente at a folder and everything inside it backs up and keeps backing up as you add to it.",
+                "Point Photovault at a folder and everything inside it backs up and keeps backing up as you add to it.",
             )}
         </Typography>
         <FocusVisibleButton

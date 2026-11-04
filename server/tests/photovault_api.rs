@@ -340,3 +340,51 @@ async fn web_app_is_served_on_the_api_port() {
     let (s, _, _) = get("/photovault/info").await;
     assert_eq!(s, 200);
 }
+
+/// The cast and embed web apps share a path prefix with the cast API: API routes must win,
+/// everything else under `/cast/` loads the cast app, and `/embed` stays framable.
+#[tokio::test]
+async fn cast_api_wins_over_the_cast_web_app_and_embed_is_framable() {
+    let web = tempfile::tempdir().unwrap();
+    std::fs::write(web.path().join("index.html"), "photos").unwrap();
+    for app in ["cast", "embed"] {
+        std::fs::create_dir_all(web.path().join(app)).unwrap();
+        std::fs::write(web.path().join(app).join("index.html"), app).unwrap();
+    }
+    let dir = web.path().to_path_buf();
+    let srv = TestServer::start_with(move |c| c.web_dir = Some(dir))
+        .await
+        .unwrap();
+
+    // Web app pages.
+    let (s, _, body) = raw(&format!("{}/cast/", srv.url), &[]).await;
+    assert_eq!((s, body.as_str()), (200, "cast"));
+    let (s, _, body) = raw(&format!("{}/cast/pair", srv.url), &[]).await;
+    assert_eq!((s, body.as_str()), (200, "cast"));
+
+    // Cast API routes are answered by the API, not by cast/index.html.
+    let c = Client::new(&srv);
+    let (s, v) = c
+        .post(
+            "/cast/device-info",
+            json!({"publicKey": photovault_server::crypto::b64(&[1u8; 32])}),
+        )
+        .await;
+    assert_eq!(s, 200, "{v}");
+    let code = v["deviceCode"].as_str().expect("deviceCode").to_string();
+    let (s, _, body) = raw(&format!("{}/cast/device-info/{code}", srv.url), &[]).await;
+    assert_ne!(body, "cast", "status {s}");
+    let (s, _, body) = raw(&format!("{}/cast/cast-data/{code}", srv.url), &[]).await;
+    assert_ne!(body, "cast", "status {s}");
+    let (s, _, body) = raw(&format!("{}/cast/info", srv.url), &[]).await;
+    assert_ne!(body, "cast", "status {s}");
+
+    // Embed: served and framable (no X-Frame-Options / frame-ancestors).
+    let (s, h, body) = raw(&format!("{}/embed/", srv.url), &[]).await;
+    assert_eq!((s, body.as_str()), (200, "embed"));
+    assert!(!h.contains_key("x-frame-options"));
+    assert!(
+        !h.get("content-security-policy")
+            .is_some_and(|v| v.contains("frame-ancestors"))
+    );
+}

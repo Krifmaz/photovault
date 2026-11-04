@@ -7,7 +7,6 @@ import {
     Box,
     CircularProgress,
     IconButton,
-    Link,
     Stack,
     Typography,
 } from "@mui/material";
@@ -139,35 +138,7 @@ export function TakeoutOptions({
                     )}
                 </Stack>
                 {provider == "apple" && <AppleExportSteps />}
-                <Typography
-                    sx={{
-                        alignSelf: "center",
-                        color: "text.faint",
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        lineHeight: "20px",
-                    }}
-                >
-                    <span style={{ opacity: 0.7 }}>
-                        {t("takeout_help_prompt")}{" "}
-                    </span>
-                    <Link
-                        href={
-                            provider == "apple"
-                                ? "https://ente.com/help/photos/faq/migration/#can-i-import-apple-photos-via-desktop"
-                                : "https://ente.com/help/photos/migration/from-google-photos/"
-                        }
-                        target="_blank"
-                        rel="noopener"
-                        sx={{
-                            color: "accent.main",
-                            fontWeight: 500,
-                            textDecoration: "underline",
-                        }}
-                    >
-                        {t("takeout_help_action")}
-                    </Link>
-                </Typography>
+                {/* PHOTOVAULT: strip - link to Ente help removed. */}
             </Stack>
         </Stack>
     );

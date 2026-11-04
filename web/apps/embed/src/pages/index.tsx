@@ -6,6 +6,7 @@ import {
 } from "ente-base/components/containers";
 import { LoadingIndicator } from "ente-base/components/loaders";
 import { useBaseContext } from "ente-base/context";
+import { buildEnvBasePath } from "ente-base/env"; // PHOTOVAULT: connect
 import {
     isHTTP401Error,
     isHTTPErrorWithStatus,
@@ -40,8 +41,18 @@ import {
     verifyPublicAlbumPassword,
 } from "../services/public-collection";
 
+// PHOTOVAULT: connect - ignore the /embed base path when the token is in the
+// path (see next.config.js).
 const accessTokenFromURL = (url: URL) =>
-    url.searchParams.get("t") || url.pathname.split("/").find(Boolean);
+    url.searchParams.get("t") ||
+    url.pathname
+        .slice(
+            buildEnvBasePath && url.pathname.startsWith(buildEnvBasePath)
+                ? buildEnvBasePath.length
+                : 0,
+        )
+        .split("/")
+        .find(Boolean);
 
 export default function EmbedGallery() {
     const { onGenericError } = useBaseContext();

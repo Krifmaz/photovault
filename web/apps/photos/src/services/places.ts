@@ -1,4 +1,5 @@
 import { HTTPError } from "ente-base/http";
+import { staticAssetURL } from "ente-base/origins"; // PHOTOVAULT: strip
 import type { EnteFile } from "ente-media/file";
 import { fileLocation } from "ente-media/file-metadata";
 import { createLocationIndex } from "ente-photos-wasm";
@@ -36,7 +37,8 @@ export const listPlaces = async (files: EnteFile[]) => {
 };
 
 const fetchLocationData = async (name: string) => {
-    const response = await fetch(`https://assets.ente.com/location/v2/${name}`);
+    // PHOTOVAULT: strip - served by our own origin, not Ente's CDN.
+    const response = await fetch(staticAssetURL(`location/v2/${name}`));
     if (!response.ok) throw new HTTPError(response);
     return new Uint8Array(await response.arrayBuffer());
 };

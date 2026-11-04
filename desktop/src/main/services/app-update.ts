@@ -18,13 +18,20 @@ export const setupAutoUpdater = (mainWindow: BrowserWindow) => {
     // Dev builds use dev-app-update.yml for manual checks, but never poll.
     autoUpdater.forceDevUpdateConfig = isDev;
     if (isDev) return;
+    // PHOTOVAULT: strip - never poll Ente's release feed (it would offer
+    // Ente's app as an "update"). Photovault updates are installed manually.
+    if (photovaultUpdatesDisabled) return;
 
     const oneDay = 1 * 24 * 60 * 60 * 1000;
     setInterval(() => void checkForUpdatesAndNotify(mainWindow), oneDay);
     void checkForUpdatesAndNotify(mainWindow);
 };
 
+// PHOTOVAULT: strip - see setupAutoUpdater.
+const photovaultUpdatesDisabled = true as boolean;
+
 export const forceCheckForAppUpdates = (mainWindow: BrowserWindow) => {
+    if (photovaultUpdatesDisabled) return; // PHOTOVAULT: strip
     userPreferences.delete("skipAppVersion");
     userPreferences.delete("muteUpdateNotificationVersion");
     void checkForUpdatesAndNotify(mainWindow, { notifyImmediately: true });

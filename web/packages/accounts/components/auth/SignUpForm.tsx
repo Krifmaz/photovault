@@ -1,6 +1,8 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { styled, Tooltip } from "@mui/material";
 import type { SignUpPresentationProps } from "ente-accounts/components/SignUpContents";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import { t } from "i18next";
 import type React from "react";
 import { Trans } from "react-i18next";
@@ -36,6 +38,7 @@ export function SignUpForm({
     onSubmit,
     onLogin,
 }: SignUpPresentationProps): React.JSX.Element {
+    const photovault = isPhotovaultApp(appName); // PHOTOVAULT: strip
     return (
         <>
             <ScreenHeader
@@ -91,53 +94,61 @@ export function SignUpForm({
                         helperText={confirmPasswordError}
                         disabled={isSubmitting}
                     />
-                    <TextField
-                        name="referral"
-                        label={
-                            <ReferralLabel>
-                                {t("referral_source_hint")}
-                                <Tooltip title={t("referral_source_info")}>
-                                    <InfoOutlinedIcon
-                                        fontSize="inherit"
-                                        tabIndex={0}
-                                        aria-label={t("referral_source_info")}
-                                    />
-                                </Tooltip>
-                            </ReferralLabel>
-                        }
-                        placeholder={t("auth_optional")}
-                        value={referral}
-                        onChange={onReferralChange}
-                        disabled={isSubmitting}
-                    />
+                    {/* PHOTOVAULT: strip - no "How did you hear about us?" field. */}
+                    {!photovault && (
+                        <TextField
+                            name="referral"
+                            label={
+                                <ReferralLabel>
+                                    {t("referral_source_hint")}
+                                    <Tooltip title={t("referral_source_info")}>
+                                        <InfoOutlinedIcon
+                                            fontSize="inherit"
+                                            tabIndex={0}
+                                            aria-label={t(
+                                                "referral_source_info",
+                                            )}
+                                        />
+                                    </Tooltip>
+                                </ReferralLabel>
+                            }
+                            placeholder={t("auth_optional")}
+                            value={referral}
+                            onChange={onReferralChange}
+                            disabled={isSubmitting}
+                        />
+                    )}
                 </FormFields>
-                <Checkbox
-                    name="acceptedTerms"
-                    checked={acceptedTerms}
-                    onChange={onAcceptedTermsChange}
-                    disabled={isSubmitting}
-                    label={
-                        <TermsText>
-                            <Trans
-                                i18nKey="terms_and_conditions"
-                                components={{
-                                    a: (
-                                        <TermsLink
-                                            href="https://ente.com/terms"
-                                            target="_blank"
-                                        />
-                                    ),
-                                    b: (
-                                        <TermsLink
-                                            href="https://ente.com/privacy"
-                                            target="_blank"
-                                        />
-                                    ),
-                                }}
-                            />
-                        </TermsText>
-                    }
-                />
+                {/* PHOTOVAULT: strip - no Ente terms / privacy policy links. */}
+                {!photovault && (
+                    <Checkbox
+                        name="acceptedTerms"
+                        checked={acceptedTerms}
+                        onChange={onAcceptedTermsChange}
+                        disabled={isSubmitting}
+                        label={
+                            <TermsText>
+                                <Trans
+                                    i18nKey="terms_and_conditions"
+                                    components={{
+                                        a: (
+                                            <TermsLink
+                                                href="https://ente.com/terms"
+                                                target="_blank"
+                                            />
+                                        ),
+                                        b: (
+                                            <TermsLink
+                                                href="https://ente.com/privacy"
+                                                target="_blank"
+                                            />
+                                        ),
+                                    }}
+                                />
+                            </TermsText>
+                        }
+                    />
+                )}
                 <FormFooter>
                     <Button
                         fullWidth

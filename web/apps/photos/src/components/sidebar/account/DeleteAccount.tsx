@@ -530,7 +530,7 @@ const DeleteAccountDialogContents: React.FC<
                                                 count: summary.authenticatorCodesCount,
                                             },
                                         )}
-                                        app={t("title_auth")}
+                                        app="Auth" // PHOTOVAULT: strip - no "Ente" in the label
                                     />
                                     <SummaryRow
                                         icon={<EnteLockerIcon />}
@@ -540,7 +540,7 @@ const DeleteAccountDialogContents: React.FC<
                                                 count: summary.lockerRecordsCount,
                                             },
                                         )}
-                                        app={t("title_locker")}
+                                        app="Locker" // PHOTOVAULT: strip - no "Ente" in the label
                                     />
                                 </Stack>
                             )}

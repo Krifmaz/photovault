@@ -1,7 +1,7 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import SmartphoneIcon from "@mui/icons-material/Smartphone";
-import { Divider, Link, Stack, TextField, useColorScheme } from "@mui/material";
+import { Divider, Stack, TextField, useColorScheme } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { isDesktop } from "ente-base/app";
 import { EnteSwitch } from "ente-base/components/EnteSwitch";
@@ -41,7 +41,6 @@ import { isMLSupported } from "ente-new/photos/services/ml";
 import type { SidebarActionID } from "ente-new/photos/services/search/types";
 import {
     pullSettings,
-    updateCFProxyDisabledPreference,
     updateCustomDomain,
     updateMapEnabled,
 } from "ente-new/photos/services/settings";
@@ -220,7 +219,13 @@ export const Preferences: React.FC<PreferencesProps> = ({
                         </Typography>
                     )}
                 </Stack>
-                <RowCard title={t("advanced")} onClick={showAdvancedSettings} />
+                {/* PHOTOVAULT: strip - Advanced only holds desktop options now. */}
+                {isDesktop && (
+                    <RowCard
+                        title={t("advanced")}
+                        onClick={showAdvancedSettings}
+                    />
+                )}
                 {isDesktop && (
                     <AppLockSettings
                         onAuthenticateUser={onAuthenticateUser}
@@ -555,21 +560,7 @@ const DomainSettingsContents: React.FC = () => {
                         values={{ host: customDomainCNAME }}
                     />
                 </Typography>
-                <Typography sx={{ color: "text.muted", mt: 3 }}>
-                    <Trans
-                        i18nKey="custom_domains_help"
-                        components={{
-                            a: (
-                                <Link
-                                    href="https://ente.com/help/photos/features/sharing-and-collaboration/custom-domains/"
-                                    target="_blank"
-                                    rel="noopener"
-                                    color="accent"
-                                />
-                            ),
-                        }}
-                    />
-                </Typography>
+                {/* PHOTOVAULT: strip - link to Ente's custom domains help removed. */}
             </DomainItem>
         </Stack>
     );
@@ -611,7 +602,6 @@ const AdvancedSettings: React.FC<NestedSidebarDrawerVisibilityProps> = ({
     onClose,
     onRootClose,
 }) => {
-    const { cfUploadProxyDisabled } = useSettingsSnapshot();
     const [isAutoLaunchEnabled, setIsAutoLaunchEnabled] = useState(false);
 
     const electron = globalThis.electron;
@@ -632,9 +622,6 @@ const AdvancedSettings: React.FC<NestedSidebarDrawerVisibilityProps> = ({
         onRootClose();
     };
 
-    const toggleProxy = () =>
-        void updateCFProxyDisabledPreference(!cfUploadProxyDisabled);
-
     const toggleAutoLaunch = () =>
         void electron?.toggleAutoLaunch().then(refreshAutoLaunchEnabled);
 
@@ -646,26 +633,7 @@ const AdvancedSettings: React.FC<NestedSidebarDrawerVisibilityProps> = ({
             title={t("advanced")}
         >
             <Stack sx={{ px: 2, py: 1, gap: 1 }}>
-                <Stack>
-                    <RowCard
-                        title={t("faster_upload")}
-                        endIcon={
-                            <EnteSwitch
-                                checked={!cfUploadProxyDisabled}
-                                onChange={toggleProxy}
-                                slotProps={{
-                                    input: { "aria-label": t("faster_upload") },
-                                }}
-                            />
-                        }
-                    />
-                    <Typography
-                        variant="small"
-                        sx={{ color: "text.faint", pl: 2, pr: 1, py: "6px" }}
-                    >
-                        {t("faster_upload_description")}
-                    </Typography>
-                </Stack>
+                {/* PHOTOVAULT: strip - "Faster upload" (Ente's upload proxy) removed. */}
                 {electron && (
                     <RowCard
                         title={t("open_ente_on_startup")}

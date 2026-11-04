@@ -23,6 +23,7 @@
         "i18next": "26.4.2",
         "memoize-one": "6.0.0",
         "p-debounce": "5.1.1",
+        "qr": "0.6.0",
         "react": "19.3.0",
         "react-dom": "19.3.0",
         "react-i18next": "16.6.6",

@@ -10,8 +10,11 @@
 /** User-visible application name. */
 export const appDisplayName = "Photovault";
 
-/** Credit line required by the fork (shown in the About panel). */
-export const upstreamCredit = "Based on Ente (ente.com)";
+/**
+ * Credit line required by the fork, shown as plain text in the About panel (no
+ * link, no logo). The only user-visible mention of Ente.
+ */
+export const upstreamCredit = "Based on Ente";
 
 /** Window background colour before the web app paints. */
 export const windowBackgroundColor = (isDark: boolean) =>

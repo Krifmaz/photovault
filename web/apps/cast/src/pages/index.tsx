@@ -59,13 +59,7 @@ const Page: React.FC = () => {
                 Enter this code on <b>Photovault</b> to pair this screen
             </Typography>
             {pairingCode ? <PairingCode code={pairingCode} /> : <Spinner />}
-            <Typography variant="h6" sx={{ fontWeight: "regular", mt: 3 }}>
-                Visit{" "}
-                <a href="https://ente.com/cast" target="_blank" rel="noopener">
-                    ente.com/cast
-                </a>{" "}
-                for help
-            </Typography>
+            {/* PHOTOVAULT: strip - "Visit ente.com/cast for help" removed. */}
         </Container>
     );
 };

@@ -1,11 +1,9 @@
 import { updateSavedLocalUser } from "ente-accounts/services/accounts-db";
 import { ensureLocalUser } from "ente-accounts/services/user";
-import { isDesktop } from "ente-base/app";
 import { authenticatedRequestHeaders, ensureOk } from "ente-base/http";
 import { getKV, setKV } from "ente-base/kv";
 import log from "ente-base/log";
 import { apiURL } from "ente-base/origins";
-import { httpOrHTTPSURL } from "ente-base/safe-navigation";
 import {
     nullishToEmpty,
     nullishToZero,
@@ -169,90 +167,12 @@ const PlansData = z.object({
 
 export type PlansData = z.infer<typeof PlansData>;
 
-export const getPlansData = async (): Promise<PlansData> => {
-    const res = await fetch(await apiURL("/billing/user-plans"), {
-        headers: await authenticatedRequestHeaders(),
-    });
-    ensureOk(res);
-    return PlansData.parse(await res.json());
-};
+// PHOTOVAULT: strip - plans, Stripe and the payments app removed (getPlansData,
+// verify/activate/cancel subscription, redirectToPaymentsApp,
+// redirectToCustomerPortal).
 
 export const planUsage = (userDetails: UserDetails) =>
     isPartOfFamily(userDetails) ? familyUsage(userDetails) : userDetails.usage;
-
-export const verifyStripeSubscription = async (
-    sessionID: unknown,
-): Promise<Subscription> => {
-    ensureOk(
-        await fetch(await apiURL("/billing/verify-subscription"), {
-            method: "POST",
-            headers: await authenticatedRequestHeaders(),
-            body: JSON.stringify({
-                paymentProvider: "stripe",
-                productID: null,
-                verificationData: sessionID,
-            }),
-        }),
-    );
-    await pullUserDetails();
-    return userDetailsSnapshot()!.subscription;
-};
-
-export const activateStripeSubscription = async () => {
-    ensureOk(
-        await fetch(await apiURL("/billing/stripe/activate-subscription"), {
-            method: "POST",
-            headers: await authenticatedRequestHeaders(),
-        }),
-    );
-    return pullUserDetails();
-};
-
-export const cancelStripeSubscription = async () => {
-    ensureOk(
-        await fetch(await apiURL("/billing/stripe/cancel-subscription"), {
-            method: "POST",
-            headers: await authenticatedRequestHeaders(),
-        }),
-    );
-    return pullUserDetails();
-};
-
-const paymentsAppOrigin = "https://payments.ente.com";
-
-export const redirectToPaymentsApp = async (
-    productID: string,
-    action: "buy" | "update",
-) => {
-    const paymentToken = await getPaymentToken();
-    const redirectURL = paymentCompletionRedirectURL();
-    window.location.href = `${paymentsAppOrigin}?productID=${productID}&paymentToken=${paymentToken}&action=${action}&redirectURL=${redirectURL}`;
-};
-
-const paymentCompletionRedirectURL = () =>
-    isDesktop
-        ? `${paymentsAppOrigin}/desktop-redirect`
-        : `${window.location.origin}/gallery`;
-
-const getPaymentToken = async () => {
-    const res = await fetch(await apiURL("/users/payment-token"), {
-        headers: await authenticatedRequestHeaders(),
-    });
-    ensureOk(res);
-    return z.object({ paymentToken: z.string() }).parse(await res.json())
-        .paymentToken;
-};
-
-export const redirectToCustomerPortal = async () => {
-    const redirectURL = paymentCompletionRedirectURL();
-    const res = await fetch(
-        await apiURL("/billing/stripe/customer-portal", { redirectURL }),
-        { headers: await authenticatedRequestHeaders() },
-    );
-    ensureOk(res);
-    const portal = z.object({ url: z.string() }).parse(await res.json());
-    window.location.href = httpOrHTTPSURL(portal.url).href;
-};
 
 export const isSubscriptionActive = (subscription: Subscription) =>
     subscription.expiryTime > Date.now() * 1000;

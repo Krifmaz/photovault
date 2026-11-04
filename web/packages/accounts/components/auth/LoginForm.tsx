@@ -63,14 +63,16 @@ export function LoginForm({
                             <TextLink onClick={onCancel}>
                                 {t("cancel")}
                             </TextLink>
-                        ) : (
+                        ) : onSignUp ? (
+                            // PHOTOVAULT: connect - no sign-up prompt when the
+                            // server refuses sign-ups.
                             <AccountPrompt>
                                 <span>{t("auth_new_account_prompt")}</span>
                                 <TextLink regular onClick={onSignUp}>
                                     {t("sign_up")}
                                 </TextLink>
                             </AccountPrompt>
-                        )}
+                        ) : null}
                         <Host>{host ?? ""}</Host>
                     </AccountActions>
                 </FormFooter>

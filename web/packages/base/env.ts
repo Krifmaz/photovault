@@ -8,6 +8,8 @@ declare const process: {
         readonly desktopAppVersion?: string;
         readonly gitSHA?: string;
         readonly isDesktop: "" | "1";
+        // PHOTOVAULT: connect - Next basePath of sub-apps (next.config.js).
+        readonly photovaultBasePath?: string;
     };
 };
 
@@ -21,6 +23,8 @@ export const buildEnvAppName = process.env.appName;
 export const buildEnvIsDesktop = process.env.isDesktop == "1";
 export const buildEnvDesktopAppVersion = process.env.desktopAppVersion;
 export const buildEnvGitSHA = process.env.gitSHA;
+// PHOTOVAULT: connect - "/albums", "/cast", "/accounts" or "" (photos).
+export const buildEnvBasePath = process.env.photovaultBasePath ?? "";
 
 // Keep these as functions; SSR would inline constants with the server value.
 export const haveWindow = () => typeof window != "undefined";

@@ -91,7 +91,6 @@ import {
     savedNormalCollections,
     savedOrCreateUserUncategorizedCollection,
 } from "ente-new/photos/services/collection";
-import { redirectToCustomerPortal } from "ente-new/photos/services/user-details";
 import { usePhotosAppContext } from "ente-new/photos/types/context";
 import { firstNonEmpty } from "ente-utils/array";
 import { t } from "i18next";
@@ -188,7 +187,7 @@ export const Upload: React.FC<UploadProps> = ({
     onOpenCollectionSelector,
     onCloseCollectionSelector,
     onUploadFile,
-    onShowSubscription,
+    onShowSubscription, // PHOTOVAULT: strip - unused (no plan upgrade action)
     onShowSessionExpiredDialog,
     ...props
 }) => {
@@ -1121,21 +1120,17 @@ export const Upload: React.FC<UploadProps> = ({
             case sessionExpiredErrorMessage:
                 onShowSessionExpiredDialog();
                 break;
+            // PHOTOVAULT: strip - no payments or plan upgrade; just say why.
             case subscriptionExpiredErrorMessage:
                 showNotification({
                     color: "critical",
-                    caption: t("subscription_expired"),
-                    title: t("renew_now"),
-                    onClick: () =>
-                        void redirectToCustomerPortal().catch(onGenericError),
+                    title: t("subscription_expired"),
                 });
                 break;
             case storageLimitExceededErrorMessage:
                 showNotification({
                     color: "critical",
-                    caption: t("storage_quota_exceeded"),
-                    title: t("upgrade_now"),
-                    onClick: onShowSubscription,
+                    title: t("storage_quota_exceeded"),
                     startIcon: Database02Icon,
                 });
                 break;

@@ -8,9 +8,11 @@ import {
     type TwoFactorRecovery,
     type TwoFactorType,
 } from "ente-accounts/services/user";
+import { appName } from "ente-base/app"; // PHOTOVAULT: strip
 import { LoadingIndicator } from "ente-base/components/loaders";
 import type { MiniDialogAttributes } from "ente-base/components/MiniDialog";
 import type { SingleInputFormProps } from "ente-base/components/SingleInputForm";
+import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: strip
 import { useBaseContext } from "ente-base/context";
 import { isNamedError } from "ente-base/error";
 import log from "ente-base/log";
@@ -44,7 +46,11 @@ const Page: React.FC<RecoverPageProps> = ({ twoFactorType = "totp" }) => {
         (dialogContinue?: MiniDialogAttributes["continue"]) =>
             showMiniDialog({
                 title: t("contact_support"),
-                message: (
+                // PHOTOVAULT: strip - no Ente support e-mail; the server's
+                // administrator handles this.
+                message: isPhotovaultApp(appName) ? (
+                    "Please contact the administrator of your server."
+                ) : (
                     <Trans
                         i18nKey={"no_two_factor_recovery_key_message"}
                         components={{

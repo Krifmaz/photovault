@@ -1,8 +1,33 @@
-import { getKVS } from "ente-base/kv";
-import { buildEnvCustomAPIEndpoint } from "./env";
+import { getKVS, removeKV, setKV } from "ente-base/kv";
+// PHOTOVAULT: connect
+import {
+    pageOrigin,
+    resolveServerOrigin,
+    savedServerStorageKey,
+} from "ente-base/photovault/server";
+import { buildEnvBasePath, buildEnvCustomAPIEndpoint } from "./env";
 
-export const apiOrigin = async () =>
-    (await customAPIOrigin()) ?? "https://api.ente.com";
+// PHOTOVAULT: strip - never fall back to Ente's servers. Every Photovault
+// deployment is a "custom" (self-hosted) origin in Ente's terms, so the
+// self-hosting code paths Ente already has are the ones that run, and the
+// Ente-hosted CDN, uploader, payments and preview hosts are never contacted.
+//
+// PHOTOVAULT: connect - the order (server chosen on this device, then
+// `NEXT_PUBLIC_ENTE_ENDPOINT`, then the page's own origin, then
+// http://localhost:8080) lives in `ente-base/photovault/server`.
+
+/** The server chosen on the login page, kept in localStorage (main thread). */
+const savedServerOrigin = (): string | undefined => {
+    try {
+        return (
+            globalThis.localStorage.getItem(savedServerStorageKey) ?? undefined
+        );
+    } catch {
+        return undefined;
+    }
+};
+
+export const apiOrigin = async () => customAPIOrigin();
 
 // path must begin with "/".
 export const apiURL = async (
@@ -20,17 +45,68 @@ export const apiURL = async (
     return url;
 };
 
-export const customAPIOrigin = async () =>
-    (await getKVS("apiOrigin")) ?? buildEnvCustomAPIEndpoint ?? undefined;
+// PHOTOVAULT: strip - never undefined, so the Ente-hosted branches that callers
+// take for "no custom origin" (thumbnails/files/public-albums CDN hosts) are
+// unreachable.
+export const customAPIOrigin = async (): Promise<string> => {
+    // PHOTOVAULT: connect - public-link pages (albums, embed) and the cast
+    // receiver belong to the server that serves them. They share an origin
+    // with Photos, so ignore a server that a Photos user saved here.
+    if (["/albums", "/embed", "/cast"].includes(buildEnvBasePath)) {
+        return resolveServerOrigin({
+            buildEnv: buildEnvCustomAPIEndpoint,
+            page: pageOrigin(),
+        });
+    }
+    // PHOTOVAULT: connect - localStorage survives logout (KV DB does not);
+    // Ente's KV "apiOrigin" is what workers can read, so keep it in sync.
+    const local = savedServerOrigin();
+    const kv = await getKVS("apiOrigin");
+    if (local && local != kv) {
+        try {
+            await setKV("apiOrigin", local);
+        } catch {
+            // Best effort; the main thread still uses `local`.
+        }
+    }
+    return resolveServerOrigin({
+        saved: local ?? kv,
+        buildEnv: buildEnvCustomAPIEndpoint,
+        page: pageOrigin(),
+    });
+};
 
-// This ignores the KV custom server and only reflects the build-time override.
-export const isCustomAPIOrigin = !!buildEnvCustomAPIEndpoint;
+/**
+ * PHOTOVAULT: connect - remember (or with `undefined`, forget) the server
+ * chosen on this device. Forgetting reverts to the build-time / same-origin
+ * default.
+ */
+export const saveServerOrigin = async (origin: string | undefined) => {
+    try {
+        if (origin) localStorage.setItem(savedServerStorageKey, origin);
+        else localStorage.removeItem(savedServerStorageKey);
+    } catch {
+        // localStorage unavailable; the KV entry below still applies.
+    }
+    if (origin) await setKV("apiOrigin", origin);
+    else await removeKV("apiOrigin");
+};
+
+// PHOTOVAULT: strip - always true (see above), so build-time checks take the
+// self-hosted branch.
+export const isCustomAPIOrigin = true as boolean;
 
 export const customAPIHost = async () => {
     const origin = await customAPIOrigin();
     return origin ? new URL(origin).host : undefined;
 };
 
-// Custom deployments bypass Ente's uploader worker.
-export const uploaderOrigin = async () =>
-    (await customAPIOrigin()) ?? "https://uploader.ente.com";
+// PHOTOVAULT: strip - uploads go to the configured server, never to Ente's
+// uploader worker.
+export const uploaderOrigin = async () => apiOrigin();
+
+// PHOTOVAULT: strip - static data that Ente serves from assets.ente.com (the
+// ffmpeg.wasm core, the world cities list and the places index) is served from
+// the web app's own origin instead, under /static-assets/ (same layout as
+// Ente's CDN). See web/scripts/photovault-vendor-assets.sh.
+export const staticAssetURL = (path: string) => `/static-assets/${path}`;

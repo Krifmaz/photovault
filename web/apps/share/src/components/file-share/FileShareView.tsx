@@ -1,5 +1,7 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
+// PHOTOVAULT: strip
 import { Notification } from "ente-base/components/Notification";
+import { PhotovaultLogo } from "ente-base/components/photovault/PhotovaultLogo";
 import Head from "next/head";
 import React from "react";
 import { useFileShare } from "../../hooks/use-file-share";
@@ -94,25 +96,10 @@ export const FileShareView: React.FC = () => {
                             px: { xs: 3, md: 4.5 },
                         }}
                     >
-                        <a
-                            href="https://ente.com/locker"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ display: "block", lineHeight: 0 }}
-                        >
-                            <picture>
-                                <source
-                                    srcSet="/images/ente-locker-white.svg"
-                                    media="(prefers-color-scheme: dark)"
-                                />
-                                <Box
-                                    component="img"
-                                    src="/images/ente-locker.svg"
-                                    alt="Ente Locker"
-                                    sx={{ height: "56px", cursor: "pointer" }}
-                                />
-                            </picture>
-                        </a>
+                        {/* PHOTOVAULT: strip - our wordmark, unlinked, instead of the linked Ente Locker logo. */}
+                        <Box sx={{ lineHeight: 0, color: "text.base" }}>
+                            <PhotovaultLogo height={28} />
+                        </Box>
                     </Box>
 
                     <Box

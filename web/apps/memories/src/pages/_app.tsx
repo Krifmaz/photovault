@@ -8,7 +8,6 @@ import { useSetupLogs } from "ente-base/components/utils/hooks-app";
 // PHOTOVAULT: theme - memories use the Photovault (Encore) theme.
 import { photosTheme } from "ente-base/components/utils/theme";
 import type { AppProps } from "next/app";
-import Head from "next/head";
 import React from "react";
 
 const memoriesAppStyle = { "--font-itim": "'Itim'" } as React.CSSProperties;
@@ -16,25 +15,13 @@ const memoriesAppTitle = "Memories, shared with you";
 // PHOTOVAULT: branding
 const memoriesAppDescription = "Tap to relive with Photovault";
 
+// PHOTOVAULT: strip - no Ente-hosted preview (og:image) metadata.
 function MemoriesAppHead() {
-    const previewImage =
-        "https://memories.ente.com/images/memories-meta-new.png";
-
     return (
-        <>
-            <CustomHead
-                title={memoriesAppTitle}
-                description={memoriesAppDescription}
-            />
-            <Head>
-                <meta property="og:image" content={previewImage} />
-                <meta property="og:image:secure_url" content={previewImage} />
-                <meta property="og:image:type" content="image/png" />
-                <meta property="og:image:width" content="720" />
-                <meta property="og:image:height" content="405" />
-                <meta name="twitter:image" content={previewImage} />
-            </Head>
-        </>
+        <CustomHead
+            title={memoriesAppTitle}
+            description={memoriesAppDescription}
+        />
     );
 }
 

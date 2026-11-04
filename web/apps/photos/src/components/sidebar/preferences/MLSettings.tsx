@@ -5,7 +5,6 @@ import {
     Checkbox,
     FormControlLabel,
     FormGroup,
-    Link,
     Stack,
     Typography,
 } from "@mui/material";
@@ -28,7 +27,6 @@ import {
     enableML,
     type MLStatus,
 } from "ente-new/photos/services/ml";
-import { openURL } from "ente-new/photos/utils/web";
 import { t } from "i18next";
 import React, { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
@@ -104,9 +102,6 @@ const EnableML: React.FC<EnableMLProps> = ({
     onEnable,
     showMagicSearchHint,
 }) => {
-    const moreDetails = () =>
-        openURL("https://ente.com/help/photos/features/machine-learning");
-
     return (
         <Stack sx={{ gap: 3, py: 1, px: 2 }}>
             <Typography sx={{ color: "text.muted", px: 1 }}>
@@ -116,9 +111,7 @@ const EnableML: React.FC<EnableMLProps> = ({
                 <Button fullWidth color="accent" onClick={onEnable}>
                     {t("enable")}
                 </Button>
-                <Button fullWidth color="secondary" onClick={moreDetails}>
-                    {t("more_details")}
-                </Button>
+                {/* PHOTOVAULT: strip - "More details" (Ente help link) removed. */}
             </Stack>
             {showMagicSearchHint && (
                 <Typography variant="small" sx={{ color: "text.faint", px: 1 }}>
@@ -174,14 +167,9 @@ export const FaceConsent: React.FC<FaceConsentProps> = ({
         setAcceptTerms(false);
     }, []);
 
-    const privacyPolicyLink = (
-        <Link
-            target="_blank"
-            href="https://ente.com/privacy#8-biometric-information-privacy-policy"
-            underline="always"
-            sx={{ color: "inherit", textDecorationColor: "inherit" }}
-        />
-    );
+    // PHOTOVAULT: strip - the sentence linking to Ente's privacy policy is
+    // not rendered.
+    const privacyPolicyLink = <Omitted />;
 
     return (
         <Stack sx={{ gap: "20px" }}>
@@ -332,3 +320,6 @@ const ManageML: React.FC<ManageMLProps> = ({ mlStatus, onDisableML }) => {
         </Stack>
     );
 };
+
+// PHOTOVAULT: strip - renders nothing (drops a linked sentence from a string).
+const Omitted: React.FC = () => null;

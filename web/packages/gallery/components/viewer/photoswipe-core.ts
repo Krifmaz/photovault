@@ -1128,12 +1128,10 @@ export class FileViewerPhotoSwipe<
                 ui.registerElement({
                     name: "ente-logo",
                     order: 5,
-                    isButton: true,
+                    // PHOTOVAULT: strip - plain wordmark, not a link to Ente.
+                    isButton: false,
                     title: "Photovault", // PHOTOVAULT: branding
                     html: publicAlbumLogoHTML,
-                    onClick: () => {
-                        window.open("https://ente.com", "_blank", "noopener");
-                    },
                 });
             }
 

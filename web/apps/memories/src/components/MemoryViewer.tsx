@@ -21,7 +21,6 @@ import {
     EnteBrandTagImage,
     IMAGE_AUTO_PROGRESS_DURATION_MS,
     isInteractiveTapTarget,
-    JoinNowButton,
     type MemoryViewerProps,
     MOBILE_LAYOUT_BREAKPOINT_PX,
     PhotoContainer,
@@ -44,20 +43,6 @@ const DESKTOP_MEDIA_MAX_WIDTH_CSS = `min(${DESKTOP_MEDIA_MAX_WIDTH_PX}px, calc(1
 const DESKTOP_MEDIA_MAX_HEIGHT_CSS = `calc(min(100vh, 100dvh) - ${DESKTOP_MEDIA_VERTICAL_RESERVED_PX}px)`;
 const DESKTOP_BACKGROUND_IMAGE_PATH = "/images/memory-lane-bg-desktop.svg";
 const MOBILE_BACKGROUND_IMAGE_PATH = "/images/memory-lane-bg-mobile.svg";
-const shareHeaderJoinNowButtonSx = {
-    borderRadius: "999px",
-    fontSize: "16px",
-    fontWeight: 700,
-    lineHeight: "14px",
-    paddingBlock: "18px",
-    paddingInline: "32px",
-};
-const compactShareHeaderJoinNowButtonSx = {
-    ...shareHeaderJoinNowButtonSx,
-    fontSize: "15px",
-    paddingBlock: "13px",
-    paddingInline: "24px",
-};
 
 interface SharedMemoryHeaderProps {
     title: string;
@@ -150,9 +135,7 @@ export function MemoryViewer({
 
     const isVideo = currentFile.metadata.fileType === FileType.video;
     const isMobileLayout = viewport.width <= MOBILE_LAYOUT_BREAKPOINT_PX;
-    const isTabletShareLayout =
-        viewport.width > MOBILE_LAYOUT_BREAKPOINT_PX &&
-        viewport.width < SHARE_COMPACT_LAYOUT_BREAKPOINT_PX;
+    // PHOTOVAULT: strip - isTabletShareLayout only sized the removed button.
     const isCurrentThumbnailResolved =
         thumbnailResolvedSession === activePrefetchSession;
     const isCurrentFullLoadUnlocked =
@@ -539,23 +522,8 @@ export function MemoryViewer({
         />
     );
 
-    const joinEnteButton = (
-        <JoinNowButton
-            variant="contained"
-            color="accent"
-            disableElevation
-            href="https://ente.com/try"
-            target="_blank"
-            rel="noopener"
-            sx={
-                isTabletShareLayout
-                    ? compactShareHeaderJoinNowButtonSx
-                    : shareHeaderJoinNowButtonSx
-            }
-        >
-            Join Ente
-        </JoinNowButton>
-    );
+    // PHOTOVAULT: strip - no "Join Ente" button.
+    const joinEnteButton = null;
 
     const mediaLayers = (
         <>
@@ -635,9 +603,7 @@ export function MemoryViewer({
                 ) : (
                     <TopControls>
                         <TopLeftBrandLink
-                            href="https://ente.com"
-                            target="_blank"
-                            rel="noopener"
+                            // PHOTOVAULT: strip - brand tag without a link to Ente.
                             data-memory-control="true"
                         >
                             <EnteBrandTagImage
@@ -685,9 +651,7 @@ export function MemoryViewer({
                 {isMobileLayout && (
                     <ViewerFooterBar style={{ gap: "24px" }}>
                         <BrandLink
-                            href="https://ente.com"
-                            target="_blank"
-                            rel="noopener"
+                            // PHOTOVAULT: strip - brand tag without a link to Ente.
                             data-memory-control="true"
                         >
                             <EnteBrandTagImage

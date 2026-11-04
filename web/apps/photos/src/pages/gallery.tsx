@@ -1,6 +1,5 @@
 import { AuthenticateUser } from "@/components/AuthenticateUser";
 import { CollectionSelector } from "@/components/CollectionSelector";
-import { DesktopWhatsNew } from "@/components/DesktopWhatsNew";
 import { QuickLinkCreatedNotification } from "@/components/QuickLinkCreatedNotification";
 import { Upload } from "@/components/Upload";
 import { PeopleConsentDialog } from "@/components/gallery";
@@ -80,7 +79,7 @@ const Page: React.FC = () => {
                 <GalleryDownloadNotifications {...downloadNotificationsProps} />
                 {uploadProps && <Upload {...uploadProps} />}
                 <QuickLinkCreatedNotification {...quickLinkNotificationProps} />
-                <DesktopWhatsNew />
+                {/* PHOTOVAULT: strip - no "What's new" dialog. */}
                 <PeopleConsentDialog {...navigation.peopleConsentDialogProps} />
                 <AuthenticateUser {...authenticateUserDialogProps} />
             </FullScreenDropZone>

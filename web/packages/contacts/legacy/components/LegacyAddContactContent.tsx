@@ -31,7 +31,8 @@ interface LegacyAddContactContentProps<Session> {
 
 const nonEnteDialogAttributes = (email: string) => ({
     title: "Cannot add trusted contact",
-    message: `${email} is not linked to an Ente account yet, so it cannot be used as a trusted contact.`,
+    // PHOTOVAULT: strip - no "Ente" in the text.
+    message: `${email} is not linked to an account yet, so it cannot be used as a trusted contact.`,
 });
 
 export const LegacyAddContactContent = <Session,>({
@@ -115,7 +116,8 @@ export const LegacyAddContactContent = <Session,>({
                 showMiniDialog({
                     title: "Verification ID unavailable",
                     message:
-                        "That email is not linked to an Ente account yet, so there is no public key to verify.",
+                        // PHOTOVAULT: strip - no "Ente" in the text.
+                        "That email is not linked to an account yet, so there is no public key to verify.",
                 });
                 return;
             }
@@ -182,7 +184,8 @@ export const LegacyAddContactContent = <Session,>({
                                 variant="small"
                                 sx={{ color: "text.muted", lineHeight: "20px" }}
                             >
-                                Ente will wait{" "}
+                                {/* PHOTOVAULT: strip - no "Ente" in the text. */}
+                                There will be a wait of{" "}
                                 <Box
                                     component="span"
                                     sx={{ color: "text.base", fontWeight: 600 }}

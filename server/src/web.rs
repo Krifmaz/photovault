@@ -3,6 +3,10 @@
 //! up in the web folder as `<path>`, `<path>.html`, `<path>/index.html`, then
 //! falls back to the nearest `index.html` above the path (client-side routes;
 //! sub-apps such as `albums/`, `cast/` and `accounts/` have their own) or `404.html`.
+//!
+//! API routes are matched first (this is the router's fallback), so `/cast/*` API
+//! calls never reach `cast/index.html`. No framing headers are sent: `/embed` must
+//! stay framable if security headers are ever added here.
 
 use axum::body::Body;
 use axum::extract::Request;

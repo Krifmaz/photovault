@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import {
     TitledNestedSidebarDrawer,
     type NestedSidebarDrawerVisibilityProps,
@@ -6,7 +6,6 @@ import {
 import {
     pvBrandName,
     pvCredit,
-    pvCreditURL,
 } from "ente-base/components/utils/photovault/encore-tokens"; // PHOTOVAULT: credit
 import { RowCard } from "ente-base/components/v2/RowCard";
 import { useBaseContext } from "ente-base/context";
@@ -14,7 +13,6 @@ import log from "ente-base/log";
 import { savedLogs } from "ente-base/log-web";
 import { saveStringAsFile } from "ente-base/utils/web";
 import type { SidebarActionID } from "ente-new/photos/services/search/types";
-import { initiateEmail, openURL } from "ente-new/photos/utils/web";
 import { t } from "i18next";
 import React, { useCallback, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
@@ -52,22 +50,8 @@ export const Help: React.FC<HelpProps> = ({
         onRootClose();
     };
 
-    const handleHelp = useCallback(
-        () => openURL("https://ente.com/help/photos/"),
-        [],
-    );
-
-    const handleBlog = useCallback(() => openURL("https://ente.com/blog/"), []);
-
-    const handleRequestFeature = useCallback(
-        () => openURL("https://github.com/ente/ente/discussions"),
-        [],
-    );
-
-    const handleSupport = useCallback(
-        () => initiateEmail("support@ente.com"),
-        [],
-    );
+    // PHOTOVAULT: strip - Ente's help centre, blog, feature requests and
+    // support e-mail are removed; only "View logs" and About remain.
 
     const viewLogs = useCallback(async () => {
         log.info("Viewing logs");
@@ -75,7 +59,11 @@ export const Help: React.FC<HelpProps> = ({
         if (electron) {
             await electron.openLogDirectory();
         } else {
-            saveStringAsFile(savedLogs(), `ente-web-logs-${Date.now()}.txt`);
+            // PHOTOVAULT: strip - file name without "ente".
+            saveStringAsFile(
+                savedLogs(),
+                `photovault-web-logs-${Date.now()}.txt`,
+            );
         }
     }, []);
 
@@ -92,33 +80,18 @@ export const Help: React.FC<HelpProps> = ({
     useEffect(() => {
         if (!open || !pendingAction) return;
         switch (pendingAction) {
+            // PHOTOVAULT: strip - Ente help links removed.
             case "help.helpCenter":
-                handleHelp();
-                break;
             case "help.blog":
-                handleBlog();
-                break;
             case "help.requestFeature":
-                handleRequestFeature();
-                break;
             case "help.support":
-                handleSupport();
                 break;
             case "help.viewLogs":
                 confirmViewLogs();
                 break;
         }
         onActionHandled?.();
-    }, [
-        confirmViewLogs,
-        handleBlog,
-        handleHelp,
-        handleRequestFeature,
-        handleSupport,
-        open,
-        onActionHandled,
-        pendingAction,
-    ]);
+    }, [confirmViewLogs, open, onActionHandled, pendingAction]);
 
     return (
         <TitledNestedSidebarDrawer
@@ -128,44 +101,22 @@ export const Help: React.FC<HelpProps> = ({
             title={t("help")}
         >
             <Stack sx={{ px: 2, py: 1, gap: 1 }}>
-                <RowCard
-                    title="Help centre"
-                    subtitle="ente.com/help/photos"
-                    onClick={handleHelp}
-                />
-                <RowCard
-                    title={t("blog")}
-                    subtitle="ente.com/blog"
-                    onClick={handleBlog}
-                />
-                <RowCard
-                    title="Request a feature"
-                    subtitle="github.com/ente/ente"
-                    onClick={handleRequestFeature}
-                />
-                <RowCard
-                    title={t("support")}
-                    subtitle="support@ente.com"
-                    onClick={handleSupport}
-                />
+                {/* PHOTOVAULT: strip - Ente help, blog, feature request and support rows removed. */}
                 <RowCard
                     title={t("view_logs")}
                     subtitle="Share with support when something goes wrong"
                     onClick={confirmViewLogs}
                 />
-                {/* PHOTOVAULT: credit */}
-                <RowCard
-                    title={pvBrandName}
-                    subtitle={pvCredit}
-                    onClick={() => openURL(pvCreditURL)}
-                />
-                {appVersion && (
-                    <RowCard
-                        title="About"
-                        subtitle={`Photos ${appVersion}`}
-                        endIcon={null}
-                    />
-                )}
+                {/* PHOTOVAULT: credit - About, with the plain-text "Based on Ente" line (no link, no logo). */}
+                <Stack sx={{ px: 1, pt: 2, gap: 0.5 }} aria-label="About">
+                    <Typography variant="small" sx={{ fontWeight: 600 }}>
+                        {pvBrandName}
+                        {appVersion ? ` ${appVersion}` : ""}
+                    </Typography>
+                    <Typography variant="small" sx={{ color: "text.muted" }}>
+                        {pvCredit}
+                    </Typography>
+                </Stack>
             </Stack>
         </TitledNestedSidebarDrawer>
     );

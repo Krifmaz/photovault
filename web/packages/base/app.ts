@@ -38,7 +38,7 @@ export const staticAppTitle = {
     auth: "Ente Auth",
     cast: "Photovault",
     embed: "Photovault",
-    share: "Ente Locker",
+    share: "Photovault", // PHOTOVAULT: strip
     photos: "Photovault",
     photobook: "Photovault Photobook",
     ensu: "Ensu",
