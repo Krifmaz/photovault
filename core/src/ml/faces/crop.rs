@@ -176,11 +176,21 @@ async fn original(inner: &Inner, file_id: i64) -> Option<Vec<u8>> {
                 .get_object(&format!("/files/download/{file_id}"))
                 .await
                 .ok()?;
-            let b = res.bytes().await.ok()?;
-            if b.len() as u64 > MAX_ORIGINAL_BYTES {
+            // Read at most the limit (records without a size included).
+            let mut res = res;
+            if !res.status().is_success()
+                || res.content_length().is_some_and(|n| n > MAX_ORIGINAL_BYTES)
+            {
                 return None;
             }
-            b.to_vec()
+            let mut b = Vec::new();
+            while let Some(chunk) = res.chunk().await.ok()? {
+                if (b.len() + chunk.len()) as u64 > MAX_ORIGINAL_BYTES {
+                    return None;
+                }
+                b.extend_from_slice(&chunk);
+            }
+            b
         }
     };
     let key = f.key.clone();
