@@ -39,8 +39,9 @@ import app.photovault.android.ui.viewer.ViewerViewModel
  */
 fun NavGraphBuilder.mlDestinations(graph: AppGraph, nav: NavHostController) {
     composable<SearchRoute> {
-        val context = LocalContext.current
-        val vm = viewModel { SearchViewModel(graph.ml, onMlEnabled = { MlWork.scheduler(context).reschedule() }) }
+        // The scheduler holds the application context only: the view model outlives this activity.
+        val scheduler = MlWork.scheduler(LocalContext.current)
+        val vm = viewModel { SearchViewModel(graph.ml, onMlEnabled = scheduler::reschedule) }
         SearchScreen(
             vm = vm,
             onBack = { nav.popBackStack() },
