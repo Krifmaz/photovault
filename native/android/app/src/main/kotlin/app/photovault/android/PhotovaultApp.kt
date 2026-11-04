@@ -7,6 +7,10 @@ import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.LanDiscovery
 import app.photovault.android.data.NsdLanDiscovery
 import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.VideoRepository
+import app.photovault.android.data.VideoRepositoryProvider
+import app.photovault.android.ui.viewer.video.ExoPlaybackEngine
+import app.photovault.android.ui.viewer.video.PlaybackEngine
 import app.photovault.android.ui.image.buildImageLoader
 import app.photovault.android.ui.timeline.TimelineLabels
 import coil3.ImageLoader
@@ -33,6 +37,12 @@ class AppGraph(private val context: Context) {
     }
     val discovery: LanDiscovery by lazy { NsdLanDiscovery(context) }
     val timeline: TimelineStore by lazy { TimelineStore(core) }
+
+    /** Streamable videos (contract v1.2): core's loopback streams, or v1's `streamPlaylist` without them. */
+    val videos: VideoRepository by lazy { VideoRepositoryProvider.create(core) }
+
+    /** The viewer's player (one per open viewer, created on its first video, released when it closes). */
+    fun newPlaybackEngine(): PlaybackEngine = ExoPlaybackEngine(context)
 
     /** App-lifetime work that must not block the UI or die with a screen (file cleanup, network re-checks). */
     val appScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

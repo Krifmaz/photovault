@@ -63,3 +63,10 @@ The code `123456` is accepted. Videos show an error since there are no real file
   are kept, and they are deleted when the viewer closes.
 - Pinch-to-zoom scales the grid in its graphics layer and only changes the column count (2/3/4 by day,
   6 by month, 10 by year) when a threshold is crossed, so a pinch does not recompose the grid.
+- Videos (contract v1.2 "video"): `data/VideoRepository` asks core for a stream of every video (`video_stream`);
+  core answers with an HLS playlist on its loopback server (127.0.0.1, random port, secret token), decrypting
+  Ente's streamable segments in memory, and the viewer plays it with Media3's HLS module. Without a stream the
+  original is downloaded and played by the same player. One ExoPlayer (`ui/viewer/video`) serves all pages: only
+  the settled page attaches a Compose `PlayerSurface` (TextureView, so it follows the pager and dismiss
+  transforms); controls fade after 3 s, mute sticks across videos, audio focus is handled by ExoPlayer, and the
+  player is released (and core's streams ended with `stop_streams`) when the viewer closes.
