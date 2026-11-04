@@ -113,3 +113,65 @@ Tests the core track hands back with: SRP and key-derivation against `server/tes
 files/thumbnails/metadata produced by Ente's web client, a full sign-in + sync + upload + download round
 trip against the real server (`cargo test -p photovault-core --features it`), and `uniffi-bindgen` Kotlin
 generation in CI. Additive changes (new methods/fields) need a contracts commit; renames do not happen in v1.
+
+## Albums, sharing and trash (contract v1.2, additive)
+
+Implemented in `core/src/albums.rs` (its own `#[uniffi::export] impl Core` block). Requests and
+crypto exactly as Ente's apps: album keys secretbox'd with the master key, shared with a sealed box to
+the sharee's public key (`GET /users/public-key`), file keys re-encrypted with the target album's key
+on add/restore/move, the public link's album key appended as `#<base58(key)>`, link passwords as
+Ente's `deriveInteractiveKey` (Argon2id, interactive limits, random salt as `nonce`). Hiding an album
+sets `visibility = 2` in its magic metadata; hiding files moves them to the default hidden collection
+(`subType = 1`), created if missing. Trash entries and keys of deleted albums are sealed kv rows.
+
+```rust
+#[derive(uniffi::Enum)] pub enum ShareRole { Viewer, Collaborator, Admin, Owner, Unknown }
+#[derive(uniffi::Record)] pub struct Sharee { user_id: i64, email: String, role: ShareRole }
+#[derive(uniffi::Record)] pub struct PublicLink {
+  url: String,                    // with "#<base58 album key>"
+  valid_till_us: i64,             // 0 = never
+  device_limit: u32,              // 0 = unlimited
+  enable_download: bool, enable_collect: bool, enable_join: bool, password_enabled: bool,
+}
+#[derive(uniffi::Record)] pub struct PublicLinkUpdate {
+  valid_till_us: Option<i64>, device_limit: Option<u32>, enable_download: Option<bool>,
+  enable_collect: Option<bool>, enable_join: Option<bool>,
+  password: Option<String>,       // Some("") removes the password
+}
+#[derive(uniffi::Record)] pub struct AlbumDetails {
+  collection: Collection, owned: bool, owner_email: String, my_role: ShareRole,
+  hidden: bool, archived: bool, is_default_hidden: bool,
+  sharees: Vec<Sharee>, public_link: Option<PublicLink>,
+}
+#[derive(uniffi::Record)] pub struct TrashEntry { item: TimelineItem, delete_by_us: i64 }
+
+#[uniffi::export] impl Core {
+  fn albums(&self) -> Vec<AlbumDetails>;          // same set and order as collections()
+  fn hidden_albums(&self) -> Vec<AlbumDetails>;   // hidden albums + the default hidden collection
+  fn album_details(&self, collection_id: i64) -> Option<AlbumDetails>;
+  async fn create_album(&self, name: String) -> Result<Collection, CoreError>;
+  async fn rename_album(&self, collection_id: i64, name: String) -> Result<(), CoreError>;
+  async fn delete_album(&self, collection_id: i64, keep_files: bool) -> Result<(), CoreError>;
+  async fn add_to_album(&self, collection_id: i64, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn remove_from_album(&self, collection_id: i64, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn set_album_hidden(&self, collection_id: i64, hidden: bool) -> Result<(), CoreError>;
+  async fn hide_files(&self, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn unhide_files(&self, file_ids: Vec<i64>, collection_id: Option<i64>) -> Result<(), CoreError>;
+  async fn share_album(&self, collection_id: i64, email: String, role: ShareRole) -> Result<Vec<Sharee>, CoreError>;
+  async fn unshare_album(&self, collection_id: i64, email: String) -> Result<Vec<Sharee>, CoreError>;
+  async fn leave_album(&self, collection_id: i64) -> Result<(), CoreError>;
+  async fn create_public_link(&self, collection_id: i64) -> Result<PublicLink, CoreError>;
+  async fn update_public_link(&self, collection_id: i64, update: PublicLinkUpdate) -> Result<PublicLink, CoreError>;
+  async fn delete_public_link(&self, collection_id: i64) -> Result<(), CoreError>;
+  async fn sync_trash(&self) -> Result<u64, CoreError>;
+  fn trash_count(&self) -> u64;
+  fn trash_page(&self, offset: u64, limit: u32) -> Vec<TrashEntry>;   // most recently trashed first
+  async fn move_to_trash(&self, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn restore_from_trash(&self, file_ids: Vec<i64>, collection_id: Option<i64>) -> Result<(), CoreError>;
+  async fn delete_from_trash(&self, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn empty_trash(&self) -> Result<(), CoreError>;
+}
+```
+
+`thumbnail(file_id)` also serves trashed files. Every mutation updates the local index before it
+returns. The Android app reaches these through `data/albums/AlbumsRepository` (not `CoreRepository`).
