@@ -36,7 +36,9 @@ on:
         default: patch
 
 concurrency:
-  group: release
+  # Releasing runs queue one at a time. Runs on other branches (all jobs
+  # skipped) get their own group, so they never replace a queued release.
+  group: ${{ (github.ref == 'refs/heads/main' || github.ref_name == github.event.repository.default_branch) && 'release' || format('release-skip-{0}', github.ref) }}
   cancel-in-progress: false
 
 permissions:
