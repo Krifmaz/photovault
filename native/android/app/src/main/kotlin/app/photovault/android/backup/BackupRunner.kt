@@ -137,10 +137,12 @@ class BackupRunner(
 
     /** Runs core's queue, reporting its status every [pollMs] meanwhile. */
     private suspend fun upload(onPhase: suspend (BackupPhase) -> Unit): UploadStatus = coroutineScope {
+        // Reported before the queue starts, so the notification (and foreground service) come up at once.
+        onPhase(BackupPhase.Uploading(core.uploadStatus()))
         val poll = launch {
             while (true) {
-                onPhase(BackupPhase.Uploading(core.uploadStatus()))
                 delay(pollMs)
+                onPhase(BackupPhase.Uploading(core.uploadStatus()))
             }
         }
         try {
