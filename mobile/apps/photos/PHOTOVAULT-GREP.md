@@ -793,7 +793,10 @@ Grouped per message key across all 57 locales. "used" means Photos or a package 
 `classes*.dex`, `resources.arsc`, `assets/` and `lib/arm64-v8a/libapp.so` has
 not run. The build environment cannot reach `dl.google.com` (Android SDK, NDK
 and Google's Maven repository), so `flutter build apk` stops at "No Android SDK
-found". When an APK exists, `.github/workflows/photovault-mobile.yml` (step
+found". Checked again on 2026-11-04 after the review fixes: `dl.google.com`
+is still refused by the proxy (`maven.google.com` answers, but the SDK
+platform, build-tools and NDK come only from `dl.google.com`), so there is
+still no APK. When an APK exists, `.github/workflows/photovault-mobile.yml` (step
 "Check APK") fails the build if the dex contains `com/google/firebase`,
 `com/google/android/gms`, `io/sentry` or `com/android/billingclient` classes,
 and checks the applicationId and signature.
