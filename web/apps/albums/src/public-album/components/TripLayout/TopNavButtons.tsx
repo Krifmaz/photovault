@@ -7,6 +7,7 @@ import {
 } from "@/public-album/components/ActionIcons";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 import { Box, IconButton, styled } from "@mui/material";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import { useState } from "react";
 
 interface TopNavButtonsProps {
@@ -29,7 +30,10 @@ export const TopNavButtons: React.FC<TopNavButtonsProps> = ({
 
     const handleShare = () => {
         if (typeof window !== "undefined") {
-            void navigator.clipboard.writeText(window.location.href);
+            void copyTextToClipboard(
+                // PHOTOVAULT: clipboard
+                window.location.href,
+            );
             setShowCopiedMessage(true);
             setTimeout(() => setShowCopiedMessage(false), 2000);
         }

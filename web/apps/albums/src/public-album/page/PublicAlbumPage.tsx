@@ -58,6 +58,7 @@ import {
 } from "ente-base/http";
 import log from "ente-base/log";
 import { apiOrigin } from "ente-base/origins";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import type { FullScreenDropZoneProps } from "ente-gallery/components/FullScreenDropZone";
 import {
     useSaveGroupsActions,
@@ -1150,7 +1151,10 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
             }
         }
 
-        void navigator.clipboard.writeText(isMobile ? shareText : shareUrl);
+        void copyTextToClipboard(
+            // PHOTOVAULT: clipboard
+            isMobile ? shareText : shareUrl,
+        );
         setShowCopiedMessage(true);
         setTimeout(() => setShowCopiedMessage(false), 2000);
     };

@@ -26,6 +26,7 @@ import { useBaseContext } from "ente-base/context";
 import { isNamedError } from "ente-base/error";
 import type { PublicAlbumsCredentials } from "ente-base/http";
 import log from "ente-base/log";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import type { AddSaveGroup } from "ente-gallery/components/utils/save-groups";
 import { createPSRegisterElementIconHTML } from "ente-gallery/components/viewer/icons";
 import type { EnteFile } from "ente-media/file";
@@ -437,7 +438,10 @@ export const PublicAlbumSingleFileViewer: React.FC<
         }
 
         try {
-            await navigator.clipboard.writeText(shareUrl);
+            await copyTextToClipboard(
+                // PHOTOVAULT: clipboard
+                shareUrl,
+            );
             setShowCopiedMessage(true);
             window.setTimeout(() => setShowCopiedMessage(false), 2000);
         } catch (error) {

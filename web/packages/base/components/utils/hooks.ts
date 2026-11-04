@@ -1,4 +1,5 @@
 import { useMediaQuery, useTheme } from "@mui/material";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import { useCallback, useEffect, useEffectEvent, useState } from "react";
 
 export const useIsSmallWidth = () =>
@@ -15,7 +16,9 @@ export const useClipboardCopy = (
     const [copied, setCopied] = useState(false);
 
     const handleCopyLink = useCallback(() => {
-        void navigator.clipboard.writeText(text).then(() => {
+        // PHOTOVAULT: clipboard - also works on plain http:// servers.
+        void copyTextToClipboard(text).then((ok) => {
+            if (!ok) return;
             setCopied(true);
             setTimeout(() => setCopied(false), 1000);
         });

@@ -482,3 +482,4 @@ its check reports to the per-locale table), then
 - `packages/accounts/components/auth/LoginForm.tsx`: when the server refuses sign-ups, show "Sign-up is closed on this server. Ask its admin for an account." (`pv_signups_closed`) instead of hiding the prompt silently.
 - `packages/accounts/pages/signup.tsx`: a direct /signup visit on a server with sign-ups off goes to /login (which says sign-up is closed).
 - `packages/accounts/components/SignUpContents.tsx`: when sign-up fails and the server reports `signupsAllowed: false`, show "Sign-up is closed on this server" instead of "Something went wrong".
+- `packages/base/photovault/clipboard.ts` (new), `packages/base/components/utils/hooks.ts`, and the copy call sites in photos/albums: copy also works on plain http:// servers (execCommand fallback, then a prompt to copy by hand).
