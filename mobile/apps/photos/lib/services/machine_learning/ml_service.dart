@@ -30,6 +30,7 @@ import "package:photos/services/machine_learning/ml_process_lock.dart";
 import "package:photos/services/machine_learning/ml_result.dart";
 import "package:photos/services/machine_learning/ml_run_control.dart";
 import "package:photos/services/machine_learning/semantic_search/semantic_search_service.dart";
+import "package:photos/services/photovault/server_assets.dart"; // PHOTOVAULT
 import "package:photos/services/search_service.dart";
 import "package:photos/services/video_preview_service.dart";
 import "package:photos/utils/isolate/isolate_operations.dart";
@@ -315,6 +316,13 @@ class MLService {
       unawaited(_maybePredownloadLocalModels());
     });
   }
+
+  // PHOTOVAULT: server connection. Local indexing needs the server's model
+  // mirror; without it this runs as if local indexing were off (embeddings
+  // already on the server are still fetched).
+  bool get _canIndexLocally =>
+      localSettings.isMLLocalIndexingEnabled &&
+      PhotovaultServerAssets.modelsAvailable;
 
   bool canFetch() {
     if (localSettings.isMLLocalIndexingEnabled) return true;
@@ -624,7 +632,7 @@ class MLService {
     bool rustRuntimePrepared = false;
     try {
       _logger.info('starting image indexing');
-      if (allowImageIndexing && localSettings.isMLLocalIndexingEnabled) {
+      if (allowImageIndexing && _canIndexLocally) {
         await MLModelDownloadService.instance.ensureModelsDownloaded(
           onlyIndexingModels: true,
         );
@@ -646,7 +654,7 @@ class MLService {
           _logRunStopped(control, "between indexing chunks");
           break;
         }
-        if (!allowImageIndexing || !localSettings.isMLLocalIndexingEnabled) {
+        if (!allowImageIndexing || !_canIndexLocally) {
           if (rustRuntimePrepared) {
             await MLIndexingIsolate.instance.releaseRustRuntime();
             rustRuntimePrepared = false;

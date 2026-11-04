@@ -135,6 +135,14 @@ line = "models\\.ente\\.com"
 category = "pending-user-decision"
 reason = "ML models still download from models.ente.com (owner to decide); this is the host check for those downloads."
 
+
+[[allow]]
+path = "rust/bindings/frb/photos/src/api/ml_indexing_api.rs"
+term = "ente.com"
+line = "MODEL_CATALOG_PREFIX: &str = \"https://models\\.ente\\.com/\""
+category = "internal-identifier"
+reason = "Prefix the model catalog's URLs are matched on: rewritten to the server's mirror (modelsUrl) or blocked when there is none. Never requested."
+
 # ---------------------------------------------------------------------------
 # Mobile: Photos app
 

@@ -13,6 +13,7 @@ import "package:photos/events/notification_event.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/services/machine_learning/ml_model_download_service.dart";
 import "package:photos/services/machine_learning/ml_service.dart";
+import "package:photos/services/photovault/server_assets.dart"; // PHOTOVAULT
 import "package:photos/services/wake_lock_service.dart";
 import "package:photos/theme/ente_theme.dart";
 import "package:photos/ui/settings/ml/machine_learning_settings_page.dart";
@@ -274,6 +275,8 @@ class _MLProgressBannerState extends State<MLProgressBanner>
 
   bool _shouldShowModelDownloadPhase(IndexStatus status) {
     if (!localSettings.isMLLocalIndexingEnabled) return false;
+    // PHOTOVAULT: server connection. No model mirror: nothing to download.
+    if (!PhotovaultServerAssets.modelsAvailable) return false;
     if (status.indexedItems > 0) return false;
     if (status.pendingItems <= 0) return false;
     return !MLModelDownloadService.instance.areModelsDownloaded(

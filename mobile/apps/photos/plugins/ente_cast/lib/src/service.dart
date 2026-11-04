@@ -11,7 +11,23 @@ import "package:ente_cast/src/cast/chromecast_discovery.dart";
 import "package:flutter/foundation.dart";
 
 class CastService {
-  static const _appID = "F5BCEC64";
+  // PHOTOVAULT: server connection. Upstream launched Ente's registered
+  // receiver (app id F5BCEC64), which loads Ente's hosted cast page and pairs
+  // through Ente's servers. The receiver is now the app's choice (the server's
+  // own receiver, see `castAppId` in /photovault/info); with none, Chromecast
+  // auto-pairing is off and casting uses "Pair with code".
+  CastService({String? Function()? appID}) : _resolveAppID = appID;
+
+  final String? Function()? _resolveAppID;
+
+  /// The receiver to launch, or null when auto-pairing is unavailable.
+  String? get appID {
+    final id = _resolveAppID?.call()?.trim();
+    return id == null || id.isEmpty ? null : id;
+  }
+
+  /// True when a Chromecast can be paired automatically (a receiver is set).
+  bool get canAutoPair => isSupported && appID != null;
   static const _pairingTimeout = Duration(seconds: 20);
 
   final _client = ChromecastClient();
@@ -49,12 +65,21 @@ class CastService {
       return Future.error(StateError("Already connected to ${device.name}"));
     }
 
+    final appID = this.appID; // PHOTOVAULT: server connection
+    if (appID == null) {
+      return Future.error(
+        UnsupportedError("No Cast receiver is configured for this server"),
+      );
+    }
+
     late final Future<String> attempt;
-    attempt = _connect(device, collectionID: collectionID).whenComplete(() {
-      if (identical(_connectionAttempts[serviceName], attempt)) {
-        _connectionAttempts.remove(serviceName);
-      }
-    });
+    attempt = _connect(device, appID, collectionID: collectionID).whenComplete(
+      () {
+        if (identical(_connectionAttempts[serviceName], attempt)) {
+          _connectionAttempts.remove(serviceName);
+        }
+      },
+    );
     _connectionAttempts[serviceName] = attempt;
     return attempt;
   }
@@ -98,11 +123,12 @@ class CastService {
   }
 
   Future<String> _connect(
-    ChromecastDevice device, {
+    ChromecastDevice device,
+    String appID, {
     required int? collectionID,
   }) async {
     final connection = await _client.connect(device);
-    final session = _CastSession(device, connection);
+    final session = _CastSession(device, connection, appID);
     _sessions[device.serviceName] = session;
 
     session.messageSubscription = connection.messages.listen(
@@ -129,7 +155,7 @@ class CastService {
       return await waitForPairCode(
         messages: connection.messages,
         states: connection.states,
-        start: () => connection.launch(_appID),
+        start: () => connection.launch(appID),
         sendPairRequest: () => connection.send(castPairRequestNamespace, {
           "collectionID": ?collectionID,
         }),
@@ -153,7 +179,7 @@ class CastService {
     if (applications is List) {
       for (final application in applications) {
         if (application is Map &&
-            application["appId"] == _appID &&
+            application["appId"] == session.appID &&
             application["sessionId"] is String) {
           receiverSessionID = application["sessionId"] as String;
           break;
@@ -199,12 +225,13 @@ class CastService {
 final class _CastSession {
   final ChromecastDevice device;
   final ChromecastConnection connection;
+  final String appID; // PHOTOVAULT: server connection
   StreamSubscription<ChromecastMessage>? messageSubscription;
   StreamSubscription<ChromecastConnectionState>? stateSubscription;
   String? receiverSessionID;
   Future<void>? closeFuture;
 
-  _CastSession(this.device, this.connection);
+  _CastSession(this.device, this.connection, this.appID);
 
   Future<void> cancelSubscriptions() async {
     await messageSubscription?.cancel();

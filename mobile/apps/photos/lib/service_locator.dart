@@ -42,6 +42,7 @@ import "package:photos/services/memories/rust_memories_computer.dart";
 import "package:photos/services/memories/smart_memories_service.dart";
 import "package:photos/services/memories_cache_service.dart";
 import "package:photos/services/permission/service.dart";
+import "package:photos/services/photovault/server_assets.dart"; // PHOTOVAULT
 import "package:photos/services/rituals/rituals_service.dart";
 import "package:photos/services/smart_albums_service.dart";
 import "package:photos/services/storage_bonus_service.dart";
@@ -107,7 +108,9 @@ FlagService get flagService {
 CastService? _castService;
 
 CastService get castService {
-  _castService ??= CastService();
+  // PHOTOVAULT: server connection. The server's own Cast receiver, never
+  // Ente's (see PhotovaultServerAssets.castAppId).
+  _castService ??= CastService(appID: PhotovaultServerAssets.castAppId);
   return _castService!;
 }
 

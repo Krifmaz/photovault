@@ -38,6 +38,8 @@ class PhotovaultStrings {
   static const changeServer = "Change server";
   static const switchServer = "Switch server";
   static const notConnected = "Not connected";
+  static const mlModelsUnavailable =
+      "Unavailable: this server doesn't provide the models";
   static const address = "Address";
   static const homeAddress = "Home address";
   static const publicAddress = "Public address";
