@@ -14,6 +14,7 @@ import 'package:photos/events/subscription_purchased_event.dart'; // PHOTOVAULT:
 import "package:photos/locale.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
+import "package:photos/services/photovault/photovault_strings.dart"; // PHOTOVAULT
 import "package:photos/services/photovault/server_contract.dart"; // PHOTOVAULT
 import "package:photos/theme/ente_theme.dart";
 import 'package:photos/ui/account/email_entry_page.dart';
@@ -152,6 +153,17 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
                             label: context.strings.createMyAccount,
                             onTap: _navigateToSignUpPage,
                             shouldSurfaceExecutionStates: false,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ] else ...[
+                        // PHOTOVAULT: say why there is no sign-up button.
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            PhotovaultStrings.signupsClosed,
+                            textAlign: TextAlign.center,
+                            style: getEnteTextTheme(context).miniMuted,
                           ),
                         ),
                         const SizedBox(height: 12),

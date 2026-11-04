@@ -478,3 +478,5 @@ change and re-adding the `PHOTOVAULT` hunk; for locales, take upstream's file
 and re-run `node scripts/photovault-locale-brand.mjs` (add any inflected form
 its check reports to the per-locale table), then
 `node scripts/photovault-brand-audit.mjs` for code strings.
+
+- `packages/accounts/components/auth/LoginForm.tsx`: when the server refuses sign-ups, show "Sign-up is closed on this server. Ask its admin for an account." (`pv_signups_closed`) instead of hiding the prompt silently.

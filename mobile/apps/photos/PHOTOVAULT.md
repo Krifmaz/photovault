@@ -493,3 +493,5 @@ not ship):
   `scripts/strip-allowlist.toml`, over the sources and the built APK
   (`photovault-mobile.yml`, report artifact `strip-report-apk`); the source
   report is `docs/src/strip-report.md`.
+
+- `lib/ui/home/landing_page_widget.dart`: when the server refuses sign-ups, the landing page shows PhotovaultStrings.signupsClosed in place of "Create account".

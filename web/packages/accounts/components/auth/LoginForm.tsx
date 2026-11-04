@@ -72,7 +72,13 @@ export function LoginForm({
                                     {t("sign_up")}
                                 </TextLink>
                             </AccountPrompt>
-                        ) : null}
+                        ) : (
+                            // PHOTOVAULT: connect - say why there is no sign-up
+                            // link instead of hiding it silently.
+                            <AccountPrompt>
+                                <span>{t("pv_signups_closed")}</span>
+                            </AccountPrompt>
+                        )}
                         <Host>{host ?? ""}</Host>
                     </AccountActions>
                 </FormFooter>
