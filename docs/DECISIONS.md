@@ -1,30 +1,11 @@
 # Decisions
 
-Calls that are not obvious from the code, newest first.
+One line per non-obvious call, newest last.
 
-## Android release build (Photos APK)
-
-- **Version from the tag.** `release.yml` passes the tag without the `v` as
-  `--build-name` (versionName) and `major*1000000 + minor*10000 + patch` as
-  `--build-number` (versionCode). It rises with every patch release, needs no
-  stored counter and is above Ente's last code (2158), so it never looks like a
-  downgrade. Limits: minor < 100, patch < 10000; the version job fails loudly
-  past them. `pubspec.yaml` carries the same scheme for local builds only.
-  With `--split-per-abi` Flutter adds 2000 to the arm64 APK's versionCode
-  (1000 × ABI index), so v0.1.5 ships as 12005; still a constant offset, so it
-  still rises every release.
-- **Release key is mandatory for releases.** A release build without the
-  `PHOTOVAULT_KEYSTORE_*` secrets fails instead of shipping a debug-signed APK,
-  and the certificate is checked against the Photovault key's SHA-256. PR and
-  push builds still fall back to the debug key so CI works without secrets.
-- **Compressed native libraries** (`useLegacyPackaging = true`). Stored,
-  page-aligned libraries let Android map them straight from the APK, but they
-  make the arm64 APK about 150 MB of libraries instead of about 63 MB. The APK is
-  downloaded from GitHub Releases, so download size wins over the extra install
-  space the extracted copies take.
-- **arm64 only, split per ABI.** CI builds the Rust library only for
-  `aarch64-linux-android`, so an armeabi-v7a APK could not run anyway; the old
-  single APK still carried about 60 MB of v7a plugin libraries.
-- **Dart debug info split out** (`--split-debug-info`, not `--obfuscate`).
-  Symbols are a workflow artifact for decoding stack traces. Obfuscation was
-  left off because Ente code uses `runtimeType` names at runtime.
+- 2026-11-04: Backup progress notification (Photos app): the app is Flutter, so Krifmaz/kit's kit-compose (Jetpack Compose) widgets cannot render in it and linking the library would put kit's AGP/Kotlin/Compose pins into Flutter's Gradle build; the banner and copyable error details are Flutter widgets that follow kit's rules (plain words, errors copyable), and no kit piece was added because no app would use it yet. Photovault Native (Compose) is the place to use kit's notices/toasts if it gets the same feature.
+- 2026-11-04: Backup notification runs the app as a `dataSync` foreground service only while uploading; paused, failed and finished states are plain notifications, so no wake lock is held and Android 15's daily `dataSync` budget is not spent while waiting.
+- 2026-11-04: "Backup complete: N photos" says photos for any file type (as asked); videos count too.
+- 2026-11-04: Android release versions come from the tag: versionName is the tag without the `v`, versionCode is `major*1000000 + minor*10000 + patch` (set by `release.yml`; rises every release with no stored counter and sits above Ente's 2158). Limits minor < 100, patch < 10000; the version job fails past them. `--split-per-abi` makes Flutter add 2000 to the arm64 APK's code (v0.1.5 ships as 12005), a constant offset.
+- 2026-11-04: A release build without the `PHOTOVAULT_KEYSTORE_*` secrets fails instead of shipping a debug-signed APK, and the certificate is checked against the Photovault key's SHA-256; PR and push builds still fall back to the debug key so CI runs without secrets.
+- 2026-11-04: Photos APK native libraries are compressed (`useLegacyPackaging = true`): the APK is downloaded from GitHub Releases, so download size (218 MiB to 74 MiB together with arm64-only splits) beats the extra install space for extracted libraries.
+- 2026-11-04: Photos APK is arm64 only (`--split-per-abi`, `--target-platform android-arm64`): CI builds the Rust library only for `aarch64-linux-android`, so an armeabi-v7a APK could not run anyway. Dart debug info is split out (`--split-debug-info`, uploaded as an artifact); `--obfuscate` is off because some code prints `runtimeType` names.

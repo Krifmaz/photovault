@@ -501,6 +501,48 @@ not ship):
 - `lib/main.dart`, `lib/ui/account/onboarding_page_scaffold.dart`: analyzer
   fixes (unused imports left by the telemetry removal, a missing `const`).
 
+## Backup progress notification (Android)
+
+While a backup uploads, Android shows an ongoing notification ("Backing up 446
+of 2,026", progress bar, current file, speed and time left) with Pause and
+"Wi-Fi only" actions; tapping it opens Backup status. The app runs as a
+`dataSync` foreground service meanwhile (with a partial wake lock and a Wi-Fi
+lock), so uploads continue in the background and with the screen off. When the
+session ends the notification becomes "Backup complete: N photos" and goes
+away after 5 seconds; a pause or failure becomes "Backup paused: ..." with
+Resume or Retry. The notification channel is "Backup progress" (id
+`backup_progress`, low importance, silent). The same progress shows as a banner
+on the Photos screen, and Backup status adds Pause/Resume, a Wi-Fi only switch
+and copyable error details.
+
+- `lib/services/photovault/backup_progress/backup_progress_state.dart` (new):
+  pure tracker (sync events -> snapshot, batches of one session add up) and
+  all wording.
+- `lib/services/photovault/backup_progress/backup_progress_service.dart` (new):
+  event listeners, Pause/Resume/Retry/Wi-Fi only, the platform channel
+  `app.photovault/backup_progress`. Started for the foreground app in
+  `lib/main.dart`.
+- `lib/ui/photovault/backup_progress_banner.dart` (new): Photos banner (in
+  `lib/ui/home/status_bar_widget.dart`) and the Backup status panel (in
+  `lib/ui/settings/backup/backup_status_screen.dart`).
+- `lib/services/sync/sync_service.dart`: `pauseBackup`/`resumeBackup`; paused
+  events say why (`SyncPauseCause` in `lib/events/sync_status_update_event.dart`)
+  and carry error details. `lib/settings/backup_settings.dart` stores the
+  pause, `lib/module/upload/service/file_uploader.dart` honours it
+  (`BackupPausedByUserError` in `lib/core/errors.dart`, rethrown in
+  `remote_sync_service.dart`) and reports bytes sent for the speed.
+- `android/app/src/main/kotlin/io/ente/photos/BackupProgressBridge.kt`,
+  `BackupProgressService.kt` (new), `MainActivity.kt`, `AndroidManifest.xml`
+  (service, action receiver, `FOREGROUND_SERVICE`,
+  `FOREGROUND_SERVICE_DATA_SYNC`, `WAKE_LOCK`).
+- Tests: `test/photovault/backup_progress_test.dart`.
+
+Limits: uploads run in the app's Flutter engine, so swiping the app away from
+Recents stops the backup (and its notification). Background WorkManager syncs
+do not show the notification: Android does not let them start a foreground
+service. On Android 15+ a `dataSync` service gets about 6 hours a day; after
+that the notification stays but Android may freeze the app.
+
 ## Known gaps
 
 - ML models and memories music come only from the server's mirror. Ente's

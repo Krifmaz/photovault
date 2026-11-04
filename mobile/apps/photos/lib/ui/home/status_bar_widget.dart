@@ -18,6 +18,7 @@ import 'package:photos/events/sync_status_update_event.dart';
 import 'package:photos/events/tab_changed_event.dart';
 import 'package:photos/models/home_tab.dart';
 import "package:photos/service_locator.dart";
+import "package:photos/services/photovault/backup_progress/backup_progress_service.dart";
 import "package:photos/services/sync/large_backup_session_tracker.dart";
 import 'package:photos/services/sync/sync_service.dart';
 import "package:photos/theme/ente_theme.dart";
@@ -25,6 +26,7 @@ import 'package:photos/ui/account/verify_recovery_page.dart';
 import 'package:photos/ui/components/home_header_widget.dart';
 import 'package:photos/ui/home/header_error_widget.dart';
 import "package:photos/ui/home/large_backup_screen.dart";
+import "package:photos/ui/photovault/backup_progress_banner.dart";
 import "package:photos/ui/settings/backup/backup_settings_screen.dart";
 import "package:photos/ui/settings/backup/backup_status_screen.dart";
 import "package:photos/ui/settings/ml/ml_consent_sheet.dart";
@@ -148,6 +150,20 @@ class _StatusBarWidgetState extends State<StatusBarWidget> {
             ? Divider(height: 8, color: getEnteColorScheme(context).strokeFaint)
             : const SizedBox.shrink(),
         if (_showErrorBanner) HeaderErrorWidget(error: _syncError),
+        // PHOTOVAULT: same progress as the backup notification.
+        if (!_showErrorBanner && Platform.isAndroid)
+          BackupProgressBanner(
+            progress: BackupProgressService.instance.progress,
+            onTap: () {
+              routeToPage(
+                context,
+                const BackupStatusScreen(),
+                forceCustomPageRoute: true,
+              ).ignore();
+            },
+            onPause: BackupProgressService.instance.pause,
+            onResume: BackupProgressService.instance.resume,
+          ),
         if (_shouldShowLargeBackupBanner) _largeBackupBanner(context),
         if (_showMlBanner && !_showErrorBanner) const _MachineLearningBanner(),
         if (_showVerificationBanner()) const _RecoveryKeyBanner(),

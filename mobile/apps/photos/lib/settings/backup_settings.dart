@@ -6,6 +6,9 @@ class BackupSettings {
   static const _keyShouldBackupOverMobileData =
       "should_backup_over_mobile_data";
   static const _keyShouldBackupVideos = "should_backup_videos";
+  // PHOTOVAULT: Pause from the backup notification. Native code reads it as
+  // "flutter.photovault.backup_paused".
+  static const keyBackupPausedByUser = "photovault.backup_paused";
 
   final SharedPreferences _preferences;
 
@@ -23,5 +26,13 @@ class BackupSettings {
 
   Future<void> setBackupVideos(bool value) async {
     await _preferences.setBool(_keyShouldBackupVideos, value);
+  }
+
+  bool isBackupPausedByUser() {
+    return _preferences.getBool(keyBackupPausedByUser) ?? false;
+  }
+
+  Future<void> setBackupPausedByUser(bool value) async {
+    await _preferences.setBool(keyBackupPausedByUser, value);
   }
 }
