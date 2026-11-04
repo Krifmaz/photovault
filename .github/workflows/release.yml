@@ -135,7 +135,8 @@ jobs:
           PHOTOVAULT_COMMIT: ${{ github.sha }}
         run: |
           export PHOTOVAULT_COMMIT="${PHOTOVAULT_COMMIT:0:7}"
-          cargo build --release --locked --workspace --bins --target ${{ matrix.target }}
+          # photovault-core is a library for the apps (its uniffi-bindgen tool needs a feature); not shipped here
+          cargo build --release --locked --workspace --exclude photovault-core --bins --target ${{ matrix.target }}
       - name: Package
         shell: bash
         run: |
@@ -143,7 +144,7 @@ jobs:
           name="photovault-${{ needs.version.outputs.tag }}-${{ matrix.target }}"
           mkdir -p "dist/$name"
           for bin in $(cargo metadata --no-deps --format-version 1 \
-                         | jq -r '.packages[].targets[] | select(.kind[] == "bin") | .name'); do
+                         | jq -r '.packages[] | select(.name != "photovault-core") | .targets[] | select(.kind[] == "bin") | .name'); do
             cp "target/${{ matrix.target }}/release/$bin" "dist/$name/"
           done
           cp LICENSE README.md "dist/$name/"
