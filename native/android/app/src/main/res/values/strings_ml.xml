@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Search, people and memories (contract v1.2). Kept apart from strings.xml so the tracks merge cleanly. -->
+<resources>
+    <!-- Search -->
+    <string name="search_open">Search</string>
+    <string name="search_hint">People, places, albums, things…</string>
+    <string name="search_clear">Clear</string>
+    <string name="search_see_all">See all</string>
+    <string name="search_section_people">People</string>
+    <string name="search_section_places">Places</string>
+    <string name="search_section_types">File types</string>
+    <string name="search_section_dates">Dates</string>
+    <string name="search_section_albums">Albums</string>
+    <string name="search_section_magic">Magic search</string>
+    <string name="search_section_file_names">File names</string>
+    <string name="search_section_captions">Captions</string>
+    <string name="search_magic_row">Photos that match this description</string>
+    <string name="search_no_results">Nothing found for “%1$s”.</string>
+    <string name="search_results_none">No photos here.</string>
+    <string name="search_magic_none">No photos match this description yet. Magic search finds more as your library is indexed.</string>
+    <string name="search_retry">Try again</string>
+    <string name="search_discovery_empty">Search by person, place, album, date or file name. People and magic search appear once your photos are indexed.</string>
+    <string name="search_ml_title">Faces and magic search</string>
+    <string name="search_ml_body">Find people and describe what you are looking for. Indexing happens on your devices and stays end-to-end encrypted.</string>
+    <string name="search_ml_enable">Turn on</string>
+    <plurals name="search_photos">
+        <item quantity="one">%1$d photo</item>
+        <item quantity="other">%1$d photos</item>
+    </plurals>
+
+    <!-- People -->
+    <string name="people_title">People</string>
+    <string name="people_more">More options</string>
+    <string name="people_cancel">Cancel</string>
+    <string name="people_show_hidden">Show hidden people</string>
+    <string name="people_unnamed">Add a name</string>
+    <string name="people_unnamed_short">Unnamed</string>
+    <string name="people_empty">No people yet. Faces are grouped as your photos are indexed.</string>
+    <string name="people_ml_off">Turn on faces and magic search in Search to see the people in your photos.</string>
+
+    <!-- Person -->
+    <string name="person_gone">This person is no longer in your library.</string>
+    <string name="person_add_name">Add a name</string>
+    <string name="person_rename">Rename</string>
+    <string name="person_merge">Merge with…</string>
+    <string name="person_review">Review suggestions</string>
+    <plurals name="person_review_count">
+        <item quantity="one">%1$d group of faces may be this person</item>
+        <item quantity="other">%1$d groups of faces may be this person</item>
+    </plurals>
+    <string name="person_remove_photos">Remove wrong photos</string>
+    <string name="person_select_hint">Tap the photos this person is not in, then Remove.</string>
+    <plurals name="person_selected">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <string name="person_remove_selected">Remove</string>
+    <string name="person_use_as_cover">Use as cover</string>
+    <string name="person_hide">Hide</string>
+    <string name="person_unhide">Show again</string>
+    <string name="person_hidden_note">Hidden from People and search.</string>
+    <string name="person_remove_name">Remove name</string>
+    <string name="person_remove_name_title">Remove the name %1$s?</string>
+    <string name="person_remove_name_body">The photos stay. Their faces become an unnamed group again, on all your devices.</string>
+
+    <!-- Name -->
+    <string name="name_title_new">Add a name</string>
+    <string name="name_title_rename">Rename</string>
+    <string name="name_label">Name</string>
+    <string name="name_save">Save</string>
+    <string name="name_same_as">Already in People</string>
+    <string name="name_merge_into">Merge</string>
+
+    <!-- Merge -->
+    <string name="merge_title">Merge %1$s</string>
+    <string name="merge_intro">Pick the person these photos also show. Both become one person, on all your devices.</string>
+    <string name="merge_none">There is nobody to merge with yet.</string>
+    <string name="merge_confirm_title">Merge these people?</string>
+    <string name="merge_confirm_body">The photos of %1$s will be added to %2$s.</string>
+    <string name="merge_action">Merge</string>
+
+    <!-- Suggestions -->
+    <string name="suggestions_question">Is this %1$s?</string>
+    <string name="suggestions_yes">Yes</string>
+    <string name="suggestions_no">No</string>
+    <string name="suggestions_done">No more suggestions for now.</string>
+</resources>

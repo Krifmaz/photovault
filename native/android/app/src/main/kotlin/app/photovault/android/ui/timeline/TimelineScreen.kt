@@ -98,6 +98,8 @@ fun TimelineScreen(
     onOpen: (index: Int, fileId: Long) -> Unit,
     onSignedOut: () -> Unit,
     onSwitchServer: () -> Unit,
+    /** Opens search (the top bar's search icon). */
+    onSearch: () -> Unit = {},
 ) {
     val signedOut by rememberUpdatedState(onSignedOut)
     val switchServer by rememberUpdatedState(onSwitchServer)
@@ -128,7 +130,7 @@ fun TimelineScreen(
 
     Scaffold(
         containerColor = MaterialTheme.palette.bg,
-        topBar = { TimelineTopBar(vm, gridState) },
+        topBar = { TimelineTopBar(vm, gridState, onSearch) },
     ) { padding ->
         RefreshBox(vm) {
             PhotoGrid(vm, gridState, zoom, padding, onOpen)
@@ -150,7 +152,7 @@ private fun RefreshBox(vm: TimelineViewModel, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
+private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState, onSearch: () -> Unit) {
     val status by vm.status.collectAsStateWithLifecycle()
     val p = MaterialTheme.palette
     var menu by remember { mutableStateOf(false) }
@@ -179,6 +181,9 @@ private fun TimelineTopBar(vm: TimelineViewModel, gridState: LazyGridState) {
                 }
             },
             actions = {
+                IconButton(onClick = onSearch, modifier = Modifier.testTag("timeline_search")) {
+                    Icon(painterResource(R.drawable.ic_search), contentDescription = stringResource(R.string.search_open), tint = p.text)
+                }
                 IconButton(onClick = { menu = true }) {
                     Icon(painterResource(R.drawable.ic_account), contentDescription = stringResource(R.string.timeline_account), tint = p.text)
                 }
@@ -427,7 +432,7 @@ private const val PREFETCH_ROWS = 6
 private const val PREFETCH_MEMORY = 1500
 
 @Composable
-private fun HeaderRow(label: String) {
+internal fun HeaderRow(label: String) {
     val p = MaterialTheme.palette
     Text(
         label,
@@ -443,7 +448,7 @@ private fun HeaderRow(label: String) {
 }
 
 @Composable
-private fun PhotoCell(cell: GridEntry.Cell, onOpen: (Int, Long) -> Unit) {
+internal fun PhotoCell(cell: GridEntry.Cell, onOpen: (Int, Long) -> Unit) {
     val p = MaterialTheme.palette
     val item = cell.item
     Box(

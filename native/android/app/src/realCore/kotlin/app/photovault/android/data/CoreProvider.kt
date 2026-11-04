@@ -4,6 +4,10 @@ import android.content.Context
 import android.util.Log
 import app.photovault.android.BuildConfig
 import app.photovault.android.data.fake.FakeCore
+import app.photovault.android.data.ml.MlRepository
+import app.photovault.android.data.ml.RealMlRepository
+import app.photovault.android.data.ml.UnavailableMlRepository
+import app.photovault.android.data.ml.fake.FakeMlRepository
 import app.photovault.core.Core
 import app.photovault.core.CoreException
 import java.io.File
@@ -47,6 +51,16 @@ object CoreProvider {
         } catch (e: IOException) {
             fallback(e.message ?: e.javaClass.simpleName, e)
         }
+    }
+
+    /**
+     * Search, people and memories for the [CoreRepository] [create] returned: the same real core, the demo
+     * library's fake, or an unavailable stand-in that reports the same problem.
+     */
+    fun createMl(core: CoreRepository): MlRepository = when (core) {
+        is RealCore -> RealMlRepository(core.core)
+        is UnavailableCore -> UnavailableMlRepository(core.reason)
+        else -> FakeMlRepository(core)
     }
 
     private fun fallback(reason: String, cause: Throwable): CoreRepository {

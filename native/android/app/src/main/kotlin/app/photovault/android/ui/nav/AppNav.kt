@@ -134,6 +134,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                             onOpen = { index, fileId -> nav.navigate(ViewerRoute(index, fileId)) },
                             onSignedOut = { nav.navigateClearing(AuthGraph) },
                             onSwitchServer = { nav.navigate(ConnectRoute) },
+                            onSearch = { nav.navigate(SearchRoute) },
                         )
                     }
                 }
@@ -153,6 +154,8 @@ fun AppNav(graph: AppGraph, start: Any) {
                         )
                     }
                 }
+                // search, people and their viewer (MlNav.kt)
+                mlDestinations(graph, nav)
             }
         }
     }

@@ -7,7 +7,9 @@ import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.LanDiscovery
 import app.photovault.android.data.NsdLanDiscovery
 import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.ml.MlRepository
 import app.photovault.android.ui.image.buildImageLoader
+import app.photovault.android.ui.search.ResultLists
 import app.photovault.android.ui.timeline.TimelineLabels
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -27,6 +29,13 @@ class AppGraph(private val context: Context) {
      * (MainActivity resolves the start screen on Dispatchers.IO).
      */
     val core: CoreRepository by lazy { CoreProvider.create(context) }
+
+    /**
+     * Search, people and memories (contract v1.2) over the same core: real with RealCore, the demo data with
+     * FakeCore, an unavailable stand-in with UnavailableCore. Reading it opens [core], so like [core] it is
+     * first read from background dispatchers (the screens' view models and Coil's face fetcher).
+     */
+    val ml: MlRepository by lazy { CoreProvider.createMl(core) }
 
     fun warmUp() {
         Thread({ core }, "photovault-core-init").apply { priority = Thread.NORM_PRIORITY }.start()
@@ -51,6 +60,7 @@ class AppGraph(private val context: Context) {
      */
     fun clearDecrypted() {
         SingletonImageLoader.get(context).memoryCache?.clear()
+        ResultLists.clear()
         appScope.launch { viewerCache.listFiles()?.forEach { it.delete() } }
     }
 
@@ -75,8 +85,8 @@ class PhotovaultApp : Application(), SingletonImageLoader.Factory {
         }
     }
 
-    // The fetcher reads graph.core lazily on its IO dispatcher, so building the loader never opens core.
-    override fun newImageLoader(context: PlatformContext): ImageLoader = buildImageLoader(this) { graph.core }
+    // The fetchers read graph.core / graph.ml lazily on their IO dispatcher, so building the loader never opens core.
+    override fun newImageLoader(context: PlatformContext): ImageLoader = buildImageLoader(this, core = { graph.core }, ml = { graph.ml })
 }
 
 val Context.appGraph: AppGraph get() = (applicationContext as PhotovaultApp).graph
