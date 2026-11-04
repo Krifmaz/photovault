@@ -103,7 +103,7 @@ impl Inner {
         if reset {
             // The store was sealed under a key we no longer have: its account
             // data is unreadable. Drop the encrypted object cache with it.
-            for d in ["thumbs", "files"] {
+            for d in ["thumbs", "files", crate::ml::faces::CROP_CACHE_DIR] {
                 let _ = std::fs::remove_dir_all(cache_dir.join(d));
             }
         }
@@ -322,7 +322,7 @@ impl Inner {
 
     /// Remove the account's cached objects.
     pub(crate) fn wipe_cache(&self) {
-        for d in ["thumbs", "files"] {
+        for d in ["thumbs", "files", crate::ml::faces::CROP_CACHE_DIR] {
             let _ = std::fs::remove_dir_all(self.cache_dir.join(d));
         }
     }
