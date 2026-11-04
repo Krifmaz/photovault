@@ -98,8 +98,17 @@ jobs:
                   set -euo pipefail
                   sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
                   yes | "$sdkmanager" --licenses > /dev/null || true
-                  "$sdkmanager" --install "platforms;android-36" "build-tools;35.0.0" \
-                      "ndk;${NDK_VERSION}" "cmake;3.22.1" "platform-tools" > /dev/null
+                  # A corrupt NDK download ("Error reading Zip content") has been seen on
+                  # hosted runners: retry with a clean partial-download state.
+                  for attempt in 1 2 3; do
+                      if "$sdkmanager" --install "platforms;android-36" "build-tools;35.0.0" \
+                          "ndk;${NDK_VERSION}" "cmake;3.22.1" "platform-tools" > /dev/null; then
+                          break
+                      fi
+                      [ "$attempt" = 3 ] && exit 1
+                      rm -rf "$ANDROID_HOME/ndk/${NDK_VERSION}" "$ANDROID_HOME/.temp" "$HOME/.android/cache"
+                      sleep 15
+                  done
                   echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
 
             - name: Install Rust Android target
