@@ -15,6 +15,7 @@
 
 #![warn(missing_docs)]
 
+mod albums;
 pub mod api;
 mod auth;
 mod client;
@@ -33,6 +34,9 @@ use std::sync::{Arc, OnceLock};
 
 uniffi::setup_scaffolding!();
 
+pub use crate::albums::{
+    AlbumDetails, PublicLink, PublicLinkUpdate, ShareRole, Sharee, TrashEntry,
+};
 pub use crate::server::{normalize_address, parse_connect_qr_url};
 
 /// Errors of the core, as the apps see them.

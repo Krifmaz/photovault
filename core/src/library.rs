@@ -54,6 +54,21 @@ pub(crate) struct CollectionRec {
     pub sub_type: Option<i64>,
     pub visibility: Option<i64>,
     pub updation_time: i64,
+    /// Owner's email (shared with us).
+    #[serde(default)]
+    pub owner_email: String,
+    /// People it is shared with (owned albums).
+    #[serde(default)]
+    pub sharees: Vec<crate::albums::ShareeRec>,
+    /// The public link, if any.
+    #[serde(default)]
+    pub public_link: Option<crate::albums::PublicLinkRec>,
+    /// The owner's decrypted private magic metadata and its server version
+    /// (kept whole so an update preserves keys other apps set).
+    #[serde(default)]
+    pub magic: Map<String, Value>,
+    #[serde(default)]
+    pub magic_version: i64,
 }
 
 impl std::fmt::Debug for CollectionRec {
@@ -72,10 +87,10 @@ impl Drop for CollectionRec {
 }
 
 impl CollectionRec {
-    fn hidden(&self) -> bool {
+    pub(crate) fn hidden(&self) -> bool {
         self.sub_type == Some(SUB_TYPE_DEFAULT_HIDDEN) || self.visibility == Some(VISIBILITY_HIDDEN)
     }
-    fn archived(&self) -> bool {
+    pub(crate) fn archived(&self) -> bool {
         self.visibility == Some(VISIBILITY_ARCHIVED)
     }
 }
@@ -124,7 +139,7 @@ impl FileRec {
         m.get(k)
             .and_then(|v| v.as_i64().or_else(|| v.as_f64().map(|f| f as i64)))
     }
-    fn item(&self, collection_id: i64) -> TimelineItem {
+    pub(crate) fn item(&self, collection_id: i64) -> TimelineItem {
         let md = self.metadata.as_object().cloned().unwrap_or_default();
         let taken = Self::i64_of(&self.pub_magic, "editedTime")
             .filter(|t| *t != 0)
@@ -170,13 +185,15 @@ impl FileRec {
 #[derive(Debug, Default)]
 pub struct Index {
     /// Every file once, newest first (collection id = a representative).
-    all: Vec<TimelineItem>,
+    pub(crate) all: Vec<TimelineItem>,
     /// Positions in `all` shown in the timeline.
     timeline: Vec<u32>,
     /// Positions in `all` per collection.
-    by_collection: HashMap<i64, Vec<u32>>,
+    pub(crate) by_collection: HashMap<i64, Vec<u32>>,
     /// Visible collections, ready to return.
-    collections: Vec<Collection>,
+    pub(crate) collections: Vec<Collection>,
+    /// Albums, sharing and trash ([`crate::albums`]).
+    pub(crate) albums: crate::albums::AlbumIndex,
     /// Owned files by content hash, with their collections.
     pub(crate) hashes: HashMap<String, (i64, Vec<i64>)>,
 }
@@ -209,16 +226,20 @@ pub(crate) fn decrypt_collection(c: &RemoteCollection, s: &Session) -> Result<Co
         .into_owned(),
         _ => String::new(),
     };
-    let (sub_type, visibility) = match &c.magic_metadata {
-        Some(mm) if owned => {
+    let (sub_type, visibility, magic, magic_version) = match &c.magic_metadata {
+        Some(mm) if owned && !mm.data.is_empty() => {
             let m = decrypt_magic(mm, &key)?;
             (
                 m.data.get("subType").and_then(Value::as_i64),
                 m.data.get("visibility").and_then(Value::as_i64),
+                m.data,
+                m.version,
             )
         }
-        _ => (None, None),
+        Some(mm) if owned => (None, None, Map::new(), mm.version),
+        _ => (None, None, Map::new(), 0),
     };
+    let public_link = crate::albums::public_link_of(c, &key);
     Ok(CollectionRec {
         id: c.id,
         key,
@@ -229,6 +250,11 @@ pub(crate) fn decrypt_collection(c: &RemoteCollection, s: &Session) -> Result<Co
         sub_type,
         visibility,
         updation_time: c.updation_time,
+        owner_email: c.owner.email.clone(),
+        sharees: crate::albums::sharees_of(c),
+        public_link,
+        magic,
+        magic_version,
     })
 }
 
@@ -394,7 +420,7 @@ impl Inner {
     }
 
     /// Remove a file from a collection; drop it entirely when it is in none.
-    fn remove_membership(&self, collection_id: i64, file_id: i64) -> Result<()> {
+    pub(crate) fn remove_membership(&self, collection_id: i64, file_id: i64) -> Result<()> {
         let gone = {
             let mut st = self.store();
             let tx = st.conn_mut().transaction()?;
@@ -424,7 +450,7 @@ impl Inner {
         let _ = std::fs::remove_file(self.file_cache_path(file_id));
     }
 
-    fn delete_collection(&self, id: i64) -> Result<()> {
+    pub(crate) fn delete_collection(&self, id: i64) -> Result<()> {
         let orphans: Vec<i64> = {
             let mut st = self.store();
             let tx = st.conn_mut().transaction()?;
@@ -479,6 +505,8 @@ impl Inner {
         for c in &res.collections {
             max_since = max_since.max(c.updation_time);
             if c.is_deleted {
+                // Keep the key: its files may sit in the trash.
+                self.remember_deleted_key(c, &s);
                 self.delete_collection(c.id)?;
                 continue;
             }
@@ -743,6 +771,8 @@ impl Inner {
             .collect();
         visible.sort_by_key(|v| std::cmp::Reverse((v.0, v.1.id)));
         idx.collections = visible.into_iter().map(|(_, c)| c).collect();
+        crate::albums::build_album_index(&mut idx, &cols, user_id);
+        idx.albums.trash = self.load_trash(&idx)?;
         Ok(idx)
     }
 
@@ -802,7 +832,11 @@ impl Inner {
 
     pub async fn thumbnail(&self, file_id: i64) -> Result<Vec<u8>> {
         self.session()?;
-        let f = self.file_rec(file_id)?;
+        // Trashed files are no longer in the library, but the trash shows them.
+        let f = match self.file_rec(file_id) {
+            Ok(f) => f,
+            Err(e) => self.trashed_file_rec(file_id)?.ok_or(e)?,
+        };
         let header = crypto::unb64(&f.thumb_header)?;
         let path = self.thumb_path(file_id);
         // The cache holds the server's ciphertext: encrypted at rest under the file key.
