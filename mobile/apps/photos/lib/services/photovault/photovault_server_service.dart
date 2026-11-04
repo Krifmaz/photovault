@@ -108,9 +108,11 @@ class PhotovaultServerService {
   Future<void> activate(PhotovaultServerInfo info) async {
     await _save(info);
     await _prefs!.setString(_activeKey, info.publicUrl);
-    activeServer.value = info;
+    // Endpoint first, so the landing page that listens to [activeServer]
+    // never signs in against the previous address.
     final address = await _selector.select(info);
     await _setEndpoint(address);
+    activeServer.value = info;
   }
 
   /// Forgets which server is active (the saved list stays). Callers log out
