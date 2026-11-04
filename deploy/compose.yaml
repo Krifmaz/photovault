@@ -1,62 +1,66 @@
-# Photovault with PostgreSQL. Paste into a Portainer stack (or `docker compose up -d`).
+# Photovault on a home network: one container, SQLite, no reverse proxy.
+# Paste into a Portainer stack, or run `docker compose -f deploy/compose.yaml up -d`.
 #
-# Host layout (inside the Proxmox LXC):
-#   /drivepool/photovault  encrypted objects (mergerfs pool bind-mounted into the LXC)
-#   /opt/photovault        database files
+# Before the first start, give the two host folders to the container's user:
+#   mkdir -p /drivepool/photovault /opt/photovault
+#   chown -R 65532:65532 /drivepool/photovault /opt/photovault
 #
-# Variables come from Portainer's "Environment variables" (or a .env file next
-# to this file); see deploy/.env.example.
+# Then enter http://10.0.1.7:8095 in the apps ("Connect to your server").
+# Domain behind a reverse proxy: compose.domain.yaml. PostgreSQL: compose.postgres.yaml.
+# Every setting: docs/src/configuration.md.
 name: photovault
-
 services:
   photovault:
-    image: ${PHOTOVAULT_IMAGE:-photovault:latest}
-    # build: ..   # build from a checkout instead of pulling
+    # The server, the web app and the admin CLI in one image (runs as uid 65532).
+    image: ghcr.io/krifmaz/photovault:edge
+    # Start again after a crash or reboot. A failed startup check waits 30 s
+    # before it exits, so this does not spin.
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
+    ports:
+      # Host port 8095 -> the server's port 8080 (API, web app and photo up/downloads).
+      - "8095:8080"
     environment:
-      PHOTOVAULT_PUBLIC_URL: https://${PHOTOS_HOST:?set PHOTOS_HOST}
-      PHOTOVAULT_STORAGE_PUBLIC_URL: https://${STORAGE_HOST:-${PHOTOS_HOST}}
-      PHOTOVAULT_STORAGE_PATH: /data
-      PHOTOVAULT_DATABASE_URL: postgres://photovault:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/photovault
-      PHOTOVAULT_JWT_SECRET: ${PHOTOVAULT_JWT_SECRET:?set it to the output of head -c 32 /dev/urandom | base64}
-      PHOTOVAULT_ENCRYPTION_KEY: ${PHOTOVAULT_ENCRYPTION_KEY:?set it to the output of head -c 32 /dev/urandom | base64}
-      PHOTOVAULT_HASHING_KEY: ${PHOTOVAULT_HASHING_KEY:?set it to the output of head -c 32 /dev/urandom | base64}
-      PHOTOVAULT_ALLOW_SIGNUPS: ${PHOTOVAULT_ALLOW_SIGNUPS:-false}
-      RUST_LOG: ${RUST_LOG:-info}
+      # The address the apps and the web app use. The only required setting.
+      # Photo up/downloads use it too unless PHOTOVAULT_STORAGE_PUBLIC_URL is set.
+      PHOTOVAULT_PUBLIC_URL: http://10.0.1.7:8095
+      # Optional settings (remove the # to use one):
+      # Name shown in the apps, in emails and on the LAN.
+      # PHOTOVAULT_SERVER_NAME: Photovault
+      # LAN address, when PUBLIC_URL is a domain (see compose.domain.yaml).
+      # PHOTOVAULT_HOME_URL: http://10.0.1.7:8095
+      # Quota for new accounts; unset = the free disk space is the limit.
+      # PHOTOVAULT_DEFAULT_QUOTA: 500GB
+      # Email the sign-in codes. Without SMTP they are written to the log:
+      #   Verification code for <email>: <code>
+      # PHOTOVAULT_SMTP_HOST: smtp.example.com
+      # PHOTOVAULT_SMTP_PORT: "587"
+      # PHOTOVAULT_SMTP_USERNAME: photos@example.com
+      # PHOTOVAULT_SMTP_PASSWORD: change-me
+      # PHOTOVAULT_SMTP_FROM: Photovault <photos@example.com>
+      # PHOTOVAULT_SMTP_TLS: starttls          # starttls | tls | none
+      # Logs as JSON lines instead of plain text.
+      # PHOTOVAULT_LOG_FORMAT: json
+      # Stop announcing the server on the LAN (mDNS). Inside a bridge network the
+      # announcement does not reach the LAN anyway; use the photovault-mdns service below.
+      # PHOTOVAULT_MDNS: "false"
     volumes:
-      - /drivepool/photovault:/data
-    networks:
-      - proxy_net
-      - internal
-    # No published ports: the reverse proxy on proxy_net reaches photovault:8080.
+      - /drivepool/photovault:/data   # encrypted photos
+      - /opt/photovault:/config       # database + keys (local disk)
+    # The container cannot change its own files outside /data and /config.
     read_only: true
-    security_opt:
-      - no-new-privileges:true
+    # No privilege escalation (setuid binaries), no Linux capabilities.
+    security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
-    mem_limit: 256m
 
-  db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: photovault
-      POSTGRES_DB: photovault
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
-    volumes:
-      - /opt/photovault/postgres:/var/lib/postgresql/data
-    networks:
-      - internal
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U photovault -d photovault"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    shm_size: 128m
-
-networks:
-  proxy_net:
-    external: true
-  internal: {}
+  # Optional: lets the apps find the server on the LAN without typing an address.
+  # Multicast does not leave Docker's bridge network, so this small service runs
+  # on the host network, reads /photovault/info and announces _photovault._tcp.
+  # photovault-mdns:
+  #   image: ghcr.io/krifmaz/photovault:edge
+  #   restart: unless-stopped
+  #   command: ["announce", "--server", "http://127.0.0.1:8095"]
+  #   network_mode: host
+  #   healthcheck: {disable: true}   # the image's check probes port 8080, which is not here
+  #   read_only: true
+  #   security_opt: [no-new-privileges:true]
+  #   cap_drop: [ALL]

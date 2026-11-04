@@ -22,9 +22,10 @@ Section 1 (Rust server compatible with the stock Ente apps) is complete:
 ## Quick start
 
 ```sh
-docker build -t photovault:latest .
-cp deploy/.env.example deploy/.env   # fill in hostnames and secrets
-docker compose -f deploy/compose.sqlite.yaml --env-file deploy/.env up -d
+mkdir -p /drivepool/photovault /opt/photovault
+chown -R 65532:65532 /drivepool/photovault /opt/photovault
+# edit PHOTOVAULT_PUBLIC_URL and the two host folders in deploy/compose.yaml
+docker compose -f deploy/compose.yaml up -d
 ```
 
 Objects can live on a local directory (a mergerfs pool is fine) or any
@@ -41,7 +42,7 @@ for HTTPS, reverse proxies and the Proxmox/Portainer setup, and
 | `importers/` | Immich and iCloud import tools (later) |
 | `mobile/`, `web/`, `desktop/` | Light forks of Ente's apps (later) |
 | `plugins/sdk/` | Plugin SDK and examples (later) |
-| `deploy/` | Docker Compose files (SQLite or PostgreSQL) and example config |
+| `deploy/` | Docker Compose files (LAN, domain, PostgreSQL) and example config |
 | `docs/` | mdBook documentation (`mdbook build docs`) |
 | `scripts/` | Maintenance scripts, including the upstream merge |
 

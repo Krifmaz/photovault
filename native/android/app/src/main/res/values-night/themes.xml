@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Photovault" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/encore_bg</item>
+        <item name="android:colorBackground">@color/encore_bg</item>
+    </style>
+</resources>

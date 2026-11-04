@@ -76,6 +76,8 @@ if [[ "${PHOTOVAULT_E2E_EXTERNAL_API:-0}" != 1 ]]; then
         printf 'database_url = "sqlite://%s/db.sqlite?mode=rwc"\n' "$tmp"
         printf 'log_format = "pretty"\n'
         printf 'allow_signups = true\n'
+        printf 'config_dir = "%s/config"\n' "$tmp"
+        printf 'mdns = false\n'
         printf '\n[storage]\nkind = "local"\npath = "%s/objects"\n' "$tmp"
         printf '\n[accounts]\npublic_albums_url = "http://localhost:%s"\n' "$albums_port"
         printf '\n[hardcoded_ott]\n'

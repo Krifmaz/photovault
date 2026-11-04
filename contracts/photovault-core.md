@@ -14,7 +14,12 @@ Rules:
 * All network/disk calls are `async` (Kotlin `suspend`), run on a tokio runtime owned by core.
   TLS: rustls + ring. Sync calls only read the local store and must return in < 5 ms for a page of 200.
 * The local store (SQLite, `rusqlite` bundled) never holds plaintext keys; v1 wraps the master key with
-  secretbox under a device key in app-private storage, later Android Keystore.
+  secretbox under a device key. **[contract v1.1]** Apps pass that key to `Core::with_device_key` and keep
+  it wrapped by the platform keystore (Android Keystore AES-GCM); `Core::new` (legacy `device.key` file in
+  the data dir) remains for tests and tools.
+* **[contract v1.1]** A plain-http `homeUrl` is only used (it carries sign-in and the session token) after
+  the user allowed it per server (`set_home_url_allowed`); an `https://` home URL needs no approval.
+  Authenticated requests always go to the signed-in account's own server, whatever server is selected.
 * **[contract]** Base URL selection follows `contracts/server-info.md` (home/public switching).
 * **[contract]** `storage_usage()` uses `GET /photovault/usage`, falling back to `/users/details/v2`.
 
@@ -66,6 +71,8 @@ Rules:
 #[derive(uniffi::Object)] pub struct Core;
 #[uniffi::export] impl Core {
   #[uniffi::constructor] fn new(data_dir: String, cache_dir: String) -> Result<Arc<Self>, CoreError>;
+  // [contract v1.1] the store is sealed under `device_key` (32 bytes, kept wrapped by the platform keystore)
+  #[uniffi::constructor] fn with_device_key(data_dir: String, cache_dir: String, device_key: Vec<u8>) -> Result<Arc<Self>, CoreError>;
   // servers (survive logout)
   fn saved_servers(&self) -> Vec<ServerInfo>;
   async fn add_server(&self, address: String) -> Result<ServerInfo, CoreError>;
@@ -73,11 +80,15 @@ Rules:
   fn select_server(&self, public_url: String) -> Result<(), CoreError>;
   fn active_base_url(&self) -> Option<String>;
   async fn refresh_network(&self) -> Option<String>;  // [contract] re-run home/public choice on network change
+  fn home_url_allowed(&self, public_url: String) -> bool;                                    // [contract v1.1]
+  fn set_home_url_allowed(&self, public_url: String, allowed: bool) -> Result<(), CoreError>; // [contract v1.1]
   // auth
   async fn login(&self, email: String, password: String) -> Result<LoginStep, CoreError>;
   async fn send_email_ott(&self, email: String) -> Result<(), CoreError>;
   async fn verify_email_ott(&self, email: String, code: String, password: String) -> Result<LoginStep, CoreError>;
   async fn verify_totp(&self, session_id: String, code: String, password: String) -> Result<LoginStep, CoreError>;
+  // [contract v1.1] after Passkey: GET /users/two-factor/passkeys/get-token; returns Passkey again until verified
+  async fn verify_passkey(&self, session_id: String, password: String) -> Result<LoginStep, CoreError>;
   async fn recover_with_key(&self, recovery_key: String, new_password: String) -> Result<Account, CoreError>;
   fn current_account(&self) -> Option<Account>;
   async fn logout(&self) -> Result<(), CoreError>;

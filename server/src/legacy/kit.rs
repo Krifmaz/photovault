@@ -38,7 +38,6 @@ pub const MAX_ACTIVE_KITS: i64 = 5;
 /// Only variant: 2-of-3 shares.
 pub const VARIANT_TWO_OF_THREE: i64 = 1;
 const TOKEN_LIFETIME: i64 = 24 * 3_600_000_000;
-const DEFAULT_LEGACY_URL: &str = "https://legacy.ente.com";
 
 fn not_found() -> ApiError {
     ApiError::status(StatusCode::NOT_FOUND)
@@ -203,12 +202,17 @@ pub struct LegacyKit {
 }
 
 /// URL of the recovery web app (`PHOTOVAULT_LEGACY_URL`, museum's `apps.legacy`).
+/// Defaults to this server's public URL, never a third-party site.
 pub fn legacy_url() -> String {
-    std::env::var("PHOTOVAULT_LEGACY_URL")
-        .ok()
-        .map(|s| s.trim().trim_end_matches('/').to_string())
-        .filter(|s| !s.is_empty())
-        .unwrap_or_else(|| DEFAULT_LEGACY_URL.to_string())
+    let var = |k: &str| {
+        std::env::var(k)
+            .ok()
+            .map(|s| s.trim().trim_end_matches('/').to_string())
+            .filter(|s| !s.is_empty())
+    };
+    var("PHOTOVAULT_LEGACY_URL")
+        .or_else(|| var("PHOTOVAULT_PUBLIC_URL"))
+        .unwrap_or_else(|| "http://localhost:8080".to_string())
 }
 
 /// Convert a kit row for the API.
