@@ -6,6 +6,7 @@ import "package:ente_pure_utils/ente_pure_utils.dart";
 import "package:ente_strings/ente_strings.dart";
 import 'package:flutter/material.dart';
 import "package:logging/logging.dart";
+import "package:photos/core/constants.dart"; // PHOTOVAULT: strip
 import "package:photos/models/backup/backup_item.dart";
 import "package:photos/models/backup/backup_item_status.dart";
 import "package:photos/module/upload/service/file_uploader.dart";
@@ -154,7 +155,7 @@ class _BackupItemCardState extends State<BackupItemCard> {
                               await sendLogs(
                                 context,
                                 context.strings.contactSupport,
-                                "support@ente.com",
+                                supportEmail, // PHOTOVAULT: strip - was Ente's support address
                                 postShare: () {},
                               );
                               if (context.mounted) {

@@ -1,4 +1,3 @@
-import "package:photos/core/constants.dart";
 import "package:photos/core/event_bus.dart";
 import "package:photos/events/event.dart";
 import "package:shared_preferences/shared_preferences.dart";
@@ -35,12 +34,9 @@ class EndpointConfig {
     Bus.instance.fire(EndpointUpdatedEvent(this.endpoint));
   }
 
-  static String _normalize(String endpoint) {
-    if (endpoint == kLegacyProductionEndpoint) {
-      return kDefaultProductionEndpoint;
-    }
-    return endpoint;
-  }
+  // PHOTOVAULT: strip - upstream migrated Ente's old api host to the new one here;
+  // there is no Ente endpoint to migrate.
+  static String _normalize(String endpoint) => endpoint;
 }
 
 class EndpointUpdatedEvent extends Event {

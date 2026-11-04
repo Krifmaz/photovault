@@ -2,11 +2,7 @@ import 'package:ente_components/ente_components.dart';
 import 'package:ente_lock_screen/auth_util.dart';
 import 'package:ente_strings/ente_strings.dart';
 import 'package:ente_ui/utils/toast_util.dart';
-import 'package:ente_utils/platform_util.dart';
 import 'package:flutter/material.dart';
-
-const linuxSystemAuthGuideUrl =
-    'https://ente.com/help/auth/troubleshooting/linux-system-auth';
 
 bool shouldShowLinuxSystemAuthSetupGuide(
   LocalAuthenticationUnavailableException exception,
@@ -26,6 +22,9 @@ Future<void> showLocalAuthenticationUnavailableMessage(
   showToast(context, exception.userMessage);
 }
 
+// PHOTOVAULT: strip - the "Open guide" button (a help page on Ente's website,
+// Ente's /help/auth/troubleshooting/linux-system-auth page) is removed and the
+// text no longer names Ente Auth. `onOpenGuide` is kept for callers.
 Future<void> showLinuxSystemAuthSetupDialog(
   BuildContext context, {
   VoidCallback? onOpenGuide,
@@ -35,23 +34,9 @@ Future<void> showLinuxSystemAuthSetupDialog(
     builder: (context) => BottomSheetComponent(
       title: pendingTranslation('Linux setup required'),
       message: pendingTranslation(
-        'To use device lock on Linux, Ente Auth needs a one-time system authentication setup. The guide includes setup steps for Flatpak, AppImage, and fingerprint prompts.',
+        'To use device lock on Linux, this app needs a one-time system authentication (polkit) setup. See your distribution\'s documentation; Flatpak and AppImage installs and fingerprint prompts may need extra steps.',
       ),
       isScrollable: true,
-      actions: [
-        ButtonComponent(
-          label: pendingTranslation('Open guide'),
-          dismissModalOnSuccess: true,
-          onTap: () async {
-            onOpenGuide?.call();
-            await PlatformUtil.openWebView(
-              context,
-              pendingTranslation('Linux setup required'),
-              linuxSystemAuthGuideUrl,
-            );
-          },
-        ),
-      ],
     ),
   );
 }

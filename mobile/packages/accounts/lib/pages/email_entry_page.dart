@@ -6,11 +6,9 @@ import 'package:ente_configuration/base_configuration.dart';
 import 'package:ente_strings/ente_strings.dart';
 import 'package:ente_ui/components/buttons/dynamic_fab.dart';
 import 'package:ente_ui/theme/ente_theme.dart';
-import 'package:ente_utils/platform_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:password_strength/password_strength.dart';
-import "package:styled_text/styled_text.dart";
 
 class EmailEntryPage extends StatefulWidget {
   final BaseConfiguration config;
@@ -35,7 +33,8 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
   String _referralSource = '';
   double _passwordStrength = 0.0;
   bool _emailIsValid = false;
-  bool _hasAgreedToTOS = true;
+  // PHOTOVAULT: strip - no terms to agree to (see build), so always true.
+  final bool _hasAgreedToTOS = true;
   bool _password1Visible = false;
   bool _password2Visible = false;
   bool _passwordsMatch = false;
@@ -441,8 +440,10 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  _getTOSAgreement(),
+                  // PHOTOVAULT: strip - removed the agreement to Ente's terms
+                  // of service and privacy policy (Ente's /terms page,
+                  // Ente's /privacy page); the account lives on the user's own
+                  // server. `_hasAgreedToTOS` stays true.
                 ],
               ),
             ),
@@ -474,68 +475,6 @@ class _EmailEntryPageState extends State<EmailEntryPage> {
         _hasInstallSource = hasInstallSource;
       });
     }
-  }
-
-  Widget _getTOSAgreement() {
-    final textTheme = getEnteTextTheme(context);
-    final colorScheme = getEnteColorScheme(context);
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _hasAgreedToTOS = !_hasAgreedToTOS;
-        });
-      },
-      behavior: HitTestBehavior.translucent,
-      child: Row(
-        children: [
-          Checkbox(
-            value: _hasAgreedToTOS,
-            side: CheckboxTheme.of(context).side,
-            fillColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return colorScheme.primary700;
-              }
-              return Colors.transparent;
-            }),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _hasAgreedToTOS = value!;
-              });
-            },
-          ),
-          Expanded(
-            child: StyledText(
-              text: context.strings.signUpTerms,
-              style: textTheme.small.copyWith(color: colorScheme.textMuted),
-              tags: {
-                'u-terms': StyledTextActionTag(
-                  (String? text, Map<String?, String?> attrs) =>
-                      PlatformUtil.openWebView(
-                        context,
-                        context.strings.termsOfServicesTitle,
-                        "https://ente.com/terms",
-                      ),
-                  style: const TextStyle(decoration: TextDecoration.underline),
-                ),
-                'u-policy': StyledTextActionTag(
-                  (String? text, Map<String?, String?> attrs) =>
-                      PlatformUtil.openWebView(
-                        context,
-                        context.strings.privacyPolicyTitle,
-                        "https://ente.com/privacy",
-                      ),
-                  style: const TextStyle(decoration: TextDecoration.underline),
-                ),
-              },
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   bool _isFormValid() {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import "package:flutter/services.dart";
 import "package:logging/logging.dart";
 import 'package:photos/core/configuration.dart';
+import "package:photos/core/constants.dart"; // PHOTOVAULT: strip
 import "package:photos/services/account/user_service.dart";
 import "package:photos/ui/account/onboarding_page_scaffold.dart";
 import "package:photos/ui/components/buttons/button_widget.dart"
@@ -242,7 +243,7 @@ class _LoginPasswordVerificationPageState
       await sendLogs(
         context,
         context.strings.contactSupport,
-        "support@ente.com",
+        supportEmail, // PHOTOVAULT: strip - was Ente's support address
         postShare: () {},
       );
     }

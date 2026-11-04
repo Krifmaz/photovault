@@ -51,9 +51,15 @@ pub struct LocationCountryGroup {
     pub coordinate_indices: Vec<u32>,
 }
 
-pub async fn open_location_index(asset_root: String) -> Result<LocationIndex, LocationError> {
+// PHOTOVAULT: strip - `asset_base_url` is where missing location files are
+// downloaded from (the app passes its server's
+// `<server>/static-assets/location/v2`); upstream always used Ente's assets host.
+pub async fn open_location_index(
+    asset_root: String,
+    asset_base_url: String,
+) -> Result<LocationIndex, LocationError> {
     Ok(LocationIndex(
-        ente_photos::location::LocationIndex::open(asset_root).await?,
+        ente_photos::location::LocationIndex::open_from(asset_root, &asset_base_url).await?,
     ))
 }
 

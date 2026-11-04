@@ -238,4 +238,46 @@ void main() {
       );
     });
   });
+
+  // PHOTOVAULT: strip - album links never fall back to Ente's albums host.
+  group("serverAlbumsBaseUrl", () {
+    test("announced albumsUrl wins", () {
+      const server = PhotovaultServerInfo(
+        name: "Home",
+        version: "0.2.0",
+        publicUrl: "https://photos.example.com",
+        albumsUrl: "https://share.example.com",
+      );
+      expect(
+        serverAlbumsBaseUrl(server, "http://10.0.1.7:8095"),
+        "https://share.example.com",
+      );
+    });
+
+    test("publicUrl/albums without albumsUrl", () {
+      const server = PhotovaultServerInfo(
+        name: "Home",
+        version: "0.2.0",
+        publicUrl: "https://photos.example.com",
+      );
+      expect(
+        serverAlbumsBaseUrl(server, "http://10.0.1.7:8095"),
+        "https://photos.example.com/albums",
+      );
+    });
+
+    test("endpoint/albums for a compatible server or none", () {
+      expect(
+        serverAlbumsBaseUrl(
+          PhotovaultServerInfo.compatible("https://museum.example.com"),
+          "https://museum.example.com/",
+        ),
+        "https://museum.example.com/albums",
+      );
+      expect(
+        serverAlbumsBaseUrl(null, "http://10.0.1.7:8095"),
+        "http://10.0.1.7:8095/albums",
+      );
+    });
+  });
 }

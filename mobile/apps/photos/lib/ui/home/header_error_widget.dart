@@ -3,6 +3,7 @@ import "package:ente_pure_utils/ente_pure_utils.dart";
 import "package:ente_strings/ente_strings.dart";
 import 'package:flutter/material.dart';
 import "package:hugeicons/hugeicons.dart";
+import "package:photos/core/constants.dart"; // PHOTOVAULT: strip
 import 'package:photos/core/errors.dart';
 import "package:photos/ui/settings/backup/free_space_options.dart";
 import 'package:photos/utils/email_util.dart';
@@ -67,7 +68,7 @@ class HeaderErrorWidget extends StatelessWidget {
             sendLogs(
               context,
               context.strings.raiseTicket,
-              "support@ente.com",
+              supportEmail, // PHOTOVAULT: strip - was Ente's support address
               subject: context.strings.backupFailed,
             );
           },
