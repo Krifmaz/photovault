@@ -31,6 +31,12 @@ const Duration kConnectTimeout = Duration(seconds: 10);
 const String kConnectQrScheme = "photovault";
 const String kConnectQrHost = "connect";
 
+/// `emailVerification` values: codes are mailed, written to the server log,
+/// or not needed (any 6-digit code is accepted after `POST /users/ott`).
+const String kEmailVerificationSmtp = "smtp";
+const String kEmailVerificationLog = "log";
+const String kEmailVerificationSkip = "skip";
+
 /// What `/photovault/info` (or, for a stock server, `/ping`) told us.
 ///
 /// Field names follow the contract (camelCase); snake_case spellings from the
@@ -48,6 +54,7 @@ class PhotovaultServerInfo {
     this.albumsUrl,
     this.castUrl,
     this.features = const [],
+    this.emailVerification,
   });
 
   /// A server that answers Ente's `/ping` but has no `/photovault/info`:
@@ -81,6 +88,16 @@ class PhotovaultServerInfo {
   final String? castUrl;
   final List<String> features;
 
+  /// How the server delivers email codes ([kEmailVerificationSmtp],
+  /// [kEmailVerificationLog], [kEmailVerificationSkip]), lower-cased; null
+  /// when the server does not say (older server, stock Ente).
+  final String? emailVerification;
+
+  /// True when the server accepts any code, so the apps send one themselves
+  /// instead of showing the "Check your inbox" screen.
+  bool get skipsEmailVerification =>
+      isPhotovault && emailVerification == kEmailVerificationSkip;
+
   /// Parses a decoded `/photovault/info` body. Returns null when the body is
   /// not a Photovault description. Missing optional fields are tolerated;
   /// unknown fields are ignored. [fallbackUrl] (the address that was asked)
@@ -107,6 +124,7 @@ class PhotovaultServerInfo {
     final signups = json["signupsAllowed"] ?? json["signups_allowed"];
     final apiVersion = json["apiVersion"];
     final features = json["features"];
+    final emailVerification = _string(json["emailVerification"]);
     return PhotovaultServerInfo(
       name: name ?? "Photovault",
       version: _string(json["version"]) ?? "",
@@ -120,6 +138,7 @@ class PhotovaultServerInfo {
       features: features is List
           ? features.whereType<String>().toList(growable: false)
           : const [],
+      emailVerification: emailVerification?.toLowerCase(),
     );
   }
 
@@ -155,6 +174,7 @@ class PhotovaultServerInfo {
     "albumsUrl": albumsUrl,
     "castUrl": castUrl,
     "features": features,
+    "emailVerification": emailVerification,
   };
 
   /// Reads [toJson] back.
