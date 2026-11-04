@@ -23,12 +23,19 @@
 //!
 //! Based on Ente (ente.com).
 
+// Dead-code allowances for the other tracks' v1.2 stubs; drop once they land.
+#[allow(dead_code)]
 pub mod entity;
+#[allow(dead_code)]
 pub mod faces;
+pub(crate) mod filedata;
 pub mod index;
 pub mod memories;
 pub mod mldata;
+pub(crate) mod models;
+#[allow(dead_code)]
 pub mod search;
+#[allow(dead_code)]
 pub(crate) mod store;
 
 use crate::TimelineItem;
@@ -37,6 +44,7 @@ use std::path::PathBuf;
 /// In-memory ML state of a [`crate::client::Inner`]: one cache per module,
 /// each rebuilt by its owner when the data under it changes.
 #[derive(Debug)]
+#[allow(dead_code)] // caches read by the other v1.2 tracks
 pub(crate) struct MlState {
     /// Where the downloaded models live (`<data_dir>/models`).
     pub models_dir: PathBuf,
