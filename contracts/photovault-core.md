@@ -119,3 +119,24 @@ Tests the core track hands back with: SRP and key-derivation against `server/tes
 files/thumbnails/metadata produced by Ente's web client, a full sign-in + sync + upload + download round
 trip against the real server (`cargo test -p photovault-core --features it`), and `uniffi-bindgen` Kotlin
 generation in CI. Additive changes (new methods/fields) need a contracts commit; renames do not happen in v1.
+
+## v1.2: backup
+
+Camera-folder backup in Photovault Native (`native/android/.../backup/`). Additive: one new method, in its own
+file (`core/src/backup.rs`) with its own `#[uniffi::export] impl Core` block.
+
+```rust
+#[uniffi::export] impl Core {
+  // The album the device folder `folder_name` backs up into, as Ente's mobile app does it
+  // (CollectionsService.getOrCreateForPath): the signed-in user's own collection of type "folder" with that
+  // name, else a new one: POST /collections, type "folder", name and attributes.encryptedPath both the folder
+  // name secretbox'd with the new collection key (same ciphertext and nonce), attributes.version 1.
+  // Pass the id to enqueue_upload. Blank names are a Storage error.
+  async fn backup_album(&self, folder_name: String) -> Result<i64, CoreError>;
+}
+```
+
+The app side keeps everything else on the device: which MediaStore files were queued (a ledger of ids,
+timestamps and sizes per account, no names or content), the settings, and the WorkManager schedule. Uploads,
+encryption, resume and de-duplication by hash stay in core's existing queue (`enqueue_upload`, `run_uploads`,
+`upload_status`). Tested by `core/tests/backup_album.rs` against the real server.

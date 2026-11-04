@@ -135,6 +135,9 @@ dependencies {
 
     implementation(libs.androidx.profileinstaller)
 
+    // camera backup
+    implementation(libs.androidx.work.runtime)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 }

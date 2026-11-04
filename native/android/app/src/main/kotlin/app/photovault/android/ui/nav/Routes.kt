@@ -38,6 +38,10 @@ data class ViewerRoute(val index: Int, val fileId: Long)
 @Serializable
 data object MapRoute
 
+/** Camera backup settings and status. */
+@Serializable
+data object BackupRoute
+
 /** Results handed back through the previous back stack entry's SavedStateHandle. */
 object NavResults {
     const val QR_PAYLOAD = "qr_payload"
