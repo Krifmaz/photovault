@@ -1,7 +1,10 @@
 name: photos
 description: ente photos application
 
-version: 1.3.69+2158
+# PHOTOVAULT: version. The release workflow overrides both parts with
+# --build-name (the tag without the v) and --build-number
+# (major*1000000 + minor*10000 + patch); this value is only for local builds.
+version: 0.1.4+10004
 publish_to: none
 
 resolution: workspace
