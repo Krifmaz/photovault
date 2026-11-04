@@ -77,10 +77,17 @@ pub(crate) fn migrate(conn: &Connection) -> Result<()> {
     Ok(())
 }
 
-/// Delete all ML rows (logout / lost device key). kv rows go with the
-/// account's kv wipe.
+/// Delete all ML rows (logout / lost device key), and the diff cursors
+/// that describe them: a re-seal keeps the other kv rows, and a cursor
+/// left behind would mean the wiped rows are never pulled again (the
+/// people would be gone until a `cgroup` changes). Other kv rows go with
+/// the account's kv wipe.
 pub(crate) fn wipe(conn: &Connection) -> Result<()> {
     conn.execute_batch("DELETE FROM ml_data; DELETE FROM ml_local; DELETE FROM ml_entities;")?;
+    conn.execute(
+        "DELETE FROM kv WHERE k = ?1 OR substr(k, 1, length(?2)) = ?2",
+        params![kv::STATUS_SINCE, kv::ENTITY_SINCE_PREFIX],
+    )?;
     Ok(())
 }
 
@@ -276,8 +283,16 @@ mod tests {
             .put_entity("cgroup", "p1", 5, &json!({"name": "Ana"}))
             .unwrap();
         assert_eq!(store.entities("cgroup").unwrap()[0].2["name"], "Ana");
+        store.put_plain(kv::STATUS_SINCE, "9").unwrap();
+        let since = format!("{}cgroup", kv::ENTITY_SINCE_PREFIX);
+        store.put_plain(&since, "9").unwrap();
+        store.put_plain(kv::ENABLED, "1").unwrap();
         wipe(store.conn()).unwrap();
         assert!(store.ml_row(42).unwrap().is_none());
         assert!(store.entities("cgroup").unwrap().is_empty());
+        // The cursors go with the rows; other settings stay.
+        assert_eq!(store.get_plain(kv::STATUS_SINCE).unwrap(), None);
+        assert_eq!(store.get_plain(&since).unwrap(), None);
+        assert_eq!(store.get_plain(kv::ENABLED).unwrap().as_deref(), Some("1"));
     }
 }
