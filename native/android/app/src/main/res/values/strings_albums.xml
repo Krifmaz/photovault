@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Albums, sharing, hidden albums and trash. Kept apart from strings.xml so tracks merge cleanly. -->
+<resources>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+    <string name="save">Save</string>
+    <string name="more">More options</string>
+    <string name="select_all">Select all</string>
+
+    <!-- Bottom bar -->
+    <string name="tab_photos">Photos</string>
+    <string name="tab_albums">Albums</string>
+
+    <plurals name="selected_count">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <plurals name="album_items">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+
+    <!-- Albums tab -->
+    <string name="albums_title">Albums</string>
+    <string name="albums_new">New album</string>
+    <string name="albums_new_ellipsis">New album…</string>
+    <string name="albums_mine">My albums</string>
+    <string name="albums_shared_with_me">Shared with me</string>
+    <string name="albums_empty">No albums yet. Create one with the + button, then add photos to it from the album.</string>
+
+    <!-- Album -->
+    <string name="album_name">Album name</string>
+    <string name="album_untitled">Untitled album</string>
+    <string name="album_uncategorized">Uncategorized</string>
+    <string name="album_favorites">Favorites</string>
+    <string name="album_count_by">%1$s · shared by %2$s</string>
+    <string name="album_missing">This album is no longer available.</string>
+    <string name="album_empty_title">Nothing here yet</string>
+    <string name="album_empty_body">Select photos in another album and choose Add to album.</string>
+    <string name="album_rename">Rename</string>
+    <string name="album_share">Share</string>
+    <string name="album_hide">Hide album</string>
+    <string name="album_unhide">Unhide album</string>
+    <string name="album_delete">Delete album</string>
+    <string name="album_delete_title">Delete this album?</string>
+    <string name="album_delete_body">Choose what happens to photos that are only in this album. Photos that are also in other albums stay there.</string>
+    <string name="album_delete_keep">Delete album, keep photos</string>
+    <string name="album_delete_trash">Delete album and its photos</string>
+    <string name="album_leave">Leave album</string>
+    <string name="album_leave_title">Leave this shared album?</string>
+    <string name="album_leave_body">It disappears from your albums. The owner can share it with you again.</string>
+    <string name="album_add_to">Add to album</string>
+    <string name="album_remove_from">Remove from album</string>
+    <string name="album_hide_photos">Hide</string>
+    <string name="album_unhide_photos">Unhide</string>
+    <string name="album_unhide_to">Unhide to</string>
+    <string name="album_move_to_trash">Move to trash</string>
+    <string name="album_trash_body">They are removed from every album and deleted for good after 30 days. You can restore them from the trash until then.</string>
+    <plurals name="album_trash_title">
+        <item quantity="one">Move %1$d item to the trash?</item>
+        <item quantity="other">Move %1$d items to the trash?</item>
+    </plurals>
+    <plurals name="album_done_added">
+        <item quantity="one">Added %1$d item</item>
+        <item quantity="other">Added %1$d items</item>
+    </plurals>
+    <plurals name="album_done_removed">
+        <item quantity="one">Removed %1$d item from the album</item>
+        <item quantity="other">Removed %1$d items from the album</item>
+    </plurals>
+    <plurals name="album_done_trashed">
+        <item quantity="one">Moved %1$d item to the trash</item>
+        <item quantity="other">Moved %1$d items to the trash</item>
+    </plurals>
+    <plurals name="album_done_hidden">
+        <item quantity="one">Hid %1$d item</item>
+        <item quantity="other">Hid %1$d items</item>
+    </plurals>
+    <plurals name="album_done_unhidden">
+        <item quantity="one">Unhid %1$d item</item>
+        <item quantity="other">Unhid %1$d items</item>
+    </plurals>
+
+    <!-- Sharing -->
+    <string name="share_title">Share album</string>
+    <string name="share_owner_only">Only the album\'s owner can change who it is shared with.</string>
+    <string name="share_people">People</string>
+    <string name="share_email">Email</string>
+    <string name="share_email_hint">someone@example.com</string>
+    <string name="share_add">Share</string>
+    <string name="share_nobody">Not shared with anyone yet. They need an account on this server.</string>
+    <string name="share_role_viewer">Viewer</string>
+    <string name="share_role_collaborator">Collaborator</string>
+    <string name="share_role_admin">Admin</string>
+    <string name="share_role_owner">Owner</string>
+    <string name="share_role_viewer_help">Viewers can see the photos in this album.</string>
+    <string name="share_role_collaborator_help">Collaborators can also add their own photos to it.</string>
+    <string name="share_remove">Stop sharing with %1$s</string>
+    <string name="share_remove_title">Stop sharing with %1$s?</string>
+    <string name="share_remove_body">They lose access to this album. Photos they added stay in it.</string>
+    <string name="share_remove_action">Stop sharing</string>
+    <string name="share_public_link">Public link</string>
+    <string name="share_link_none">Anyone with a link can view this album in a browser, without an account. The photos stay end-to-end encrypted: the key is in the part of the link after #, which is never sent to the server.</string>
+    <string name="share_link_create">Create link</string>
+    <string name="share_link_copy">Copy</string>
+    <string name="share_link_send">Send link</string>
+    <string name="share_link_copied">Link copied</string>
+    <string name="share_link_note">Anyone who has this link can see the album. Share it only with people you trust.</string>
+    <string name="share_link_expiry">Link expires</string>
+    <string name="share_link_devices">Device limit</string>
+    <string name="share_link_downloads">Allow downloads</string>
+    <string name="share_link_collect">Allow adding photos</string>
+    <string name="share_link_password">Password lock</string>
+    <string name="share_link_password_title">Set a password</string>
+    <string name="share_link_password_body">People opening the link must enter this password first.</string>
+    <string name="share_link_remove">Remove link</string>
+    <string name="share_link_remove_title">Remove the public link?</string>
+    <string name="share_link_remove_body">The link stops working for everyone who has it.</string>
+    <string name="share_expiry_never">Never</string>
+    <string name="share_expiry_hour">In 1 hour</string>
+    <string name="share_expiry_day">In 1 day</string>
+    <string name="share_expiry_week">In 1 week</string>
+    <string name="share_expiry_month">In 1 month</string>
+    <string name="share_expiry_year">In 1 year</string>
+    <string name="share_expiry_until">%1$s</string>
+    <string name="share_devices_unlimited">No limit</string>
+    <string name="share_devices_n">%1$d devices</string>
+
+    <!-- Hidden -->
+    <string name="hidden_title">Hidden</string>
+    <string name="hidden_subtitle_short">Locked</string>
+    <string name="hidden_photos">Hidden photos</string>
+    <string name="hidden_unlock_title">Unlock hidden albums</string>
+    <string name="hidden_unlock_subtitle">Use your fingerprint, face or screen lock</string>
+    <string name="hidden_locked">Hidden albums are locked.</string>
+    <string name="hidden_unlock">Unlock</string>
+    <string name="hidden_note">Hidden albums and photos never show in Photos or Albums. Open an album to unhide it.</string>
+    <string name="hidden_no_lock">This phone has no screen lock, so hidden albums open without one. Set a screen lock in the system settings to protect them.</string>
+    <string name="hidden_empty">Nothing is hidden. Hide an album from its menu, or select photos and choose Hide.</string>
+
+    <!-- Trash -->
+    <string name="trash_title">Trash</string>
+    <string name="trash_subtitle">Items are deleted for good after 30 days</string>
+    <string name="trash_empty_title">The trash is empty</string>
+    <string name="trash_empty_body">Photos you delete wait here for 30 days before they are gone for good.</string>
+    <string name="trash_restore">Restore</string>
+    <string name="trash_restore_to">Restore to</string>
+    <string name="trash_delete_forever">Delete for good</string>
+    <string name="trash_delete_body">This can\'t be undone.</string>
+    <string name="trash_empty_action">Empty trash</string>
+    <string name="trash_empty_confirm_title">Empty the trash?</string>
+    <plurals name="trash_days_left">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="trash_delete_title">
+        <item quantity="one">Delete %1$d item for good?</item>
+        <item quantity="other">Delete %1$d items for good?</item>
+    </plurals>
+    <plurals name="trash_empty_confirm_body">
+        <item quantity="one">%1$d item will be deleted for good. This can\'t be undone.</item>
+        <item quantity="other">%1$d items will be deleted for good. This can\'t be undone.</item>
+    </plurals>
+</resources>

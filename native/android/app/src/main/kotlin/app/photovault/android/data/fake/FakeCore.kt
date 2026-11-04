@@ -40,6 +40,12 @@ class FakeCore(
 
     override val isDemo: Boolean get() = true
 
+    /** The demo library, for the demo albums/sharing/trash ([app.photovault.android.data.albums.FakeAlbums]). */
+    internal val demoItems: List<TimelineItem> get() = items
+    internal val demoCollections: List<PhotoCollection> get() = collections
+    internal val demoNowUs: Long get() = nowUs
+    internal val demoLatencyMs: Long get() = latencyMs
+
     private val lock = Any()
     private val servers = LinkedHashMap<String, ServerInfo>()
     private var active: String? = null

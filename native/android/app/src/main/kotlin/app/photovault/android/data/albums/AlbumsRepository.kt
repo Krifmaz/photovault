@@ -1,6 +1,7 @@
 package app.photovault.android.data.albums
 
 import app.photovault.android.data.PhotoCollection
+import app.photovault.android.data.TimelineItem
 
 /**
  * Albums, sharing (people and public links), hidden albums and trash, from photovault-core
@@ -16,6 +17,9 @@ interface AlbumsRepository {
     fun albums(): List<AlbumDetails>
     fun hiddenAlbums(): List<AlbumDetails>
     fun albumDetails(collectionId: Long): AlbumDetails?
+    /** Files in an album (hidden ones included), and a page of them newest first (core's `collection_page`). */
+    fun albumCount(collectionId: Long): Long
+    fun albumPage(collectionId: Long, offset: Long, limit: Int): List<TimelineItem>
     suspend fun createAlbum(name: String): PhotoCollection
     suspend fun renameAlbum(collectionId: Long, name: String)
     /** [keepFiles]: files only in this album move to Uncategorized; otherwise they go to the trash. */
@@ -46,4 +50,7 @@ interface AlbumsRepository {
     suspend fun restoreFromTrash(fileIds: List<Long>, collectionId: Long?)
     suspend fun deleteFromTrash(fileIds: List<Long>)
     suspend fun emptyTrash()
+
+    /** True for the in-memory demo implementation. */
+    val isDemo: Boolean get() = false
 }
