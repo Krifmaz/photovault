@@ -6,6 +6,8 @@ import app.photovault.android.data.CoreProvider
 import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.LanDiscovery
 import app.photovault.android.data.NsdLanDiscovery
+import app.photovault.android.data.SignupProvider
+import app.photovault.android.data.SignupRepository
 import app.photovault.android.data.TimelineStore
 import app.photovault.android.ui.image.buildImageLoader
 import app.photovault.android.ui.timeline.TimelineLabels
@@ -33,6 +35,8 @@ class AppGraph(private val context: Context) {
     }
     val discovery: LanDiscovery by lazy { NsdLanDiscovery(context) }
     val timeline: TimelineStore by lazy { TimelineStore(core) }
+    /** Create account (contract v1.2 signup), on the same core. */
+    val signup: SignupRepository by lazy { SignupProvider.create(context, core) }
 
     /** App-lifetime work that must not block the UI or die with a screen (file cleanup, network re-checks). */
     val appScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

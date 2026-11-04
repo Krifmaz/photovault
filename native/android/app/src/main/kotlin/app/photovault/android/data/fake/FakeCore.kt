@@ -117,7 +117,7 @@ class FakeCore(
             version = "0.2.0",
             publicUrl = url,
             homeUrl = if (isLan) url else null,
-            signupsAllowed = false,
+            signupsAllowed = "nosignup" !in host,
             isPhotovault = true,
         )
     }
