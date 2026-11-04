@@ -103,7 +103,17 @@ impl MlRow {
         d.updated_at = self.updated_at;
         Ok(d)
     }
+
+    /// The seal's nonce: fresh on every write, so it tells whether the row
+    /// changed since it was last read (used by `faces` to re-read only
+    /// changed rows).
+    pub fn seal_tag(&self) -> &[u8] {
+        &self.sealed[..self.sealed.len().min(SEAL_TAG_BYTES)]
+    }
 }
+
+/// Bytes of [`MlRow::seal_tag`] (a secretbox nonce).
+const SEAL_TAG_BYTES: usize = 24;
 
 impl Store {
     /// Save the (decrypted) `mldata` of a file.
@@ -146,6 +156,29 @@ impl Store {
             .prepare("SELECT file_id, updated_at, face_ok, clip_ok, sealed FROM ml_data")?;
         let rows = q
             .query_map([], row_from)?
+            .collect::<rusqlite::Result<_>>()?;
+        Ok(rows)
+    }
+
+    /// One stored `mldata` row, sealed (decrypt outside the lock).
+    pub(crate) fn ml_row(&self, file_id: i64) -> Result<Option<MlRow>> {
+        Ok(self
+            .conn()
+            .prepare_cached(
+                "SELECT file_id, updated_at, face_ok, clip_ok, sealed FROM ml_data WHERE file_id = ?1",
+            )?
+            .query_row(params![file_id], row_from)
+            .optional()?)
+    }
+
+    /// `(file_id, seal tag)` of every `mldata` row (see [`MlRow::seal_tag`]),
+    /// without reading the sealed objects.
+    pub(crate) fn ml_row_tags(&self) -> Result<Vec<(i64, Vec<u8>)>> {
+        let mut q = self.conn().prepare_cached(
+            "SELECT file_id, substr(sealed, 1, 24) FROM ml_data ORDER BY file_id",
+        )?;
+        let rows = q
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
             .collect::<rusqlite::Result<_>>()?;
         Ok(rows)
     }
