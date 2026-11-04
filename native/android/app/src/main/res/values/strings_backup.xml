@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Camera backup. Kept in its own file so parallel features don't collide in strings.xml. -->
+<resources>
+    <string name="timeline_backup">Backup</string>
+
+    <string name="backup_title">Backup</string>
+    <string name="backup_enable">Back up this phone</string>
+    <string name="backup_enable_detail">New photos and videos in the folders below are encrypted on this phone and uploaded to your server.</string>
+    <string name="backup_folders">Folders</string>
+    <string name="backup_folders_none">No photos or videos found on this phone.</string>
+    <string name="backup_folders_no_access">Allow access to your photos to choose folders.</string>
+    <plurals name="backup_folder_count">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+    <string name="backup_options">Options</string>
+    <string name="backup_wifi_only">Only on Wi-Fi</string>
+    <string name="backup_wifi_only_detail">Upload on unmetered networks only, not on mobile data.</string>
+    <string name="backup_charging_only">Only while charging</string>
+    <string name="backup_charging_only_detail">Wait until the phone is plugged in.</string>
+    <string name="backup_videos">Include videos</string>
+    <string name="backup_note">Each folder becomes an album on your server, the same as in Photovault. Backup continues where it stopped if the connection drops or the phone restarts.</string>
+
+    <string name="backup_access_needed">Photovault needs access to your photos and videos to back them up.</string>
+    <string name="backup_access_partial">Photovault can only see the photos you picked. Allow all photos and videos to back up whole folders.</string>
+    <string name="backup_access_allow">Allow access</string>
+    <string name="backup_access_settings">Open app settings</string>
+
+    <string name="backup_now">Back up now</string>
+    <string name="backup_status_loading">Checking…</string>
+    <string name="backup_status_signed_out">Sign in to back up this phone.</string>
+    <string name="backup_status_off">Backup is off</string>
+    <string name="backup_status_off_detail">Turn it on to keep this phone\'s photos safe on your server.</string>
+    <string name="backup_status_no_access">Allow access to your photos</string>
+    <string name="backup_status_scanning">Looking for new photos…</string>
+    <plurals name="backup_status_uploading">
+        <item quantity="one">Backing up %1$d item</item>
+        <item quantity="other">Backing up %1$d items</item>
+    </plurals>
+    <plurals name="backup_status_waiting">
+        <item quantity="one">%1$d item waiting</item>
+        <item quantity="other">%1$d items waiting</item>
+    </plurals>
+    <string name="backup_status_bytes">%1$s of %2$s</string>
+    <string name="backup_waiting_wifi">Uploads start on Wi-Fi.</string>
+    <string name="backup_waiting_charging">Uploads start when the phone is charging.</string>
+    <string name="backup_waiting_wifi_charging">Uploads start on Wi-Fi while the phone is charging.</string>
+    <string name="backup_waiting_network">Uploads start when the server can be reached.</string>
+    <string name="backup_status_error">Backup stopped</string>
+    <string name="backup_status_done">Up to date</string>
+    <string name="backup_status_last">Last checked %1$s</string>
+    <string name="backup_status_pending">Backup starts shortly</string>
+    <plurals name="backup_failed">
+        <item quantity="one">%1$d item failed to upload. It is retried on the next backup.</item>
+        <item quantity="other">%1$d items failed to upload. They are retried on the next backup.</item>
+    </plurals>
+    <plurals name="backup_skipped">
+        <item quantity="one">%1$d file could not be read and was skipped.</item>
+        <item quantity="other">%1$d files could not be read and were skipped.</item>
+    </plurals>
+
+    <string name="backup_channel">Backup</string>
+    <string name="backup_channel_description">Progress while photos are uploaded to your server.</string>
+    <string name="backup_notification_title">Backing up photos</string>
+    <string name="backup_notification_preparing">Preparing…</string>
+    <string name="backup_notification_progress">%1$d left · %2$s of %3$s</string>
+</resources>

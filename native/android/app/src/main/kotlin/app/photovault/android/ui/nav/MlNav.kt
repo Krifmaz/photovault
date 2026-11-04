@@ -42,12 +42,15 @@ fun NavGraphBuilder.mlDestinations(graph: AppGraph, nav: NavHostController) {
         // The scheduler holds the application context only: the view model outlives this activity.
         val scheduler = MlWork.scheduler(LocalContext.current)
         val vm = viewModel { SearchViewModel(graph.ml, onMlEnabled = scheduler::reschedule) }
-        SearchScreen(
-            vm = vm,
-            onBack = { nav.popBackStack() },
-            onOpen = { nav.openSuggestion(it) },
-            onPeople = { nav.navigate(PeopleRoute) },
-        )
+        // A bottom-bar tab: no back arrow (system back returns to Photos).
+        HomeTabScaffold(HomeTab.Search, nav) {
+            SearchScreen(
+                vm = vm,
+                onBack = null,
+                onOpen = { nav.openSuggestion(it) },
+                onPeople = { nav.navigate(PeopleRoute) },
+            )
+        }
     }
     composable<SearchResultsRoute> { entry ->
         val route = entry.toRoute<SearchResultsRoute>()

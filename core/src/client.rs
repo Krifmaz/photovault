@@ -77,6 +77,8 @@ pub struct Inner {
     store: Mutex<Store>,
     pub(crate) session: RwLock<Option<Arc<Session>>>,
     pub(crate) pending: Mutex<Option<crate::auth::Pending>>,
+    /// A create-account flow between its steps (`crate::signup`).
+    pub(crate) signup: Mutex<Option<crate::signup::PendingSignup>>,
     base: RwLock<Option<Base>>,
     pub(crate) index: RwLock<Arc<Index>>,
     pub(crate) sync_lock: tokio::sync::Mutex<()>,
@@ -114,6 +116,7 @@ impl Inner {
             store: Mutex::new(store),
             session: RwLock::new(session.map(Arc::new)),
             pending: Mutex::new(None),
+            signup: Mutex::new(None),
             base: RwLock::new(active.as_deref().map(Base::public)),
             index: RwLock::new(Arc::new(Index::default())),
             sync_lock: tokio::sync::Mutex::new(()),

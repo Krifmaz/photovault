@@ -19,7 +19,9 @@ use crate::metadata::{
     SUB_TYPE_DEFAULT_HIDDEN, VISIBILITY_ARCHIVED, VISIBILITY_HIDDEN, decrypt_json, decrypt_magic,
 };
 use crate::model::*;
-use crate::{Collection, CoreError, FileKind, Result, SyncListener, SyncProgress, TimelineItem};
+use crate::{
+    Collection, CoreError, FileKind, MapPoint, Result, SyncListener, SyncProgress, TimelineItem,
+};
 use rusqlite::{OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -54,6 +56,21 @@ pub(crate) struct CollectionRec {
     pub sub_type: Option<i64>,
     pub visibility: Option<i64>,
     pub updation_time: i64,
+    /// Owner's email (shared with us).
+    #[serde(default)]
+    pub owner_email: String,
+    /// People it is shared with (owned albums).
+    #[serde(default)]
+    pub sharees: Vec<crate::albums::ShareeRec>,
+    /// The public link, if any.
+    #[serde(default)]
+    pub public_link: Option<crate::albums::PublicLinkRec>,
+    /// The owner's decrypted private magic metadata and its server version
+    /// (kept whole so an update preserves keys other apps set).
+    #[serde(default)]
+    pub magic: Map<String, Value>,
+    #[serde(default)]
+    pub magic_version: i64,
 }
 
 impl std::fmt::Debug for CollectionRec {
@@ -72,10 +89,10 @@ impl Drop for CollectionRec {
 }
 
 impl CollectionRec {
-    fn hidden(&self) -> bool {
+    pub(crate) fn hidden(&self) -> bool {
         self.sub_type == Some(SUB_TYPE_DEFAULT_HIDDEN) || self.visibility == Some(VISIBILITY_HIDDEN)
     }
-    fn archived(&self) -> bool {
+    pub(crate) fn archived(&self) -> bool {
         self.visibility == Some(VISIBILITY_ARCHIVED)
     }
 }
@@ -124,7 +141,7 @@ impl FileRec {
         m.get(k)
             .and_then(|v| v.as_i64().or_else(|| v.as_f64().map(|f| f as i64)))
     }
-    fn item(&self, collection_id: i64) -> TimelineItem {
+    pub(crate) fn item(&self, collection_id: i64) -> TimelineItem {
         let md = self.metadata.as_object().cloned().unwrap_or_default();
         let taken = Self::i64_of(&self.pub_magic, "editedTime")
             .filter(|t| *t != 0)
@@ -164,19 +181,28 @@ impl FileRec {
     fn archived(&self) -> bool {
         Self::i64_of(&self.magic, "visibility") == Some(VISIBILITY_ARCHIVED)
     }
+    /// Where the photo was taken: the user's edit (public magic `lat`/`long`)
+    /// over the metadata's `latitude`/`longitude`, as Ente's apps read it.
+    fn location(&self) -> Option<(f64, f64)> {
+        crate::places::location(&self.pub_magic, &self.metadata)
+    }
 }
 
 /// The in-memory library index.
 #[derive(Debug, Default)]
 pub struct Index {
     /// Every file once, newest first (collection id = a representative).
-    all: Vec<TimelineItem>,
+    pub(crate) all: Vec<TimelineItem>,
     /// Positions in `all` shown in the timeline.
     timeline: Vec<u32>,
     /// Positions in `all` per collection.
-    by_collection: HashMap<i64, Vec<u32>>,
+    pub(crate) by_collection: HashMap<i64, Vec<u32>>,
     /// Visible collections, ready to return.
-    collections: Vec<Collection>,
+    pub(crate) collections: Vec<Collection>,
+    /// Timeline files with a location, newest first.
+    located: Vec<MapPoint>,
+    /// Albums, sharing and trash ([`crate::albums`]).
+    pub(crate) albums: crate::albums::AlbumIndex,
     /// Owned files by content hash, with their collections.
     pub(crate) hashes: HashMap<String, (i64, Vec<i64>)>,
 }
@@ -235,16 +261,20 @@ pub(crate) fn decrypt_collection(c: &RemoteCollection, s: &Session) -> Result<Co
         .into_owned(),
         _ => String::new(),
     };
-    let (sub_type, visibility) = match &c.magic_metadata {
-        Some(mm) if owned => {
+    let (sub_type, visibility, magic, magic_version) = match &c.magic_metadata {
+        Some(mm) if owned && !mm.data.is_empty() => {
             let m = decrypt_magic(mm, &key)?;
             (
                 m.data.get("subType").and_then(Value::as_i64),
                 m.data.get("visibility").and_then(Value::as_i64),
+                m.data,
+                m.version,
             )
         }
-        _ => (None, None),
+        Some(mm) if owned => (None, None, Map::new(), mm.version),
+        _ => (None, None, Map::new(), 0),
     };
+    let public_link = crate::albums::public_link_of(c, &key);
     Ok(CollectionRec {
         id: c.id,
         key,
@@ -255,6 +285,11 @@ pub(crate) fn decrypt_collection(c: &RemoteCollection, s: &Session) -> Result<Co
         sub_type,
         visibility,
         updation_time: c.updation_time,
+        owner_email: c.owner.email.clone(),
+        sharees: crate::albums::sharees_of(c),
+        public_link,
+        magic,
+        magic_version,
     })
 }
 
@@ -420,7 +455,7 @@ impl Inner {
     }
 
     /// Remove a file from a collection; drop it entirely when it is in none.
-    fn remove_membership(&self, collection_id: i64, file_id: i64) -> Result<()> {
+    pub(crate) fn remove_membership(&self, collection_id: i64, file_id: i64) -> Result<()> {
         let gone = {
             let mut st = self.store();
             let tx = st.conn_mut().transaction()?;
@@ -450,7 +485,7 @@ impl Inner {
         let _ = std::fs::remove_file(self.file_cache_path(file_id));
     }
 
-    fn delete_collection(&self, id: i64) -> Result<()> {
+    pub(crate) fn delete_collection(&self, id: i64) -> Result<()> {
         let orphans: Vec<i64> = {
             let mut st = self.store();
             let tx = st.conn_mut().transaction()?;
@@ -505,6 +540,8 @@ impl Inner {
         for c in &res.collections {
             max_since = max_since.max(c.updation_time);
             if c.is_deleted {
+                // Keep the key: its files may sit in the trash.
+                self.remember_deleted_key(c, &s);
                 self.delete_collection(c.id)?;
                 continue;
             }
@@ -544,6 +581,8 @@ impl Inner {
                 });
             }
         }
+        // Which videos have a stream (best effort: older servers lack the endpoint).
+        let _ = self.sync_stream_status(&api).await;
         self.rebuild_index()?;
         crate::offload(|| trim_dir(&self.cache_dir.join("thumbs"), THUMB_CACHE_MAX));
         let p = SyncProgress {
@@ -684,8 +723,9 @@ impl Inner {
             .into_iter()
             .map(|c| (c.id, c))
             .collect();
-        let (members, blobs) = {
+        let (members, blobs, streams) = {
             let st = self.store();
+            let streams = Inner::known_streams(st.conn())?;
             let mut members: HashMap<i64, Vec<i64>> = HashMap::new();
             {
                 let mut q = st.conn().prepare(
@@ -700,7 +740,7 @@ impl Inner {
             let blobs: Vec<Vec<u8>> = q
                 .query_map([], |r| r.get::<_, Vec<u8>>(0))?
                 .collect::<rusqlite::Result<_>>()?;
-            (members, blobs)
+            (members, blobs, streams)
         };
         let opener = self.store().opener();
         let files: Vec<FileRec> = blobs
@@ -708,7 +748,9 @@ impl Inner {
             .filter_map(|b| opener.open_sealed::<FileRec>(b).ok())
             .collect();
         drop(opener);
-        let mut entries: Vec<(TimelineItem, Vec<i64>, bool)> = Vec::with_capacity(files.len());
+        // (item, collections, in timeline, location)
+        type Entry = (TimelineItem, Vec<i64>, bool, Option<(f64, f64)>);
+        let mut entries: Vec<Entry> = Vec::with_capacity(files.len());
         let mut hashes = HashMap::new();
         for f in files {
             let in_cols: Vec<i64> = members.get(&f.id).cloned().unwrap_or_default();
@@ -727,17 +769,28 @@ impl Inner {
             {
                 hashes.entry(h).or_insert((f.id, in_cols.clone()));
             }
-            entries.push((f.item(rep), in_cols, in_timeline));
+            let loc = if in_timeline { f.location() } else { None };
+            let mut item = f.item(rep);
+            item.has_stream = Inner::has_stream(&f, &streams);
+            entries.push((item, in_cols, in_timeline, loc));
         }
         entries.sort_by_key(|e| std::cmp::Reverse((e.0.taken_at_us, e.0.id)));
         let mut idx = Index {
             hashes,
             ..Default::default()
         };
-        for (pos, (item, in_cols, in_timeline)) in entries.into_iter().enumerate() {
+        for (pos, (item, in_cols, in_timeline, loc)) in entries.into_iter().enumerate() {
             let pos = pos as u32;
             if in_timeline {
                 idx.timeline.push(pos);
+            }
+            if let Some((latitude, longitude)) = loc {
+                idx.located.push(MapPoint {
+                    file_id: item.id,
+                    latitude,
+                    longitude,
+                    taken_at_us: item.taken_at_us,
+                });
             }
             for c in in_cols {
                 idx.by_collection.entry(c).or_default().push(pos);
@@ -769,6 +822,8 @@ impl Inner {
             .collect();
         visible.sort_by_key(|v| std::cmp::Reverse((v.0, v.1.id)));
         idx.collections = visible.into_iter().map(|(_, c)| c).collect();
+        crate::albums::build_album_index(&mut idx, &cols, user_id);
+        idx.albums.trash = self.load_trash(&idx)?;
         Ok(idx)
     }
 
@@ -792,6 +847,20 @@ impl Inner {
 
     pub fn collections(&self) -> Vec<Collection> {
         self.index().collections.clone()
+    }
+
+    pub fn map_points(&self) -> Vec<MapPoint> {
+        self.index().located.clone()
+    }
+
+    pub fn on_this_day(&self, now_us: i64, utc_offset_secs: i32, limit: u32) -> Vec<TimelineItem> {
+        let idx = self.index();
+        crate::places::on_this_day(
+            idx.timeline.iter().map(|&p| &idx.all[p as usize]),
+            now_us,
+            utc_offset_secs,
+            limit,
+        )
     }
 
     pub fn collection_page(
@@ -828,7 +897,11 @@ impl Inner {
 
     pub async fn thumbnail(&self, file_id: i64) -> Result<Vec<u8>> {
         self.session()?;
-        let f = self.file_rec(file_id)?;
+        // Trashed files are no longer in the library, but the trash shows them.
+        let f = match self.file_rec(file_id) {
+            Ok(f) => f,
+            Err(e) => self.trashed_file_rec(file_id)?.ok_or(e)?,
+        };
         let header = crypto::unb64(&f.thumb_header)?;
         let path = self.thumb_path(file_id);
         // The cache holds the server's ciphertext: encrypted at rest under the file key.
@@ -941,9 +1014,8 @@ impl Inner {
     }
 
     pub async fn stream_playlist(&self, file_id: i64) -> Result<Option<String>> {
-        // Streamable (HLS) versions are not synced in this version of the core.
-        self.file_rec(file_id)?;
-        Ok(None)
+        // Ente's streamable videos: crate::video.
+        self.stream_playlist_url(file_id).await
     }
 }
 

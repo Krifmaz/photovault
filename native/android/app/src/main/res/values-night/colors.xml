@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="encore_bg">#161617</color>
+    <!-- widgets: encore-tokens.json panel / text -->
+    <color name="encore_panel">#222224</color>
+    <color name="encore_text">#F0EAD6</color>
 </resources>

@@ -104,8 +104,8 @@ fun TimelineScreen(
     onOpen: (index: Int, fileId: Long) -> Unit,
     onSignedOut: () -> Unit,
     onSwitchServer: () -> Unit,
-    /** Opens search (the top bar's search icon). */
-    onSearch: () -> Unit = {},
+    onMap: () -> Unit = {},
+    onBackup: () -> Unit = {},
     /** Today's memories, shown as a strip above the grid when not empty. */
     memories: StateFlow<List<Memory>>? = null,
     onOpenMemory: (Memory) -> Unit = {},
@@ -143,7 +143,7 @@ fun TimelineScreen(
 
     Scaffold(
         containerColor = MaterialTheme.palette.bg,
-        topBar = { TimelineTopBar(vm, gridState, onSearch, onOpenMlSettings) },
+        topBar = { TimelineTopBar(vm, gridState, onMap, onBackup, onOpenMlSettings) },
     ) { padding ->
         RefreshBox(vm) {
             PhotoGrid(vm, gridState, zoom, padding, onOpen, memoryList, onOpenMemory)
@@ -168,7 +168,8 @@ private fun RefreshBox(vm: TimelineViewModel, content: @Composable () -> Unit) {
 private fun TimelineTopBar(
     vm: TimelineViewModel,
     gridState: LazyGridState,
-    onSearch: () -> Unit,
+    onMap: () -> Unit,
+    onBackup: () -> Unit,
     onOpenMlSettings: (() -> Unit)?,
 ) {
     val status by vm.status.collectAsStateWithLifecycle()
@@ -199,8 +200,8 @@ private fun TimelineTopBar(
                 }
             },
             actions = {
-                IconButton(onClick = onSearch, modifier = Modifier.testTag("timeline_search")) {
-                    Icon(painterResource(R.drawable.ic_search), contentDescription = stringResource(R.string.search_open), tint = p.text)
+                IconButton(onClick = onMap, modifier = Modifier.testTag("timeline_map")) {
+                    Icon(painterResource(R.drawable.ic_map), contentDescription = stringResource(R.string.timeline_map), tint = p.text)
                 }
                 IconButton(onClick = { menu = true }) {
                     Icon(painterResource(R.drawable.ic_account), contentDescription = stringResource(R.string.timeline_account), tint = p.text)
@@ -227,6 +228,11 @@ private fun TimelineTopBar(
                             onClick = { menu = false; onOpenMlSettings() },
                         )
                     }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.timeline_backup)) },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_backup), contentDescription = null) },
+                        onClick = { menu = false; onBackup() },
+                    )
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.timeline_switch_server)) },
                         leadingIcon = { Icon(painterResource(R.drawable.ic_server), contentDescription = null) },

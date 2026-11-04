@@ -2,7 +2,7 @@
 <!-- Search, people and memories (contract v1.2). Kept apart from strings.xml so the tracks merge cleanly. -->
 <resources>
     <!-- Search -->
-    <string name="search_open">Search</string>
+    <string name="tab_search">Search</string>
     <string name="search_hint">People, places, albums, things…</string>
     <string name="search_clear">Clear</string>
     <string name="search_see_all">See all</string>

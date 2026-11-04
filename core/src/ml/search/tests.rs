@@ -71,6 +71,11 @@ fn collection(
         sub_type: None,
         visibility,
         updation_time: id,
+        owner_email: String::new(),
+        sharees: Vec::new(),
+        public_link: None,
+        magic: Default::default(),
+        magic_version: 0,
     }
 }
 

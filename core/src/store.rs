@@ -34,8 +34,37 @@ CREATE TABLE IF NOT EXISTS uploads (
   collection_id INTEGER, attempts INTEGER NOT NULL DEFAULT 0,
   bytes_total INTEGER NOT NULL DEFAULT 0, sealed BLOB NOT NULL,
   error TEXT, created_at INTEGER NOT NULL);
-PRAGMA user_version = 1;
 ";
+
+/// Schema steps after [`SCHEMA`] (`user_version` 1), appended by feature
+/// tracks: step `i` brings the store to `user_version` `i + 2`. Keep every
+/// step idempotent (`IF NOT EXISTS`): tracks merged in another order replay
+/// cleanly.
+const MIGRATIONS: &[&str] = &[
+    // 2: streamable videos (crate::video): the account's `vid_preview` file data status.
+    "CREATE TABLE IF NOT EXISTS video_streams (
+       file_id INTEGER PRIMARY KEY, object_id TEXT, size INTEGER NOT NULL DEFAULT 0,
+       updated_at INTEGER NOT NULL);",
+];
+
+/// Create the schema and run the migrations it has not seen yet.
+fn migrate(conn: &Connection) -> Result<()> {
+    conn.execute_batch(SCHEMA)?;
+    let mut v: i64 = conn.query_row("PRAGMA user_version", [], |r| r.get(0))?;
+    if v < 1 {
+        v = 1;
+        conn.pragma_update(None, "user_version", v)?;
+    }
+    for (i, step) in MIGRATIONS.iter().enumerate() {
+        let to = i as i64 + 2;
+        if v < to {
+            conn.execute_batch(step)?;
+            conn.pragma_update(None, "user_version", to)?;
+            v = to;
+        }
+    }
+    Ok(())
+}
 
 /// Upload row states.
 pub const UP_PENDING: &str = "pending";
@@ -129,7 +158,7 @@ impl Store {
         conn.pragma_update(None, "journal_mode", "WAL")?;
         conn.pragma_update(None, "synchronous", "NORMAL")?;
         conn.busy_timeout(std::time::Duration::from_secs(5))?;
-        conn.execute_batch(SCHEMA)?;
+        migrate(&conn)?;
         crate::ml::store::migrate(&conn)?;
         let mut store = Self { conn, key };
         let reset = if supplied {
@@ -312,7 +341,7 @@ impl Store {
         let tx = self.conn.transaction()?;
         tx.execute_batch(
             "DELETE FROM collections; DELETE FROM files; DELETE FROM collection_files; \
-             DELETE FROM uploads; \
+             DELETE FROM uploads; DELETE FROM video_streams; \
              DELETE FROM kv WHERE k NOT IN ('active_server', 'key_check') \
              AND k NOT LIKE 'home_allowed:%';",
         )?;

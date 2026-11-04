@@ -122,10 +122,9 @@ private fun problemText(problem: SignInProblem): String = when (problem) {
 }
 
 @Composable
-fun SignInScreen(vm: SignInViewModel, onChangeServer: () -> Unit) {
+fun SignInScreen(vm: SignInViewModel, onChangeServer: () -> Unit, onCreateAccount: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     var password by remember { mutableStateOf("") } // secrets stay out of saved state
-    var showSignupNote by rememberSaveable { mutableStateOf(false) }
     val submit = { vm.signIn(state.email, password) }
     AuthFrame(onBack = null) {
         ScreenHeader(
@@ -155,13 +154,14 @@ fun SignInScreen(vm: SignInViewModel, onChangeServer: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
         )
         LinkButton(stringResource(R.string.signin_use_recovery), vm::startRecovery, Modifier.align(Alignment.CenterHorizontally))
-        LinkButton(stringResource(R.string.signin_create_account), { showSignupNote = true }, Modifier.align(Alignment.CenterHorizontally))
-        if (showSignupNote) {
-            Text(
-                stringResource(R.string.signin_create_account_note),
+        when (state.signupsAllowed) {
+            true -> LinkButton(stringResource(R.string.signin_create_account), onCreateAccount, Modifier.align(Alignment.CenterHorizontally))
+            false -> Text(
+                stringResource(R.string.signin_signups_closed),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.palette.muted,
             )
+            null -> Unit
         }
         SecondaryButton(stringResource(R.string.signin_change_server), onChangeServer, Modifier.fillMaxWidth())
     }
