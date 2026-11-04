@@ -9,12 +9,12 @@ Comments are not scanned. Terms marked *visible* only count in text a user can s
 
 ## Summary
 
-511 hits, 511 explained, **0 unexplained**.
+510 hits, 510 explained, **0 unexplained**.
 
 | Term | Context | Hits | Unexplained |
 | --- | --- | ---: | ---: |
 | support@ente | code | 39 | 0 |
-| ente.com | code | 66 | 0 |
+| ente.com | code | 65 | 0 |
 | ente.io | code | 5 | 0 |
 | ente.sh | code | 2 | 0 |
 | github.com/ente-io | code | 0 | 0 |
@@ -33,7 +33,7 @@ Comments are not scanned. Terms marked *visible* only count in text a user can s
 | Category | Meaning | Hits |
 | --- | --- | ---: |
 | about-credit | The plain "Based on Ente" credit in About, the one allowed user-visible mention of Ente. | 3 |
-| internal-identifier | Identifiers that are never shown as text: URI schemes, package/app ids, enum values, storage keys, CSS hooks, file names. | 55 |
+| internal-identifier | Identifiers that are never shown as text: URI schemes, package/app ids, enum values, storage keys, CSS hooks, file names. | 56 |
 | api-field-name | Names in the Ente API that the Photovault server implements (paths, JSON fields, models); renaming them breaks the protocol. | 20 |
 | server-plan-wording | Generic plan/subscription wording for errors the Photovault server really returns (it keeps museum's per-user plan: quota and expiry, set by the admin). Not Ente branding. | 5 |
 | log-message | Developer log or diagnostic text (logs, adb dumps, exceptions caught and logged); not shown in the UI. | 26 |
@@ -42,7 +42,7 @@ Comments are not scanned. Terms marked *visible* only count in text a user can s
 | upstream-security-logic | Upstream security checks that name Ente hosts; left untouched so security is not weakened. | 7 |
 | inert-config | Configuration that names an Ente host or service but makes no request and shows nothing. | 10 |
 | replaced-asset-path | Asset file name kept from upstream; the content (duck mascot) was replaced or is no longer drawn. | 9 |
-| pending-user-decision | Still contacts an Ente host; left on purpose until the project owner decides (ML model downloads). | 9 |
+| pending-user-decision | Still contacts an Ente host; left on purpose until the project owner decides (ML model downloads). | 7 |
 | third-party-data | Data inside a bundled third-party library (word lists etc.). | 0 |
 | package-metadata | Package/build metadata (pubspec description, package.json name) that is not shipped in or shown by the apps. | 27 |
 
@@ -107,6 +107,7 @@ None.
 | ente | `mobile/apps/photos/lib/ui/account/passkey_page.dart:60` | internal-identifier | ente:// deep links handled by the app itself (passkey return, notification payloads). |
 | ente | `mobile/apps/photos/lib/ui/account/passkey_page.dart:112` | internal-identifier | ente:// deep links handled by the app itself (passkey return, notification payloads). |
 | ente | `mobile/apps/photos/lib/ui/tabs/home_widget.dart:837` | internal-identifier | ente:// URI scheme in notification payloads and the deep-link scheme check. |
+| ente.com | `rust/bindings/frb/photos/src/api/ml_indexing_api.rs:144` | internal-identifier | Prefix the model catalog's URLs are matched on: rewritten to the server's mirror (modelsUrl) or blocked when there is none. Never requested. |
 | ente | `rust/crates/legacy/src/error.rs:27` | internal-identifier | Display text of ContactNotOnEnte; Photos matches the variant (LegacyError_ContactNotOnEnte, web: contact_not_on_ente) and shows its own invite dialog, never this text. |
 | ente | `rust/crates/ml/src/onnx/coreml_cache.rs:153` | internal-identifier | Directory name of the Core ML compile cache (Library/Caches/ente/ml/coreml); never shown. |
 | ente | `web/apps/accounts/src/services/passkey.ts:177` | internal-identifier | ente: is an allowed passkey redirect scheme (the mobile app returns through ente://passkey). |
@@ -195,9 +196,7 @@ None.
 | ente | `mobile/packages/strings/pubspec.yaml:2` | package-metadata | pubspec description; not compiled into the app. |
 | ente | `mobile/packages/ui/pubspec.yaml:2` | package-metadata | pubspec description; not compiled into the app. |
 | ente | `mobile/packages/utils/pubspec.yaml:2` | package-metadata | pubspec description; not compiled into the app. |
-| ente.com | `mobile/apps/photos/lib/services/photovault/server_assets.dart:20` | pending-user-decision | Memories music fallback, used only when the server advertises no music mirror (musicManifestUrl, contracts/asset-mirror.md). |
 | ente.com | `mobile/apps/photos/lib/services/remote_assets_service.dart:616` | pending-user-decision | ML models still download from models.ente.com (owner to decide); this is the host check for those downloads. |
-| ente.com | `rust/bindings/frb/photos/src/api/ml_indexing_api.rs:144` | pending-user-decision | Maps models.ente.com to the server's model mirror (modelsUrl); the Ente host is the fallback when the server has no mirror. |
 | ente.com | `rust/crates/ml/src/assets.rs:45` | pending-user-decision | ML model downloads from models.ente.com; where the models come from is left to the owner. |
 | ente.com | `rust/crates/ml/src/ocr/assets.rs:22` | pending-user-decision | ML model downloads from models.ente.com; where the models come from is left to the owner. |
 | ente.com | `rust/crates/ml/src/ocr/assets.rs:30` | pending-user-decision | ML model downloads from models.ente.com; where the models come from is left to the owner. |
@@ -601,4 +600,4 @@ Not scanned at all (build output, tests, generated code):
 
 Stale entries; delete them from `scripts/strip-allowlist.toml`.
 
-- entry 22: `mobile/packages/ente_components/assets/ente_wordmark.svg` (ente)
+- entry 20: `mobile/packages/ente_components/assets/ente_wordmark.svg` (ente)

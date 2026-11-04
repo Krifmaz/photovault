@@ -135,24 +135,13 @@ line = "models\\.ente\\.com"
 category = "pending-user-decision"
 reason = "ML models still download from models.ente.com (owner to decide); this is the host check for those downloads."
 
-[[allow]]
-path = "mobile/apps/photos/lib/services/photovault/server_assets.dart"
-term = "ente.com"
-line = "enteMusicManifestUrl = \"https://music\\.ente\\.com/tracks\\.json\""
-category = "pending-user-decision"
-reason = "Memories music fallback, used only when the server advertises no music mirror (musicManifestUrl, contracts/asset-mirror.md)."
-[[allow]]
-path = "apk:lib/*/libapp.so"
-term = "ente.com"
-line = "^https://music\\.ente\\.com/tracks\\.json$"
-category = "pending-user-decision"
-reason = "Compiled PhotovaultServerAssets.enteMusicManifestUrl: memories music fallback, used only when the server advertises no music mirror."
+
 [[allow]]
 path = "rust/bindings/frb/photos/src/api/ml_indexing_api.rs"
 term = "ente.com"
-line = "set_url_mirror\\(\"https://models\\.ente\\.com/\""
-category = "pending-user-decision"
-reason = "Maps models.ente.com to the server's model mirror (modelsUrl); the Ente host is the fallback when the server has no mirror."
+line = "MODEL_CATALOG_PREFIX: &str = \"https://models\\.ente\\.com/\""
+category = "internal-identifier"
+reason = "Prefix the model catalog's URLs are matched on: rewritten to the server's mirror (modelsUrl) or blocked when there is none. Never requested."
 
 # ---------------------------------------------------------------------------
 # Mobile: Photos app

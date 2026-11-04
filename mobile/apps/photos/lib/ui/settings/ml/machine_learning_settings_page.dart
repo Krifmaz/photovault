@@ -18,6 +18,8 @@ import "package:photos/services/machine_learning/ml_indexing_isolate.dart";
 import "package:photos/services/machine_learning/ml_model_download_service.dart";
 import "package:photos/services/machine_learning/ml_run_control.dart";
 import "package:photos/services/machine_learning/ml_service.dart";
+import "package:photos/services/photovault/photovault_strings.dart"; // PHOTOVAULT
+import "package:photos/services/photovault/server_assets.dart"; // PHOTOVAULT
 import "package:photos/services/wake_lock_service.dart";
 import "package:photos/ui/settings/ml/ml_consent_sheet.dart";
 import "package:photos/ui/settings/ml/ml_user_dev_screen.dart";
@@ -386,6 +388,16 @@ class _ModelLoadingStateState extends State<ModelLoadingState> {
         FutureBuilder(
           future: canUseHighBandwidth().then((v) => isLocalGalleryMode || v),
           builder: (context, snapshot) {
+            // PHOTOVAULT: server connection. No model mirror on the server.
+            if (!PhotovaultServerAssets.modelsAvailable) {
+              return const MenuComponent(
+                title: PhotovaultStrings.mlModelsUnavailable,
+                leading: HugeIcon(
+                  icon: HugeIcons.strokeRoundedCloudOff,
+                  size: IconSizes.small,
+                ),
+              );
+            }
             String title = "";
             List<List<dynamic>> leadingIcon = HugeIcons.strokeRoundedLoading03;
             if (snapshot.hasData) {

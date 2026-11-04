@@ -5,9 +5,9 @@
 // model and music files (contracts/asset-mirror.md) and can name its own Cast
 // receiver; this file turns `/photovault/info` into the URLs the app uses.
 //
-// Rule: use what the server advertises. Ente's hosts are used only when the
-// server does not advertise a mirror (mirror turned off, or a stock server),
-// so machine learning keeps working exactly as upstream.
+// Rule: use what the server advertises. Ente's hosts are never contacted:
+// without a mirror (mirror turned off, a stock server, or no server) machine
+// learning models and memories music are unavailable.
 
 import "package:photos/services/photovault/photovault_server_service.dart";
 import "package:photos/services/photovault/server_address.dart";
@@ -15,9 +15,6 @@ import "package:photos/services/photovault/server_contract.dart";
 
 class PhotovaultServerAssets {
   PhotovaultServerAssets._();
-
-  /// Ente's memories music manifest.
-  static const enteMusicManifestUrl = "https://music.ente.com/tracks.json";
 
   /// Build-time Cast receiver (`--dart-define=PHOTOVAULT_CAST_APP_ID=...`),
   /// used when the server does not announce one.
@@ -34,7 +31,8 @@ class PhotovaultServerAssets {
   static String get _currentAddress =>
       PhotovaultServerService.instance.currentAddress;
 
-  /// Base URL for model files, or null for Ente's own host.
+  /// Base URL for model files, or null when the server has no model mirror
+  /// (models are then unavailable).
   static String? modelsMirrorUrl({
     PhotovaultServerInfo? server,
     String? currentAddress,
@@ -45,14 +43,18 @@ class PhotovaultServerAssets {
     return rebase(url, server, currentAddress ?? _currentAddress);
   }
 
-  /// The memories music manifest: the server's mirror, else Ente's.
-  static String musicManifestUrl({
+  /// True when the active server mirrors the ML models.
+  static bool get modelsAvailable => modelsMirrorUrl() != null;
+
+  /// The memories music manifest on the server's mirror, or null when the
+  /// server has none (memories then play without music).
+  static String? musicManifestUrl({
     PhotovaultServerInfo? server,
     String? currentAddress,
   }) {
     server ??= _server;
     final url = server?.musicManifestUrl;
-    if (server == null || url == null) return enteMusicManifestUrl;
+    if (server == null || url == null) return null;
     return rebase(url, server, currentAddress ?? _currentAddress);
   }
 

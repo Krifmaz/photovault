@@ -57,7 +57,7 @@ void main() {
     );
   });
 
-  test("falls back to Ente's hosts only without a mirror", () {
+  test("never falls back to Ente's hosts without a mirror", () {
     expect(
       PhotovaultServerAssets.modelsMirrorUrl(
         server: noMirror,
@@ -70,7 +70,7 @@ void main() {
         server: noMirror,
         currentAddress: "https://photos.example.com",
       ),
-      PhotovaultServerAssets.enteMusicManifestUrl,
+      isNull,
     );
   });
 

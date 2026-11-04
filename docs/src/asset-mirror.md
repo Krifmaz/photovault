@@ -31,5 +31,6 @@ The apps read `modelsUrl` and `musicManifestUrl` from `/photovault/info` and
 fetch through the address they use at that moment (the home address on your
 LAN). Music tracks may be plain `http` when they come from your server.
 
-To turn the feature off: `PHOTOVAULT_ASSET_MIRROR=false`. The apps then fall
-back to Ente's hosts for models and music, as Ente's apps do.
+To turn the feature off: `PHOTOVAULT_ASSET_MIRROR=false`. The apps never fall
+back to Ente's hosts: on-device machine learning (faces, magic search) is then
+unavailable in the Android app, and memories play without music.

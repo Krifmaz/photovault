@@ -1025,12 +1025,24 @@ impl RangeDownloadContext<'_, '_> {
     }
 }
 
+// PHOTOVAULT: server connection. A blocked prefix (no server mirror) fails
+// before any request is made.
+fn ensure_not_blocked(url: &str) -> Result<(), Error> {
+    if crate::mirror::is_blocked(url) {
+        return Err(Error::Validation(format!(
+            "{url} is not available from this server"
+        )));
+    }
+    Ok(())
+}
+
 async fn request_file(
     client: &Client,
     url: &str,
     resume_from: u64,
     if_range: Option<&str>,
 ) -> Result<Response, Error> {
+    ensure_not_blocked(url)?;
     let mut request = client.get(url);
     if resume_from > 0
         && let Some(if_range) = if_range
@@ -1051,6 +1063,7 @@ async fn request_model_range(
     range: RangeDownloadPartMetadata,
     response_metadata: Option<&ResponseMetadata>,
 ) -> Result<Response, Error> {
+    ensure_not_blocked(url)?;
     let mut request = client
         .get(url)
         .header(RANGE, format!("bytes={}-{}", range.start, range.end));
@@ -1064,6 +1077,9 @@ async fn request_model_range(
 }
 
 async fn fetch_download_probe(client: &Client, url: &str) -> DownloadProbe {
+    if crate::mirror::is_blocked(url) {
+        return DownloadProbe::default();
+    }
     let response = client.head(url).send().await.ok();
     let Some(response) = response else {
         return DownloadProbe::default();

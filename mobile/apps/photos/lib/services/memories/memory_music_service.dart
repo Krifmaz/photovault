@@ -21,11 +21,14 @@ class MemoryMusicService {
     preferences: ServiceLocator.instance.prefs,
     // PHOTOVAULT: server connection. The track list and MP3s come from the
     // server's music mirror (`musicManifestUrl` in /photovault/info), through
-    // the address in use (home or public); Ente's host only when the server
-    // has no mirror. Cache names stay keyed on the manifest URL.
+    // the address in use (home or public). Without a mirror nothing is
+    // fetched (never Ente's host): the manifest is empty and memories play
+    // without music. Cache names stay keyed on the manifest URL.
     fetchManifest: () async {
+      final manifestUrl = PhotovaultServerAssets.musicManifestUrl();
+      if (manifestUrl == null) return <String, dynamic>{"tracks": <dynamic>[]};
       final response = await ServiceLocator.instance.nonEnteDio.get<Object?>(
-        PhotovaultServerAssets.musicManifestUrl(),
+        manifestUrl,
         options: Options(receiveTimeout: const Duration(seconds: 15)),
       );
       return response.data;

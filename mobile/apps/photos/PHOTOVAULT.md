@@ -369,8 +369,11 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   `../../../rust/bindings/frb/photos/src/api/ml_indexing_api.rs`
   `set_models_mirror`; `lib/services/machine_learning/ml_model_download_service.dart`
   (`syncModelsMirror`, called before every model preload, progress UI
-  unchanged) and `ocr/rust_ocr_backend.dart` set it. Ente's host only when the
-  server advertises no mirror.
+  unchanged) and `ocr/rust_ocr_backend.dart` set it. Without a mirror (or
+  before any server is set, `api/init.rs`) the prefix is blocked: no request
+  goes to Ente's host, local indexing is skipped (`ml_service.dart`
+  `_canIndexLocally`) and ML settings say the models are unavailable.
+  Memories music likewise: no mirror, no music (empty manifest).
 - Chromecast: `plugins/ente_cast/lib/src/service.dart` no longer launches
   Ente's receiver app (`F5BCEC64`, which loads Ente's hosted cast page and
   pairs through Ente's servers). `CastService(appID:)` takes the receiver from
@@ -498,9 +501,10 @@ not ship):
 
 ## Known gaps
 
-- ML models and memories music come from the server's mirror. Ente's hosts
-  (models.ente.com, music.ente.com) are contacted only when the server turns
-  its mirror off (`PHOTOVAULT_ASSET_MIRROR=false`) or is a stock server. The
+- ML models and memories music come only from the server's mirror. Ente's
+  hosts (models.ente.com, music.ente.com) are never contacted: if the server
+  turns its mirror off (`PHOTOVAULT_ASSET_MIRROR=false`) or is a stock server,
+  on-device ML and memories music are unavailable. The
   map uses OpenStreetMap tiles.
 - Location data (places, city search) needs the server's web build to
   include `static-assets/location/v2/{cities,urban-centres,countries,disputes}.bin`.
