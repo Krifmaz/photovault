@@ -23,7 +23,7 @@ import app.photovault.core.UploadStatus as CUploadStatus
  * Core's async functions run on core's own tokio runtime, so the `suspend` functions here are main-safe.
  * The plain ones read core's local store (or the in-memory index) and are called from Dispatchers.IO.
  */
-internal class RealCore(private val core: Core) : CoreRepository, BackupCore {
+internal class RealCore(internal val core: Core) : CoreRepository, BackupCore {
 
     override fun discoverServers(timeoutMs: Int): List<String> = coreDiscoverServers(timeoutMs.coerceAtLeast(0).toUInt())
 

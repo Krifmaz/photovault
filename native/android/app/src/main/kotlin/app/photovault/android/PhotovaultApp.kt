@@ -8,6 +8,8 @@ import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.LanDiscovery
 import app.photovault.android.data.NsdLanDiscovery
 import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.albums.AlbumsProvider
+import app.photovault.android.data.albums.AlbumsRepository
 import app.photovault.android.ui.image.buildImageLoader
 import app.photovault.android.ui.timeline.TimelineLabels
 import app.photovault.android.widget.WidgetRefresh
@@ -38,6 +40,24 @@ class AppGraph(private val context: Context) {
 
     /** Camera backup (WorkManager): settings, media scan, ledger, scheduling. */
     val backup: BackupGraph by lazy { BackupGraph(context) { core } }
+
+    /** Albums, sharing, hidden albums and trash (photovault-core's albums API, or the demo library). */
+    val albums: AlbumsRepository by lazy { AlbumsProvider.create(core) }
+
+    private var albumStore: Pair<Long, TimelineStore>? = null
+
+    /**
+     * The loaded photos of one album, shared by its grid and the viewer opened from it (like [timeline]).
+     * Only the most recently opened album is kept.
+     */
+    fun albumStore(collectionId: Long): TimelineStore = synchronized(this) {
+        albumStore?.takeIf { it.first == collectionId }?.second
+            ?: TimelineStore(
+                core,
+                countOf = { albums.albumCount(collectionId) },
+                pageOf = { offset, limit -> albums.albumPage(collectionId, offset, limit) },
+            ).also { albumStore = collectionId to it }
+    }
 
     /** App-lifetime work that must not block the UI or die with a screen (file cleanup, network re-checks). */
     val appScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

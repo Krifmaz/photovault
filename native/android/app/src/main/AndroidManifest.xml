@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- The device lock in front of hidden albums (platform BiometricPrompt) -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <!-- QR scanning of the server's connect code (CameraX + ZXing core, all on device) -->
     <uses-permission android:name="android.permission.CAMERA" />
 

@@ -257,6 +257,18 @@ impl Api {
         .await
     }
 
+    /// `method path?query` without a body; ignore the answer.
+    pub async fn send_empty(
+        &self,
+        method: Method,
+        path: &str,
+        query: &[(&str, String)],
+    ) -> Result<()> {
+        self.send(|| self.request(method.clone(), path).query(query))
+            .await
+            .map(drop)
+    }
+
     /// `GET path` of an object (file, thumbnail). A redirect is followed with
     /// the storage client, without the auth token.
     pub async fn get_object(&self, path: &str) -> Result<Response> {

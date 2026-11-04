@@ -42,6 +42,26 @@ data object MapRoute
 @Serializable
 data object BackupRoute
 
+/** The Albums tab (bottom bar). */
+@Serializable
+data object AlbumsRoute
+
+@Serializable
+data class AlbumRoute(val collectionId: Long)
+
+/** The viewer over one album's photos; [index] is the position in that album. */
+@Serializable
+data class AlbumViewerRoute(val collectionId: Long, val index: Int, val fileId: Long)
+
+@Serializable
+data class ShareAlbumRoute(val collectionId: Long)
+
+@Serializable
+data object HiddenRoute
+
+@Serializable
+data object TrashRoute
+
 /** Results handed back through the previous back stack entry's SavedStateHandle. */
 object NavResults {
     const val QR_PAYLOAD = "qr_payload"
