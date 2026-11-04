@@ -29,7 +29,7 @@ pub fn normalize_address(address: &str) -> Vec<String> {
     }
 }
 
-fn trim_url(u: &str) -> String {
+pub(crate) fn trim_url(u: &str) -> String {
     u.trim().trim_end_matches('/').to_string()
 }
 

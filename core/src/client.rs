@@ -274,7 +274,16 @@ impl Inner {
             .into_iter()
             .find(|s| s.public_url == active)?;
         let allow_http = self.home_url_allowed(&active);
-        let base = server::choose_base(&info, allow_http).await;
+        let mut base = server::choose_base(&info, allow_http).await;
+        // The approval may have been withdrawn while we probed (a probe started
+        // earlier must not bring the plain-http home URL back).
+        if allow_http
+            && base != server::trim_url(&info.public_url)
+            && base.to_ascii_lowercase().starts_with("http://")
+            && !self.home_url_allowed(&active)
+        {
+            base = server::trim_url(&info.public_url);
+        }
         // The user may have switched servers while we probed.
         if self.active_public_url().as_deref() == Some(active.as_str()) {
             self.set_base(Some(Base {
