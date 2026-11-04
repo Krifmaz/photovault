@@ -238,6 +238,112 @@ longer says "email to us".
 
 See `PHOTOVAULT-GREP.md` for the remaining grep hits and why each is left.
 
+## Server connection (`PHOTOVAULT: connect`)
+
+The server contract is coded in one file:
+`packages/base/photovault/server.ts` (the `GET /photovault/info` model from
+`contracts/server-info.md`, address normalisation, the default-server order,
+the QR payload, and the info check with Ente's `/ping` as fallback). Change
+that file when the contract changes. Unit tests:
+`apps/photos/tests/photovault-server.test.ts`.
+
+Which server the apps talk to (`customAPIOrigin()` in `packages/base/origins.ts`):
+
+1. the server chosen on this device (login page), kept in localStorage under
+   `photovaultServer` (survives logout) and mirrored to Ente's KV
+   `apiOrigin` so workers see it;
+2. `NEXT_PUBLIC_ENTE_ENDPOINT` at build time (Ente's variable; empty = unset);
+3. the origin the page was served from (the Photovault server serves the web
+   app and the API on one port, so this is the default for the server image);
+4. `http://localhost:8080` (only reachable for a desktop app never pointed at
+   a server).
+
+API paths are Ente's, unchanged.
+
+Assumption (documented, not asked): public albums, cast and accounts pages are
+served by the same server under `/albums`, `/cast`, `/accounts`
+(`contracts/apps.json`). Public album links themselves are built by the
+server (`albumsUrl`), as in Ente. The cast and embed URLs the Photos app uses
+default to `<server>/cast` and `<server>/embed`; the server's feature flags
+(`castUrl`, `embedUrl`) still override them, as in Ente. Ente's
+`NEXT_PUBLIC_ENTE_*` variables keep their upstream meaning.
+
+Changed files:
+
+- `packages/base/photovault/server.ts` (new): the contract model (see above).
+- `packages/base/origins.ts`: default order above; `saveServerOrigin()`.
+- `packages/base/local-storage.ts`: logout keeps `photovaultServer`.
+- `packages/base/env.ts`: `buildEnvBasePath` (the sub-app's Next `basePath`).
+- `packages/new/photos/services/settings.ts`: cast/embed defaults follow the API
+  server rather than the page origin.
+- `apps/photos/src/pages/index.tsx`: Ente's hidden "tap seven times" developer
+  endpoint dialog is removed and `components/auth/DevSettingsDialog.tsx`
+  deleted; `ServerField` is shown under the login/sign-up form, and the forms'
+  own host line is left empty (the field shows it).
+- `apps/photos/src/components/photovault/{ServerField.tsx,server-check.ts}`
+  (new): the collapsed server field (shows name and address; "Change" expands
+  it; checks `GET /photovault/info` and shows name + version, or errors such as
+  "Can't reach 10.0.1.7:8095. Are you on your home Wi-Fi?" for home-network
+  addresses).
+- `apps/photos/src/components/sidebar/photovault/ServerSettings.tsx` (new) and
+  `sidebar/Sidebar.tsx`: Settings → Server with name, version, home and public
+  addresses and a QR code of
+  `photovault://connect?url=<publicUrl>&home=<homeUrl>&name=<name>` (a stock
+  Ente server gets a QR of its bare address). Not added to settings search.
+- `apps/photos/package.json`, `package-lock.json`: `qr@0.6.0` (pure JS, no
+  dependencies; already in the lock file for Ente's Legacy and Twoof3 apps)
+  added to Photos. JSON, so no comment.
+- `packages/base/locales/en-US/translation.json`: `pv_server*` strings (English
+  only; other languages fall back to English).
+- `apps/photos/src/components/PhotosAuthShell.tsx` (`PHOTOVAULT: strip`): the
+  sign-in brand panel's "10 GB free forever" (Ente's plan) and "Independently
+  audited" (Ente's audit) bullets are replaced by `pv_auth_own_server` and
+  `pv_auth_your_keys` ("No ads, no spying" stays).
+- `apps/photos/tests/sidebar-album-search.test.tsx`: expects the album group
+  label "Photovault" (renamed by the theme commit; the test still said "Ente").
+- `apps/{albums,cast,accounts}/next.config.js`: Next `basePath` `/albums`,
+  `/cast`, `/accounts` by default. `PHOTOVAULT_{ALBUMS,CAST,ACCOUNTS}_BASE_PATH=""`
+  builds an app for its own host (Ente's layout).
+- `apps/albums/src/public-album/page/PublicAlbumPage.tsx`: a path token
+  (`/albums/<token>`) ignores the base path. Links with `?t=` are unaffected.
+
+Not done for the web app: the contract's home/public address switching rule
+(the web app is served by the server it talks to, so there is nothing to
+switch), and showing `/photovault/usage` "unlimited" on the storage card.
+
+## Serving the web apps (static export)
+
+Build: `web/scripts/photovault-build.sh` (npm ci, wasm for prelogin/photos/cast,
+the `/static-assets/` data files, then `next build` of each app with the
+repo's own workspace commands; see the script header for its variables). CI:
+`.github/workflows/photovault-web.yml` runs the same and uploads the served
+layout as the `photovault-web` artifact.
+
+| Build output             | Serve at     | Notes                                                                                                                                                                            |
+| ------------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `web/apps/photos/out/`   | `/`          | Photos (login, gallery, settings). Also holds `/static-assets/` and the few `/fonts`, `/images` files the sub-apps reference by absolute path (the build script copies them in). |
+| `web/apps/albums/out/`   | `/albums/`   | Public albums and collect links (`basePath` `/albums`). Links: `<publicUrl>/albums/?t=<token>#<key>`, or `/albums/<token>#<key>`.                                                |
+| `web/apps/cast/out/`     | `/cast/`     | Cast receiver (pairing code, slideshow).                                                                                                                                         |
+| `web/apps/accounts/out/` | `/accounts/` | Passkeys, family invites, account recovery.                                                                                                                                      |
+
+Server rules: try `$uri`, `$uri.html`, `$uri/index.html`; for an extension-less
+path that matches nothing, serve the nearest sub-app's `index.html`
+(`/albums/…` → `albums/index.html`, likewise `/cast/`, `/accounts/`, else the
+root `index.html`). `_next/static/` is content-hashed and can be cached
+immutable. This matches `PHOTOVAULT_WEB_DIR` in `contracts/server-env.md` and
+the server branch's Dockerfile (which copies `web/apps/<app>/out`).
+`PHOTOVAULT_WEB_OUT=<dir> scripts/photovault-build.sh` also assembles that
+layout into one directory.
+
+Watch out: Ente's cast API also lives under `/cast/` (`POST /cast/device-info`,
+`GET /cast/cast-data/<code>`, `/cast/diff`, `/cast/files/...` and friends).
+The server must route those API paths before the web-dir fallback, and only
+fall back to `cast/index.html` for paths that are not API routes.
+
+The `embed` and `memories` apps are not built (not in `contracts/apps.json`);
+the "embed" share option therefore points at a path the server does not serve
+yet.
+
 ## Merging upstream
 
 Conflicts will mostly be in the files above. Re-apply by keeping upstream's
