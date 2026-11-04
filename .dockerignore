@@ -7,8 +7,12 @@ data
 *.sqlite
 *.sqlite-*
 **/node_modules
-web
 mobile
 desktop
 docs
 deploy
+# Web build outputs: the image builds the web app itself (Dockerfile, stage web-build).
+web/apps/*/out
+web/apps/*/.next
+web/packages/wasm/*/pkg
+photovault-web
