@@ -16,8 +16,9 @@
 //! files the user can see: files that are only in hidden collections are
 //! left out, like the apps do.
 //!
-//! Internal API: [`invalidate`] (after `mldata` changes), [`clip_matches`]
-//! and [`text_embedding`] (memories).
+//! Internal API: [`invalidate`] (after `mldata` changes) and
+//! [`clip_matches`] (memories, which use Ente's precomputed theme
+//! embeddings, so no text model is needed there).
 //!
 //! Based on Ente (ente.com).
 
@@ -107,8 +108,6 @@ fn lock(m: &Mutex<()>) -> MutexGuard<'_, ()> {
 }
 
 /// Drop the caches (library or `mldata` changed).
-// Called by the index track after `mldata` changes (a stub there for now).
-#[allow(dead_code)]
 pub(crate) fn invalidate(inner: &Inner) {
     cache(inner).generation.fetch_add(1, Ordering::SeqCst);
     let mut s = state(inner);
@@ -134,12 +133,6 @@ pub(crate) fn clip_matches(
 /// The CLIP text embedding of `text` (normalised, like the image ones), or
 /// `None` when the text model is not downloaded or cannot run (or this
 /// build has no cargo feature `ml`). Blocking (tens of ms on first use).
-// Used by the memories track (CLIP memories); a stub there for now.
-#[allow(dead_code)]
-pub(crate) fn text_embedding(inner: &Inner, text: &str) -> Option<Vec<f32>> {
-    text_embedding_arc(inner, text).map(|e| e.as_ref().clone())
-}
-
 #[cfg(feature = "ml")]
 fn text_embedding_arc(inner: &Inner, text: &str) -> Option<Arc<Vec<f32>>> {
     let (model, vocab) = clip::text_model_paths(&inner.ml.models_dir)?;

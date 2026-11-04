@@ -113,8 +113,6 @@ pub(crate) fn people(inner: &Inner, include_hidden: bool, min_files: u32) -> Vec
 }
 
 /// Files of a person or cluster, newest first.
-// Called by the search and memories tracks (stubs on this branch).
-#[allow(dead_code)]
 pub(crate) fn person_file_ids(inner: &Inner, person_id: &str) -> Vec<i64> {
     snapshot(inner)
         .and_then(|s| s.person(person_id).map(|p| p.file_ids.clone()))

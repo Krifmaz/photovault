@@ -100,7 +100,6 @@ impl MemoriesCache {
 
 /// Drop the cache (library, people or `mldata` changed). Library index
 /// rebuilds are noticed without it; `faces` calls it when people change.
-#[allow(dead_code)] // called by the v1.2 faces track
 pub(crate) fn invalidate(inner: &Inner) {
     let mut st = inner.ml.memories.lock();
     st.generation += 1;

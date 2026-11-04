@@ -87,10 +87,7 @@ pub(crate) fn wipe(conn: &Connection) -> Result<()> {
 /// One stored `mldata` row, still sealed. Open it with [`MlRow::open`]
 /// after releasing the store lock.
 pub(crate) struct MlRow {
-    pub file_id: i64,
     pub updated_at: Option<i64>,
-    pub face_ok: bool,
-    pub clip_ok: bool,
     sealed: Vec<u8>,
 }
 
@@ -141,7 +138,7 @@ impl Store {
         let row = self
             .conn()
             .query_row(
-                "SELECT file_id, updated_at, face_ok, clip_ok, sealed FROM ml_data WHERE file_id = ?1",
+                "SELECT updated_at, sealed FROM ml_data WHERE file_id = ?1",
                 params![file_id],
                 row_from,
             )
@@ -149,24 +146,11 @@ impl Store {
         row.map(|r| r.open(&self.opener())).transpose()
     }
 
-    /// Every stored `mldata` row, sealed (decrypt outside the lock).
-    pub(crate) fn ml_rows(&self) -> Result<Vec<MlRow>> {
-        let mut q = self
-            .conn()
-            .prepare("SELECT file_id, updated_at, face_ok, clip_ok, sealed FROM ml_data")?;
-        let rows = q
-            .query_map([], row_from)?
-            .collect::<rusqlite::Result<_>>()?;
-        Ok(rows)
-    }
-
     /// One stored `mldata` row, sealed (decrypt outside the lock).
     pub(crate) fn ml_row(&self, file_id: i64) -> Result<Option<MlRow>> {
         Ok(self
             .conn()
-            .prepare_cached(
-                "SELECT file_id, updated_at, face_ok, clip_ok, sealed FROM ml_data WHERE file_id = ?1",
-            )?
+            .prepare_cached("SELECT updated_at, sealed FROM ml_data WHERE file_id = ?1")?
             .query_row(params![file_id], row_from)
             .optional()?)
     }
@@ -206,18 +190,6 @@ impl Store {
             params![file_id, state, attempts, error, crate::store::now_us()],
         )?;
         Ok(())
-    }
-
-    /// The local indexing state and attempts of a file.
-    pub(crate) fn ml_local(&self, file_id: i64) -> Result<Option<(String, u32)>> {
-        Ok(self
-            .conn()
-            .query_row(
-                "SELECT state, attempts FROM ml_local WHERE file_id = ?1",
-                params![file_id],
-                |r| Ok((r.get(0)?, r.get(1)?)),
-            )
-            .optional()?)
     }
 
     /// Save a decrypted user entity (`data` is the entity's JSON).
@@ -264,11 +236,8 @@ impl Store {
 
 fn row_from(r: &rusqlite::Row<'_>) -> rusqlite::Result<MlRow> {
     Ok(MlRow {
-        file_id: r.get(0)?,
-        updated_at: r.get(1)?,
-        face_ok: r.get(2)?,
-        clip_ok: r.get(3)?,
-        sealed: r.get(4)?,
+        updated_at: r.get("updated_at")?,
+        sealed: r.get("sealed")?,
     })
 }
 
@@ -289,9 +258,13 @@ mod tests {
         let back = store.ml_data(42).unwrap().unwrap();
         assert_eq!(back.raw, d.raw);
         assert_eq!(back.updated_at, Some(7));
-        let rows = store.ml_rows().unwrap();
-        assert_eq!(rows.len(), 1);
-        assert!(rows[0].clip_ok && !rows[0].face_ok);
+        let (face_ok, clip_ok): (bool, bool) = store
+            .conn()
+            .query_row("SELECT face_ok, clip_ok FROM ml_data", [], |r| {
+                Ok((r.get(0)?, r.get(1)?))
+            })
+            .unwrap();
+        assert!(clip_ok && !face_ok);
         // Nothing readable in the clear.
         let blob: Vec<u8> = store
             .conn()
@@ -304,7 +277,7 @@ mod tests {
             .unwrap();
         assert_eq!(store.entities("cgroup").unwrap()[0].2["name"], "Ana");
         wipe(store.conn()).unwrap();
-        assert!(store.ml_rows().unwrap().is_empty());
+        assert!(store.ml_row(42).unwrap().is_none());
         assert!(store.entities("cgroup").unwrap().is_empty());
     }
 }

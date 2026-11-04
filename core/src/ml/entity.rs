@@ -47,7 +47,6 @@ use serde_json::{Value, json};
 /// Entity type of people.
 pub(crate) const CGROUP: &str = "cgroup";
 /// Entity type of location tags.
-#[allow(dead_code)] // Read by the search track (location tags).
 pub(crate) const LOCATION: &str = "location";
 
 /// Page size of diffs (`defaultDiffLimit` / `EntityService.fetchLimit`).

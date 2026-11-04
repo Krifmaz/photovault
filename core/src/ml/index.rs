@@ -505,13 +505,23 @@ async fn sync(inner: &Arc<Inner>, listener: Option<&Arc<dyn MlListener>>) -> Res
     Ok(())
 }
 
-/// Recluster and drop the search and memories caches.
+/// Recluster, push faces new to people's clusters to their `cgroup`s
+/// ([`super::faces::refresh`]), and drop the search and memories caches.
+/// When the push fails (offline) the local rebuild still runs, so new
+/// faces show up; the push is retried on the next sync.
 async fn data_changed(inner: &Arc<Inner>) -> Result<()> {
-    let me = inner.clone();
-    let rebuilt = blocking(move || super::faces::rebuild(&me)).await?;
+    let refreshed = super::faces::refresh(inner).await;
+    let result = match refreshed {
+        Ok(()) => Ok(()),
+        Err(e) => {
+            let me = inner.clone();
+            blocking(move || super::faces::rebuild(&me)).await??;
+            Err(e)
+        }
+    };
     super::search::invalidate(inner);
     super::memories::invalidate(inner);
-    rebuilt
+    result
 }
 
 /// `/files/data/status-diff` from the saved cursor to the end.

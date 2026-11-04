@@ -486,7 +486,7 @@ fn clip_matches_threshold_order_and_invalidate() {
         .unwrap();
     assert!(!String::from_utf8_lossy(&blob).contains("embedding"));
     // No text model in this build/data dir: no text embedding.
-    assert!(text_embedding(inner, "sunset").is_none());
+    assert!(text_embedding_arc(inner, "sunset").is_none());
     assert!(!magic_available(inner));
 }
 
