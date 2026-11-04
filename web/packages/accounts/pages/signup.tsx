@@ -3,6 +3,7 @@ import { SignUpContents } from "ente-accounts/components/SignUpContents";
 import { savedPartialLocalUser } from "ente-accounts/services/accounts-db";
 import { LoadingIndicator } from "ente-base/components/loaders";
 import { customAPIHost } from "ente-base/origins";
+import type { ServerCheck } from "ente-base/photovault/server"; // PHOTOVAULT: connect
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -18,6 +19,16 @@ const Page: React.FC = () => {
     const [host, setHost] = useState<string | undefined>(undefined);
 
     const router = useRouter();
+
+    // PHOTOVAULT: connect - a direct /signup visit on a server that refuses
+    // sign-ups goes to the login page, which says that sign-up is closed.
+    const handleServerCheck = useCallback(
+        (check: ServerCheck) => {
+            if (check.kind == "photovault" && !check.info.signupsAllowed)
+                void router.replace("/login");
+        },
+        [router],
+    );
 
     useEffect(() => {
         void customAPIHost().then(setHost);
@@ -37,7 +48,12 @@ const Page: React.FC = () => {
                 {...{ router, onLogin }}
                 host={ServerField ? undefined : host}
             />
-            {ServerField && <ServerField onChange={handleServerChange} />}
+            {ServerField && (
+                <ServerField
+                    onChange={handleServerChange}
+                    onCheck={handleServerCheck}
+                />
+            )}
         </Shell>
     );
 };
