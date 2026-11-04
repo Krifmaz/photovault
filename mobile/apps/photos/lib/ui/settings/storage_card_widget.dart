@@ -1,3 +1,5 @@
+import "dart:async";
+
 import 'package:ente_components/theme/photovault/encore_tokens.dart';
 import 'package:ente_components/theme/text_styles.dart';
 import 'package:ente_pure_utils/ente_pure_utils.dart';
@@ -8,14 +10,29 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:photos/core/constants.dart';
 import "package:photos/core/errors.dart";
+import "package:photos/core/event_bus.dart";
+import "package:photos/events/opened_settings_event.dart";
 import 'package:photos/models/user_details.dart';
 import 'package:photos/service_locator.dart';
+import "package:photos/services/photovault/storage_usage.dart";
 import 'package:photos/states/user_details_state.dart';
 import 'package:photos/theme/colors.dart';
 import 'package:photos/ui/settings/storage_progress_widget.dart';
 
 class StorageCardWidget extends StatefulWidget {
   const StorageCardWidget({super.key});
+
+  /// PHOTOVAULT: test seam for `/photovault/usage` (widget tests have no
+  /// network stack). Null = ask the server through [usersGateway].
+  @visibleForTesting
+  static Future<Map<String, dynamic>?> Function()? usageLoaderForTesting;
+
+  /// PHOTOVAULT: forget the last `/photovault/usage` answer (tests).
+  @visibleForTesting
+  static void resetForTesting() {
+    usageLoaderForTesting = null;
+    _StorageCardWidgetState._lastUsage = null;
+  }
 
   @override
   State<StorageCardWidget> createState() => _StorageCardWidgetState();
@@ -55,6 +72,42 @@ class _StorageCardWidgetState extends State<StorageCardWidget> {
   final _logger = Logger((_StorageCardWidgetState).toString());
   int? familyMemberStorageLimit;
   bool showFamilyBreakup = false;
+
+  // PHOTOVAULT: real disk. `/photovault/usage` replaces Ente's plan numbers
+  // when the server has it; the last answer is kept so reopening Settings
+  // does not flash the fallback.
+  static PhotovaultStorageUsage? _lastUsage;
+  PhotovaultStorageUsage? _usage = _lastUsage;
+  StreamSubscription<OpenedSettingsEvent>? _openedSettings;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadUsage());
+    _openedSettings = Bus.instance.on<OpenedSettingsEvent>().listen(
+      (_) => unawaited(_loadUsage()),
+    );
+  }
+
+  @override
+  void dispose() {
+    unawaited(_openedSettings?.cancel());
+    super.dispose();
+  }
+
+  Future<void> _loadUsage() async {
+    try {
+      final loader = StorageCardWidget.usageLoaderForTesting;
+      if (loader == null && isLocalGalleryMode) return;
+      final usage = PhotovaultStorageUsage.fromJson(
+        await (loader ?? usersGateway.getPhotovaultUsage)(),
+      );
+      _lastUsage = usage;
+      if (mounted) setState(() => _usage = usage);
+    } catch (e) {
+      _logger.warning("Cannot load /photovault/usage", e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +176,10 @@ class _StorageCardWidgetState extends State<StorageCardWidget> {
   }
 
   Widget _userDetails(UserDetails userDetails) {
+    final usage = _usage;
+    if (usage != null) {
+      return _diskDetails(StorageCardView.from(usage), userDetails);
+    }
     const hundredMBinBytes = 107374182;
     const oneTBinBytes = 1073741824000;
     showFamilyBreakup = userDetails.isPartOfFamily();
@@ -270,6 +327,131 @@ class _StorageCardWidgetState extends State<StorageCardWidget> {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  // PHOTOVAULT: the disk that holds the photos, the account's own photos as a
+  // second line, and a warning from 90% full (contracts/storage-usage.md).
+  Widget _diskDetails(StorageCardView view, UserDetails userDetails) {
+    final mutedStyle = TextStyles.tiny.copyWith(
+      fontFamily: TextStyles.outfitFontFamily,
+      fontWeight: FontWeight.w600,
+      color: const Color.fromRGBO(165, 165, 165, 0.79),
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.strings.storage,
+            style: TextStyles.tiny.copyWith(
+              fontFamily: TextStyles.outfitFontFamily,
+              color: textMutedDark,
+            ),
+          ),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              view.headline,
+              key: const ValueKey("photovault-storage-headline"),
+              maxLines: 1,
+              style: TextStyles.display2.copyWith(
+                fontWeight: FontWeight.w700,
+                color: textBaseDark,
+                letterSpacing: -1,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Stack(
+            children: <Widget>[
+              const StorageProgressWidget(
+                color: Color.fromRGBO(193, 193, 193, 0.11),
+                fractionOfStorage: 1,
+              ),
+              StorageProgressWidget(
+                color: view.warning != null
+                    ? encoreDarkWarn
+                    : const Color.fromRGBO(193, 193, 193, 0.45),
+                fractionOfStorage: view.diskFraction,
+              ),
+              StorageProgressWidget(
+                color: encoreLightAccent2, // PHOTOVAULT: theme
+                fractionOfStorage: view.userFraction,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: encoreLightAccent2, // PHOTOVAULT: theme
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        view.detail,
+                        key: const ValueKey("photovault-storage-detail"),
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyles.tiny.copyWith(
+                          fontFamily: TextStyles.outfitFontFamily,
+                          fontWeight: FontWeight.w600,
+                          color: textBaseDark,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                context.strings.memoryCount(
+                  count: userDetails.fileCount,
+                  formattedCount: NumberFormat().format(userDetails.fileCount),
+                ),
+                style: mutedStyle,
+              ),
+            ],
+          ),
+          if (view.warning != null) ...[
+            const SizedBox(height: 12),
+            Row(
+              key: const ValueKey("photovault-storage-warning"),
+              children: [
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  size: 16,
+                  color: encoreDarkWarn,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    view.warning!,
+                    style: TextStyles.tiny.copyWith(
+                      fontFamily: TextStyles.outfitFontFamily,
+                      fontWeight: FontWeight.w600,
+                      color: encoreDarkWarn,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

@@ -111,47 +111,49 @@ pub async fn usage_value(state: &AppState, user_id: i64) -> ApiResult<Value> {
         members.push(admin);
     }
     let used = crate::users::store::combined_usage(&state.db, &members).await?;
+    let mine = crate::users::store::usage(&state.db, user_id).await?;
     let quota = crate::users::subscription(&state.db, admin).await?.storage;
-    let free = crate::capacity::free_bytes(state).await?;
-    let disk_limit = free.map(|f| used.saturating_add(f));
+    let disk = crate::capacity::disk(state).await?;
     let quota_limit = (quota > 0).then_some(quota);
-    let default_quota = quota > 0 && quota == state.config.default_storage_bytes;
-    let (limit, source) = match (quota_limit, disk_limit) {
-        (Some(q), Some(d)) if q <= d => (
-            Some(q),
-            if default_quota {
-                "default-quota"
-            } else {
-                "quota"
-            },
-        ),
-        (Some(q), None) => (
-            Some(q),
-            if default_quota {
-                "default-quota"
-            } else {
-                "quota"
-            },
-        ),
-        (_, Some(d)) => (
-            Some(d),
-            match &state.config.storage {
-                StorageConfig::S3(_) => "storage-limit",
-                StorageConfig::Local { .. } if state.config.storage_limit.is_some() => {
-                    "storage-limit"
-                }
-                StorageConfig::Local { .. } => "disk",
-            },
-        ),
+    let quota_source = if quota_limit.is_some() && quota == state.config.default_storage_bytes {
+        "default-quota"
+    } else {
+        "quota"
+    };
+    let disk_source = |d: &crate::capacity::Disk| match d.source {
+        crate::capacity::DiskSource::Disk => "disk",
+        crate::capacity::DiskSource::StorageLimit => "storage-limit",
+    };
+    let (limit, source) = match (quota_limit, disk) {
+        (Some(q), Some(d)) if q <= d.total => (Some(q), quota_source),
+        (Some(q), None) => (Some(q), quota_source),
+        (_, Some(d)) => (Some(d.total), disk_source(&d)),
         (None, None) => (None, "unlimited"),
+    };
+    // What can still be uploaded: the quota's rest, never more than the disk has left.
+    let free = match (quota_limit, disk) {
+        (Some(q), Some(d)) => Some((q - used).max(0).min(d.available)),
+        (Some(q), None) => Some((q - used).max(0)),
+        (None, Some(d)) => Some(d.available),
+        (None, None) => None,
     };
     Ok(json!({
         "usedBytes": used,
+        "userBytes": mine,
         "limitBytes": limit,
-        "freeBytes": limit.map(|l| (l - used).max(0)),
+        "freeBytes": free,
         "unlimited": limit.is_none(),
         "limitSource": source,
         "quotaBytes": quota_limit,
+        "disk": disk.map(|d| json!({
+            "totalBytes": d.total,
+            "usedBytes": d.used,
+            "availableBytes": d.available,
+            "usedPercent": (d.used_percent() * 10.0).round() / 10.0,
+            "nearlyFull": d.nearly_full(),
+            "source": disk_source(&d),
+        })),
+        "nearlyFullPercent": crate::capacity::NEARLY_FULL_PERCENT,
     }))
 }
 

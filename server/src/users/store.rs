@@ -634,7 +634,7 @@ pub async fn storage_limit(state: &AppState, user_id: i64) -> ApiResult<i64> {
     let admin = fam.and_then(|f| f.0).unwrap_or(user_id);
     let sub = subscription(db, admin).await?;
     let plan = if sub.expiry_time > now_micros() {
-        crate::capacity::effective_limit(state, admin, sub.storage).await?
+        crate::capacity::effective_limit(state, sub.storage).await?
     } else {
         0
     };
