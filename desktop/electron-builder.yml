@@ -17,11 +17,9 @@ win:
     target:
         - target: nsis
           arch: [x64, arm64]
-    azureSignOptions:
-        publisherName: ENTE TECHNOLOGIES, INC.
-        endpoint: https://eus.codesigning.azure.net/
-        certificateProfileName: EnteTrustCertProfile
-        codeSigningAccountName: EnteTechnologiesInc
+    # PHOTOVAULT: strip - no azureSignOptions: they named Ente's Azure signing
+    # account and publisher ("ENTE TECHNOLOGIES, INC."). Add Photovault's own
+    # here when there is a signing certificate; builds are unsigned until then.
     signExts: [".dll", ".node"]
 nsis:
     deleteAppDataOnUninstall: true
