@@ -810,7 +810,7 @@ impl Inner {
     }
 
     /// The user's uncategorized collection, created as the apps do if missing.
-    async fn uncategorized(&self, api: &Api) -> Result<CollectionRec> {
+    pub(crate) async fn uncategorized(&self, api: &Api) -> Result<CollectionRec> {
         if let Some(c) = self
             .all_collections()?
             .into_iter()

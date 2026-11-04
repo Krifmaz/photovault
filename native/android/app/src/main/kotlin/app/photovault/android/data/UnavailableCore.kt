@@ -36,6 +36,8 @@ class UnavailableCore(private val reason: String) : CoreRepository {
     override fun timelinePage(offset: Long, limit: Int): List<TimelineItem> = emptyList()
     override fun collections(): List<PhotoCollection> = emptyList()
     override fun collectionPage(collectionId: Long, offset: Long, limit: Int): List<TimelineItem> = emptyList()
+    override fun mapPoints(): List<MapPoint> = emptyList()
+    override fun onThisDay(nowUs: Long, utcOffsetSecs: Int, limit: Int): List<TimelineItem> = emptyList()
     override suspend fun thumbnail(fileId: Long): ByteArray = fail()
     override suspend fun download(fileId: Long, destPath: String): String = fail()
     override suspend fun streamPlaylist(fileId: Long): String? = null

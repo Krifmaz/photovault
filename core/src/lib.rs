@@ -15,25 +15,34 @@
 
 #![warn(missing_docs)]
 
+mod albums;
 pub mod api;
 mod auth;
+mod backup;
 mod client;
 pub mod crypto;
 mod library;
 pub mod media;
 pub mod metadata;
 pub mod model;
+mod places;
 mod server;
+mod signup;
 pub mod srp;
 mod store;
 mod upload;
+mod video;
 
 use std::future::Future;
 use std::sync::{Arc, OnceLock};
 
 uniffi::setup_scaffolding!();
 
+pub use crate::albums::{
+    AlbumDetails, PublicLink, PublicLinkUpdate, ShareRole, Sharee, TrashEntry,
+};
 pub use crate::server::{normalize_address, parse_connect_qr_url};
+pub use crate::video::VideoStream;
 
 /// Errors of the core, as the apps see them.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, uniffi::Error)]
@@ -254,6 +263,19 @@ pub struct TimelineItem {
     pub has_stream: bool,
     /// File name (edited name if set).
     pub title: String,
+}
+
+/// A timeline file with a location, for the map. [contract v1.2]
+#[derive(Debug, Clone, PartialEq, uniffi::Record)]
+pub struct MapPoint {
+    /// File id.
+    pub file_id: i64,
+    /// Latitude in degrees (WGS 84).
+    pub latitude: f64,
+    /// Longitude in degrees (WGS 84).
+    pub longitude: f64,
+    /// Capture time, µs since the epoch.
+    pub taken_at_us: i64,
 }
 
 /// An album or other collection.
@@ -573,6 +595,17 @@ impl Core {
     /// Visible collections, most recently changed first.
     pub fn collections(&self) -> Vec<Collection> {
         self.inner.collections()
+    }
+
+    /// Timeline files with a location, newest first (local only). [contract v1.2]
+    pub fn map_points(&self) -> Vec<MapPoint> {
+        self.inner.map_points()
+    }
+
+    /// Timeline files taken on today's date (in the device's UTC offset) in
+    /// earlier years, newest first, at most `limit` (local only). [contract v1.2]
+    pub fn on_this_day(&self, now_us: i64, utc_offset_secs: i32, limit: u32) -> Vec<TimelineItem> {
+        self.inner.on_this_day(now_us, utc_offset_secs, limit)
     }
 
     /// A page of one collection, newest first (local only).
