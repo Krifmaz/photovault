@@ -133,6 +133,18 @@ const root = (components: Components, name: keyof Components): Overrides => {
  */
 export const encoreComponents = (components: Components): Components => ({
     ...components,
+    MuiCssBaseline: {
+        ...components.MuiCssBaseline,
+        styleOverrides: {
+            ...(components.MuiCssBaseline?.styleOverrides as Overrides),
+            // The wordmark glyph's gradient follows the scheme's accent
+            // (`photovault/wordmark.ts`); light mode gets the charcoal accent.
+            ":root": {
+                "--pv-glyph-from": pvVar.accent2,
+                "--pv-glyph-to": pvVar.accent,
+            },
+        },
+    },
     MuiPaper: {
         ...components.MuiPaper,
         styleOverrides: {

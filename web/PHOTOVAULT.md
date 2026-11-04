@@ -70,7 +70,22 @@ Logo, name, icons:
 - `apps/photos/public/images/auth-ducky.svg`: sign-in illustration replaced by
   the Photovault glyph (same canvas size).
 - `apps/photos/public/images/auth-frame-curves.svg`: decorative curves in gold
-  instead of green.
+  instead of green (fallback file). The sign-in pages draw the curves from the
+  tokens instead: `apps/photos/src/components/photovault/auth-curves.ts` (new)
+  builds the same path as a data URL in a token colour, passed as the
+  `curves` (page, per-scheme `accent2`) and `brand-curves` (dark panel,
+  `pvDark.accent2`) variables; `AuthPageShell.tsx` reads them with the file as
+  fallback. The duck's camera-flash sparkle (`IllustrationClip::after`) is
+  turned off with `sparkle-display: none` (the variable is unset in Auth and
+  Locker, which keep it).
+- `packages/base/components/photovault/wordmark.ts`: the glyph's gradient reads
+  `--pv-glyph-from`/`--pv-glyph-to`, which `encore-theme.ts` sets on `:root`
+  (CssBaseline) to the scheme's accent: gold to charcoal in light mode (the
+  cream glyph was nearly invisible there), gold to cream in dark mode. Always
+  dark surfaces pin the dark colours with `pvGlyphDarkVars`: the sign-in
+  brand panel (`AuthPageShell.tsx` `Wordmark`), the public-album photo viewer
+  (`photoswipe.ts`, `PublicAlbumSingleFileViewer.tsx`) and the trip cover
+  (`TripCover.tsx`). Apps without the Encore theme keep the dark colours.
 - `apps/memories/public/images/ente-brand-tag.svg`: Ente tag replaced by the
   Photovault glyph (same size).
 
@@ -100,6 +115,15 @@ gold where the text was white:
   `apps/photos/public/images/empty-state/no-matches.svg`,
   `apps/photos/public/images/empty-album/background.svg`,
   `apps/albums/src/public-album/upload/components/enter-name.svg`
+
+Primary buttons (token rule: `accent` to `accent2` gradient with `onAccent`
+text, per scheme, via `pvVar`):
+
+- `packages/base/components/SingleInput.styles.ts` (`v2SubmitButtonSx`, used by
+  the Family screen's "Add family member" and other dialogs), and the
+  `color="accent"` buttons in `apps/photos/src/components/{UploadConfirmationDialog,collections/EditAlbumDetailsDialog,app-lock/AppLockUnlockForm,gallery/sections/albums/GalleryEmptyState}.tsx`.
+  These had fixed dark text (`pvOnGold`) on the theme's light-mode charcoal
+  gradient; they now use `onAccent` (cream in light mode, dark in dark mode).
 
 Text on the (now cream) accent:
 
@@ -168,9 +192,15 @@ Photos app (settings and gallery):
   subscription status line. Where Ente opened the plan selector (storage card,
   "subscription" action) we open family management, so family stays reachable.
 - `components/sidebar/accounts/{Account,subscription,ManageMemberSubscription}.tsx`,
-  `components/FamilyManagement.tsx`: "Manage plan" row becomes "Family" with
-  storage only (no billing period); no Stripe customer portal; families can be
-  created without a paid plan (the server decides).
+  `components/FamilyManagement.tsx`: "Manage plan" row becomes "Family"; its
+  subtitle is the member count when in a family with others, otherwise none
+  (no plan storage or billing period); no Stripe customer portal; families can
+  be created without a paid plan (the server decides). No "plan" wording on
+  the family screens: "Family" / "Share your storage with up to five family
+  members…", "Leave family", "You are in a family managed by", and on
+  `apps/accounts/src/pages/family.tsx` "…invited you to share their storage"
+  (new `pv_family_*` / `pv_leave_family*` strings in `en-US` only; other
+  locales fall back to English).
 - Deleted: `components/PlanSelector.tsx`, `pages/plan.tsx`,
   `components/sidebar/ReferralSettings.tsx`, `services/storage-bonus.ts`,
   `components/{WhatsNew,DesktopWhatsNew}.tsx`, `services/changelog.ts`,
@@ -324,7 +354,12 @@ Changed files:
 - `apps/photos/src/pages/index.tsx`: Ente's hidden "tap seven times" developer
   endpoint dialog is removed and `components/auth/DevSettingsDialog.tsx`
   deleted; `ServerField` is shown under the login/sign-up form, and the forms'
-  own host line is left empty (the field shows it).
+  own host line is left empty (the field shows it). The `/login` and `/signup`
+  routes do the same: `packages/accounts/components/auth/AuthPageProvider.ts`
+  has an optional `ServerField` slot (set in `apps/photos/src/auth-page-config.ts`)
+  that `packages/accounts/pages/{login,signup}.tsx` render instead of the bare
+  host line. In the field's edit state, Connect and Cancel ignore the auth
+  button's 2 px hover lift so they stay level.
 - `apps/photos/src/components/photovault/{ServerField.tsx,server-check.ts}`
   (new): the collapsed server field (shows name and address; "Change" expands
   it; checks `GET /photovault/info` and shows name + version, or errors such as

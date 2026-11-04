@@ -10,10 +10,7 @@ import { t } from "i18next";
 import React, { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 // PHOTOVAULT: theme - Encore colours instead of Ente green.
-import {
-    pvGold,
-    pvOnGold,
-} from "ente-base/components/utils/photovault/encore-tokens";
+import { pvVar } from "ente-base/components/utils/photovault/encore-tokens";
 
 interface GalleryEmptyStateProps {
     isUploadInProgress: boolean;
@@ -363,9 +360,10 @@ const GalleryEmptyStateButton = styled(FocusVisibleButton)(({ theme }) => ({
     lineHeight: "20px",
     fontWeight: 500,
     "&.MuiButton-containedAccent:not(.Mui-disabled)": {
-        backgroundColor: pvGold, // PHOTOVAULT: theme
-        color: pvOnGold, // PHOTOVAULT: theme
-        "&:hover": { backgroundColor: pvGold },
+        // PHOTOVAULT: theme - primary button from the tokens (scheme-aware).
+        backgroundColor: pvVar.accent,
+        color: pvVar.onAccent,
+        "&:hover": { backgroundColor: pvVar.accent },
     },
     "& .MuiButton-startIcon": { marginRight: 14, "& > svg": { fontSize: 20 } },
 }));

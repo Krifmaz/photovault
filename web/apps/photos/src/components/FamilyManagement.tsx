@@ -137,8 +137,9 @@ export const FamilyManagement: React.FC<FamilyManagementProps> = ({
 
     const confirmLeave = () =>
         showMiniDialog({
-            title: t("leave_family_plan"),
-            message: t("leave_family_plan_confirm"),
+            // PHOTOVAULT: strip - no "plan" wording.
+            title: t("pv_leave_family"),
+            message: t("pv_leave_family_confirm"),
             continue: {
                 text: t("leave"),
                 color: "critical",
@@ -311,7 +312,8 @@ const FamilyIntroduction: React.FC<{
                 component="h3"
                 sx={{ fontSize: 24, lineHeight: "32px", fontWeight: 600 }}
             >
-                {t("family_plan")}
+                {/* PHOTOVAULT: strip - "Family", not "Family plan". */}
+                {t("family")}
             </Typography>
             <Typography
                 sx={{
@@ -321,7 +323,8 @@ const FamilyIntroduction: React.FC<{
                     color: "text.muted",
                 }}
             >
-                {t("family_plan_description")}
+                {/* PHOTOVAULT: strip - shared storage, not a shared plan. */}
+                {t("pv_family_description")}
             </Typography>
         </Stack>
         <FocusVisibleButton
@@ -513,7 +516,7 @@ const FamilyDashboard: React.FC<FamilyDashboardProps> = ({
                 )
             ) : (
                 <FocusVisibleButton color="critical" onClick={onLeave}>
-                    {t("leave_family_plan")}
+                    {t("pv_leave_family") /* PHOTOVAULT: strip */}
                 </FocusVisibleButton>
             )}
         </Stack>

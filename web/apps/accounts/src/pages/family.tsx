@@ -78,7 +78,7 @@ const Page: React.FC = () => {
         phase == "accepted"
             ? "family_invite_accepted"
             : phase == "invalid" || phase == "loading"
-              ? "family_plan"
+              ? "family" // PHOTOVAULT: strip - not "Family plan"
               : phase == "failed"
                 ? "generic_error_retry"
                 : "family_invite_title",
@@ -127,7 +127,8 @@ const Page: React.FC = () => {
                 <FamilyInviteContents>
                     <FamilyInviteIllustration src="/images/family-invite-accepted.png" />
                     <FamilyInviteDescription>
-                        {t("family_invite_accepted_description", {
+                        {/* PHOTOVAULT: strip - storage, not a plan. */}
+                        {t("pv_family_invite_accepted_description", {
                             email: invite?.adminEmail,
                         })}
                     </FamilyInviteDescription>
@@ -148,7 +149,8 @@ const Page: React.FC = () => {
                 <FamilyInviteContents>
                     <FamilyInviteIllustration src="/images/family-invite.png" />
                     <FamilyInviteDescription>
-                        {t("family_invite_description", {
+                        {/* PHOTOVAULT: strip - storage, not a plan. */}
+                        {t("pv_family_invite_description", {
                             email: invite?.adminEmail,
                         })}
                     </FamilyInviteDescription>

@@ -6,6 +6,7 @@ import {
 } from "ente-base/components/ente-wordmark";
 // PHOTOVAULT: branding
 import {
+    pvGlyphDarkVars,
     pvWordmarkSVGHTML,
     pvWordmarkViewBox,
 } from "ente-base/components/photovault/wordmark";
@@ -52,10 +53,14 @@ const fileViewerPhotoSwipeDataSource = {
     updateFileInfoExifIfNeeded,
 } satisfies FileViewerPhotoSwipeDataSource;
 
-// PHOTOVAULT: branding - Photovault wordmark instead of Ente's.
+// PHOTOVAULT: branding - Photovault wordmark instead of Ente's (the viewer is
+// always dark, so the glyph keeps its dark-scheme colours).
+const pvGlyphDarkStyle = Object.entries(pvGlyphDarkVars)
+    .map(([k, v]) => `${k}:${v}`)
+    .join(";");
 const publicAlbumLogoHTML = isPhotovaultApp(appName)
     ? `
-<svg class="pswp__ente-logo-svg" viewBox="${pvWordmarkViewBox}" xmlns="http://www.w3.org/2000/svg">
+<svg class="pswp__ente-logo-svg" viewBox="${pvWordmarkViewBox}" xmlns="http://www.w3.org/2000/svg" style="${pvGlyphDarkStyle}">
   ${pvWordmarkSVGHTML("pv-pswp")}
 </svg>
 `

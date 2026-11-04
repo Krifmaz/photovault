@@ -13,7 +13,6 @@ import {
 import { useModalVisibility } from "ente-base/components/utils/modal";
 import { RowCard } from "ente-base/components/v2/RowCard";
 import { useBaseContext } from "ente-base/context";
-import { formattedStorageByteSize } from "ente-gallery/utils/units";
 import { useUserDetailsSnapshot } from "ente-new/photos/components/utils/use-snapshot";
 import {
     reauthenticateWithAppLock,
@@ -21,8 +20,9 @@ import {
 } from "ente-new/photos/services/app-lock";
 import type { SidebarActionID } from "ente-new/photos/services/search/types";
 import { disable2FA, get2FAStatus } from "ente-new/photos/services/user";
+// PHOTOVAULT: strip - no storage subtitle (familyMemberStorageLimit,
+// formattedStorageByteSize) on the Family row.
 import {
-    familyMemberStorageLimit,
     isFamilyAdmin,
     isPartOfFamily,
     isPartOfFamilyWithOtherMembers,
@@ -86,22 +86,14 @@ export const Account: React.FC<AccountProps> = ({
         [open],
     );
 
-    let planSubtext: string | undefined;
-    if (userDetails) {
-        let storage =
-            userDetails.subscription.storage + userDetails.storageBonus;
-
-        if (isPartOfFamilyWithOtherMembers(userDetails)) {
-            const memberLimit = familyMemberStorageLimit(userDetails);
-            const familyStorage =
-                (userDetails.familyData?.storage ?? 0) +
-                userDetails.storageBonus;
-            storage = memberLimit ?? familyStorage;
-        }
-
-        // PHOTOVAULT: strip - storage only, no billing period.
-        planSubtext = formattedStorageByteSize(storage);
-    }
+    // PHOTOVAULT: strip - the Family row shows the member count (when in a
+    // family with others), not the plan's storage and billing period.
+    const planSubtext =
+        userDetails && isPartOfFamilyWithOtherMembers(userDetails)
+            ? t("pv_family_member_count", {
+                  count: userDetails.familyData?.members.length ?? 0,
+              })
+            : undefined;
 
     const router = useRouter();
 

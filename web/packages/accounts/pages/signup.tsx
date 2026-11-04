@@ -7,7 +7,13 @@ import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
 
 const Page: React.FC = () => {
-    const { Shell } = useAuthPageConfig();
+    const { Shell, ServerField } = useAuthPageConfig();
+    // PHOTOVAULT: connect - remount the form when the server changes.
+    const [serverKey, setServerKey] = useState(0);
+    const handleServerChange = useCallback(
+        () => setServerKey((k) => k + 1),
+        [],
+    );
     const [loading, setLoading] = useState(true);
     const [host, setHost] = useState<string | undefined>(undefined);
 
@@ -25,7 +31,13 @@ const Page: React.FC = () => {
         <LoadingIndicator />
     ) : (
         <Shell>
-            <SignUpContents {...{ router, host, onLogin }} />
+            {/* PHOTOVAULT: connect - the server field instead of the host. */}
+            <SignUpContents
+                key={serverKey}
+                {...{ router, onLogin }}
+                host={ServerField ? undefined : host}
+            />
+            {ServerField && <ServerField onChange={handleServerChange} />}
         </Shell>
     );
 };

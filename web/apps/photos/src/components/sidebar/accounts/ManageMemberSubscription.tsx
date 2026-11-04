@@ -38,8 +38,9 @@ export const ManageMemberSubscription: React.FC<
 
     const confirmLeaveFamily = () =>
         showMiniDialog({
-            title: t("leave_family_plan"),
-            message: t("leave_family_plan_confirm"),
+            // PHOTOVAULT: strip - no "plan" wording.
+            title: t("pv_leave_family"),
+            message: t("pv_leave_family_confirm"),
             continue: {
                 text: t("leave"),
                 color: "critical",
@@ -107,7 +108,7 @@ export const ManageMemberSubscription: React.FC<
                         color: "text.muted",
                     }}
                 >
-                    {t("family_plan")}
+                    {t("pv_family_shared_storage") /* PHOTOVAULT: strip */}
                 </Typography>
                 <Stack
                     direction="row"
@@ -142,7 +143,7 @@ export const ManageMemberSubscription: React.FC<
                                 color: "text.muted",
                             }}
                         >
-                            {t("subscription_info_family")}
+                            {t("pv_family_managed_by") /* PHOTOVAULT: strip */}
                         </Typography>
                         <Typography
                             sx={{
@@ -174,7 +175,7 @@ export const ManageMemberSubscription: React.FC<
                             }),
                         })}
                     >
-                        {t("leave_family_plan")}
+                        {t("pv_leave_family") /* PHOTOVAULT: strip */}
                     </FocusVisibleButton>
                 </Stack>
             </Stack>

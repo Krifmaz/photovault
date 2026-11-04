@@ -1,3 +1,4 @@
+import type { ServerCheck } from "ente-base/photovault/server"; // PHOTOVAULT: connect
 import type { SessionStorageCrypto } from "ente-base/session-storage";
 import {
     createContext,
@@ -20,6 +21,15 @@ export interface AuthPageConfig {
     recoveryKeyMnemonic?: () => Promise<string>;
     passkeyPresentation?: ComponentType<VerifyingPasskeyPresentationProps>;
     Shell: ComponentType<Pick<AuthPageShellProps, "children" | "contentWidth">>;
+    /**
+     * PHOTOVAULT: connect - the server field shown below the login and
+     * sign-up forms (in place of their bare host line), as on the photos
+     * app's index page. Unset in Ente's other apps.
+     */
+    ServerField?: ComponentType<{
+        onChange: () => void;
+        onCheck?: (check: ServerCheck) => void;
+    }>;
 }
 
 const AuthPageContext = createContext<AuthPageConfig | undefined>(undefined);

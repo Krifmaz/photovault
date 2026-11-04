@@ -1252,5 +1252,14 @@
     "pv_server_qr_hint": "Scan this code with the Photovault app to connect it to this server.",
     "pv_server_retry": "Try again",
     "pv_auth_own_server": "Stored on your own server",
-    "pv_auth_your_keys": "Only you hold the keys"
+    "pv_auth_your_keys": "Only you hold the keys",
+    "pv_family_description": "Share your storage with up to five family members. Everyone gets their own private space.",
+    "pv_family_shared_storage": "Shared storage",
+    "pv_family_member_count_one": "{{count, number}} member",
+    "pv_family_member_count_other": "{{count, number}} members",
+    "pv_family_managed_by": "You are in a family managed by",
+    "pv_leave_family": "Leave family",
+    "pv_leave_family_confirm": "Are you sure that you want to leave this family?",
+    "pv_family_invite_description": "{{email}} invited you to share their storage. Your photos and videos will stay private.",
+    "pv_family_invite_accepted_description": "You are now sharing {{email}}'s storage."
 }

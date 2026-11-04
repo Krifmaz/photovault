@@ -236,4 +236,8 @@ const ButtonRow = styled("div")({
     display: "flex",
     alignItems: "center",
     gap: "8px",
+    // Keep the two buttons level: the auth button's 2 px hover lift stays
+    // on after clicking Connect (the pointer is still over it), which left
+    // Connect sitting above Cancel.
+    "& > button:hover:not(:disabled)": { transform: "none" },
 });
