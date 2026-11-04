@@ -277,6 +277,9 @@ template part and JSX text in the shipped apps that contains an Ente word
 remaining hit.
 
 See `PHOTOVAULT-GREP.md` for the remaining grep hits and why each is left.
+Repo-wide, `scripts/strip-report.py` (with `scripts/strip-allowlist.toml`)
+checks the web, mobile and desktop sources and the static export in CI and
+writes `docs/src/strip-report.md`; every remaining hit needs an entry there.
 
 ## Server connection (`PHOTOVAULT: connect`)
 
@@ -392,7 +395,9 @@ Build: `web/scripts/photovault-build.sh` (npm ci, wasm for prelogin/photos/cast,
 the `/static-assets/` data files, then `next build` of each app with the
 repo's own workspace commands; see the script header for its variables). CI:
 `.github/workflows/photovault-web.yml` runs the same and uploads the served
-layout as the `photovault-web` artifact.
+layout as the `photovault-web` artifact, then runs
+`scripts/strip-report.py --check --web-out` over it (report uploaded as
+`strip-report-web`).
 
 | Build output             | Serve at     | Notes                                                                                                                                                                            |
 | ------------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

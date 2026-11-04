@@ -3,6 +3,9 @@
 #   1. flutter analyze + flutter test (Ente's tests and test/photovault)
 #   2. arm64 release APK (flavor `independent`, applicationId app.photovault)
 #   3. uploads the APK and its SHA256SUMS as a workflow artifact
+#   4. scripts/strip-report.py --check over the source and the built APK
+#      (Ente hosts/branding left must be explained in
+#      scripts/strip-allowlist.toml); the report is uploaded as an artifact
 #
 # Signing: with the repository secrets PHOTOVAULT_KEYSTORE_B64,
 # PHOTOVAULT_KEYSTORE_PASSWORD, PHOTOVAULT_KEY_ALIAS and PHOTOVAULT_KEY_PASSWORD
@@ -21,11 +24,13 @@ on:
         paths:
             - "mobile/**"
             - "rust/**"
+            - "scripts/strip-*"
             - ".github/workflows/photovault-mobile.yml"
     pull_request:
         paths:
             - "mobile/**"
             - "rust/**"
+            - "scripts/strip-*"
             - ".github/workflows/photovault-mobile.yml"
     workflow_dispatch:
 
@@ -192,3 +197,20 @@ jobs:
                   name: photovault-android-arm64-${{ steps.signing.outputs.suffix }}
                   path: mobile/apps/photos/artifacts/
                   if-no-files-found: error
+
+            - name: Strip report (source + APK)
+              shell: bash
+              working-directory: .
+              run: |
+                  set -euo pipefail
+                  apk=$(ls mobile/apps/photos/artifacts/*.apk)
+                  python3 -I scripts/strip-report.py --check --apk "$apk" \
+                      --output "$RUNNER_TEMP/strip-report/strip-report-apk.md"
+
+            - name: Upload strip report
+              if: ${{ !cancelled() }}
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: strip-report-apk
+                  path: ${{ runner.temp }}/strip-report/
+                  if-no-files-found: warn
