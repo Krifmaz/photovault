@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
@@ -142,6 +143,7 @@ fun ViewerScreen(vm: ViewerViewModel, startIndex: Int, onClose: (Int) -> Unit) {
             pageSpacing = 12.dp,
             modifier = Modifier
                 .fillMaxSize()
+                .testTag("viewer_pager")
                 .graphicsLayer {
                     val d = dismiss.value
                     translationY = d

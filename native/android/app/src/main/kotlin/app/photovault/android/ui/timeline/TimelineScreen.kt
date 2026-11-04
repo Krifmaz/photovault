@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -384,11 +386,13 @@ private fun PhotoGrid(
             },
     ) {
         val entries = model.entries
+        // Startup benchmarks measure time to first thumbnails (see perf/README.md).
+        ReportDrawnWhen { gridState.layoutInfo.visibleItemsInfo.any { it.contentType == GridContentType.CELL } }
         LazyVerticalGrid(
             columns = GridCells.Fixed(model.columns),
             state = gridState,
             contentPadding = contentPadding,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("timeline_grid"),
         ) {
             var i = 0
             while (i < entries.size) {
@@ -444,6 +448,7 @@ private fun PhotoCell(cell: GridEntry.Cell, onOpen: (Int, Long) -> Unit) {
     val item = cell.item
     Box(
         Modifier
+            .testTag("photo_tile")
             .aspectRatio(1f)
             .padding(1.dp)
             .background(p.panel)

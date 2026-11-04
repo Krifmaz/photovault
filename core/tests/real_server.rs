@@ -31,10 +31,11 @@ async fn upload_sync_timeline_download() {
     let srv = server(&[EMAIL]).await;
     let acc = signup(&srv.url, EMAIL, PASSWORD).await;
 
-    // The base server is a stock Ente-compatible one: no /photovault/info.
+    // The in-process Photovault server answers /photovault/info.
+    // (A stock server without it is covered by home_public_switching_and_usage.)
     let info = fetch_server_info(srv.url.clone()).await.unwrap();
-    assert!(!info.is_photovault);
-    assert_eq!(info.public_url, srv.url);
+    assert!(info.is_photovault, "{info:?}");
+    assert!(!info.version.is_empty(), "{info:?}");
 
     // Device A: log in with SRP.
     let a = TestCore::connected(&srv.url).await;
@@ -135,7 +136,7 @@ async fn upload_sync_timeline_download() {
         );
     }
 
-    // Storage usage falls back to /users/details/v2 on a stock server.
+    // Storage usage from the server's real numbers (/photovault/usage).
     let u = b.core.storage_usage().await.unwrap();
     assert!(u.used_bytes > 0, "{u:?}");
 
