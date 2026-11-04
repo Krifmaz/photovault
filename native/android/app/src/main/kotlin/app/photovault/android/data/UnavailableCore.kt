@@ -18,11 +18,14 @@ class UnavailableCore(private val reason: String) : CoreRepository {
     override fun selectServer(publicUrl: String): Unit = fail()
     override fun activeBaseUrl(): String? = null
     override suspend fun refreshNetwork(): String? = null
+    override fun homeUrlAllowed(publicUrl: String): Boolean = false
+    override fun setHomeUrlAllowed(publicUrl: String, allowed: Boolean): Unit = fail()
 
     override suspend fun login(email: String, password: String): LoginStep = fail()
     override suspend fun sendEmailOtt(email: String): Unit = fail()
     override suspend fun verifyEmailOtt(email: String, code: String, password: String): LoginStep = fail()
     override suspend fun verifyTotp(sessionId: String, code: String, password: String): LoginStep = fail()
+    override suspend fun verifyPasskey(sessionId: String, password: String): LoginStep = fail()
     override suspend fun recoverWithKey(recoveryKey: String, newPassword: String): Account = fail()
     override fun currentAccount(): Account? = null
     override suspend fun logout() = Unit

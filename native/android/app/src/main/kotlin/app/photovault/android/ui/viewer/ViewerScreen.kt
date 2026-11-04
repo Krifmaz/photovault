@@ -86,8 +86,15 @@ import kotlin.math.min
 @Composable
 fun ViewerScreen(vm: ViewerViewModel, startIndex: Int, onClose: (Int) -> Unit) {
     val items by vm.items.collectAsStateWithLifecycle()
-    if (items.isEmpty()) {
-        Box(Modifier.fillMaxSize().background(Color.Black))
+    val loaded by vm.loaded.collectAsStateWithLifecycle()
+    val total by vm.total.collectAsStateWithLifecycle()
+    // Restored after process death, the view model loads the timeline first (up to the opened photo), so
+    // the pager starts on the right page.
+    val ready = loaded && (items.size > startIndex || items.size.toLong() >= total)
+    if (!ready || items.isEmpty()) {
+        Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
+            if (!ready) CircularProgressIndicator(color = Color.White)
+        }
         return
     }
     val pager = rememberPagerState(initialPage = startIndex.coerceIn(0, items.lastIndex)) { items.size }

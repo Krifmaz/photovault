@@ -99,6 +99,33 @@ class SignInViewModelTest {
     }
 
     @Test
+    fun passkeySignInFinishesOnceTheBrowserPartIsDone() = runTest(main.dispatcher) {
+        val vm = vm()
+        vm.signIn("me+passkey@example.com", "secret")
+        advanceUntilIdle()
+        val step = vm.eventFlow.first() as SignInEvent.Passkey
+        // Not confirmed in the browser yet: stay on the screen and say so.
+        vm.checkPasskey(step.sessionId)
+        advanceUntilIdle()
+        assertEquals(SignInProblem.PasskeyPending, vm.state.value.problem)
+        vm.checkPasskey(step.sessionId)
+        advanceUntilIdle()
+        assertEquals(SignInEvent.Done, vm.eventFlow.first())
+        assertNotNull(core.currentAccount())
+    }
+
+    @Test
+    fun aCodeWithoutThePasswordRestartsTheSignIn() = runTest(main.dispatcher) {
+        // A view model restored after process death: no password, and not the recovery flow.
+        val vm = vm()
+        vm.onEmailChange("me+otp@example.com")
+        vm.verifyEmailCode(FakeCore.DEMO_CODE)
+        advanceUntilIdle()
+        assertEquals(SignInEvent.Restart, vm.eventFlow.first())
+        assertNull(core.currentAccount())
+    }
+
+    @Test
     fun useRecoveryKeyVerifiesEmailFirst() = runTest(main.dispatcher) {
         val vm = vm()
         vm.startRecovery()

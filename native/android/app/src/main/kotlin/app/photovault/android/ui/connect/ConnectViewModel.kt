@@ -42,6 +42,8 @@ data class ConnectUiState(
     val problem: ConnectProblem? = null,
     val saved: List<ServerInfo> = emptyList(),
     val activeUrl: String? = null,
+    /** Saved servers (public URLs) whose plain-http home address the user allowed. */
+    val homeAllowed: Set<String> = emptySet(),
 )
 
 sealed interface ConnectEvent {
@@ -74,8 +76,11 @@ class ConnectViewModel(
 
     private fun reloadSaved() {
         viewModelScope.launch {
-            val (saved, active) = withContext(io) { core.savedServers() to core.activeBaseUrl() }
-            _state.update { it.copy(saved = saved, activeUrl = active) }
+            val (saved, active, allowed) = withContext(io) {
+                val saved = core.savedServers()
+                Triple(saved, core.activeBaseUrl(), saved.filter { core.homeUrlAllowed(it.publicUrl) }.map { it.publicUrl }.toSet())
+            }
+            _state.update { it.copy(saved = saved, activeUrl = active, homeAllowed = allowed) }
         }
     }
 
@@ -149,6 +154,22 @@ class ConnectViewModel(
             } catch (e: CoreError) {
                 _state.update { it.copy(problem = e.toProblem(server.publicUrl)) }
             }
+        }
+    }
+
+    /**
+     * Allows (or stops) using a server's plain-http home address. That address carries the sign-in and the
+     * session token unencrypted, and on another network the same address can be someone else's machine,
+     * so it is off until the user turns it on.
+     */
+    fun setHomeAllowed(server: ServerInfo, allowed: Boolean) {
+        viewModelScope.launch {
+            try {
+                withContext(io) { core.setHomeUrlAllowed(server.publicUrl, allowed) }
+            } catch (e: CoreError) {
+                _state.update { it.copy(problem = e.toProblem(server.publicUrl)) }
+            }
+            reloadSaved()
         }
     }
 

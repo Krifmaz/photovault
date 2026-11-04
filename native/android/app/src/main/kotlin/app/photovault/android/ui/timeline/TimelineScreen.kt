@@ -81,6 +81,7 @@ import app.photovault.android.ui.theme.palette
 import coil3.SingletonImageLoader
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
+import coil3.size.Scale
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -299,7 +300,16 @@ private fun PhotoGrid(
                 for (j in (last + 1)..minOf(entries.lastIndex, last + ahead)) {
                     val cell = entries[j] as? GridEntry.Cell ?: continue
                     if (!prefetched.add(cell.item.id)) continue
-                    loader.enqueue(ImageRequest.Builder(context).data(Thumb(cell.item.id)).size(cellPx, cellPx).build())
+                    // Same scale as the cell (ContentScale.Crop = FILL) and at least its size (the cell's image is
+                    // the slot minus its 1 dp padding), so the cell's memory-cache lookup accepts this bitmap
+                    // instead of decrypting and decoding the thumbnail a second time.
+                    loader.enqueue(
+                        ImageRequest.Builder(context)
+                            .data(Thumb(cell.item.id))
+                            .size(cellPx, cellPx)
+                            .scale(Scale.FILL)
+                            .build(),
+                    )
                 }
                 while (prefetched.size > PREFETCH_MEMORY) prefetched.remove(prefetched.first())
             }

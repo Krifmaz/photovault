@@ -45,6 +45,8 @@ class FakeCore(
     private var active: String? = null
     private var account: Account? = null
     private var pendingUploads = 0
+    private val homeAllowed = HashSet<String>()
+    private var passkeyChecks = 0
 
     private val collections: List<PhotoCollection>
     private val items: List<TimelineItem>
@@ -153,9 +155,17 @@ class FakeCore(
         }
     }
 
-    override fun activeBaseUrl(): String? = synchronized(lock) { active?.let { servers[it]?.homeUrl ?: it } }
+    override fun activeBaseUrl(): String? = synchronized(lock) {
+        active?.let { a -> servers[a]?.homeUrl?.takeIf { it.startsWith("https://") || a in homeAllowed } ?: a }
+    }
 
     override suspend fun refreshNetwork(): String? = activeBaseUrl()
+
+    override fun homeUrlAllowed(publicUrl: String): Boolean = synchronized(lock) { publicUrl in homeAllowed }
+
+    override fun setHomeUrlAllowed(publicUrl: String, allowed: Boolean) {
+        synchronized(lock) { if (allowed) homeAllowed += publicUrl else homeAllowed -= publicUrl }
+    }
 
     // ---- auth ----
 
@@ -193,6 +203,17 @@ class FakeCore(
         delay(latencyMs)
         if (code.trim() != DEMO_CODE) throw CoreError.IncorrectCode()
         val server = synchronized(lock) { active } ?: throw CoreError.NotLoggedIn()
+        if (password.isEmpty()) return LoginStep.NeedsRecoveryKey
+        return LoginStep.Done(signIn("demo@photovault.app", server))
+    }
+
+    /** The demo passkey ceremony "finishes" on the second check. */
+    override suspend fun verifyPasskey(sessionId: String, password: String): LoginStep {
+        delay(latencyMs)
+        val server = synchronized(lock) { active } ?: throw CoreError.NotLoggedIn()
+        val checks = synchronized(lock) { ++passkeyChecks }
+        if (checks < 2) return LoginStep.Passkey(sessionId, "$server/passkeys?session=fake")
+        synchronized(lock) { passkeyChecks = 0 }
         if (password.isEmpty()) return LoginStep.NeedsRecoveryKey
         return LoginStep.Done(signIn("demo@photovault.app", server))
     }

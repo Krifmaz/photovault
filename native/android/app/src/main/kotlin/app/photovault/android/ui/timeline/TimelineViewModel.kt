@@ -52,6 +52,8 @@ class TimelineViewModel(
     private val io: CoroutineDispatcher = Dispatchers.IO,
     compute: CoroutineDispatcher = Dispatchers.Default,
     autoSync: Boolean = true,
+    /** Drops decrypted images held outside core (Coil's memory cache, viewer files); see AppGraph. */
+    private val clearDecrypted: () -> Unit = {},
 ) : ViewModel() {
 
     private val zoomIndex = MutableStateFlow(DEFAULT_ZOOM_INDEX)
@@ -140,6 +142,7 @@ class TimelineViewModel(
         viewModelScope.launch {
             runCatching { core.logout() }
             store.clear()
+            clearDecrypted()
             events.send(TimelineEvent.SignedOut)
         }
     }

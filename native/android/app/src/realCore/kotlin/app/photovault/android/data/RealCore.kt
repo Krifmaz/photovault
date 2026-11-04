@@ -42,6 +42,10 @@ internal class RealCore(private val core: Core) : CoreRepository {
 
     override suspend fun refreshNetwork(): String? = core.refreshNetwork()
 
+    override fun homeUrlAllowed(publicUrl: String): Boolean = core.homeUrlAllowed(publicUrl)
+
+    override fun setHomeUrlAllowed(publicUrl: String, allowed: Boolean) = guardSync { core.setHomeUrlAllowed(publicUrl, allowed) }
+
     override suspend fun login(email: String, password: String): LoginStep = guard { core.login(email, password).toApp() }
 
     override suspend fun sendEmailOtt(email: String) = guard { core.sendEmailOtt(email) }
@@ -51,6 +55,9 @@ internal class RealCore(private val core: Core) : CoreRepository {
 
     override suspend fun verifyTotp(sessionId: String, code: String, password: String): LoginStep =
         guard { core.verifyTotp(sessionId, code, password).toApp() }
+
+    override suspend fun verifyPasskey(sessionId: String, password: String): LoginStep =
+        guard { core.verifyPasskey(sessionId, password).toApp() }
 
     override suspend fun recoverWithKey(recoveryKey: String, newPassword: String): Account =
         guard { core.recoverWithKey(recoveryKey, newPassword).toApp() }

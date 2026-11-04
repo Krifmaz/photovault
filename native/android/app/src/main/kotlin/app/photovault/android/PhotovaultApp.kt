@@ -11,7 +11,12 @@ import app.photovault.android.ui.image.buildImageLoader
 import app.photovault.android.ui.timeline.TimelineLabels
 import coil3.ImageLoader
 import coil3.PlatformContext
+import app.photovault.android.data.NetworkWatcher
 import coil3.SingletonImageLoader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
 
 /** The app's few long-lived objects, created on first use. */
@@ -29,8 +34,30 @@ class AppGraph(private val context: Context) {
     val discovery: LanDiscovery by lazy { NsdLanDiscovery(context) }
     val timeline: TimelineStore by lazy { TimelineStore(core) }
 
-    /** Decrypted originals for the viewer; app-private, trimmed by the viewer and cleared on sign-out. */
-    val viewerCache: File by lazy { File(context.cacheDir, "viewer").apply { mkdirs() } }
+    /** App-lifetime work that must not block the UI or die with a screen (file cleanup, network re-checks). */
+    val appScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /**
+     * Decrypted originals for the viewer; app-private, trimmed by the viewer and cleared on sign-out.
+     * Created (mkdirs) by the viewer on its IO dispatcher, never here: this is first read on the main thread.
+     */
+    val viewerCache: File = File(context.cacheDir, "viewer")
+
+    /**
+     * Drops every decrypted image of the current account from memory and disk: Coil's memory cache (keyed
+     * by file id, which another server reuses) and the viewer's originals. Called on sign-out and whenever
+     * a sign-in completes (another account or server may have been chosen). The timeline list itself is
+     * cleared by sign-out and reloaded by the next timeline screen.
+     */
+    fun clearDecrypted() {
+        SingletonImageLoader.get(context).memoryCache?.clear()
+        appScope.launch { viewerCache.listFiles()?.forEach { it.delete() } }
+    }
+
+    /** Re-runs core's home/public address choice when the device's network changes. */
+    fun watchNetwork() {
+        NetworkWatcher(context, appScope) { core.refreshNetwork() }.start()
+    }
 
     fun timelineLabels(): TimelineLabels =
         TimelineLabels(context.getString(R.string.timeline_today), context.getString(R.string.timeline_yesterday))
@@ -42,7 +69,10 @@ class PhotovaultApp : Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
-        graph = AppGraph(this).also { it.warmUp() }
+        graph = AppGraph(this).also {
+            it.warmUp()
+            it.watchNetwork()
+        }
     }
 
     // The fetcher reads graph.core lazily on its IO dispatcher, so building the loader never opens core.

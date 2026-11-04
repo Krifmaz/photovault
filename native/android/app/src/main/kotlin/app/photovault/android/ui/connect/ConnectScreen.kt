@@ -23,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -227,6 +228,23 @@ private fun LanList(vm: ConnectViewModel) {
     }
 }
 
+/** Opt-in for a plain-http home address (see ConnectViewModel.setHomeAllowed). */
+@Composable
+private fun HomeAddressRow(address: String, allowed: Boolean, onChange: (Boolean) -> Unit) {
+    val p = MaterialTheme.palette
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = Spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.connect_home_title, address), color = p.text, style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.connect_home_warning), color = p.muted, style = MaterialTheme.typography.bodySmall)
+        }
+        Switch(checked = allowed, onCheckedChange = onChange)
+    }
+}
+
 private fun androidx.compose.foundation.lazy.LazyListScope.savedSection(vm: ConnectViewModel) {
     item(key = "saved", contentType = "saved") {
         SavedList(vm)
@@ -258,6 +276,14 @@ private fun SavedList(vm: ConnectViewModel) {
                     }
                 },
             )
+            val home = server.homeUrl
+            if (home != null && home.startsWith("http://", ignoreCase = true)) {
+                HomeAddressRow(
+                    address = displayAddress(home),
+                    allowed = server.publicUrl in state.homeAllowed,
+                    onChange = { vm.setHomeAllowed(server, it) },
+                )
+            }
         }
         Spacer(Modifier.height(Spacing.xl))
     }

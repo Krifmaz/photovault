@@ -23,6 +23,8 @@ sealed interface SignInProblem {
     data object IncorrectCode : SignInProblem
     data object PasswordsDiffer : SignInProblem
     data object PasswordTooShort : SignInProblem
+    /** The passkey was not confirmed in the browser yet. */
+    data object PasskeyPending : SignInProblem
     data class Unreachable(val address: String) : SignInProblem
     data class Other(val message: String) : SignInProblem
 }
@@ -43,6 +45,8 @@ sealed interface SignInEvent {
     data class Passkey(val sessionId: String, val url: String) : SignInEvent
     data object RecoveryKey : SignInEvent
     data object Done : SignInEvent
+    /** The password is gone (the process was restarted mid sign-in): start over at the sign-in screen. */
+    data object Restart : SignInEvent
 }
 
 /**
@@ -58,6 +62,8 @@ class SignInViewModel(
     private val _state = MutableStateFlow(SignInUiState())
     private val events = Channel<SignInEvent>(Channel.BUFFERED)
     private var password: String = ""
+    /** "Use recovery key" was chosen: the steps run without a password on purpose. */
+    private var recovering = false
 
     val state: StateFlow<SignInUiState> = _state.asStateFlow()
     val eventFlow: Flow<SignInEvent> = events.receiveAsFlow()
@@ -84,6 +90,7 @@ class SignInViewModel(
             return
         }
         this.password = password
+        recovering = false
         _state.update { it.copy(email = e) }
         runStep { core.login(e, password) }
     }
@@ -107,6 +114,7 @@ class SignInViewModel(
         val e = _state.value.email.trim()
         if (e.isEmpty()) return problem(SignInProblem.MissingFields)
         password = ""
+        recovering = true
         _state.update { it.copy(email = e) }
         launchBusy {
             core.sendEmailOtt(e)
@@ -117,12 +125,41 @@ class SignInViewModel(
 
     fun verifyEmailCode(code: String) {
         if (code.isBlank()) return problem(SignInProblem.MissingFields)
+        if (passwordLost()) return
         runStep { core.verifyEmailOtt(_state.value.email, code.trim(), password) }
     }
 
     fun verifyTotp(sessionId: String, code: String) {
         if (code.isBlank()) return problem(SignInProblem.MissingFields)
+        if (passwordLost()) return
         runStep { core.verifyTotp(sessionId, code.trim(), password) }
+    }
+
+    /**
+     * After the passkey ceremony in the browser (the user taps "Continue", or the app comes back to the
+     * front): asks core whether the session is verified. [quiet] checks (on resume) do not report "not yet".
+     */
+    fun checkPasskey(sessionId: String, quiet: Boolean = false) {
+        if (passwordLost()) return
+        launchBusy {
+            val next = core.verifyPasskey(sessionId, password)
+            if (next is LoginStep.Passkey && next.sessionId == sessionId) {
+                if (!quiet) _state.update { it.copy(problem = SignInProblem.PasskeyPending) }
+            } else {
+                route(next)
+            }
+        }
+    }
+
+    /**
+     * The password lives only in this view model, never in saved state. After process death a restored
+     * code screen has none; core would take that for the forgot-password path and ask for the recovery
+     * key, so a normal sign-in starts over instead.
+     */
+    private fun passwordLost(): Boolean {
+        if (password.isNotEmpty() || recovering) return false
+        viewModelScope.launch { events.send(SignInEvent.Restart) }
+        return true
     }
 
     fun recover(recoveryKey: String, newPassword: String, confirm: String) {
@@ -140,8 +177,10 @@ class SignInViewModel(
     private fun problem(p: SignInProblem) = _state.update { it.copy(problem = p) }
 
     /** Runs a step and routes its LoginStep. */
-    private fun runStep(step: suspend () -> LoginStep) = launchBusy {
-        when (val next = step()) {
+    private fun runStep(step: suspend () -> LoginStep) = launchBusy { route(step()) }
+
+    private suspend fun route(next: LoginStep) {
+        when (next) {
             is LoginStep.Done -> finish()
             LoginStep.EmailOtt -> {
                 // core's login has already sent the code (contracts/photovault-core.md); "Send a new code"
@@ -157,6 +196,7 @@ class SignInViewModel(
 
     private suspend fun finish() {
         password = ""
+        recovering = false
         events.send(SignInEvent.Done)
     }
 

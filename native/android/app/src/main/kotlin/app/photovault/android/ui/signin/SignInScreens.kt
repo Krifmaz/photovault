@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.photovault.android.R
 import app.photovault.android.ui.components.LinkButton
@@ -58,12 +59,14 @@ fun SignInEvents(
     onPasskey: (String, String) -> Unit,
     onRecovery: () -> Unit,
     onDone: () -> Unit,
+    onRestart: () -> Unit,
 ) {
     val emailCode by rememberUpdatedState(onEmailCode)
     val totp by rememberUpdatedState(onTotp)
     val passkey by rememberUpdatedState(onPasskey)
     val recovery by rememberUpdatedState(onRecovery)
     val done by rememberUpdatedState(onDone)
+    val restart by rememberUpdatedState(onRestart)
     LaunchedEffect(vm) {
         vm.eventFlow.collect { e ->
             when (e) {
@@ -72,6 +75,7 @@ fun SignInEvents(
                 is SignInEvent.Passkey -> passkey(e.sessionId, e.url)
                 SignInEvent.RecoveryKey -> recovery()
                 SignInEvent.Done -> done()
+                SignInEvent.Restart -> restart()
             }
         }
     }
@@ -112,6 +116,7 @@ private fun problemText(problem: SignInProblem): String = when (problem) {
     SignInProblem.IncorrectCode -> stringResource(R.string.signin_incorrect_code)
     SignInProblem.PasswordsDiffer -> stringResource(R.string.recovery_mismatch)
     SignInProblem.PasswordTooShort -> stringResource(R.string.recovery_too_short, SignInViewModel.MIN_PASSWORD)
+    SignInProblem.PasskeyPending -> stringResource(R.string.passkey_pending)
     is SignInProblem.Unreachable -> stringResource(R.string.connect_unreachable, problem.address)
     is SignInProblem.Other -> problem.message
 }
@@ -209,9 +214,16 @@ private fun CodeField(code: String, onChange: (String) -> Unit, busy: Boolean, o
 }
 
 @Composable
-fun PasskeyScreen(url: String, onBack: () -> Unit) {
+fun PasskeyScreen(vm: SignInViewModel, sessionId: String, url: String, onBack: () -> Unit) {
     val context = LocalContext.current
+    val state by vm.state.collectAsStateWithLifecycle()
     var failed by rememberSaveable { mutableStateOf(false) }
+    var opened by rememberSaveable { mutableStateOf(false) }
+    // Back from the browser (or its photovault://passkey redirect): see whether the passkey was accepted.
+    LifecycleResumeEffect(sessionId, opened) {
+        if (opened) vm.checkPasskey(sessionId, quiet = true)
+        onPauseOrDispose { }
+    }
     AuthFrame(onBack = onBack) {
         ScreenHeader(
             title = stringResource(R.string.passkey_title),
@@ -219,16 +231,25 @@ fun PasskeyScreen(url: String, onBack: () -> Unit) {
             showBrand = false,
         )
         if (failed) ProblemText(stringResource(R.string.passkey_no_browser))
+        state.problem?.let { ProblemText(problemText(it)) }
         PrimaryButton(
             text = stringResource(R.string.passkey_open),
             onClick = {
                 try {
                     context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    opened = true
                 } catch (e: ActivityNotFoundException) {
                     failed = true
                 }
             },
             modifier = Modifier.fillMaxWidth(),
+            enabled = !state.busy,
+        )
+        SecondaryButton(
+            text = stringResource(R.string.passkey_continue),
+            onClick = { vm.checkPasskey(sessionId) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !state.busy,
         )
     }
 }

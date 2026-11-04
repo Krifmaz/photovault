@@ -32,11 +32,17 @@ import app.photovault.android.ui.timeline.TimelineViewModel
 import app.photovault.android.ui.viewer.ViewerScreen
 import app.photovault.android.ui.viewer.ViewerViewModel
 
-/** Where the app opens: the timeline when signed in, sign-in when a server is chosen, else connect. */
-fun startDestination(graph: AppGraph): Any = when {
-    graph.core.currentAccount() != null -> TimelineRoute
-    graph.core.activeBaseUrl() != null -> AuthGraph
-    else -> ConnectRoute
+/**
+ * Where the app opens: the timeline when signed in to the active server, sign-in when a server is chosen,
+ * else connect. (After "Switch server" the active server can differ from the signed-in account's.)
+ */
+fun startDestination(graph: AppGraph): Any {
+    val core = graph.core
+    val active = core.activeBaseUrl() ?: return ConnectRoute
+    val account = core.currentAccount() ?: return AuthGraph
+    val server = core.savedServers().firstOrNull { it.publicUrl == active || it.homeUrl == active }
+    val activePublic = (server?.publicUrl ?: active).trimEnd('/')
+    return if (account.serverUrl.trimEnd('/') == activePublic) TimelineRoute else AuthGraph
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -62,7 +68,13 @@ fun AppNav(graph: AppGraph, start: Any) {
                         qrPayloads = qr,
                         onQrConsumed = { handle[NavResults.QR_PAYLOAD] = null },
                         onScanQr = { nav.navigate(QrScanRoute) },
-                        onSignIn = { nav.navigate(AuthGraph) },
+                        onSignIn = {
+                            // Opened from the timeline ("Switch server"): another server was chosen, so the
+                            // old timeline (another account, another server) must not be reachable by Back.
+                            nav.navigate(AuthGraph) {
+                                if (nav.hasRoute<TimelineRoute>()) popUpTo<TimelineRoute> { inclusive = true }
+                            }
+                        },
                         onTimeline = { nav.navigateClearing(TimelineRoute) },
                     )
                 }
@@ -78,7 +90,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                 navigation<AuthGraph>(startDestination = SignInRoute) {
                     composable<SignInRoute> { entry ->
                         val vm = nav.signInViewModel(entry, graph)
-                        AuthEvents(vm, nav)
+                        AuthEvents(vm, nav, graph)
                         SignInScreen(
                             vm = vm,
                             onChangeServer = {
@@ -88,25 +100,30 @@ fun AppNav(graph: AppGraph, start: Any) {
                     }
                     composable<EmailCodeRoute> { entry ->
                         val vm = nav.signInViewModel(entry, graph)
-                        AuthEvents(vm, nav)
+                        AuthEvents(vm, nav, graph)
                         EmailCodeScreen(vm, onBack = { nav.popBackStack() })
                     }
                     composable<TotpRoute> { entry ->
                         val vm = nav.signInViewModel(entry, graph)
-                        AuthEvents(vm, nav)
+                        AuthEvents(vm, nav, graph)
                         TotpScreen(vm, entry.toRoute<TotpRoute>().sessionId, onBack = { nav.popBackStack() })
                     }
                     composable<PasskeyRoute> { entry ->
-                        PasskeyScreen(entry.toRoute<PasskeyRoute>().url, onBack = { nav.popBackStack() })
+                        val vm = nav.signInViewModel(entry, graph)
+                        val route = entry.toRoute<PasskeyRoute>()
+                        AuthEvents(vm, nav, graph)
+                        PasskeyScreen(vm, route.sessionId, route.url, onBack = { nav.popBackStack() })
                     }
                     composable<RecoveryRoute> { entry ->
                         val vm = nav.signInViewModel(entry, graph)
-                        AuthEvents(vm, nav)
+                        AuthEvents(vm, nav, graph)
                         RecoveryScreen(vm, onBack = { nav.popBackStack() })
                     }
                 }
                 composable<TimelineRoute> { entry ->
-                    val vm = viewModel { TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels()) }
+                    val vm = viewModel {
+                        TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels(), clearDecrypted = graph::clearDecrypted)
+                    }
                     val handle = entry.savedStateHandle
                     val returned = remember(handle) { handle.getStateFlow<Int?>(NavResults.VIEWER_INDEX, null) }
                     CompositionLocalProvider(LocalNavAnimatedScope provides this) {
@@ -122,7 +139,9 @@ fun AppNav(graph: AppGraph, start: Any) {
                 }
                 composable<ViewerRoute> { entry ->
                     val route = entry.toRoute<ViewerRoute>()
-                    val vm = viewModel { ViewerViewModel(graph.core, graph.timeline, graph.viewerCache) }
+                    val vm = viewModel {
+                        ViewerViewModel(graph.core, graph.timeline, graph.viewerCache, cleanupScope = graph.appScope, startIndex = route.index)
+                    }
                     CompositionLocalProvider(LocalNavAnimatedScope provides this) {
                         ViewerScreen(
                             vm = vm,
@@ -140,14 +159,19 @@ fun AppNav(graph: AppGraph, start: Any) {
 }
 
 @Composable
-private fun AuthEvents(vm: SignInViewModel, nav: NavHostController) {
+private fun AuthEvents(vm: SignInViewModel, nav: NavHostController, graph: AppGraph) {
     SignInEvents(
         vm = vm,
         onEmailCode = { nav.navigate(EmailCodeRoute) },
         onTotp = { nav.navigate(TotpRoute(it)) },
-        onPasskey = { session, url -> nav.navigate(PasskeyRoute(session, url)) },
+        onPasskey = { session, url -> nav.navigate(PasskeyRoute(session, url)) { launchSingleTop = true } },
         onRecovery = { nav.navigate(RecoveryRoute) },
-        onDone = { nav.navigateClearing(TimelineRoute) },
+        onDone = {
+            // Possibly another account or server than before: no decrypted image of the old one may show.
+            graph.clearDecrypted()
+            nav.navigateClearing(TimelineRoute)
+        },
+        onRestart = { nav.popBackStack<SignInRoute>(inclusive = false) },
     )
 }
 
@@ -157,6 +181,9 @@ private fun NavHostController.signInViewModel(entry: NavBackStackEntry, graph: A
     val parent = remember(entry) { getBackStackEntry<AuthGraph>() }
     return viewModel(parent) { SignInViewModel(graph.core) }
 }
+
+private inline fun <reified T : Any> NavHostController.hasRoute(): Boolean =
+    runCatching { getBackStackEntry<T>() }.isSuccess
 
 /** Navigates to [route] and drops everything before it. */
 private fun NavHostController.navigateClearing(route: Any) {

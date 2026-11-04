@@ -63,4 +63,15 @@ class ViewerViewModelTest {
         advanceUntilIdle()
         assertEquals(300, vm.items.value.size)
     }
+
+    @Test
+    fun aRestoredViewerLoadsTheTimelineUpToItsPhoto() = runTest(main.dispatcher) {
+        // Process death with the viewer on top: nothing else fills the shared store.
+        core.addServer("photos.example.com")
+        core.login("me@example.com", "secret")
+        val vm = ViewerViewModel(core, store, tmp.newFolder("viewer"), io = main.dispatcher, startIndex = 250)
+        advanceUntilIdle()
+        assertTrue(vm.loaded.value)
+        assertTrue(vm.items.value.size > 250)
+    }
 }

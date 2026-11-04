@@ -28,6 +28,8 @@
     <string name="connect_saved">Saved servers</string>
     <string name="connect_saved_active">%1$s · current</string>
     <string name="connect_saved_remove">Remove %1$s</string>
+    <string name="connect_home_title">Use home address %1$s</string>
+    <string name="connect_home_warning">Faster at home. Sign-in and your session go unencrypted to this address, so turn it on only if you trust every network where it answers.</string>
 
     <!-- QR -->
     <string name="qr_permission">The camera is needed to scan your server\'s QR code.</string>
@@ -61,6 +63,8 @@
     <string name="passkey_subtitle">This account signs in with a passkey. Finish in your browser, then come back to the app.</string>
     <string name="passkey_open">Open browser</string>
     <string name="passkey_no_browser">No browser is installed to finish the passkey sign-in.</string>
+    <string name="passkey_continue">I have used my passkey</string>
+    <string name="passkey_pending">The passkey sign-in is not finished yet. Complete it in the browser, then try again.</string>
 
     <string name="recovery_title">Use recovery key</string>
     <string name="recovery_subtitle">Enter the 24-word recovery key you saved when you created your account, then choose a new password.</string>

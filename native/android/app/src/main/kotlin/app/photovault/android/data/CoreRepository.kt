@@ -21,12 +21,17 @@ interface CoreRepository {
     fun selectServer(publicUrl: String)
     fun activeBaseUrl(): String?
     suspend fun refreshNetwork(): String?
+    /** Whether requests (sign-in, the session token) may go to this server's plain-http home URL. */
+    fun homeUrlAllowed(publicUrl: String): Boolean
+    fun setHomeUrlAllowed(publicUrl: String, allowed: Boolean)
 
     // auth
     suspend fun login(email: String, password: String): LoginStep
     suspend fun sendEmailOtt(email: String)
     suspend fun verifyEmailOtt(email: String, code: String, password: String): LoginStep
     suspend fun verifyTotp(sessionId: String, code: String, password: String): LoginStep
+    /** After [LoginStep.Passkey]: returns the same Passkey step until the browser ceremony is done. */
+    suspend fun verifyPasskey(sessionId: String, password: String): LoginStep
     suspend fun recoverWithKey(recoveryKey: String, newPassword: String): Account
     fun currentAccount(): Account?
     suspend fun logout()

@@ -7,7 +7,9 @@ import app.photovault.android.data.FileKind
 import app.photovault.android.data.TimelineItem
 import app.photovault.android.data.TimelineStore
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -27,10 +29,29 @@ class ViewerViewModel(
     private val store: TimelineStore,
     private val cacheDir: File,
     private val io: CoroutineDispatcher = Dispatchers.IO,
+    /** Outlives this view model: deletes the decrypted originals after the viewer closes, off the main thread. */
+    private val cleanupScope: CoroutineScope = CoroutineScope(SupervisorJob() + io),
+    /** The timeline position the viewer opens at (loaded before the pager appears). */
+    startIndex: Int = 0,
 ) : ViewModel() {
 
     val items: StateFlow<List<TimelineItem>> = store.items
+
+    /** core's timeline count at the last refresh. */
+    val total: StateFlow<Long> = store.total
+
+    /** False until the timeline (and the page the viewer opens at) is loaded. */
+    val loaded: StateFlow<Boolean> = store.loaded
     private val cacheLock = Mutex()
+
+    init {
+        // After process death the viewer is restored on its own: the shared store starts empty and the
+        // timeline screen (which normally fills it) is not composed. Load it here, up to the opened photo.
+        viewModelScope.launch {
+            if (!store.loaded.value) store.refresh()
+            store.ensureLoaded(startIndex + 1)
+        }
+    }
 
     /** The pager settled on [index]: keep loading ahead of it. */
     fun onPage(index: Int) {
@@ -78,8 +99,9 @@ class ViewerViewModel(
     }
 
     override fun onCleared() {
-        // decrypted originals do not outlive the viewer
-        cacheDir.listFiles()?.forEach { it.delete() }
+        // decrypted originals do not outlive the viewer; deleting them is file I/O, so not on the main thread
+        val dir = cacheDir
+        cleanupScope.launch { dir.listFiles()?.forEach { it.delete() } }
     }
 
     companion object {
