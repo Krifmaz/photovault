@@ -45,6 +45,7 @@ import app.photovault.android.ui.signin.TotpScreen
 import app.photovault.android.ui.map.MapScreen
 import app.photovault.android.ui.map.MapViewModel
 import app.photovault.android.ui.map.timelineIndexOf
+import app.photovault.android.ui.signup.signupGraph
 import app.photovault.android.ui.timeline.TimelineScreen
 import app.photovault.android.ui.timeline.TimelineViewModel
 import app.photovault.android.ui.viewer.ViewerScreen
@@ -114,6 +115,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                             onChangeServer = {
                                 if (!nav.popBackStack<ConnectRoute>(inclusive = false)) nav.navigateClearing(ConnectRoute)
                             },
+                            onCreateAccount = { nav.navigate(SignupGraph) { launchSingleTop = true } },
                         )
                     }
                     composable<EmailCodeRoute> { entry ->
@@ -138,6 +140,11 @@ fun AppNav(graph: AppGraph, start: Any) {
                         RecoveryScreen(vm, onBack = { nav.popBackStack() })
                     }
                 }
+                signupGraph(nav, graph, onDone = {
+                    // A new account: no decrypted image of a previous one may show.
+                    graph.clearDecrypted()
+                    nav.navigateClearing(TimelineRoute)
+                })
                 composable<TimelineRoute> { entry ->
                     val vm = viewModel {
                         TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels(), clearDecrypted = graph::clearDecrypted, onSynced = graph::refreshWidgets)

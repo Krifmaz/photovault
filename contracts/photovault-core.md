@@ -202,3 +202,46 @@ sets `visibility = 2` in its magic metadata; hiding files moves them to the defa
 
 `thumbnail(file_id)` also serves trashed files. Every mutation updates the local index before it
 returns. The Android app reaches these through `data/albums/AlbumsRepository` (not `CoreRepository`).
+
+## v1.2: signup
+
+Create account, exactly as Ente's apps do it (`rust/crates/accounts/src/signup.rs`, `auth/key_gen.rs`;
+the photos app's `UserService.generateKey` / `setAttributes`). Module `core/src/signup.rs`, its own
+`#[uniffi::export] impl Core` block. No new records or error variants: failures use the v1 `CoreError`.
+
+```rust
+#[uniffi::export] impl Core {
+  // POST /users/ott {email, purpose: "signup", mobile: true}. Refused before sending when the active
+  // server's ServerInfo.signups_allowed is false (asked fresh from /photovault/info, the saved copy if
+  // that does not answer): Server { status: 403 }. Email already registered: Server { status: 409 }.
+  async fn signup_send_code(&self, email: String) -> Result<(), CoreError>;
+  // POST /users/verify-email. Wrong/expired code: IncorrectCode. An answer with key attributes, a sealed
+  // token or a second factor is an existing account: Server { status: 409 }. Keeps {email, id, token}
+  // in memory (never on disk) for the next steps.
+  async fn signup_verify_code(&self, email: String, code: String) -> Result<(), CoreError>;
+  // Makes the keys on the device and returns the recovery key as 24 BIP39 (English) words. Nothing is
+  // uploaded. masterKey, recoveryKey: 32 random bytes; masterKeyEncryptedWithRecoveryKey and
+  // recoveryKeyEncryptedWithMasterKey: secretbox (+ nonces). KEK: Argon2id over the password with a 16-byte
+  // kekSalt, Ente's deriveSensitiveKey: 1 GiB / 4 ops, or 256 MiB / 16 ops when `low_memory` (Ente's
+  // low-spec start), halving memory and doubling ops while the derivation fails, down to 128 MiB (the
+  // server minimum); mem x ops is always 4 GiB. encryptedKey = secretbox(masterKey, KEK). X25519 key pair;
+  // encryptedSecretKey = secretbox(secretKey, masterKey). SRP: login sub-key of the KEK, srpUserID = UUID v4,
+  // 16-byte srpSalt, verifier. The same password again returns the same words; another password makes new
+  // keys (until they are uploaded).
+  async fn signup_prepare(&self, password: String, low_memory: bool) -> Result<String, CoreError>;
+  // After the user saved the recovery key: GET /users/session-validity/v2, PUT /users/attributes
+  // {keyAttributes} (skipped if the same attributes are already there), POST /users/srp/setup +
+  // POST /users/srp/complete (server M2 checked), GET /users/srp/attributes must match (srpUserID, srpSalt,
+  // kekSalt, memLimit, opsLimit). Then the account is signed in on this device (as after `login`).
+  // Safe to retry after a failure.
+  async fn signup_finish(&self) -> Result<Account, CoreError>;
+  // The signed-in account's recovery key as 24 words (recoveryKeyEncryptedWithMasterKey opened with the
+  // master key). Local only.
+  fn recovery_key_words(&self) -> Result<String, CoreError>;
+}
+```
+
+Apps pass `low_memory = ActivityManager.isLowRamDevice() || totalMem < 4 GiB || availMem < 1.5 GiB` on
+Android. Tests: `core/tests/signup.rs` (sign-up through core against the in-process server, SRP login from
+a second core and from a hand-rolled SRP client, the key attributes opened with Ente's steps, checked
+against Ente's own `vectors/keys.json` + `sealed_token.json`, recovery with the shown words, closed sign-ups).

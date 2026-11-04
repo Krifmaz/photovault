@@ -7,6 +7,8 @@ import app.photovault.android.data.CoreProvider
 import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.LanDiscovery
 import app.photovault.android.data.NsdLanDiscovery
+import app.photovault.android.data.SignupProvider
+import app.photovault.android.data.SignupRepository
 import app.photovault.android.data.TimelineStore
 import app.photovault.android.data.albums.AlbumsProvider
 import app.photovault.android.data.albums.AlbumsRepository
@@ -37,6 +39,8 @@ class AppGraph(private val context: Context) {
     }
     val discovery: LanDiscovery by lazy { NsdLanDiscovery(context) }
     val timeline: TimelineStore by lazy { TimelineStore(core) }
+    /** Create account (contract v1.2 signup), on the same core. */
+    val signup: SignupRepository by lazy { SignupProvider.create(context, core) }
 
     /** Camera backup (WorkManager): settings, media scan, ledger, scheduling. */
     val backup: BackupGraph by lazy { BackupGraph(context) { core } }

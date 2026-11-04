@@ -45,7 +45,6 @@
     <string name="signin_action">Sign in</string>
     <string name="signin_use_recovery">Use recovery key</string>
     <string name="signin_create_account">Create account</string>
-    <string name="signin_create_account_note">Creating an account in this app is coming soon. Create it on your server\'s web page, then sign in here.</string>
     <string name="signin_change_server">Change server</string>
     <string name="signin_missing">Fill in every field.</string>
     <string name="signin_incorrect_password">Incorrect email or password.</string>
