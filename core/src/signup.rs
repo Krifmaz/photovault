@@ -37,6 +37,8 @@ use crate::srp::SrpClient;
 use crate::{Account, Core, CoreError, Result, run};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// libsodium's `crypto_pwhash_MEMLIMIT_SENSITIVE` (1 GiB).
 pub const MEMLIMIT_SENSITIVE: u64 = 1024 * 1024 * 1024;
@@ -123,7 +125,9 @@ pub(crate) struct PendingSignup {
     user_id: i64,
     /// The plain token from `verify-email`.
     token: String,
-    keys: Option<PreparedKeys>,
+    /// Shared, so a step never takes the keys out across an await: a
+    /// cancelled call (the caller's coroutine went away) leaves them here.
+    keys: Option<Arc<PreparedKeys>>,
 }
 
 /// Keys made by [`Core::signup_prepare`].
@@ -138,7 +142,7 @@ struct PreparedKeys {
     srp_salt: Vec<u8>,
     srp_verifier: Vec<u8>,
     /// `PUT /users/attributes` succeeded: the keys can no longer change.
-    uploaded: bool,
+    uploaded: AtomicBool,
 }
 
 impl Drop for PreparedKeys {
@@ -203,7 +207,7 @@ fn generate_keys(password: &[u8], low_memory: bool) -> Result<PreparedKeys> {
             srp_user_id,
             srp_salt,
             srp_verifier,
-            uploaded: false,
+            uploaded: AtomicBool::new(false),
         })
     })();
     crypto::wipe(&mut master_key);
@@ -286,8 +290,8 @@ fn same_keys(a: &KeyAttributes, b: &KeyAttributes) -> bool {
 }
 
 impl crate::client::Inner {
-    fn take_signup(&self) -> Option<PendingSignup> {
-        self.signup.lock().unwrap_or_else(|e| e.into_inner()).take()
+    fn signup_slot(&self) -> std::sync::MutexGuard<'_, Option<PendingSignup>> {
+        self.signup.lock().unwrap_or_else(|e| e.into_inner())
     }
 
     fn put_signup(&self, s: PendingSignup) {
@@ -392,25 +396,32 @@ impl crate::client::Inner {
         if password.is_empty() {
             return Err(CoreError::IncorrectPassword);
         }
-        let mut s = self.take_signup().ok_or(CoreError::NotLoggedIn)?;
+        // Read what this step needs and leave the pending sign-up in place:
+        // nothing is lost if the call is cancelled during the key work.
+        let (email, token, old) = {
+            let slot = self.signup_slot();
+            let s = slot.as_ref().ok_or(CoreError::NotLoggedIn)?;
+            (s.email.clone(), s.token.clone(), s.keys.clone())
+        };
         let pw = password.as_bytes().to_vec();
-        let old = s.keys.take();
         let (keys, result) = tokio::task::spawn_blocking(move || {
             let mut pw = pw;
             let out = match old {
                 // Same password again (the user came back): keep the keys.
                 Some(k) => match password_opens(&pw, &k) {
                     Ok(true) => (Some(k), Ok(())),
-                    Ok(false) if !k.uploaded => match generate_keys(&pw, low_memory) {
-                        Ok(n) => (Some(n), Ok(())),
-                        Err(e) => (None, Err(e)),
-                    },
+                    Ok(false) if !k.uploaded.load(Ordering::SeqCst) => {
+                        match generate_keys(&pw, low_memory) {
+                            Ok(n) => (Some(Arc::new(n)), Ok(())),
+                            Err(e) => (None, Err(e)),
+                        }
+                    }
                     // Uploaded keys are final: only their password opens them.
                     Ok(false) => (Some(k), Err(CoreError::IncorrectPassword)),
                     Err(e) => (Some(k), Err(e)),
                 },
                 None => match generate_keys(&pw, low_memory) {
-                    Ok(n) => (Some(n), Ok(())),
+                    Ok(n) => (Some(Arc::new(n)), Ok(())),
                     Err(e) => (None, Err(e)),
                 },
             };
@@ -419,47 +430,65 @@ impl crate::client::Inner {
         })
         .await
         .map_err(|e| CoreError::crypto(e.to_string()))?;
-        s.keys = keys;
-        let words = s
-            .keys
+        let words = keys
             .as_ref()
             .map(|k| crypto::recovery_key_to_mnemonic(&k.recovery_key));
-        self.put_signup(s);
+        {
+            let mut slot = self.signup_slot();
+            match slot.as_mut() {
+                // Still the same sign-up (not replaced meanwhile).
+                Some(s) if s.email == email && s.token == token => {
+                    // Keys that reached the server stay, whatever happened.
+                    if !s
+                        .keys
+                        .as_ref()
+                        .is_some_and(|k| k.uploaded.load(Ordering::SeqCst))
+                    {
+                        s.keys = keys;
+                    }
+                }
+                _ => return Err(CoreError::NotLoggedIn),
+            }
+        }
         result?;
         Ok(words.ok_or(CoreError::NotLoggedIn)??)
     }
 
     pub(crate) async fn signup_finish(&self) -> Result<Account> {
-        let mut s = self.take_signup().ok_or(CoreError::NotLoggedIn)?;
-        if s.keys.is_none() {
-            self.put_signup(s);
-            return Err(CoreError::NotLoggedIn);
-        }
-        let api = self.anon_api()?.with_token(s.token.clone());
-        let r = upload(&api, &s.email, s.keys.as_mut().expect("checked")).await;
-        if let Err(e) = r {
-            self.put_signup(s);
-            return Err(e);
-        }
-        let keys = s.keys.take().expect("checked");
+        // Clone what the upload needs; the pending sign-up stays in place
+        // until the session is set, so a cancelled call can be retried.
+        let (email, user_id, token, keys) = {
+            let slot = self.signup_slot();
+            let s = slot.as_ref().ok_or(CoreError::NotLoggedIn)?;
+            let keys = s.keys.clone().ok_or(CoreError::NotLoggedIn)?;
+            (s.email.clone(), s.user_id, s.token.clone(), keys)
+        };
+        let api = self.anon_api()?.with_token(token.clone());
+        upload(&api, &email, &keys).await?;
         let server_url = self
             .active_public_url()
             .or_else(|| self.active_base_url())
             .unwrap_or_default();
         let account = Account {
-            user_id: s.user_id,
-            email: s.email.clone(),
+            user_id,
+            email: email.clone(),
             server_url,
         };
         self.set_session(Session {
             account: account.clone(),
-            token: std::mem::take(&mut s.token),
+            token,
             master_key: keys.master_key.clone(),
             secret_key: keys.secret_key.clone(),
             public_key: keys.public_key.clone(),
             key_attributes: keys.attributes.clone(),
         })?;
-        // A sign-in that was half done before is void now.
+        // The sign-up is done; a sign-in that was half done before is void.
+        {
+            let mut slot = self.signup_slot();
+            if slot.as_ref().is_some_and(|s| s.email == email) {
+                *slot = None;
+            }
+        }
         *self.pending.lock().unwrap_or_else(|e| e.into_inner()) = None;
         Ok(account)
     }
@@ -485,8 +514,8 @@ impl crate::client::Inner {
 
 /// Ente's `complete_signup`: key attributes, SRP, then check what the server
 /// stored.
-async fn upload(api: &Api, email: &str, keys: &mut PreparedKeys) -> Result<()> {
-    if !keys.uploaded {
+async fn upload(api: &Api, email: &str, keys: &PreparedKeys) -> Result<()> {
+    if !keys.uploaded.load(Ordering::SeqCst) {
         let remote: SessionValidity = api.get_json("/users/session-validity/v2", &[]).await?;
         match (remote.has_set_keys, remote.key_attributes) {
             (false, None) => {
@@ -502,7 +531,7 @@ async fn upload(api: &Api, email: &str, keys: &mut PreparedKeys) -> Result<()> {
             (true, Some(a)) if same_keys(&a, &keys.attributes) => {}
             _ => return Err(already_registered()),
         }
-        keys.uploaded = true;
+        keys.uploaded.store(true, Ordering::SeqCst);
     }
     // A 400 means this SRP setup was done already (a retry after a lost
     // answer); the attributes check below decides.

@@ -49,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.photovault.android.R
 import app.photovault.android.data.CoreError
@@ -77,6 +78,12 @@ fun ViewerScreen(vm: ViewerViewModel, startIndex: Int, onClose: (Int) -> Unit) {
     val items by vm.items.collectAsStateWithLifecycle()
     val loaded by vm.loaded.collectAsStateWithLifecycle()
     val total by vm.total.collectAsStateWithLifecycle()
+    // Pause the video in the background (Home, screen off) and resume on return. A recreated Activity
+    // (rotation) passes through stop and start too, so a playing video goes on playing.
+    LifecycleStartEffect(vm.playback) {
+        vm.playback.onStart()
+        onStopOrDispose { vm.playback.onStop() }
+    }
     // Restored after process death, the view model loads the timeline first (up to the opened photo), so
     // the pager starts on the right page.
     val ready = loaded && (items.size > startIndex || items.size.toLong() >= total)

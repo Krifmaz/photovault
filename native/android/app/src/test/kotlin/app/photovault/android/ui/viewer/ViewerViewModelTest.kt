@@ -113,6 +113,8 @@ class ViewerViewModelTest {
     fun closingThePlayerEndsCoresStreams() = runTest(main.dispatcher) {
         val repo = FakeVideoRepository()
         val vm = ViewerViewModel(core, store, tmp.newFolder("viewer"), io = main.dispatcher, videos = repo)
+        // The viewer announces itself, so core's streams end only when the last open viewer closes.
+        assertEquals(1, repo.openCount)
         vm.playback.release()
         assertEquals(1, repo.stopCount)
     }

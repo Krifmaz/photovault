@@ -243,6 +243,69 @@ class VideoPlaybackControllerTest {
     }
 
     @Test
+    fun theBackgroundPausesAndTheForegroundResumes() = runTest {
+        val h = Harness(this) { stream(it) }
+        h.controller.open(video(1, hasStream = true))
+        runCurrent()
+        h.engine.startPlaying()
+        // Home or screen off while playing: pause, no ticking.
+        h.controller.onStop()
+        assertEquals("pause", h.engine.calls.last())
+        h.engine.events!!.onIsPlaying(false)
+        h.engine.positionMs = 5_000
+        advanceTimeBy(5_000)
+        runCurrent()
+        assertTrue(h.controller.progress.value.positionMs != 5_000L)
+        // Back: it plays on, from where it was (same video, no reload).
+        h.controller.onStart()
+        assertEquals("play", h.engine.calls.last())
+        assertEquals(1, h.engine.calls.count { it.startsWith("load:") })
+        assertEquals(5_000L, h.controller.progress.value.positionMs)
+        // Paused by the user: coming back does not start it.
+        h.engine.events!!.onIsPlaying(true)
+        h.controller.togglePlay()
+        h.engine.events!!.onIsPlaying(false)
+        h.controller.onStop()
+        h.controller.onStart()
+        assertEquals("pause", h.engine.calls.last())
+    }
+
+    @Test
+    fun aVideoResolvedInTheBackgroundWaitsForTheForeground() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        val h = Harness(this) {
+            gate.await()
+            stream(it)
+        }
+        h.controller.open(video(1, hasStream = true))
+        runCurrent()
+        h.controller.onStop()
+        gate.complete(Unit)
+        runCurrent()
+        assertEquals(listOf("load:http://127.0.0.1:1/t/1/index.m3u8"), h.engine.calls)
+        h.controller.onStart()
+        assertEquals("play", h.engine.calls.last())
+    }
+
+    @Test
+    fun aRecreatedScreenKeepsTheVideo() = runTest {
+        val h = Harness(this) { stream(it) }
+        h.controller.open(video(1, hasStream = true))
+        runCurrent()
+        h.engine.startPlaying()
+        h.engine.positionMs = 12_000
+        // Rotation: the old composition stops, the new one opens the same page again and starts.
+        h.controller.onStop()
+        h.controller.open(video(1, hasStream = true))
+        h.controller.onStart()
+        runCurrent()
+        assertEquals(1, h.engine.calls.count { it.startsWith("load:") })
+        assertFalse(h.engine.calls.contains("stop"))
+        assertEquals(12_000L, h.engine.positionMs)
+        assertEquals("play", h.engine.calls.last())
+    }
+
+    @Test
     fun timesAreFormatted() {
         assertEquals("0:00", formatTime(0))
         assertEquals("0:09", formatTime(9_999))

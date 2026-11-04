@@ -151,6 +151,60 @@ class SignupViewModelTest {
     }
 
     @Test
+    fun lostEmailRestarts() = runTest(main.dispatcher) {
+        // A restored password or code screen after process death has no email: start over, ask core nothing.
+        var sent = 0
+        val counting = object : SignupRepository by signup {
+            override suspend fun sendCode(email: String) {
+                sent++
+                signup.sendCode(email)
+            }
+        }
+        val vm = vm(repo = counting)
+        vm.submitPassword(STRONG, STRONG)
+        assertEquals(SignupEvent.Restart, vm.eventFlow.first())
+        vm.resendCode()
+        assertEquals(SignupEvent.Restart, vm.eventFlow.first())
+        advanceUntilIdle()
+        assertEquals(0, sent)
+        assertNull(vm.state.value.problem)
+    }
+
+    @Test
+    fun retryAfterAKeyFailureDoesNotReuseTheCode() = runTest(main.dispatcher) {
+        var verified = 0
+        var prepares = 0
+        val flaky = object : SignupRepository by signup {
+            override suspend fun verifyCode(email: String, code: String) {
+                verified++
+                // Codes work once, as on the server.
+                if (verified > 1) throw CoreError.IncorrectCode()
+                signup.verifyCode(email, code)
+            }
+
+            override suspend fun prepare(password: String): List<String> {
+                if (++prepares == 1) throw CoreError.Crypto("this device does not have enough memory to make secure keys")
+                return signup.prepare(password)
+            }
+        }
+        val vm = vm(repo = flaky)
+        vm.onEmailChange("new@example.com")
+        vm.submitPassword(STRONG, STRONG)
+        advanceUntilIdle()
+        vm.eventFlow.first()
+        vm.verifyCode(FakeCore.DEMO_CODE)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.problem is SignupProblem.Other)
+        // Verify again: only the keys are made.
+        vm.verifyCode(FakeCore.DEMO_CODE)
+        advanceUntilIdle()
+        assertEquals(SignupEvent.RecoveryKey, vm.eventFlow.first())
+        assertEquals(1, verified)
+        assertEquals(2, prepares)
+        assertNull(vm.state.value.problem)
+    }
+
+    @Test
     fun finishFailureKeepsTheRecoveryKey() = runTest(main.dispatcher) {
         val failing = object : SignupRepository by signup {
             override suspend fun finish(): Account = throw CoreError.Network("connection reset")

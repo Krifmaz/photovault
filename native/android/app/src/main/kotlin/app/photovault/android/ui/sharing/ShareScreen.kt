@@ -126,18 +126,18 @@ fun ShareScreen(vm: ShareViewModel, onBack: () -> Unit) {
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = Spacing.xl, vertical = Spacing.md),
                     verticalArrangement = Arrangement.spacedBy(Spacing.md),
                 ) {
-                    item(key = "people") { SectionLabel(stringResource(R.string.share_people)) }
-                    item(key = "add") { AddPerson(state, vm) }
+                    item(key = "people", contentType = "label") { SectionLabel(stringResource(R.string.share_people)) }
+                    item(key = "add", contentType = "add") { AddPerson(state, vm) }
                     if (d.sharees.isEmpty()) {
-                        item(key = "nobody") {
+                        item(key = "nobody", contentType = "empty") {
                             Text(stringResource(R.string.share_nobody), style = MaterialTheme.typography.bodyMedium, color = p.muted)
                         }
                     }
-                    items(d.sharees, key = { "s${it.userId}-${it.email}" }) { s ->
+                    items(d.sharees, key = { "s${it.userId}-${it.email}" }, contentType = { "sharee" }) { s ->
                         ShareeRow(s, busy = state.busy, onRole = { vm.changeRole(s.email, it) }, onRemove = { vm.unshare(s.email) })
                     }
-                    item(key = "link-label") { SectionLabel(stringResource(R.string.share_public_link)) }
-                    item(key = "link") {
+                    item(key = "link-label", contentType = "label") { SectionLabel(stringResource(R.string.share_public_link)) }
+                    item(key = "link", contentType = "link") {
                         LinkSection(
                             album = d,
                             busy = state.busy,

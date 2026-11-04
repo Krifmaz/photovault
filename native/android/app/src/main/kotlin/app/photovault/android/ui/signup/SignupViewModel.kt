@@ -68,6 +68,8 @@ class SignupViewModel(
     private val _state = MutableStateFlow(SignupUiState())
     private val events = Channel<SignupEvent>(Channel.BUFFERED)
     private var password: String = ""
+    /** Core accepted the emailed code (a code works once): a retry after a key failure only makes the keys. */
+    private var codeVerified = false
 
     val state: StateFlow<SignupUiState> = _state.asStateFlow()
     val eventFlow: Flow<SignupEvent> = events.receiveAsFlow()
@@ -106,28 +108,50 @@ class SignupViewModel(
             password.length < MIN_PASSWORD -> return problem(SignupProblem.PasswordTooShort)
             PasswordStrengthEstimator.level(password) == PasswordStrength.Weak -> return problem(SignupProblem.PasswordTooWeak)
         }
+        if (emailLost()) return
         this.password = password
         launchBusy {
+            codeVerified = false
             signup.sendCode(_state.value.email)
             events.send(SignupEvent.Code)
         }
     }
 
-    fun resendCode() = launchBusy { signup.sendCode(_state.value.email) }
+    fun resendCode() {
+        if (emailLost()) return
+        launchBusy {
+            codeVerified = false
+            signup.sendCode(_state.value.email)
+        }
+    }
+
+    /**
+     * The email is gone (the process was restarted and the back stack restored past the email screen): start
+     * over instead of asking core for a code to an empty address.
+     */
+    private fun emailLost(): Boolean {
+        if (_state.value.email.isNotBlank()) return false
+        viewModelScope.launch { events.send(SignupEvent.Restart) }
+        return true
+    }
 
     /** Code screen: checks the code, then makes the keys and shows the recovery key. */
     fun verifyCode(code: String) {
-        if (code.isBlank()) return problem(SignupProblem.MissingFields)
-        if (password.isEmpty()) {
+        if (code.isBlank() && !codeVerified) return problem(SignupProblem.MissingFields)
+        if (password.isEmpty() || _state.value.email.isBlank()) {
             viewModelScope.launch { events.send(SignupEvent.Restart) }
             return
         }
         launchBusy {
-            signup.verifyCode(_state.value.email, code.trim())
+            if (!codeVerified) {
+                signup.verifyCode(_state.value.email, code.trim())
+                codeVerified = true
+            }
             _state.update { it.copy(makingKeys = true) }
             try {
                 val words = signup.prepare(password)
                 password = ""
+                codeVerified = false
                 _state.update { it.copy(recoveryWords = words, savedConfirmed = false) }
                 events.send(SignupEvent.RecoveryKey)
             } finally {

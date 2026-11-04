@@ -80,7 +80,7 @@ class AlbumPickerActivity : ComponentActivity() {
                             verticalArrangement = Arrangement.spacedBy(Spacing.xs),
                             modifier = Modifier.testTag("widget_albums"),
                         ) {
-                            items(list, key = { it.id }) { album ->
+                            items(list, key = { it.id }, contentType = { "row" }) { album ->
                                 Row(
                                     Modifier
                                         .fillMaxWidth()

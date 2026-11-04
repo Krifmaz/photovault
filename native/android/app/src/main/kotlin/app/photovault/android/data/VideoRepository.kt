@@ -12,7 +12,14 @@ interface VideoRepository {
      */
     suspend fun videoStream(fileId: Long): VideoStream?
 
-    /** Ends every stream (their loopback URLs stop working); called when the viewer closes. */
+    /**
+     * A viewer opened and may play streams; it calls [stopStreams] when it closes. Several viewers can be
+     * alive at once (an album viewer over the timeline's, or one still leaving while the next opens), so
+     * core's streams end only when the last one closed.
+     */
+    fun viewerOpened() {}
+
+    /** A viewer closed: ends every stream (their loopback URLs stop working) once no other viewer is open. */
     fun stopStreams()
 }
 

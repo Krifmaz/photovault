@@ -382,7 +382,7 @@ private fun PhotoStrip(loaded: Boolean, anyPhotos: Boolean, photos: List<WorldPo
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(Spacing.xs),
                 modifier = Modifier.testTag("map_strip"),
             ) {
-                items(photos, key = { it.fileId }) { pt ->
+                items(photos, key = { it.fileId }, contentType = { "photo" }) { pt ->
                     AsyncImage(
                         model = Thumb(pt.fileId),
                         contentDescription = null,

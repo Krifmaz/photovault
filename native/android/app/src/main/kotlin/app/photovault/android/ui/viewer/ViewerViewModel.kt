@@ -61,6 +61,7 @@ class ViewerViewModel(
     )
 
     init {
+        videos?.viewerOpened()
         // After process death the viewer is restored on its own: the shared store starts empty and the
         // timeline screen (which normally fills it) is not composed. Load it here, up to the opened photo.
         viewModelScope.launch {

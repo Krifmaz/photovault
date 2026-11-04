@@ -20,7 +20,7 @@ use super::playlist::Preview;
 use crate::api::Api;
 use crate::{CoreError, Result, crypto};
 use reqwest::Method;
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
@@ -53,7 +53,9 @@ pub struct Stream {
     preview: Preview,
     source: tokio::sync::Mutex<Source>,
     cache: Mutex<VecDeque<(usize, Arc<Vec<u8>>)>>,
-    inflight: tokio::sync::Mutex<()>,
+    /// One lock per segment being fetched (dedupes the player's request and
+    /// the prefetch of the same segment; different segments run at once).
+    inflight: Mutex<HashMap<usize, Arc<tokio::sync::Mutex<()>>>>,
     last_used: Mutex<Instant>,
 }
 
@@ -94,9 +96,26 @@ impl Stream {
         if let Some(b) = self.cached(n) {
             return Ok(b);
         }
-        // One fetch at a time per stream: the player's request and the
-        // prefetch of the same segment do not both download it.
-        let _one = self.inflight.lock().await;
+        // One fetch at a time per segment: the player's request and the
+        // prefetch of the same segment do not both download it, while a
+        // seek elsewhere does not wait behind the prefetch.
+        let lock = self
+            .inflight
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .entry(n)
+            .or_default()
+            .clone();
+        let _one = lock.lock().await;
+        let r = self.fetch_segment(n).await;
+        self.inflight
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .remove(&n);
+        r
+    }
+
+    async fn fetch_segment(&self, n: usize) -> Result<Arc<Vec<u8>>> {
         if let Some(b) = self.cached(n) {
             return Ok(b);
         }
@@ -160,21 +179,44 @@ async fn get_range(api: &Api, url: &str, range: Option<(u64, u64)>) -> Result<Ve
         })
         .await?;
     let partial = res.status() == reqwest::StatusCode::PARTIAL_CONTENT;
-    let body = res.bytes().await.map_err(CoreError::network)?;
     match range {
-        // The store ignored the range: cut it out ourselves.
-        Some((off, len)) if !partial => {
-            let end = off.saturating_add(len);
-            if (body.len() as u64) < end {
-                return Err(CoreError::protocol("segment object is truncated"));
+        // The store ignored the range: read only up to the end of the
+        // segment, skipping what is before it (never the whole object,
+        // which can be gigabytes).
+        Some((off, len)) if !partial => cut_from_stream(res, off, len).await,
+        Some((_, len)) => {
+            let body = res.bytes().await.map_err(CoreError::network)?;
+            if body.len() as u64 != len {
+                return Err(CoreError::protocol("short segment range"));
             }
-            Ok(body[off as usize..end as usize].to_vec())
+            Ok(body.to_vec())
         }
-        Some((_, len)) if body.len() as u64 != len => {
-            Err(CoreError::protocol("short segment range"))
-        }
-        _ => Ok(body.to_vec()),
+        None => Ok(res.bytes().await.map_err(CoreError::network)?.to_vec()),
     }
+}
+
+/// Bytes `off..off + len` of a full-object answer, read chunk by chunk; the
+/// connection is dropped once they are in.
+async fn cut_from_stream(mut res: reqwest::Response, off: u64, len: u64) -> Result<Vec<u8>> {
+    let len_usize =
+        usize::try_from(len).map_err(|_| CoreError::protocol("segment range too large"))?;
+    let mut out = Vec::with_capacity(len_usize);
+    let mut pos = 0u64;
+    let end = off.saturating_add(len);
+    while (out.len() as u64) < len {
+        let Some(chunk) = res.chunk().await.map_err(CoreError::network)? else {
+            return Err(CoreError::protocol("segment object is truncated"));
+        };
+        let start = pos;
+        pos += chunk.len() as u64;
+        if pos <= off {
+            continue;
+        }
+        let a = off.saturating_sub(start) as usize;
+        let b = (end.min(pos) - start) as usize;
+        out.extend_from_slice(&chunk[a..b]);
+    }
+    Ok(out)
 }
 
 /// The running server.
@@ -241,7 +283,7 @@ impl Loopback {
             preview,
             source: tokio::sync::Mutex::new(source),
             cache: Mutex::new(VecDeque::new()),
-            inflight: tokio::sync::Mutex::new(()),
+            inflight: Mutex::new(HashMap::new()),
             last_used: Mutex::new(Instant::now()),
         });
         let mut st = self.streams.lock().unwrap_or_else(|e| e.into_inner());
@@ -477,6 +519,61 @@ async fn respond(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A store that ignores `Range`: answers 200 with a huge object, sends
+    /// `sent` bytes (byte i is `i % 251`) in small writes, then stalls.
+    async fn rangeless_store(sent: usize, declared: u64) -> String {
+        let l = tokio::net::TcpListener::bind(("127.0.0.1", 0))
+            .await
+            .unwrap();
+        let port = l.local_addr().unwrap().port();
+        tokio::spawn(async move {
+            let (mut sock, _) = l.accept().await.unwrap();
+            let _ = read_head(&mut sock).await;
+            let head = format!("HTTP/1.1 200 OK\r\nContent-Length: {declared}\r\n\r\n");
+            sock.write_all(head.as_bytes()).await.unwrap();
+            let body: Vec<u8> = (0..sent).map(|i| (i % 251) as u8).collect();
+            for c in body.chunks(700) {
+                if sock.write_all(c).await.is_err() {
+                    return;
+                }
+                sock.flush().await.unwrap();
+                tokio::time::sleep(Duration::from_millis(2)).await;
+            }
+            // Never sends the rest: a client that buffers the whole object
+            // would wait forever.
+            tokio::time::sleep(Duration::from_secs(60)).await;
+        });
+        format!("http://127.0.0.1:{port}/obj")
+    }
+
+    #[tokio::test]
+    async fn range_ignored_reads_only_the_segment() {
+        let url = rangeless_store(5000, 4 << 30).await;
+        let api = Api::new(&url);
+        let got = tokio::time::timeout(
+            Duration::from_secs(10),
+            get_range(&api, &url, Some((1500, 2000))),
+        )
+        .await
+        .expect("must not read the whole object")
+        .unwrap();
+        let want: Vec<u8> = (1500..3500).map(|i| (i % 251) as u8).collect();
+        assert_eq!(got, want);
+    }
+
+    #[tokio::test]
+    async fn range_ignored_truncated_object() {
+        let url = rangeless_store(1200, 1200).await;
+        let api = Api::new(&url);
+        let r = tokio::time::timeout(
+            Duration::from_secs(10),
+            get_range(&api, &url, Some((1000, 500))),
+        )
+        .await
+        .unwrap();
+        assert!(r.is_err());
+    }
 
     #[test]
     fn heads_and_ranges() {

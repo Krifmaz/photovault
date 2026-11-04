@@ -341,12 +341,12 @@ fun AlbumPickerDialog(
         text = {
             LazyColumn(Modifier.heightIn(max = 420.dp)) {
                 if (allowNew) {
-                    item(key = "new") { PickerRow(stringResource(R.string.albums_new_ellipsis), R.drawable.ic_add) { naming = true } }
+                    item(key = "new", contentType = "row") { PickerRow(stringResource(R.string.albums_new_ellipsis), R.drawable.ic_add) { naming = true } }
                 }
                 if (noneLabel != null) {
-                    item(key = "none") { PickerRow(noneLabel, R.drawable.ic_albums) { onPick(null) } }
+                    item(key = "none", contentType = "row") { PickerRow(noneLabel, R.drawable.ic_albums) { onPick(null) } }
                 }
-                items(targets.orEmpty(), key = { it.id }) { a ->
+                items(targets.orEmpty(), key = { it.id }, contentType = { "row" }) { a ->
                     PickerRow(albumName(a), R.drawable.ic_albums) { onPick(a.id) }
                 }
             }

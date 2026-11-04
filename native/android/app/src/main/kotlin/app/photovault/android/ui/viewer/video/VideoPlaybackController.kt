@@ -62,6 +62,10 @@ class VideoPlaybackController(
 
     private var engineOrNull: PlaybackEngine? = null
     private var released = false
+    /** The app is in the background ([onStop]): nothing plays or ticks until [onStart]. */
+    private var stopped = false
+    /** It was playing when the app went to the background: play again on [onStart]. */
+    private var resumeOnStart = false
     private var loadJob: Job? = null
     private var hideJob: Job? = null
     private var tickJob: Job? = null
@@ -121,6 +125,7 @@ class VideoPlaybackController(
         loadJob?.cancel()
         hideJob?.cancel()
         engineOrNull?.stop()
+        resumeOnStart = false
         _state.value = VideoUiState(fileId = item.id, phase = VideoPhase.Resolving, muted = cur.muted)
         _progress.value = VideoProgress(durationMs = item.durationMs?.toLong() ?: 0L)
         syncTicker()
@@ -140,7 +145,8 @@ class VideoPlaybackController(
             _state.update { it.copy(phase = VideoPhase.Buffering, isStream = source.isHls) }
             val e = engine()
             e.load(source)
-            e.play()
+            // Resolved while the app was in the background: start when it is back.
+            if (stopped) resumeOnStart = true else e.play()
         }
     }
 
@@ -156,6 +162,7 @@ class VideoPlaybackController(
         loadJob?.cancel()
         hideJob?.cancel()
         engineOrNull?.stop()
+        resumeOnStart = false
         _state.update { VideoUiState(muted = it.muted) }
         _progress.value = VideoProgress()
         syncTicker()
@@ -231,7 +238,7 @@ class VideoPlaybackController(
 
     private fun syncTicker() {
         val s = _state.value
-        val want = s.controlsVisible && s.playing && !released
+        val want = s.controlsVisible && s.playing && !released && !stopped
         if (want && tickJob?.isActive != true) {
             tickJob = scope.launch {
                 while (isActive) {
@@ -243,6 +250,31 @@ class VideoPlaybackController(
             tickJob?.cancel()
             tickJob = null
         }
+    }
+
+    /** The app went to the background (screen off, Home, another app): pause, remember whether it played. */
+    fun onStop() {
+        if (stopped) return
+        stopped = true
+        val e = engineOrNull
+        if (e != null && _state.value.playing) {
+            resumeOnStart = true
+            e.pause()
+        }
+        hideJob?.cancel()
+        syncTicker()
+    }
+
+    /** The app is visible again: resume what [onStop] paused. */
+    fun onStart() {
+        if (!stopped) return
+        stopped = false
+        val resume = resumeOnStart
+        resumeOnStart = false
+        val e = engineOrNull
+        if (resume && e != null && !released && _state.value.fileId != null) e.play()
+        refreshProgress()
+        syncTicker()
     }
 
     /** The viewer closed: free the player and end core's streams. */

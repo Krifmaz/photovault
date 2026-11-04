@@ -1,5 +1,8 @@
 package app.photovault.android.ui.viewer.video
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -40,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -67,8 +71,11 @@ fun VideoPage(item: TimelineItem, controller: VideoPlaybackController, active: B
     LaunchedEffect(active, item.id) {
         if (active) controller.open(item) else controller.leave(item.id)
     }
+    // The player lives in the view model: an Activity recreated for a configuration change (rotation, dark
+    // mode, resize) keeps the video where it is; only a page that really goes away stops it.
+    val activity = LocalContext.current.findActivity()
     DisposableEffect(item.id) {
-        onDispose { controller.leave(item.id) }
+        onDispose { if (activity?.isChangingConfigurations != true) controller.leave(item.id) }
     }
     if (!active) {
         Box(Modifier.fillMaxSize()) {
@@ -241,4 +248,10 @@ internal fun formatTime(ms: Long): String {
     val m = (total % 3600) / 60
     val sec = total % 60
     return if (h > 0) String.format(Locale.ROOT, "%d:%02d:%02d", h, m, sec) else String.format(Locale.ROOT, "%d:%02d", m, sec)
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

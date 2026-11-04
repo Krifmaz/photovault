@@ -362,3 +362,53 @@ async fn signups_closed() {
     );
     assert_eq!(a.core.current_account(), None);
 }
+
+/// A step cancelled mid-way (the app's coroutine went away) loses nothing:
+/// the same keys come back and the sign-up finishes on retry.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn cancelled_steps_can_be_retried() {
+    use std::time::Duration;
+    const EMAIL: &str = "pia@example.org";
+    const PASSWORD: &str = "pia's patient passphrase";
+    let srv = server(&[EMAIL]).await;
+    let a = TestCore::connected(&srv.url).await;
+    a.core.signup_send_code(EMAIL.into()).await.unwrap();
+    a.core
+        .signup_verify_code(EMAIL.into(), OTT.into())
+        .await
+        .unwrap();
+    // Cancelled during the key work: the verified code still counts.
+    let cut = tokio::time::timeout(
+        Duration::from_millis(1),
+        a.core.signup_prepare(PASSWORD.into(), true),
+    )
+    .await;
+    assert!(cut.is_err(), "Argon2id finished in 1 ms?");
+    let words = a.core.signup_prepare(PASSWORD.into(), true).await.unwrap();
+    // Cancel the upload at several points (before, during and after the
+    // requests); every retry still has what it needs.
+    for ms in [0, 1, 2, 4, 8, 16] {
+        let r = tokio::time::timeout(Duration::from_millis(ms), a.core.signup_finish()).await;
+        // (A cut right after the last request may still have signed in.)
+        if r.is_ok() || a.core.current_account().is_some() {
+            break;
+        }
+        assert_eq!(a.core.current_account(), None);
+        assert_eq!(
+            a.core.signup_prepare(PASSWORD.into(), true).await.unwrap(),
+            words
+        );
+    }
+    if a.core.current_account().is_none() {
+        a.core.signup_finish().await.unwrap();
+    }
+    assert_eq!(a.core.recovery_key_words().unwrap(), words);
+    done(
+        TestCore::connected(&srv.url)
+            .await
+            .core
+            .login(EMAIL.into(), PASSWORD.into())
+            .await
+            .unwrap(),
+    );
+}

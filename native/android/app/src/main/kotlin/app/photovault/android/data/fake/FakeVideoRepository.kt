@@ -15,11 +15,17 @@ class FakeVideoRepository(
     val requested = mutableListOf<Long>()
     var stopCount = 0
         private set
+    var openCount = 0
+        private set
 
     override suspend fun videoStream(fileId: Long): VideoStream? {
         requested += fileId
         if (fileId in failing) throw CoreError.Network("stream unavailable")
         return streams[fileId]
+    }
+
+    override fun viewerOpened() {
+        openCount++
     }
 
     override fun stopStreams() {
