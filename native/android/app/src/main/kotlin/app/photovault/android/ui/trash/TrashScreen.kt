@@ -88,10 +88,10 @@ fun TrashScreen(vm: TrashViewModel, onBack: () -> Unit) {
                             Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.trash_delete_forever), tint = p.text)
                         }
                         IconButton(onClick = { more = true }) {
-                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more), tint = p.text)
+                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.albums_more), tint = p.text)
                         }
                         DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
-                            DropdownMenuItem(text = { Text(stringResource(R.string.select_all)) }, onClick = { more = false; vm.selectAll() })
+                            DropdownMenuItem(text = { Text(stringResource(R.string.albums_select_all)) }, onClick = { more = false; vm.selectAll() })
                         }
                     }
                 } else {

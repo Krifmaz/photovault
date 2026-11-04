@@ -282,7 +282,7 @@ fun NameDialog(title: String, initial: String, confirm: String, onConfirm: (Stri
                 Text(confirm, color = p.accent2)
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = p.muted) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.albums_cancel), color = p.muted) } },
     )
 }
 
@@ -303,7 +303,7 @@ fun ConfirmDialog(
         title = { Text(title, color = p.text) },
         text = { if (body != null) Text(body, color = p.muted) },
         confirmButton = { TextButton(onClick = onConfirm) { Text(confirm, color = if (danger) p.err else p.accent2) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = p.muted) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.albums_cancel), color = p.muted) } },
     )
 }
 
@@ -328,7 +328,7 @@ fun AlbumPickerDialog(
         NameDialog(
             title = stringResource(R.string.albums_new),
             initial = "",
-            confirm = stringResource(R.string.create),
+            confirm = stringResource(R.string.albums_create),
             onConfirm = { onNew(it) },
             onDismiss = { naming = false },
         )
@@ -352,7 +352,7 @@ fun AlbumPickerDialog(
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = p.muted) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.albums_cancel), color = p.muted) } },
     )
 }
 

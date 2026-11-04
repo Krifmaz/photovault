@@ -147,7 +147,7 @@ fun AlbumScreen(
                         }
                         if (details != null && !details.isDefaultHidden) {
                             IconButton(onClick = { menu = true }) {
-                                Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more), tint = p.text)
+                                Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.albums_more), tint = p.text)
                             }
                             AlbumMenu(details, menu, onDismiss = { menu = false }, onShare = onShare, onDialog = { dialog = it }, vm = vm)
                         }
@@ -197,7 +197,7 @@ fun AlbumScreen(
         AlbumDialog.Rename -> if (d != null) NameDialog(
             title = stringResource(R.string.album_rename),
             initial = d.collection.name,
-            confirm = stringResource(R.string.save),
+            confirm = stringResource(R.string.albums_save),
             onConfirm = { vm.rename(it); dialog = null },
             onDismiss = { dialog = null },
         )
@@ -285,10 +285,10 @@ private fun SelectionActions(d: AlbumDetails?, onDialog: (AlbumDialog) -> Unit, 
         }
     }
     IconButton(onClick = { more = true }) {
-        Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more), tint = p.text)
+        Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.albums_more), tint = p.text)
     }
     DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
-        DropdownMenuItem(text = { Text(stringResource(R.string.select_all)) }, onClick = { more = false; vm.selectAll() })
+        DropdownMenuItem(text = { Text(stringResource(R.string.albums_select_all)) }, onClick = { more = false; vm.selectAll() })
         if (d.owned && !d.isDefaultHidden) {
             DropdownMenuItem(text = { Text(stringResource(R.string.album_remove_from)) }, onClick = { more = false; vm.removeSelected() })
             DropdownMenuItem(text = { Text(stringResource(R.string.album_hide_photos)) }, onClick = { more = false; vm.hideSelected() })
@@ -310,7 +310,7 @@ private fun DeleteAlbumDialog(onKeep: () -> Unit, onTrash: () -> Unit, onDismiss
             Column(horizontalAlignment = Alignment.End) {
                 androidx.compose.material3.TextButton(onClick = onKeep) { Text(stringResource(R.string.album_delete_keep), color = p.accent2) }
                 androidx.compose.material3.TextButton(onClick = onTrash) { Text(stringResource(R.string.album_delete_trash), color = p.err) }
-                androidx.compose.material3.TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = p.muted) }
+                androidx.compose.material3.TextButton(onClick = onDismiss) { Text(stringResource(R.string.albums_cancel), color = p.muted) }
             }
         },
     )

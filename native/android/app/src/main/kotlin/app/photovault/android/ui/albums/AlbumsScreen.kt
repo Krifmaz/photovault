@@ -173,7 +173,7 @@ fun AlbumsScreen(
         NameDialog(
             title = stringResource(R.string.albums_new),
             initial = "",
-            confirm = stringResource(R.string.create),
+            confirm = stringResource(R.string.albums_create),
             onConfirm = vm::createAlbum,
             onDismiss = { creating = false },
         )

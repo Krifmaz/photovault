@@ -412,8 +412,8 @@ private fun PasswordDialog(onSet: (String) -> Unit, onDismiss: () -> Unit) {
                 PasswordField(value = pw, onValueChange = { pw = it }, label = stringResource(R.string.signin_password), onIme = { if (pw.isNotEmpty()) onSet(pw) })
             }
         },
-        confirmButton = { TextButton(onClick = { onSet(pw) }, enabled = pw.isNotEmpty()) { Text(stringResource(R.string.save), color = p.accent2) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = p.muted) } },
+        confirmButton = { TextButton(onClick = { onSet(pw) }, enabled = pw.isNotEmpty()) { Text(stringResource(R.string.albums_save), color = p.accent2) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.albums_cancel), color = p.muted) } },
     )
 }
 
