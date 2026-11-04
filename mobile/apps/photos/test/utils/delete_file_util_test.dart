@@ -148,7 +148,8 @@ void main() {
           },
         );
 
-        await tester.tap(find.text('Delete from Ente'));
+        // PHOTOVAULT: string rebranded (deleteFromEnte).
+        await tester.tap(find.text('Delete from Photovault'));
         await tester.pumpAndSettle();
 
         expect(remoteDeleteCalls, 1);
