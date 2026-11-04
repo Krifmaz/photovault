@@ -1,0 +1,161 @@
+# Perf tooling: Macrobenchmark / Baseline Profile test APKs and the Flutter frame test.
+#
+#   pull_request (perf/** changed)  check + build: shell/python/dart checks, then
+#                                   assemble + lint of perf/android. No app needed.
+#   workflow_dispatch               the same, plus, when apk_run_id is given, an API 34
+#                                   x86_64 emulator smoke run of the macrobenchmarks
+#                                   against the APK artifacts of that run.
+#
+# Emulator numbers are not 120 Hz numbers. The pass/fail check is
+# perf/scripts/device-120hz.sh on a real 120 Hz phone with release builds
+# (see perf/README.md).
+name: Perf
+
+on:
+  pull_request:
+    paths:
+      - "perf/**"
+      - ".github/workflows/perf.yml"
+  workflow_dispatch:
+    inputs:
+      apk_run_id:
+        description: "Actions run id whose artifacts hold the app APKs (empty = build/compile only)"
+        required: false
+        default: ""
+      apk_artifact_pattern:
+        description: "Artifact name pattern in that run (glob)"
+        required: false
+        default: "*"
+      iterations:
+        description: "Macrobenchmark iterations on the emulator"
+        required: false
+        default: "3"
+
+concurrency:
+  group: perf-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read  # download artifacts from another run
+
+env:
+  GRADLE_VERSION: "8.14.3"
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck -x perf/scripts/*.sh
+      - name: Python report helper
+        run: |
+          python3 -m py_compile perf/scripts/perf_report.py
+          python3 perf/scripts/perf_report.py --help >/dev/null
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - name: Dart syntax (Flutter perf test and driver)
+        # Parse check only; analysis needs the Flutter app, which is not on this branch.
+        run: dart format --output=none perf/flutter
+
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+      - name: Assemble and lint perf/android
+        run: gradle -p perf/android --stacktrace assemble lint
+      - name: Upload test APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-test-apks
+          if-no-files-found: error
+          path: |
+            perf/android/macrobenchmark/build/outputs/apk/**/*.apk
+            perf/android/baselineprofile/build/outputs/apk/**/*.apk
+      - name: Upload lint reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-lint-reports
+          if-no-files-found: ignore
+          path: perf/android/**/build/reports/lint-results-*.*
+
+  emulator:
+    needs: [check, build]
+    if: github.event_name == 'workflow_dispatch' && inputs.apk_run_id != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Download perf test APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: perf-test-apks
+          path: perf-apks
+      - name: Download app APKs from run ${{ inputs.apk_run_id }}
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.apk_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: ${{ inputs.apk_artifact_pattern }}
+          merge-multiple: true
+          path: app-apks
+      - name: Identify APKs by package name
+        id: apks
+        run: |
+          set -euo pipefail
+          aapt2="$(find "$ANDROID_HOME/build-tools" -name aapt2 -type f | sort -V | tail -n 1)"
+          test_apk="$(find perf-apks -name 'macrobenchmark-release.apk' | head -n 1)"
+          [ -n "$test_apk" ] || test_apk="$(find perf-apks -name 'macrobenchmark-*.apk' | head -n 1)"
+          args="--test-apk $test_apk"
+          found=0
+          while IFS= read -r -d '' apk; do
+            pkg="$("$aapt2" dump packagename "$apk" 2>/dev/null || true)"
+            case "$pkg" in
+              app.photovault.native) args="$args --native-apk $apk"; found=1 ;;
+              app.photovault) args="$args --flutter-apk $apk"; found=1 ;;
+              *) echo "skipping $apk (package '$pkg')" ;;
+            esac
+          done < <(find app-apks -name '*.apk' -print0)
+          [ "$found" = 1 ] || { echo "::error::no app.photovault or app.photovault.native APK in run ${{ inputs.apk_run_id }}"; exit 1; }
+          echo "args=$args" >> "$GITHUB_OUTPUT"
+          echo "device-120hz.sh $args"
+      - name: Macrobenchmark smoke run (API 34 x86_64 emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          ITERATIONS: ${{ inputs.iterations }}
+        with:
+          api-level: 34
+          arch: x86_64
+          # google_apis images carry ARM-to-x86 translation, needed because the
+          # release APKs are arm64-v8a only. The apps themselves use no Google services.
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: >-
+            bash perf/scripts/device-120hz.sh --emulator --smoke --iterations "$ITERATIONS"
+            ${{ steps.apks.outputs.args }} --out perf/results
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-emulator-results
+          if-no-files-found: ignore
+          path: perf/results/

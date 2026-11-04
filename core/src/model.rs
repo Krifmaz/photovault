@@ -184,6 +184,39 @@ pub struct RemoteMagicMetadata {
 pub struct CollectionUser {
     /// User id.
     pub id: i64,
+    /// Email (owner and sharees).
+    #[serde(default)]
+    pub email: String,
+    /// Participant role of a sharee (`VIEWER`, `COLLABORATOR`, `ADMIN`).
+    #[serde(default)]
+    pub role: String,
+}
+
+/// A public link of a collection (`ente.PublicURL`).
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RemotePublicUrl {
+    /// The link, without the key fragment.
+    #[serde(default)]
+    pub url: String,
+    /// 0 = unlimited.
+    #[serde(default)]
+    pub device_limit: i64,
+    /// Expiry, µs; 0 = never.
+    #[serde(default)]
+    pub valid_till: i64,
+    /// Viewers may download originals.
+    #[serde(default)]
+    pub enable_download: bool,
+    /// Viewers may add photos.
+    #[serde(default)]
+    pub enable_collect: bool,
+    /// Signed-in viewers may join the album.
+    #[serde(default)]
+    pub enable_join: bool,
+    /// The link asks for a password.
+    #[serde(default)]
+    pub password_enabled: bool,
 }
 
 /// A collection as `GET /collections/v2` and `POST /collections` return it.
@@ -222,6 +255,12 @@ pub struct RemoteCollection {
     /// Owner's private magic metadata (subType, visibility, order).
     #[serde(default)]
     pub magic_metadata: Option<RemoteMagicMetadata>,
+    /// People the collection is shared with (owner's view).
+    #[serde(default)]
+    pub sharees: Option<Vec<CollectionUser>>,
+    /// Public links.
+    #[serde(default, rename = "publicURLs")]
+    pub public_urls: Option<Vec<RemotePublicUrl>>,
 }
 
 /// `POST /collections` request.

@@ -113,7 +113,16 @@ pub async fn signup(base: &str, email: &str, password: &str) -> Account {
     .expect("attributes");
 
     let login_key = crypto::derive_login_key(&kek).unwrap();
-    let srp_user_id = "0b7e6d1c-5a4f-4e3d-8c2b-1a0f9e8d7c6b";
+    // A fresh UUID per account (the server keys SRP attributes by it).
+    let r = hex::encode(crypto::random_bytes(16));
+    let srp_user_id = &format!(
+        "{}-{}-4{}-8{}-{}",
+        &r[0..8],
+        &r[8..12],
+        &r[13..16],
+        &r[17..20],
+        &r[20..32]
+    );
     let srp_salt = crypto::random_bytes(16);
     let ver = verifier(srp_user_id.as_bytes(), &srp_salt, &login_key);
     let mut srp = SrpClient::new(srp_user_id.as_bytes(), &srp_salt, &login_key);

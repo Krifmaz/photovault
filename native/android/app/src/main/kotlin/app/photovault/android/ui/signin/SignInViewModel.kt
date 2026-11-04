@@ -36,6 +36,8 @@ data class SignInUiState(
     val problem: SignInProblem? = null,
     /** A code was (re)sent to [email]; the code screen says so. */
     val codeSent: Boolean = false,
+    /** The active server accepts new accounts (saved server info; null until read). */
+    val signupsAllowed: Boolean? = null,
 )
 
 /** Where the sign-in goes next (LoginStep -> screen). */
@@ -70,12 +72,12 @@ class SignInViewModel(
 
     init {
         viewModelScope.launch {
-            val label = withContext(io) {
+            val (label, signups) = withContext(io) {
                 val active = core.activeBaseUrl()
                 val server = core.savedServers().firstOrNull { it.publicUrl == active || it.homeUrl == active }
-                server?.name?.takeIf { it.isNotBlank() } ?: server?.publicUrl ?: active.orEmpty()
+                (server?.name?.takeIf { it.isNotBlank() } ?: server?.publicUrl ?: active.orEmpty()) to server?.signupsAllowed
             }
-            _state.update { it.copy(serverLabel = label) }
+            _state.update { it.copy(serverLabel = label, signupsAllowed = signups) }
         }
     }
 

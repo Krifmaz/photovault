@@ -89,7 +89,7 @@ fn require_m2(client: &SrpClient, m2: &Option<String>, what: &str) -> Result<()>
 }
 
 /// A v4 UUID from libsodium randomness (SRP identities).
-fn uuid_v4() -> String {
+pub(crate) fn uuid_v4() -> String {
     let mut b = crypto::random_bytes(16);
     b[6] = (b[6] & 0x0f) | 0x40;
     b[8] = (b[8] & 0x3f) | 0x80;

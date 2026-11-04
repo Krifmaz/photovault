@@ -12,10 +12,15 @@ import kotlinx.coroutines.withContext
 /**
  * The timeline as loaded so far, shared by the grid and the viewer: pages of [CHUNK] from core's
  * `timeline_page` (local store only, newest first), appended on demand as the user scrolls.
+ *
+ * [countOf] and [pageOf] default to the timeline; an album passes its own (`collection_page`), so the album grid
+ * and the viewer share one store the same way.
  */
 class TimelineStore(
-    private val core: CoreRepository,
+    core: CoreRepository,
     private val io: CoroutineDispatcher = Dispatchers.IO,
+    private val countOf: () -> Long = core::timelineCount,
+    private val pageOf: (offset: Long, limit: Int) -> List<TimelineItem> = core::timelinePage,
 ) {
     private val mutex = Mutex()
     private val _items = MutableStateFlow<List<TimelineItem>>(emptyList())
@@ -42,14 +47,14 @@ class TimelineStore(
         var attempt = 0
         while (true) {
             val (stable, count, fresh) = withContext(io) {
-                val count = core.timelineCount()
+                val count = countOf()
                 val out = ArrayList<TimelineItem>(minOf(count, keep.toLong()).toInt())
                 while (out.size < keep && out.size < count) {
-                    val page = core.timelinePage(out.size.toLong(), CHUNK)
+                    val page = pageOf(out.size.toLong(), CHUNK)
                     if (page.isEmpty()) break
                     out += page
                 }
-                Triple(core.timelineCount() == count, count, out)
+                Triple(countOf() == count, count, out)
             }
             if (stable || ++attempt >= MAX_RELOADS) {
                 _total.value = count
@@ -73,7 +78,7 @@ class TimelineStore(
                 val current = _items.value
                 val expected = _total.value
                 val (before, page, after) = withContext(io) {
-                    Triple(core.timelineCount(), core.timelinePage(current.size.toLong(), CHUNK), core.timelineCount())
+                    Triple(countOf(), pageOf(current.size.toLong(), CHUNK), countOf())
                 }
                 if (before != expected || after != expected) {
                     reloadLocked(maxOf(index, current.size))

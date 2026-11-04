@@ -11,6 +11,7 @@
 - [Configuration](configuration.md)
 - [Storage backends](storage.md)
 - [LAN discovery](discovery.md)
+- [Models and music](asset-mirror.md)
 - [Observability](observability.md)
 - [Admin CLI](admin-cli.md)
 

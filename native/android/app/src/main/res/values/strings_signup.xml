@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Create account (contract v1.2 signup) -->
+    <string name="signin_signups_closed">This server isn\'t accepting new accounts. Ask the person who runs it to create one for you.</string>
+
+    <string name="signup_title">Create account</string>
+    <string name="signup_subtitle">on %1$s</string>
+    <string name="signup_email_action">Continue</string>
+    <string name="signup_have_account">I already have an account</string>
+    <string name="signup_password_title">Choose a password</string>
+    <string name="signup_password_subtitle">Your photos are encrypted with keys made from this password. Nobody can reset it for you, not even the server\'s owner.</string>
+    <string name="signup_password">Password</string>
+    <string name="signup_confirm">Confirm password</string>
+    <string name="signup_strength_weak">Password strength: weak</string>
+    <string name="signup_strength_moderate">Password strength: moderate</string>
+    <string name="signup_strength_strong">Password strength: strong</string>
+    <string name="signup_password_action">Send code</string>
+    <string name="signup_code_subtitle">We sent a 6-digit code to %1$s to confirm it\'s yours.</string>
+    <string name="signup_making_keys">Generating your encryption keys… This takes a few seconds.</string>
+    <string name="signup_recovery_title">Save your recovery key</string>
+    <string name="signup_recovery_subtitle">If you forget your password, these 24 words are the only way to get into your account. Write them down or keep them in a password manager.</string>
+    <string name="signup_recovery_copy">Copy</string>
+    <string name="signup_recovery_copied">Copied</string>
+    <string name="signup_recovery_clip_label">Recovery key</string>
+    <string name="signup_recovery_saved">I saved my recovery key</string>
+    <string name="signup_recovery_action">Continue</string>
+    <string name="signup_recovery_words">Recovery key, 24 words</string>
+
+    <string name="signup_missing">Fill in every field.</string>
+    <string name="signup_invalid_email">Enter a valid email address.</string>
+    <string name="signup_too_weak">Choose a stronger password: make it longer or mix in other kinds of characters.</string>
+    <string name="signup_already_registered">This email already has an account. Sign in instead.</string>
+    <string name="signup_not_saved">Confirm that you saved your recovery key first.</string>
+</resources>
