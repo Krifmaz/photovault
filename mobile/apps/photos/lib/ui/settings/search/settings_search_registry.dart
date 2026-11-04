@@ -7,7 +7,6 @@ import "package:flutter/material.dart";
 import "package:hugeicons/hugeicons.dart";
 import "package:photos/core/configuration.dart";
 import "package:photos/service_locator.dart";
-import "package:photos/ui/settings/about/about_us_page.dart";
 import "package:photos/ui/settings/account/account_settings_page.dart";
 import "package:photos/ui/settings/appearance/appearance_settings_page.dart";
 import "package:photos/ui/settings/backup/backup_settings_page.dart";
@@ -617,19 +616,9 @@ class SettingsSearchRegistry {
       ]);
     }
 
-    // PHOTOVAULT: removed Ente's Help & Support entries.
-    items.add(
-      SettingsSearchItem(
-        title: l10n.about,
-        sectionPath: l10n.about,
-        icon: HugeIcons.strokeRoundedInformationCircle,
-        routeBuilder: (_) => const AboutUsPage(),
-        keywords: ["version", "license"], // PHOTOVAULT
-      ),
-    );
-
-    // PHOTOVAULT: removed the About sub-entries (What's new, open source,
-    // blog, privacy, terms, check for updates): all were Ente links/services.
+    // PHOTOVAULT: removed Ente's Help & Support entries and About (with its
+    // sub-entries: What's new, open source, blog, privacy, terms, check for
+    // updates). The app has no About page.
 
     return items;
   }

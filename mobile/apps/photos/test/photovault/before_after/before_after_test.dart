@@ -45,7 +45,6 @@ import "package:photos/ui/home/grant_permissions_widget.dart";
 import "package:photos/ui/home/header_error_widget.dart";
 import "package:photos/ui/home/landing_page_widget.dart";
 import "package:photos/ui/home/loading_photos_widget.dart";
-import "package:photos/ui/settings/about/about_us_page.dart";
 import "package:photos/ui/settings/account/account_settings_page.dart";
 import "package:photos/ui/settings/backup/free_space_options.dart";
 import "package:photos/ui/settings/ml/machine_learning_settings_page.dart";
@@ -301,7 +300,6 @@ final _screens = <_Screen>[
       await tester.drag(find.byType(Scrollable).first, const Offset(0, -4000));
     },
   ),
-  _Screen("about", () => const AboutUsPage()),
   _Screen(
     "account-settings",
     () => _withUserDetails(const AccountSettingsPage()),
