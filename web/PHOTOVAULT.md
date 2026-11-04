@@ -192,15 +192,20 @@ Photos app (settings and gallery):
   subscription status line. Where Ente opened the plan selector (storage card,
   "subscription" action) we open family management, so family stays reachable.
 - `components/sidebar/accounts/{Account,subscription,ManageMemberSubscription}.tsx`,
-  `components/FamilyManagement.tsx`: "Manage plan" row becomes "Family"; its
-  subtitle is the member count when in a family with others, otherwise none
-  (no plan storage or billing period); no Stripe customer portal; families can
-  be created without a paid plan (the server decides). No "plan" wording on
-  the family screens: "Family" / "Share your storage with up to five family
-  members…", "Leave family", "You are in a family managed by", and on
+  `components/FamilyManagement.tsx`: "Manage plan" row becomes "Family" with
+  storage only (upstream's family/member-limit storage, no billing period); no
+  Stripe customer portal; families can be created without a paid plan (the
+  server decides). No "plan" wording on the family screens: "Family" / "Share
+  your storage with up to five family members…", "Shared storage", "Leave
+  family", "You are in a family managed by", and on
   `apps/accounts/src/pages/family.tsx` "…invited you to share their storage"
-  (new `pv_family_*` / `pv_leave_family*` strings in `en-US` only; other
-  locales fall back to English).
+  (titles use Ente's translated `family` key). The reworded strings are new
+  `pv_family_*` / `pv_leave_family*` keys in `en-US` only, read through
+  `packages/base/photovault/i18n.ts` (new, `pvT(pvKey, upstreamKey)`): a
+  locale without the `pv_*` key shows Ente's translated string (e.g.
+  `leave_family_plan`) rather than English. Known limitation: in those
+  locales the family screens still say "plan" until the `pv_*` strings are
+  translated.
 - Deleted: `components/PlanSelector.tsx`, `pages/plan.tsx`,
   `components/sidebar/ReferralSettings.tsx`, `services/storage-bonus.ts`,
   `components/{WhatsNew,DesktopWhatsNew}.tsx`, `services/changelog.ts`,

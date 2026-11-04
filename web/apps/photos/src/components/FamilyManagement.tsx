@@ -44,6 +44,7 @@ import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
 import { isSxArray } from "ente-base/components/utils/sx";
 import { useBaseContext } from "ente-base/context";
 import { isHTTPErrorWithStatus } from "ente-base/http";
+import { pvT } from "ente-base/photovault/i18n";
 import {
     uploadSheetMediaQuery,
     uploadSheetPaperSx,
@@ -138,8 +139,11 @@ export const FamilyManagement: React.FC<FamilyManagementProps> = ({
     const confirmLeave = () =>
         showMiniDialog({
             // PHOTOVAULT: strip - no "plan" wording.
-            title: t("pv_leave_family"),
-            message: t("pv_leave_family_confirm"),
+            title: pvT("pv_leave_family", "leave_family_plan"),
+            message: pvT(
+                "pv_leave_family_confirm",
+                "leave_family_plan_confirm",
+            ),
             continue: {
                 text: t("leave"),
                 color: "critical",
@@ -324,7 +328,7 @@ const FamilyIntroduction: React.FC<{
                 }}
             >
                 {/* PHOTOVAULT: strip - shared storage, not a shared plan. */}
-                {t("pv_family_description")}
+                {pvT("pv_family_description", "family_plan_description")}
             </Typography>
         </Stack>
         <FocusVisibleButton
@@ -516,7 +520,12 @@ const FamilyDashboard: React.FC<FamilyDashboardProps> = ({
                 )
             ) : (
                 <FocusVisibleButton color="critical" onClick={onLeave}>
-                    {t("pv_leave_family") /* PHOTOVAULT: strip */}
+                    {
+                        pvT(
+                            "pv_leave_family",
+                            "leave_family_plan",
+                        ) /* PHOTOVAULT: strip */
+                    }
                 </FocusVisibleButton>
             )}
         </Stack>

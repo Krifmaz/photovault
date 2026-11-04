@@ -10,6 +10,7 @@ import { FocusVisibleButton } from "ente-base/components/mui/FocusVisibleButton"
 import type { ModalVisibilityProps } from "ente-base/components/utils/modal";
 import { isSxArray } from "ente-base/components/utils/sx";
 import { useBaseContext } from "ente-base/context";
+import { pvT } from "ente-base/photovault/i18n";
 import {
     uploadSheetMediaQuery,
     uploadSheetPaperSx,
@@ -39,8 +40,11 @@ export const ManageMemberSubscription: React.FC<
     const confirmLeaveFamily = () =>
         showMiniDialog({
             // PHOTOVAULT: strip - no "plan" wording.
-            title: t("pv_leave_family"),
-            message: t("pv_leave_family_confirm"),
+            title: pvT("pv_leave_family", "leave_family_plan"),
+            message: pvT(
+                "pv_leave_family_confirm",
+                "leave_family_plan_confirm",
+            ),
             continue: {
                 text: t("leave"),
                 color: "critical",
@@ -108,7 +112,12 @@ export const ManageMemberSubscription: React.FC<
                         color: "text.muted",
                     }}
                 >
-                    {t("pv_family_shared_storage") /* PHOTOVAULT: strip */}
+                    {
+                        pvT(
+                            "pv_family_shared_storage",
+                            "family_plan",
+                        ) /* PHOTOVAULT: strip */
+                    }
                 </Typography>
                 <Stack
                     direction="row"
@@ -143,7 +152,12 @@ export const ManageMemberSubscription: React.FC<
                                 color: "text.muted",
                             }}
                         >
-                            {t("pv_family_managed_by") /* PHOTOVAULT: strip */}
+                            {
+                                pvT(
+                                    "pv_family_managed_by",
+                                    "subscription_info_family",
+                                ) /* PHOTOVAULT: strip */
+                            }
                         </Typography>
                         <Typography
                             sx={{
@@ -175,7 +189,12 @@ export const ManageMemberSubscription: React.FC<
                             }),
                         })}
                     >
-                        {t("pv_leave_family") /* PHOTOVAULT: strip */}
+                        {
+                            pvT(
+                                "pv_leave_family",
+                                "leave_family_plan",
+                            ) /* PHOTOVAULT: strip */
+                        }
                     </FocusVisibleButton>
                 </Stack>
             </Stack>
