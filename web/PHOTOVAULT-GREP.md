@@ -25,23 +25,21 @@ left in the scope (the Play Store / App Store footer in
 `GalleryMedia.tsx` was removed). There is no Sentry/analytics SDK in these
 apps; logs stay local ("View logs" saves a file or opens the log folder).
 
-## `ente.io` / `ente.com`: all unreachable, non-network, or not user-visible
+## `ente.io` / `ente.com`: no Ente host is contacted
 
-Unreachable: `isCustomAPIOrigin` is always `true` and `customAPIOrigin()`
-always returns a server (see `packages/base/origins.ts`), so these Ente-hosted
-branches never run. They are left as in upstream to keep merges small.
+The Ente CDN, uploader and redirect branches (thumbnails/files/public-albums/
+cast-albums.ente.com, photos/albums/ente.com redirects, the
+`ente://albums.ente.io` deep link) were removed in the second strip pass, so
+media always comes from the configured server. Left, all outside Photovault's
+own apps or not network calls:
 
-| File                                                                                       | What                                   | Why left                                                                                                     |
-| ------------------------------------------------------------------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `packages/gallery/services/download.ts` (thumbnails/files/public-albums.ente.com)          | CDN fetches used when no custom origin | unreachable                                                                                                  |
-| `packages/media/public-albums.ts` (`public-albums.ente.com`)                               | last fallback after `customOrigin`     | unreachable (`customOrigin` is always set)                                                                   |
-| `apps/albums/.../thumbnail-manager.ts`, `.../download-manager.ts` (public-albums.ente.com) | same CDN branch                        | unreachable                                                                                                  |
-| `apps/cast/src/services/render.ts` (cast-albums.ente.com)                                  | same CDN branch                        | unreachable                                                                                                  |
-| `apps/albums/.../PublicAlbumPage.tsx` (photos.ente.com, albums.ente.com, ente.com)         | redirects for Ente-hosted builds       | guarded by `!isCustomAPIOrigin` → unreachable                                                                |
-| `apps/embed/src/pages/index.tsx` (ente.com)                                                | redirect for Ente-hosted builds        | guarded by `!isCustomAPIOrigin` → unreachable                                                                |
-| `apps/albums/.../join-public-album-redirect.ts` (`ente://albums.ente.io` deep link)        | Android "Join album" deep link         | skipped in Photovault builds (`isPhotovaultBuild`); "Join album" now redirects to Photos on the same origin. |
-| `packages/accounts/components/auth/SignUpForm.tsx` (ente.com/terms, /privacy)              | terms checkbox                         | rendered only for non-Photovault apps (Auth/Locker)                                                          |
-| `packages/accounts/pages/two-factor/recover.tsx` (support@ente.com)                        | support e-mail                         | rendered only for non-Photovault apps                                                                        |
+| File                                                                          | What                                                                        | Why left                                                                                                                                                       |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/accounts/components/auth/SignUpForm.tsx` (ente.com/terms, /privacy) | terms checkbox                                                              | rendered only for non-Photovault apps (Auth/Locker), out of scope                                                                                              |
+| `packages/accounts/pages/two-factor/recover.tsx` (support@ente.com)           | support e-mail                                                              | rendered only for non-Photovault apps (Auth/Locker); Photovault apps say "contact your server's administrator" (`/photovault/info` has no admin contact field) |
+| `apps/photos/src/components/collections/AlbumCastDialog.tsx` (cast.ente.com)  | comment on Ente's Chromecast receiver app id `F5BCEC64`                     | Auto pair is hidden; the id in `utils/chromecast-sender.ts` is unchanged (pending a Photovault receiver registration)                                          |
+| `scripts/photovault-vendor-assets.mjs` (assets.ente.com)                      | build-time download of the places/cities/ffmpeg data into `/static-assets/` | build step only, overridable with `PHOTOVAULT_ASSETS_SOURCE`; the apps never contact it                                                                        |
+| `rust/crates/ml` (models.ente.com)                                            | ML model downloads (desktop native ML)                                      | pending a decision on where models come from                                                                                                                   |
 
 Not network calls / not shown:
 
@@ -94,9 +92,7 @@ Code-string hits (`photovault-brand-audit.mjs`) by kind:
   `pvCredit = "Based on Ente"` (Settings → Help → About); the desktop About
   panel uses the same plain-text line (`desktop/src/main/photovault/brand.ts`,
   `desktop/src/main.ts`).
-- Ente-hosted URLs (thumbnails/files/public-albums/cast-albums.ente.com,
-  photos/albums/ente.com redirects, `ente://albums.ente.io`): unreachable, see
-  the table above.
+- Ente-hosted URLs: only in comments now (see the table above).
 - Shown only in Ente's other apps, never in Photovault apps:
   `packages/base/app.ts` titles "Ente Auth", "Ente Locker", "Ente Legacy Kit",
   "Ente Space"; `packages/accounts/components/auth/SignUpForm.tsx`

@@ -3,9 +3,9 @@ import { detectMediaMIMEType } from "@/services/detect-type";
 import { decryptStreamBytes } from "ente-base/crypto";
 import { fetchCastFile } from "ente-base/file-download";
 import { nameAndExtension } from "ente-base/file-name";
-import { ensureOk, isHTTP401Error, publicRequestHeaders } from "ente-base/http";
+import { ensureOk, isHTTP401Error } from "ente-base/http";
 import log from "ente-base/log";
-import { apiURL, customAPIOrigin } from "ente-base/origins";
+import { apiURL } from "ente-base/origins";
 import {
     decryptRemoteFile,
     FileDiffResponse,
@@ -163,27 +163,14 @@ const downloadFile = async (
     if (!isImageOrLivePhoto(file))
         throw new Error("Can only cast images and live photos");
 
-    const customOrigin = await customAPIOrigin();
-
-    const getFile = () => {
-        if (customOrigin) {
-            return fetchCastFile(
-                file.id,
-                shouldUseThumbnail ? "thumbnail" : "file",
-                castToken,
-            );
-        } else {
-            const url = shouldUseThumbnail
-                ? `https://cast-albums.ente.com/preview/?fileID=${file.id}`
-                : `https://cast-albums.ente.com/download/?fileID=${file.id}`;
-            return fetch(url, {
-                headers: {
-                    ...publicRequestHeaders(),
-                    "X-Cast-Access-Token": castToken,
-                },
-            });
-        }
-    };
+    // PHOTOVAULT: strip - always from the configured server (Ente's
+    // self-hosted path), never Ente's cast-albums.ente.com CDN.
+    const getFile = () =>
+        fetchCastFile(
+            file.id,
+            shouldUseThumbnail ? "thumbnail" : "file",
+            castToken,
+        );
 
     const res = await getFile();
     ensureOk(res);

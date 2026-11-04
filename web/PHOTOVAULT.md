@@ -125,12 +125,25 @@ Server and network:
 - `packages/base/origins.ts`: `customAPIOrigin()` always resolves (saved
   server → `NEXT_PUBLIC_ENTE_ENDPOINT` → the page's own http(s) origin →
   `http://localhost:8080`) and `isCustomAPIOrigin` is always true, so Ente's
-  existing self-hosted code paths run everywhere. The Ente-hosted branches
-  (thumbnails/files/public-albums/cast-albums CDN hosts, uploader worker,
-  ente.com redirects, Ente og:image metadata) are left in place
-  upstream-style but are unreachable. Also new: `staticAssetURL()` for data
+  existing self-hosted code paths run everywhere. The uploader worker and Ente
+  og:image metadata are gone; the Ente CDN and redirect branches are removed
+  too (next item). Also new: `staticAssetURL()` for data
   Ente loads from assets.ente.com. Desktop builds vendor the same files
   (`desktop/package.json` `build-renderer*`, see desktop/PHOTOVAULT.md).
+- No Ente host fallback at all (files, thumbnails and public/cast album media
+  always come from the configured server, Ente's self-hosted path):
+  `packages/gallery/services/download.ts` (thumbnails/files/public-albums.ente.com
+  branches; the `background` download option only chose Ente's proxy, so the
+  transport ignores it), `packages/media/public-albums.ts`
+  (`public-albums.ente.com` fallback), `apps/albums/.../thumbnail-manager.ts`
+  and `.../download-manager.ts` (public-albums.ente.com),
+  `apps/cast/src/services/render.ts` (cast-albums.ente.com),
+  `apps/photobook/src/lib/ente/import.ts` (public-albums.ente.com default).
+- `apps/albums/.../PublicAlbumPage.tsx`: "Login" on an expired link goes to
+  Photos at the root of this origin (was `router.push("/")`, i.e. the albums
+  app itself, or photos.ente.com); no trip-album redirect to albums.ente.com
+  (the check always returns false) and no ente.com redirect without a token.
+  `apps/embed/src/pages/index.tsx`: no ente.com redirect without a token.
 - `apps/photos/src/services/places.ts`, `packages/new/photos/services/search/worker.ts`,
   `packages/gallery/services/ffmpeg/web.ts`: places index, world cities and the
   ffmpeg.wasm core load from `/static-assets/` on our origin.
@@ -212,8 +225,9 @@ Shared packages and other apps:
   texts without "Ente".
 - `apps/albums/.../access/services/join-public-album-redirect.ts`: "Join
   album" goes to Photos at the root of this origin (`/?joinAlbum=…`), not
-  photos.ente.com, and never tries the `ente://` deep link (Ente's own app also
-  handles it and would send the token to Ente's servers).
+  photos.ente.com. The `ente://albums.ente.io` Android deep link code is
+  removed (Ente's own app also handles it and would send the token to Ente's
+  servers).
 - `apps/albums`: no "Join Ente" buttons (`page/PublicAlbumPage.tsx`,
   `components/TripLayout/{TopNavButtons,MobileNavBar}.tsx`,
   `viewer/components/PublicAlbumSingleFileViewer.tsx`), wordmark not linked;

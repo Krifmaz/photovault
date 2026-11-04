@@ -25,8 +25,8 @@ export async function prepareEnteAlbum(
     const credentials: EnteCredentials = {
         ...parsedCredentials,
         linkDeviceToken: await getKVS(deviceTokenKey),
-        downloadOrigin:
-            (await customAPIOrigin()) ?? "https://public-albums.ente.com",
+        // PHOTOVAULT: strip - the configured server, no Ente CDN fallback.
+        downloadOrigin: await customAPIOrigin(),
     };
     const info = await getPublicCollectionInfo(credentials);
     if (info.linkDeviceToken) {

@@ -14,7 +14,7 @@ import {
     type PublicAlbumsCredentials,
 } from "ente-base/http";
 import log from "ente-base/log";
-import { apiOrigin, isCustomAPIOrigin } from "ente-base/origins";
+import { apiOrigin } from "ente-base/origins";
 import { downloadManager } from "ente-gallery/services/download";
 import { extractCollectionKeyFromShareURL } from "ente-gallery/services/share";
 import type { Collection } from "ente-media/collection";
@@ -156,17 +156,11 @@ export default function EmbedGallery() {
 
     useEffect(() => {
         const main = async () => {
-            let redirectingToWebsite = false;
             try {
                 const currentURL = new URL(window.location.href);
                 const accessToken = accessTokenFromURL(currentURL);
                 const ck = await extractCollectionKeyFromShareURL(currentURL);
-                if (!accessToken && !ck) {
-                    if (!isCustomAPIOrigin) {
-                        window.location.href = "https://ente.com";
-                        redirectingToWebsite = true;
-                    }
-                }
+                // PHOTOVAULT: strip - no redirect to ente.com without a token.
                 if (!accessToken || !ck) {
                     return;
                 }
@@ -204,9 +198,7 @@ export default function EmbedGallery() {
 
                 await publicAlbumsRemotePull();
             } finally {
-                if (!redirectingToWebsite) {
-                    setLoading(false);
-                }
+                setLoading(false);
             }
         };
 
