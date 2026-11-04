@@ -47,6 +47,14 @@ pub struct Config {
     pub web_origins: Vec<String>,
     /// Announce the server on the LAN with mDNS/DNS-SD (`PHOTOVAULT_MDNS`, default true).
     pub mdns: bool,
+    /// Serve the ML models and memory music the apps would otherwise fetch from
+    /// Ente's CDN, caching each file in `<config_dir>/assets` on first use
+    /// (`PHOTOVAULT_ASSET_MIRROR`, default true). See `crate::asset_mirror`.
+    pub asset_mirror: bool,
+    /// Where the mirror fetches models (`PHOTOVAULT_MODELS_UPSTREAM`).
+    pub models_upstream: String,
+    /// Where the mirror fetches the memory music (`PHOTOVAULT_MUSIC_UPSTREAM`).
+    pub music_upstream: String,
     /// Tests only: report this many free bytes instead of asking the storage backend.
     #[serde(skip)]
     pub free_space_override: Option<i64>,
@@ -215,6 +223,9 @@ impl Default for Config {
             home_url: None,
             web_origins: vec![],
             mdns: true,
+            asset_mirror: true,
+            models_upstream: "https://models.ente.com".into(),
+            music_upstream: "https://music.ente.com".into(),
             free_space_override: None,
             admins: vec![],
             allow_signups: false,
@@ -355,6 +366,15 @@ impl Config {
         }
         if let Some(v) = env("PHOTOVAULT_MDNS") {
             self.mdns = flag(&v);
+        }
+        if let Some(v) = env("PHOTOVAULT_ASSET_MIRROR") {
+            self.asset_mirror = flag(&v);
+        }
+        if let Some(v) = env("PHOTOVAULT_MODELS_UPSTREAM") {
+            self.models_upstream = v.trim().trim_end_matches('/').to_string();
+        }
+        if let Some(v) = env("PHOTOVAULT_MUSIC_UPSTREAM") {
+            self.music_upstream = v.trim().trim_end_matches('/').to_string();
         }
         self.apply_smtp_env(env)?;
         Ok(())

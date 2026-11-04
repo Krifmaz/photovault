@@ -23,6 +23,9 @@ Precedence: environment variable > `--config` TOML > `/config/keys.toml` (keys o
 | `PHOTOVAULT_WEB_DIR` | `/app/web` (image) | Built web app served on the API port: `$uri`, `$uri.html`, `$uri/index.html`, then the nearest sub-app `index.html` (`/albums/`, `/cast/`, `/accounts/`, else root) for extension-less paths; `_next/static` cached immutable |
 | `PHOTOVAULT_WEB_ORIGINS` | unset (= any origin) | When set, CORS is restricted to this comma-separated list; `/photovault/info` stays open |
 | `PHOTOVAULT_MDNS` | `true` | Announce `_photovault._tcp` |
+| `PHOTOVAULT_ASSET_MIRROR` | `true` | Serve ML models and memories music (cache-through, `contracts/asset-mirror.md`) |
+| `PHOTOVAULT_MODELS_UPSTREAM` | `https://models.ente.com` | Where the mirror fetches models |
+| `PHOTOVAULT_MUSIC_UPSTREAM` | `https://music.ente.com` | Where the mirror fetches the music manifest and tracks |
 | `PHOTOVAULT_LOG_FORMAT` | `pretty` | `pretty` or `json`; one line per event |
 | `PHOTOVAULT_ALLOW_SIGNUPS` | `false` | Open sign-up |
 | `PHOTOVAULT_ADMINS` | unset | Admin user ids (comma-separated) |
