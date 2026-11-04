@@ -56,6 +56,7 @@ pub fn api(state: &AppState) -> Router<AppState> {
         .merge(objects::router())
         .merge(passkeys::router())
         .merge(photovault::router())
+        .merge(crate::asset_mirror::router(state.config.asset_mirror))
         .merge(public_collection::router())
         .merge(push::router())
         .merge(remote_store::router())
