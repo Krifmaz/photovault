@@ -142,6 +142,12 @@ line = "enteMusicManifestUrl = \"https://music\\.ente\\.com/tracks\\.json\""
 category = "pending-user-decision"
 reason = "Memories music fallback, used only when the server advertises no music mirror (musicManifestUrl, contracts/asset-mirror.md)."
 [[allow]]
+path = "apk:lib/*/libapp.so"
+term = "ente.com"
+line = "^https://music\\.ente\\.com/tracks\\.json$"
+category = "pending-user-decision"
+reason = "Compiled PhotovaultServerAssets.enteMusicManifestUrl: memories music fallback, used only when the server advertises no music mirror."
+[[allow]]
 path = "rust/bindings/frb/photos/src/api/ml_indexing_api.rs"
 term = "ente.com"
 line = "set_url_mirror\\(\"https://models\\.ente\\.com/\""
