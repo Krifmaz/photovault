@@ -96,6 +96,16 @@ pub(crate) async fn refresh(inner: &Inner) -> Result<()> {
     ops::refresh_locked(inner).await
 }
 
+/// Whether [`refresh`] has work even if no `mldata` or `cgroup` changed:
+/// nothing was built for this account yet, the library index changed
+/// since the last build, or cluster changes still wait to be pushed.
+pub(crate) fn needs_refresh(inner: &Inner) -> bool {
+    let Some(s) = snapshot(inner) else {
+        return true;
+    };
+    !Arc::ptr_eq(&s.index, &inner.index()) || !s.pending.is_empty()
+}
+
 /// People (named first, then unnamed clusters with at least
 /// `min_files` files), hidden ones only if `include_hidden`.
 pub(crate) fn people(inner: &Inner, include_hidden: bool, min_files: u32) -> Vec<Person> {

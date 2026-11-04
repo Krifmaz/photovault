@@ -489,16 +489,23 @@ async fn sync(inner: &Arc<Inner>, listener: Option<&Arc<dyn MlListener>>) -> Res
         return Ok(());
     }
     let user_id = inner.session()?.account.user_id;
-    pull_diff(inner, &api, user_id, listener).await?;
-    hydrate(inner, &api, user_id, listener).await?;
+    let mut changed = pull_diff(inner, &api, user_id, listener).await?;
+    changed |= hydrate(inner, &api, user_id, listener).await?;
     let me = inner.clone();
-    blocking(move || prune(&me)).await??;
+    changed |= blocking(move || prune(&me)).await??;
     invalidate_counts(inner);
     notify(inner, listener);
 
     let cgroups = super::entity::sync(inner, super::entity::CGROUP).await;
     let locations = super::entity::sync(inner, super::entity::LOCATION).await;
-    data_changed(inner).await?;
+    changed |= matches!(cgroups, Ok(true)) || matches!(locations, Ok(true));
+    // Reclustering and the people snapshot cost seconds on a large
+    // library: only when something changed, the library index moved, or
+    // a push to people is still due (this runs before every indexing
+    // batch too).
+    if changed || super::faces::needs_refresh(inner) {
+        data_changed(inner).await?;
+    }
     cgroups?;
     locations?;
     notify(inner, listener);
@@ -524,13 +531,15 @@ async fn data_changed(inner: &Arc<Inner>) -> Result<()> {
     result
 }
 
-/// `/files/data/status-diff` from the saved cursor to the end.
+/// `/files/data/status-diff` from the saved cursor to the end. Returns
+/// whether the diff listed anything.
 async fn pull_diff(
     inner: &Arc<Inner>,
     api: &crate::api::Api,
     user_id: i64,
     listener: Option<&Arc<dyn MlListener>>,
-) -> Result<()> {
+) -> Result<bool> {
+    let mut changed = false;
     let mut since: i64 = inner
         .store()
         .get_plain(kv::STATUS_SINCE)?
@@ -553,6 +562,7 @@ async fn pull_diff(
         if page.is_empty() {
             break;
         }
+        changed = true;
         let mut next = since;
         let mut want = Vec::new();
         let mut deleted = Vec::new();
@@ -586,7 +596,7 @@ async fn pull_diff(
         }
         since = next;
     }
-    Ok(())
+    Ok(changed)
 }
 
 /// Fetch, decrypt and store the `mldata` of `ids` (files of the library;
@@ -670,12 +680,14 @@ fn open_remote(fd: &filedata::RemoteFileData, key: &[u8]) -> Option<RemoteMlData
 
 /// Look up library files that were never looked up, and once a day the
 /// files shared by others (whose `mldata` the diff does not list).
+/// Returns whether any `mldata` was stored.
 async fn hydrate(
     inner: &Arc<Inner>,
     api: &crate::api::Api,
     user_id: i64,
     listener: Option<&Arc<dyn MlListener>>,
-) -> Result<()> {
+) -> Result<bool> {
+    let mut changed = false;
     let now = crate::store::now_us();
     let me = inner.clone();
     let (unchecked, others) = blocking(move || -> Result<(Vec<i64>, Option<Vec<i64>>)> {
@@ -706,36 +718,43 @@ async fn hydrate(
     })
     .await??;
     for chunk in unchecked.chunks(filedata::FETCH_BATCH) {
-        fetch_and_store(inner, api, user_id, chunk, true).await?;
+        changed |= !fetch_and_store(inner, api, user_id, chunk, true)
+            .await?
+            .is_empty();
         invalidate_counts(inner);
         notify(inner, listener);
     }
     if let Some(others) = others {
         for chunk in others.chunks(filedata::FETCH_BATCH) {
-            fetch_and_store(inner, api, user_id, chunk, false).await?;
+            changed |= !fetch_and_store(inner, api, user_id, chunk, false)
+                .await?
+                .is_empty();
         }
         inner
             .store()
             .put_plain(KV_OTHERS_CHECKED, &now.to_string())?;
     }
-    Ok(())
+    Ok(changed)
 }
 
-/// Drop ML rows of files no longer in the library.
-fn prune(inner: &Inner) -> Result<()> {
+/// Drop ML rows of files no longer in the library. Returns whether any
+/// `mldata` was dropped.
+fn prune(inner: &Inner) -> Result<bool> {
     let idx = inner.index();
     let ids: HashSet<i64> = idx.all_items().iter().map(|i| i.id).collect();
     let data = data_rows(inner)?;
     let local = local_rows(inner)?;
     let st = inner.store();
+    let mut changed = false;
     for id in data.keys().filter(|i| !ids.contains(i)) {
         st.delete_ml_data(*id)?;
+        changed = true;
     }
     for id in local.keys().filter(|i| !ids.contains(i)) {
         st.conn()
             .execute("DELETE FROM ml_local WHERE file_id = ?1", params![id])?;
     }
-    Ok(())
+    Ok(changed)
 }
 
 // ------------------------------------------------------------ indexing
