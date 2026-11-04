@@ -181,7 +181,7 @@ jobs:
         run: |
           mkdir -p .github/release/rootfs/data .github/release/rootfs/config .github/release/rootfs/app/web
           if [ -f web/apps/photos/out/index.html ]; then cp -r web/apps/photos/out/. .github/release/rootfs/app/web/; fi
-          for app in albums cast accounts; do if [ -f web/apps/$app/out/index.html ]; then mkdir -p .github/release/rootfs/app/web/$app && cp -r web/apps/$app/out/. .github/release/rootfs/app/web/$app/; fi; done
+          for app in albums cast accounts embed; do if [ -f web/apps/$app/out/index.html ]; then mkdir -p .github/release/rootfs/app/web/$app && cp -r web/apps/$app/out/. .github/release/rootfs/app/web/$app/; fi; done
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
         with:
