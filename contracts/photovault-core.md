@@ -54,6 +54,9 @@ Rules:
   id: i64, collection_id: i64, kind: FileKind, taken_at_us: i64,
   width: u32, height: u32, duration_ms: Option<u32>, has_stream: bool, title: String,
 }
+// [contract v1.2] map: a timeline file with a location (pubMagic lat/long over metadata latitude/longitude;
+// 0,0 and out-of-range mean none, as in Ente's apps)
+#[derive(uniffi::Record)] pub struct MapPoint { file_id: i64, latitude: f64, longitude: f64, taken_at_us: i64 }
 #[derive(uniffi::Record)] pub struct Collection {
   id: i64, name: String, kind: String, cover_file_id: Option<i64>, count: u64, updated_at_us: i64,
 }
@@ -99,6 +102,9 @@ Rules:
   fn timeline_page(&self, offset: u64, limit: u32) -> Vec<TimelineItem>;   // newest first, local only
   fn collections(&self) -> Vec<Collection>;
   fn collection_page(&self, collection_id: i64, offset: u64, limit: u32) -> Vec<TimelineItem>;
+  fn map_points(&self) -> Vec<MapPoint>;                                     // [contract v1.2] newest first
+  // [contract v1.2] timeline items taken on now's local date (utc offset) in earlier years, newest first
+  fn on_this_day(&self, now_us: i64, utc_offset_secs: i32, limit: u32) -> Vec<TimelineItem>;
   async fn thumbnail(&self, file_id: i64) -> Result<Vec<u8>, CoreError>;  // decrypted, disk cache encrypted at rest
   async fn download(&self, file_id: i64, dest_path: String) -> Result<String, CoreError>;
   async fn stream_playlist(&self, file_id: i64) -> Result<Option<String>, CoreError>;

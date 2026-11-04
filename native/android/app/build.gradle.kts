@@ -5,6 +5,8 @@ plugins {
 }
 
 // contracts/apps.json "photovault-native"
+// Map tiles: Ente's apps use OpenStreetMap's standard tiles; -Pphotovault.mapTiles=<template> for your own tile server.
+val mapTiles: String = providers.gradleProperty("photovault.mapTiles").orElse("https://tile.openstreetmap.org/{z}/{x}/{y}.png").get().trim()
 val defaultServer: String = providers.gradleProperty("photovault.defaultServer").orElse("").get().trim()
 val pvVersionName: String = providers.gradleProperty("photovault.versionName").orElse("0.1.0-beta").get()
 val pvVersionCode: Int = providers.gradleProperty("photovault.versionCode").orElse("1").get().toInt()
@@ -38,6 +40,7 @@ android {
         versionName = pvVersionName
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"${defaultServer.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("boolean", "REAL_CORE", hasRealCore.toString())
+        buildConfigField("String", "MAP_TILE_URL", "\"${mapTiles.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("boolean", "DEMO", forceDemo.toString())
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")

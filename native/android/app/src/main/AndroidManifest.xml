@@ -39,5 +39,40 @@
                 <data android:scheme="photovault" android:host="passkey" />
             </intent-filter>
         </activity>
+
+        <!-- Home-screen widgets (plain RemoteViews). -->
+        <receiver
+            android:name=".widget.MemoriesWidget"
+            android:exported="false"
+            android:label="@string/widget_memories_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_memories" />
+        </receiver>
+        <receiver
+            android:name=".widget.AlbumWidget"
+            android:exported="false"
+            android:label="@string/widget_album_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_album" />
+        </receiver>
+        <!-- The launcher starts this when an Album widget is placed, so it must be exported. -->
+        <activity
+            android:name=".widget.AlbumPickerActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Photovault">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

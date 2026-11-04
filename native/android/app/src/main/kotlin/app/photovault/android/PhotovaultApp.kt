@@ -9,6 +9,7 @@ import app.photovault.android.data.NsdLanDiscovery
 import app.photovault.android.data.TimelineStore
 import app.photovault.android.ui.image.buildImageLoader
 import app.photovault.android.ui.timeline.TimelineLabels
+import app.photovault.android.widget.WidgetRefresh
 import coil3.ImageLoader
 import coil3.PlatformContext
 import app.photovault.android.data.NetworkWatcher
@@ -52,7 +53,12 @@ class AppGraph(private val context: Context) {
     fun clearDecrypted() {
         SingletonImageLoader.get(context).memoryCache?.clear()
         appScope.launch { viewerCache.listFiles()?.forEach { it.delete() } }
+        // widgets of the old account must not keep showing its photos
+        refreshWidgets()
     }
+
+    /** Re-renders the home-screen widgets (after a sync, sign-in or sign-out). */
+    fun refreshWidgets() = WidgetRefresh.all(context)
 
     /** Re-runs core's home/public address choice when the device's network changes. */
     fun watchNetwork() {
