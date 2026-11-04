@@ -126,6 +126,9 @@ pub async fn send_email_ott(
             && st == SignUpState::NoAccount
             && !crate::settings::signups_allowed(state).await
         {
+            tracing::warn!(
+                "Sign-up refused for {email}: sign-ups are off. Turn them on with `photovault admin signups on`, or create the account with `photovault admin create-user {email}`"
+            );
             return Err(permission_denied());
         }
         if purpose == purpose::SIGNUP && st == SignUpState::Complete {
