@@ -20,7 +20,7 @@ private class FakeEngine : PlaybackEngine {
     var events: PlaybackEngine.Listener? = null
     val calls = mutableListOf<String>()
     var loaded: VideoSource? = null
-    var isMuted = false
+    var volumeOff = false
     var released = false
     override var positionMs = 0L
     override var durationMs = 0L
@@ -49,7 +49,7 @@ private class FakeEngine : PlaybackEngine {
     }
 
     override fun setMuted(muted: Boolean) {
-        isMuted = muted
+        volumeOff = muted
     }
 
     override fun stop() {
@@ -202,12 +202,12 @@ class VideoPlaybackControllerTest {
 
         // Mute sticks to the shared player across videos.
         h.controller.toggleMute()
-        assertTrue(h.engine.isMuted && h.controller.state.value.muted)
+        assertTrue(h.engine.volumeOff && h.controller.state.value.muted)
         h.controller.open(video(2))
         runCurrent()
         assertTrue(h.controller.state.value.muted)
         h.controller.toggleMute()
-        assertFalse(h.engine.isMuted)
+        assertFalse(h.engine.volumeOff)
 
         // At the end the controls show; play starts over.
         h.engine.startPlaying()
