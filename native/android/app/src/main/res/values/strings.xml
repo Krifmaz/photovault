@@ -92,4 +92,29 @@
 
     <!-- Viewer -->
     <string name="viewer_video_error">Can\'t play this video. %1$s</string>
+
+    <!-- Map -->
+    <string name="timeline_map">Map</string>
+    <string name="map_attribution">© OpenStreetMap contributors</string>
+    <string name="map_loading">Loading places…</string>
+    <string name="map_empty">No photos with a location yet</string>
+    <string name="map_none_here">No photos in this area</string>
+    <plurals name="map_photos_here">
+        <item quantity="one">%1$d photo here</item>
+        <item quantity="other">%1$d photos here</item>
+    </plurals>
+
+    <!-- Home-screen widgets -->
+    <string name="widget_memories_label">On this day</string>
+    <string name="widget_memories_description">A photo from this day in earlier years, or a recent one</string>
+    <string name="widget_album_label">Album</string>
+    <string name="widget_album_description">Photos from an album you choose</string>
+    <string name="widget_sign_in">Open Photovault to sign in</string>
+    <string name="widget_no_photos">No photos yet</string>
+    <string name="widget_years_ago">%1$d years ago</string>
+    <string name="widget_one_year_ago">1 year ago</string>
+    <string name="widget_recent">Recent</string>
+    <string name="widget_pick_album">Choose an album</string>
+    <string name="widget_pick_album_empty">No albums yet. Sync in the app first.</string>
+    <string name="widget_album_missing">Album not found</string>
 </resources>

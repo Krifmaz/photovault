@@ -91,6 +91,12 @@ internal class RealCore(private val core: Core) : CoreRepository {
     override fun collectionPage(collectionId: Long, offset: Long, limit: Int): List<TimelineItem> =
         core.collectionPage(collectionId, offset.coerceAtLeast(0).toULong(), limit.coerceAtLeast(0).toUInt()).map { it.toApp() }
 
+    override fun mapPoints(): List<MapPoint> =
+        core.mapPoints().map { MapPoint(it.fileId, it.latitude, it.longitude, it.takenAtUs) }
+
+    override fun onThisDay(nowUs: Long, utcOffsetSecs: Int, limit: Int): List<TimelineItem> =
+        core.onThisDay(nowUs, utcOffsetSecs, limit.coerceAtLeast(0).toUInt()).map { it.toApp() }
+
     override suspend fun thumbnail(fileId: Long): ByteArray = guard { core.thumbnail(fileId) }
 
     override suspend fun download(fileId: Long, destPath: String): String = guard { core.download(fileId, destPath) }

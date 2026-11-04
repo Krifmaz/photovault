@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -27,6 +29,9 @@ import app.photovault.android.ui.signin.SignInEvents
 import app.photovault.android.ui.signin.SignInScreen
 import app.photovault.android.ui.signin.SignInViewModel
 import app.photovault.android.ui.signin.TotpScreen
+import app.photovault.android.ui.map.MapScreen
+import app.photovault.android.ui.map.MapViewModel
+import app.photovault.android.ui.map.timelineIndexOf
 import app.photovault.android.ui.timeline.TimelineScreen
 import app.photovault.android.ui.timeline.TimelineViewModel
 import app.photovault.android.ui.viewer.ViewerScreen
@@ -122,7 +127,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                 }
                 composable<TimelineRoute> { entry ->
                     val vm = viewModel {
-                        TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels(), clearDecrypted = graph::clearDecrypted)
+                        TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels(), clearDecrypted = graph::clearDecrypted, onSynced = graph::refreshWidgets)
                     }
                     val handle = entry.savedStateHandle
                     val returned = remember(handle) { handle.getStateFlow<Int?>(NavResults.VIEWER_INDEX, null) }
@@ -134,8 +139,24 @@ fun AppNav(graph: AppGraph, start: Any) {
                             onOpen = { index, fileId -> nav.navigate(ViewerRoute(index, fileId)) },
                             onSignedOut = { nav.navigateClearing(AuthGraph) },
                             onSwitchServer = { nav.navigate(ConnectRoute) },
+                            onMap = { nav.navigate(MapRoute) { launchSingleTop = true } },
                         )
                     }
+                }
+                composable<MapRoute> {
+                    val vm = viewModel { MapViewModel(graph.core) }
+                    val scope = rememberCoroutineScope()
+                    MapScreen(
+                        vm = vm,
+                        onOpen = { fileId ->
+                            // the viewer pages through the timeline: open it at this photo's position
+                            scope.launch {
+                                val index = graph.timeline.timelineIndexOf(fileId) ?: return@launch
+                                nav.navigate(ViewerRoute(index, fileId)) { launchSingleTop = true }
+                            }
+                        },
+                        onBack = { nav.popBackStack() },
+                    )
                 }
                 composable<ViewerRoute> { entry ->
                     val route = entry.toRoute<ViewerRoute>()

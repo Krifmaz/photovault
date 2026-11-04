@@ -34,6 +34,10 @@ data object TimelineRoute
 @Serializable
 data class ViewerRoute(val index: Int, val fileId: Long)
 
+/** Photos on a map. */
+@Serializable
+data object MapRoute
+
 /** Results handed back through the previous back stack entry's SavedStateHandle. */
 object NavResults {
     const val QR_PAYLOAD = "qr_payload"

@@ -6,6 +6,7 @@ import app.photovault.android.data.CoreError
 import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.FileKind
 import app.photovault.android.data.LoginStep
+import app.photovault.android.data.MapPoint
 import app.photovault.android.data.PhotoCollection
 import app.photovault.android.data.ServerInfo
 import app.photovault.android.data.StorageUsage
@@ -271,6 +272,28 @@ class FakeCore(
         return items.asSequence().filter { it.collectionId == collectionId }.drop(offset.toInt()).take(limit).toList()
     }
 
+    /** Two in three demo photos have a place: around a few cities, spread a little. */
+    override fun mapPoints(): List<MapPoint> {
+        if (currentAccount() == null) return emptyList()
+        return items.filter { it.id % 3 != 0L }.map { item ->
+            val (lat, lon) = DEMO_PLACES[(item.id % DEMO_PLACES.size).toInt()]
+            val jLat = ((item.id * 7919 % 1000) - 500) / 1000.0 * 0.08
+            val jLon = ((item.id * 104729 % 1000) - 500) / 1000.0 * 0.12
+            MapPoint(item.id, lat + jLat, lon + jLon, item.takenAtUs)
+        }
+    }
+
+    override fun onThisDay(nowUs: Long, utcOffsetSecs: Int, limit: Int): List<TimelineItem> {
+        if (currentAccount() == null || limit <= 0) return emptyList()
+        val zone = java.time.ZoneOffset.ofTotalSeconds(utcOffsetSecs.coerceIn(-18 * 3600, 18 * 3600))
+        fun date(us: Long) = java.time.Instant.ofEpochSecond(Math.floorDiv(us, 1_000_000L)).atOffset(zone).toLocalDate()
+        val today = date(nowUs)
+        return items.asSequence()
+            .filter { val d = date(it.takenAtUs); d.year < today.year && d.monthValue == today.monthValue && d.dayOfMonth == today.dayOfMonth }
+            .take(limit)
+            .toList()
+    }
+
     override suspend fun thumbnail(fileId: Long): ByteArray = withContext(ioDispatcher) {
         val item = byId(fileId)
         // Ente thumbnails are at most 720 px; a smaller placeholder keeps the demo light.
@@ -328,6 +351,8 @@ class FakeCore(
     }
 
     companion object {
+        /** Demo map places: Lisbon, Paris, Berlin, Reykjavik, Kyoto. */
+        private val DEMO_PLACES = listOf(38.72 to -9.14, 48.86 to 2.35, 52.52 to 13.40, 64.15 to -21.94, 35.01 to 135.77)
         const val DEMO_CODE = "123456"
         private const val MINUTE_US = 60_000_000L
         private const val HOUR_US = 60 * MINUTE_US

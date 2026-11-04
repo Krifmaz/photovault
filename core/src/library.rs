@@ -19,7 +19,9 @@ use crate::metadata::{
     SUB_TYPE_DEFAULT_HIDDEN, VISIBILITY_ARCHIVED, VISIBILITY_HIDDEN, decrypt_json, decrypt_magic,
 };
 use crate::model::*;
-use crate::{Collection, CoreError, FileKind, Result, SyncListener, SyncProgress, TimelineItem};
+use crate::{
+    Collection, CoreError, FileKind, MapPoint, Result, SyncListener, SyncProgress, TimelineItem,
+};
 use rusqlite::{OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -164,6 +166,11 @@ impl FileRec {
     fn archived(&self) -> bool {
         Self::i64_of(&self.magic, "visibility") == Some(VISIBILITY_ARCHIVED)
     }
+    /// Where the photo was taken: the user's edit (public magic `lat`/`long`)
+    /// over the metadata's `latitude`/`longitude`, as Ente's apps read it.
+    fn location(&self) -> Option<(f64, f64)> {
+        crate::places::location(&self.pub_magic, &self.metadata)
+    }
 }
 
 /// The in-memory library index.
@@ -177,6 +184,8 @@ pub struct Index {
     by_collection: HashMap<i64, Vec<u32>>,
     /// Visible collections, ready to return.
     collections: Vec<Collection>,
+    /// Timeline files with a location, newest first.
+    located: Vec<MapPoint>,
     /// Owned files by content hash, with their collections.
     pub(crate) hashes: HashMap<String, (i64, Vec<i64>)>,
 }
@@ -682,7 +691,9 @@ impl Inner {
             .filter_map(|b| opener.open_sealed::<FileRec>(b).ok())
             .collect();
         drop(opener);
-        let mut entries: Vec<(TimelineItem, Vec<i64>, bool)> = Vec::with_capacity(files.len());
+        // (item, collections, in timeline, location)
+        type Entry = (TimelineItem, Vec<i64>, bool, Option<(f64, f64)>);
+        let mut entries: Vec<Entry> = Vec::with_capacity(files.len());
         let mut hashes = HashMap::new();
         for f in files {
             let in_cols: Vec<i64> = members.get(&f.id).cloned().unwrap_or_default();
@@ -701,17 +712,26 @@ impl Inner {
             {
                 hashes.entry(h).or_insert((f.id, in_cols.clone()));
             }
-            entries.push((f.item(rep), in_cols, in_timeline));
+            let loc = if in_timeline { f.location() } else { None };
+            entries.push((f.item(rep), in_cols, in_timeline, loc));
         }
         entries.sort_by_key(|e| std::cmp::Reverse((e.0.taken_at_us, e.0.id)));
         let mut idx = Index {
             hashes,
             ..Default::default()
         };
-        for (pos, (item, in_cols, in_timeline)) in entries.into_iter().enumerate() {
+        for (pos, (item, in_cols, in_timeline, loc)) in entries.into_iter().enumerate() {
             let pos = pos as u32;
             if in_timeline {
                 idx.timeline.push(pos);
+            }
+            if let Some((latitude, longitude)) = loc {
+                idx.located.push(MapPoint {
+                    file_id: item.id,
+                    latitude,
+                    longitude,
+                    taken_at_us: item.taken_at_us,
+                });
             }
             for c in in_cols {
                 idx.by_collection.entry(c).or_default().push(pos);
@@ -766,6 +786,20 @@ impl Inner {
 
     pub fn collections(&self) -> Vec<Collection> {
         self.index().collections.clone()
+    }
+
+    pub fn map_points(&self) -> Vec<MapPoint> {
+        self.index().located.clone()
+    }
+
+    pub fn on_this_day(&self, now_us: i64, utc_offset_secs: i32, limit: u32) -> Vec<TimelineItem> {
+        let idx = self.index();
+        crate::places::on_this_day(
+            idx.timeline.iter().map(|&p| &idx.all[p as usize]),
+            now_us,
+            utc_offset_secs,
+            limit,
+        )
     }
 
     pub fn collection_page(
