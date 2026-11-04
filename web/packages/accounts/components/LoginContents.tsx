@@ -3,12 +3,17 @@ import {
     replaceSavedLocalUser,
     saveSRPAttributes,
 } from "ente-accounts/services/accounts-db";
+import {
+    serverEmailVerificationMode,
+    stashSkipEmailCode,
+} from "ente-accounts/services/photovault/email-code"; // PHOTOVAULT: email-skip
 import { getSRPAttributes } from "ente-accounts/services/srp";
 import { sendOTT } from "ente-accounts/services/user";
 import { appName } from "ente-base/app";
 import { isNamedError } from "ente-base/error";
 import { JOIN_ALBUM_CONTEXT_KEY } from "ente-base/join-album";
 import log from "ente-base/log";
+import { shouldAutoSubmitEmailCode } from "ente-base/photovault/server"; // PHOTOVAULT: email-skip
 import { useFormik } from "formik";
 import { t } from "i18next";
 import { useRouter } from "next/router";
@@ -55,8 +60,19 @@ export const LoginContents: React.FC<LoginContentsProps> = ({
         async (email: string) => {
             const srpAttributes = await getSRPAttributes(email);
             if (!srpAttributes || srpAttributes.isEmailMFAEnabled) {
-                await sendOTT(email, "login");
+                // PHOTOVAULT: email-skip - ask the server (in parallel)
+                // whether it emails codes; if not, /verify submits the code.
+                const [, emailVerification] = await Promise.all([
+                    sendOTT(email, "login"),
+                    serverEmailVerificationMode(),
+                ]);
                 replaceSavedLocalUser({ email });
+                if (
+                    shouldAutoSubmitEmailCode(emailVerification, {
+                        isEmailMFAEnabled: !!srpAttributes?.isEmailMFAEnabled,
+                    })
+                )
+                    stashSkipEmailCode(email);
                 void router.push("/verify");
             } else {
                 replaceSavedLocalUser({ email });

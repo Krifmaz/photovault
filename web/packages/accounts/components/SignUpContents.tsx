@@ -6,6 +6,10 @@ import {
     stashReferralSource,
     stashSRPSetupAttributes,
 } from "ente-accounts/services/accounts-db";
+import {
+    serverEmailVerificationMode,
+    stashSkipEmailCode,
+} from "ente-accounts/services/photovault/email-code"; // PHOTOVAULT: email-skip
 import { saveMasterKeyInSessionAndSafeStore } from "ente-accounts/services/prelogin-session";
 import {
     generateAndSaveInteractiveKeyAttributes,
@@ -22,7 +26,10 @@ import { isNamedError } from "ente-base/error";
 import { JOIN_ALBUM_CONTEXT_KEY } from "ente-base/join-album";
 import log from "ente-base/log";
 import { apiOrigin } from "ente-base/origins"; // PHOTOVAULT: connect
-import { checkServer } from "ente-base/photovault/server"; // PHOTOVAULT: connect
+import {
+    checkServer,
+    shouldAutoSubmitEmailCode, // PHOTOVAULT: email-skip
+} from "ente-base/photovault/server"; // PHOTOVAULT: connect
 import { useFormik } from "formik";
 import { t } from "i18next";
 import type { NextRouter } from "next/router";
@@ -120,6 +127,9 @@ export const SignUpContents: React.FC<SignUpContentsProps> = ({
                 const cleanedReferral = referral.trim();
                 if (cleanedReferral) stashReferralSource(cleanedReferral);
 
+                // PHOTOVAULT: email-skip - ask the server (in parallel) whether
+                // it emails codes at all.
+                const emailVerification = serverEmailVerificationMode();
                 await sendOTT(email, "signup");
                 replaceSavedLocalUser({ email });
                 const { masterKey, keyAttributes, srp } =
@@ -134,6 +144,9 @@ export const SignUpContents: React.FC<SignUpContentsProps> = ({
                 await saveMasterKeyInSessionAndSafeStore(masterKey);
 
                 saveJustSignedUp();
+                // PHOTOVAULT: email-skip - /verify submits the code itself.
+                if (shouldAutoSubmitEmailCode(await emailVerification))
+                    stashSkipEmailCode(email);
                 void router.push("/verify");
             } catch (e) {
                 if (isNamedError(e, "already_registered")) {

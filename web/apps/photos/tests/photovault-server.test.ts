@@ -4,11 +4,14 @@ import {
     checkServer,
     companionAppURL,
     connectQRPayload,
+    fetchEmailVerificationMode,
     isLocalNetworkHost,
     localServerFallback,
     normalizeServerURL,
     resolveServerOrigin,
     serverDisplayName,
+    shouldAutoSubmitEmailCode,
+    skippedEmailCode,
 } from "ente-base/photovault/server";
 import { describe, expect, it } from "vitest";
 
@@ -280,5 +283,102 @@ describe("checkServer", () => {
                 (await checkServer("https://x.example", { fetchFn })).kind,
             ).toBe("invalid");
         }
+    });
+});
+
+// PHOTOVAULT: email-skip - when the client submits the email code itself.
+describe("shouldAutoSubmitEmailCode", () => {
+    it("auto-submits only for skip", () => {
+        expect(shouldAutoSubmitEmailCode("skip")).toBe(true);
+        for (const mode of ["smtp", "log", "future", "", null, undefined])
+            expect(shouldAutoSubmitEmailCode(mode)).toBe(false);
+    });
+
+    it("keeps the code screen for accounts with email 2FA", () => {
+        expect(
+            shouldAutoSubmitEmailCode("skip", { isEmailMFAEnabled: true }),
+        ).toBe(false);
+        expect(
+            shouldAutoSubmitEmailCode("skip", { isEmailMFAEnabled: false }),
+        ).toBe(true);
+    });
+
+    it("sends a 6-digit code", () => {
+        expect(skippedEmailCode).toMatch(/^\d{6}$/);
+    });
+});
+
+describe("fetchEmailVerificationMode", () => {
+    const info = {
+        product: "photovault",
+        name: "Photovault",
+        version: "0.2.0",
+        publicUrl: "https://photos.example.com",
+        homeUrl: null,
+        signupsAllowed: true,
+    };
+    const respond = (body: unknown, status = 200) =>
+        (() =>
+            Promise.resolve(
+                new Response(JSON.stringify(body), { status }),
+            )) as unknown as typeof fetch;
+
+    it("reads emailVerification from /photovault/info only", async () => {
+        const urls: string[] = [];
+        const fetchFn = ((url: string) => {
+            urls.push(url);
+            return Promise.resolve(
+                new Response(
+                    JSON.stringify({ ...info, emailVerification: "skip" }),
+                ),
+            );
+        }) as unknown as typeof fetch;
+        expect(
+            await fetchEmailVerificationMode("http://10.0.1.7:8095", {
+                fetchFn,
+            }),
+        ).toBe("skip");
+        expect(urls).toEqual(["http://10.0.1.7:8095/photovault/info"]);
+    });
+
+    it("is undefined when the field is absent", async () => {
+        expect(
+            await fetchEmailVerificationMode("https://x.example", {
+                fetchFn: respond(info),
+            }),
+        ).toBeUndefined();
+    });
+
+    it("is undefined for a stock Ente server, errors and timeouts", async () => {
+        expect(
+            await fetchEmailVerificationMode("https://e.example", {
+                fetchFn: respond({ code: "NOT_FOUND" }, 404),
+            }),
+        ).toBeUndefined();
+        expect(
+            await fetchEmailVerificationMode("https://x.example", {
+                fetchFn: () => Promise.reject(new TypeError("x")),
+            }),
+        ).toBeUndefined();
+        const hang = ((_: string, init?: RequestInit) =>
+            new Promise((_resolve, reject) => {
+                init?.signal?.addEventListener("abort", () =>
+                    reject(new DOMException("aborted", "AbortError")),
+                );
+            })) as unknown as typeof fetch;
+        expect(
+            await fetchEmailVerificationMode("https://x.example", {
+                fetchFn: hang,
+                timeoutMs: 10,
+            }),
+        ).toBeUndefined();
+    });
+
+    it("keeps an unknown mode (which then shows the code screen)", async () => {
+        const mode = await fetchEmailVerificationMode("https://x.example", {
+            fetchFn: respond({ ...info, emailVerification: "future" }),
+        });
+        expect(mode).toBe("future");
+        expect(shouldAutoSubmitEmailCode(mode)).toBe(false);
     });
 });

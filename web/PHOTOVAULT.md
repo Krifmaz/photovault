@@ -431,6 +431,37 @@ Not done for the web app: the contract's home/public address switching rule
 (the web app is served by the server it talks to, so there is nothing to
 switch), and showing `/photovault/usage` "unlimited" on the storage card.
 
+## Email code on servers without SMTP (`PHOTOVAULT: email-skip`)
+
+`/photovault/info` may carry `emailVerification`: `"smtp"`, `"log"` or
+`"skip"` (contracts/server-info.md). With `"skip"` the server accepts any
+6-digit code while an OTT from `POST /users/ott` is pending, so the apps do
+not show the "Check your inbox" screen:
+
+- `packages/base/photovault/server.ts`: optional `emailVerification` in the
+  info model (a string, so a future value does not make the body invalid),
+  `skippedEmailCode` (`"000000"`), `shouldAutoSubmitEmailCode()` (only
+  `"skip"`, and not for accounts with email 2FA, which still need their real
+  code) and `fetchEmailVerificationMode()` (one `GET /photovault/info`, 3 s
+  timeout, never throws; a stock Ente server gives no mode). Tests in
+  `apps/photos/tests/photovault-server.test.ts`.
+- `packages/accounts/services/photovault/email-code.ts` (new): reads the mode
+  of the configured server and keeps a one-shot sessionStorage note
+  (`photovaultSkipEmailCode` = the email) for /verify.
+- `packages/accounts/components/SignUpContents.tsx` and `LoginContents.tsx`
+  (the email-code login branch only, not SRP): fetch the mode in parallel
+  with `sendOTT` (no extra wait; sign-up awaits it after key generation) and
+  leave the note when the code can be skipped.
+- `packages/accounts/pages/verify.tsx`: when the note matches the email, shows
+  a loading indicator and submits `skippedEmailCode` through the page's own
+  `onSubmit`, so success continues exactly as a typed code (`/generate` for a
+  new account, `/credentials`, two-factor or passkey). A wrong code or any
+  error shows the normal code screen. A reload of /verify shows the code
+  screen (the note is consumed).
+
+Absent field, `"smtp"`, `"log"` and stock Ente servers keep upstream's flow.
+Keys, SRP and 2FA are unchanged; only the email check is automated.
+
 ## Serving the web apps (static export)
 
 Build: `web/scripts/photovault-build.sh` (npm ci, wasm for prelogin/photos/cast,
