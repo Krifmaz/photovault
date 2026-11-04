@@ -163,6 +163,23 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   (`_handleConnectLink`, which opens the connect screen with the address filled
   in and looks it up. When an account is signed in, or a sign-up is half done,
   it only shows a toast that points to Settings > Server).
+- Email verification skip: when the active server's `/photovault/info` says
+  `"emailVerification": "skip"` (no SMTP; any 6-digit code is accepted after
+  `POST /users/ott`), sign-up and email-code login send the code `000000`
+  themselves instead of showing "Check your inbox", then continue exactly as
+  if it had been typed. If that code is refused (email 2FA accounts, stock
+  Ente server) the usual code screen is shown with no error. Absent field,
+  `smtp`, `log`, change of email, password reset and resends are unchanged.
+  The field is read from the cached active server (refreshed on start), so
+  there is no extra request. Files: `server_contract.dart`
+  (`emailVerification`, `skipsEmailVerification`, stored with the server),
+  new pure `lib/services/photovault/email_verification.dart`
+  (`shouldAutoSubmitEmailCode`, `kSkippedEmailCode`), and
+  `lib/services/account/user_service.dart` (`sendOtt` tries the code first;
+  `verifyEmail` returns whether it succeeded and takes `silentFailure`).
+  Photos' own `UserService` only; `packages/accounts` (Auth/Locker) is
+  untouched. Tests: `test/photovault/email_verification_test.dart`,
+  `test/photovault/email_verification_flow_test.dart`.
 - `ios/Runner/Info.plist`: `_photovault._tcp` in `NSBonjourServices`, the
   local-network prompt mentions the server, stale
   `FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED` key removed.
