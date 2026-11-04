@@ -72,6 +72,10 @@ dependencies:
     path: ../../packages/ente_pure_utils
   ente_qr:
     path: ../../packages/ente_qr
+  # PHOTOVAULT: server connection. Ente's live QR scanner (CameraX +
+  # zxing-cpp, which ente_qr already ships; no Google Play services).
+  ente_qr_scanner:
+    path: ../../packages/ente_qr_scanner
   ente_qr_ui:
     path: ../../packages/qr
   ente_screen_brightness:
@@ -155,6 +159,9 @@ dependencies:
     git:
       url: https://github.com/ente/move_to_background.git
       ref: 0cdfeed654d79636eff0c57110f3f6ad5801ba2f
+  # PHOTOVAULT: server connection. Pure-Dart mDNS for LAN server discovery
+  # (already in the tree through plugins/ente_cast).
+  multicast_dns: 0.3.3+1
   nanoid: 1.0.0
   native_dio_adapter: 1.6.0
   native_video_editor:

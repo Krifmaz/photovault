@@ -13,6 +13,8 @@ import 'package:photos/core/event_bus.dart'; // PHOTOVAULT: payments removed
 import 'package:photos/events/subscription_purchased_event.dart'; // PHOTOVAULT: payments removed
 import "package:photos/locale.dart";
 import "package:photos/service_locator.dart";
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
+import "package:photos/services/photovault/server_contract.dart"; // PHOTOVAULT
 import "package:photos/theme/ente_theme.dart";
 import 'package:photos/ui/account/email_entry_page.dart';
 import 'package:photos/ui/account/login_page.dart';
@@ -21,7 +23,9 @@ import 'package:photos/ui/account/password_reentry_page.dart';
 import 'package:photos/ui/components/buttons/button_widget.dart';
 import 'package:photos/ui/components/dialog_widget.dart';
 import 'package:photos/ui/components/models/button_type.dart';
+import "package:photos/ui/photovault/connect_server_page.dart"; // PHOTOVAULT
 import "package:photos/ui/photovault/photovault_glyph.dart";
+import "package:photos/ui/photovault/photovault_server_chip.dart"; // PHOTOVAULT
 
 class LandingPageWidget extends StatefulWidget {
   const LandingPageWidget({required this.onStartWithoutAccount, super.key});
@@ -38,8 +42,29 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
     Future(_showAutoLogoutDialogIfRequired);
   }
 
+  // PHOTOVAULT: server connection. "Connect to your server" comes first;
+  // Ente's landing page (create account / log in) follows once a server is
+  // active.
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<PhotovaultServerInfo?>(
+      valueListenable: PhotovaultServerService.instance.activeServer,
+      builder: (context, server, _) {
+        if (server == null) {
+          return ConnectServerPage(
+            onConnected: () {},
+            onUseWithoutServer: localSettings.showLocalGalleryModeOption
+                ? _navigateWithoutAccount
+                : null,
+          );
+        }
+        return _buildEnteLanding(context, server);
+      },
+    );
+  }
+
+  // PHOTOVAULT: was build(); takes the active server.
+  Widget _buildEnteLanding(BuildContext context, PhotovaultServerInfo server) {
     final lightComponentTheme = ComponentTheme.lightTheme(
       app: ComponentApp.photos,
     );
@@ -110,17 +135,27 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
                           },
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: ButtonComponent(
-                          variant: ButtonComponentVariant.neutral,
-                          density: ButtonComponentDensity.compact,
-                          label: context.strings.createMyAccount,
-                          onTap: _navigateToSignUpPage,
-                          shouldSurfaceExecutionStates: false,
-                        ),
+                      // PHOTOVAULT: server connection. Which server, and a
+                      // way back to the connect screen.
+                      PhotovaultServerChip(
+                        server: server,
+                        onChange: _changeServer,
                       ),
                       const SizedBox(height: 12),
+                      // PHOTOVAULT: hidden when the server takes no sign-ups.
+                      if (server.signupsAllowed) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: ButtonComponent(
+                            variant: ButtonComponentVariant.neutral,
+                            density: ButtonComponentDensity.compact,
+                            label: context.strings.createMyAccount,
+                            onTap: _navigateToSignUpPage,
+                            shouldSurfaceExecutionStates: false,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: SizedBox(
@@ -224,6 +259,16 @@ class _LandingPageWidgetState extends State<LandingPageWidget> {
         );
       },
     );
+  }
+
+  // PHOTOVAULT: server connection. Back to the connect screen; a half-done
+  // sign-up on the old server is discarded with Ente's logout.
+  Future<void> _changeServer() async {
+    if (Configuration.instance.getToken() != null ||
+        Configuration.instance.getEncryptedToken() != null) {
+      await Configuration.instance.logout();
+    }
+    await PhotovaultServerService.instance.clearActive();
   }
 
   void _navigateWithoutAccount() {

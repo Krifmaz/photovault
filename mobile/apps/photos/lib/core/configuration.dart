@@ -47,6 +47,7 @@ import "package:photos/services/memory_share_service.dart";
 import 'package:photos/services/notification_key_service.dart';
 import "package:photos/services/notification_service.dart";
 import 'package:photos/services/photos_contacts_service.dart';
+import 'package:photos/services/photovault/photovault_server_service.dart'; // PHOTOVAULT
 import 'package:photos/services/search_service.dart';
 import 'package:photos/services/sync/sync_service.dart';
 import 'package:photos/services/video_preview_service.dart';
@@ -242,7 +243,16 @@ class Configuration implements LockScreenHost, AccountDeletionHost {
     await _clearTempFolderOnLogout();
 
     _cachedToken = null;
+    // PHOTOVAULT: server connection. Saved servers and the endpoint survive
+    // logout (upstream clears every preference here).
+    final keptServerPrefs = PhotovaultServerService.preserveOnLogout(
+      _preferences,
+    );
     await _preferences.clear();
+    await PhotovaultServerService.restoreAfterLogout(
+      _preferences,
+      keptServerPrefs,
+    );
     await _secureStorage.deleteAll();
     _key = null;
     _secretKey = null;

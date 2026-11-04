@@ -90,9 +90,9 @@ Rule used: internal identifiers, class/package names, API paths and fields, comm
   - L114 `_documentsDirectory + "/ente-shared-media";`: Internal temp-file / key prefix; not shown.
   - remaining hits are comments; internal.
 - `apps/photos/lib/core/constants.dart` (`ente.io`×1, `ente.com`×4, `ente (word)`×9, `sentry`×1):
-  - L39 `const kLegacyProductionEndpoint = 'https://api.ente.io';`: Upstream production endpoint constants; the server comes from dart-define `endpoint` / `setEndpoint()`.
-  - L38 `const kDefaultProductionEndpoint = 'https://api.ente.com';`: Upstream production endpoint constants; the server comes from dart-define `endpoint` / `setEndpoint()`.
-  - L40 `const kUploadProxyEndpoint = 'https://uploader.ente.com';`: Upstream production endpoint constants; the server comes from dart-define `endpoint` / `setEndpoint()`.
+  - L39 `const kLegacyProductionEndpoint = 'https://api.ente.io';`: Upstream production endpoint constants; the server comes from dart-define `PHOTOVAULT_SERVER` (or `endpoint`) / the connect screen via `setEndpoint()`; never a default.
+  - L38 `const kDefaultProductionEndpoint = 'https://api.ente.com';`: Upstream production endpoint constants; the server comes from dart-define `PHOTOVAULT_SERVER` (or `endpoint`) / the connect screen via `setEndpoint()`; never a default.
+  - L40 `const kUploadProxyEndpoint = 'https://uploader.ente.com';`: Upstream production endpoint constants; the server comes from dart-define `PHOTOVAULT_SERVER` (or `endpoint`) / the connect screen via `setEndpoint()`; never a default.
   - L34 `const supportEmail = 'support@ente.com';`: Unused constant kept for upstream compatibility; nothing displays it.
   - L23 `const String sharedMediaIdentifier = 'ente-shared-media://';`: Internal temp-file / key prefix; not shown.
   - L65 `const iOSGroupIDMemory = "group.io.ente.frame.EnteMemoryWidget";`: Platform identifier (namespace, bundle id, channel, task or app-group id); internal.
@@ -510,8 +510,8 @@ Rule used: internal identifiers, class/package names, API paths and fields, comm
 - `packages/base/pubspec.yaml` (`ente (word)`×1): Package name/description/repository metadata; not shown.
 - `packages/configuration/lib/app_identity.dart` (`referral`×2): only identifiers (class/field/variable names such as `StreamSubscription`, `EnteFile`, `Subscription` model); internal.
 - `packages/configuration/lib/constants.dart` (`ente.io`×1, `ente.com`×1, `ente (word)`×2):
-  - L2 `const kLegacyProductionEndpoint = 'https://api.ente.io';`: Upstream production endpoint constants; the server comes from dart-define `endpoint` / `setEndpoint()`.
-  - L1 `const kDefaultProductionEndpoint = 'https://api.ente.com';`: Upstream production endpoint constants; the server comes from dart-define `endpoint` / `setEndpoint()`.
+  - L2 `const kLegacyProductionEndpoint = 'https://api.ente.io';`: Upstream production endpoint constants; the server comes from dart-define `PHOTOVAULT_SERVER` (or `endpoint`) / the connect screen via `setEndpoint()`; never a default.
+  - L1 `const kDefaultProductionEndpoint = 'https://api.ente.com';`: Upstream production endpoint constants; the server comes from dart-define `PHOTOVAULT_SERVER` (or `endpoint`) / the connect screen via `setEndpoint()`; never a default.
 - `packages/configuration/pubspec.yaml` (`ente (word)`×1): Package name/description/repository metadata; not shown.
 - `packages/contacts/lib/src/db/contacts_database.dart` (`ente (word)`×1):
   - L14 `static const _databasePrefix = 'ente.contacts.';`: On-device database/index file name; internal.

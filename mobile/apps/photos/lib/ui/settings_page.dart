@@ -11,10 +11,16 @@ import "package:photos/emergency/emergency_page.dart";
 import "package:photos/models/user_details.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/services/account/user_service.dart";
+// PHOTOVAULT: server connection (Settings > Server)
+import "package:photos/services/photovault/photovault_server_service.dart";
+import "package:photos/services/photovault/photovault_strings.dart";
+import "package:photos/services/photovault/server_address.dart";
 import "package:photos/ui/account/login_page.dart";
 import "package:photos/ui/notification/toast.dart";
 // PHOTOVAULT: branding (footer with upstream credit)
+import "package:photos/ui/photovault/connect_server_page.dart"; // PHOTOVAULT
 import "package:photos/ui/photovault/photovault_settings_footer.dart";
+import "package:photos/ui/photovault/server_settings_page.dart"; // PHOTOVAULT
 import "package:photos/ui/settings/about/about_us_page.dart";
 import "package:photos/ui/settings/account/account_settings_page.dart";
 import "package:photos/ui/settings/appearance/appearance_settings_page.dart";
@@ -102,6 +108,17 @@ class _SettingsBody extends StatelessWidget {
               ),
               const SizedBox(height: 8),
             ],
+            // PHOTOVAULT: server connection. Settings > Server (current
+            // server, addresses, switch).
+            _buildMenuItem(
+              title: PhotovaultStrings.server,
+              subtitle: _serverSubtitle(),
+              icon: HugeIcons.strokeRoundedServerStack01,
+              onTap: () async {
+                await routeToPage(context, const ServerSettingsPage());
+              },
+            ),
+            const SizedBox(height: 8),
             _buildMenuItem(
               title: context.strings.security,
               icon: HugeIcons.strokeRoundedSecurityCheck,
@@ -216,6 +233,15 @@ class _SettingsBody extends StatelessWidget {
     );
   }
 
+  // PHOTOVAULT: server connection.
+  String? _serverSubtitle() {
+    final server = PhotovaultServerService.instance.activeServer.value;
+    if (server == null) return PhotovaultStrings.notConnected;
+    return server.isPhotovault
+        ? server.name
+        : displayServerAddress(server.publicUrl);
+  }
+
   Widget _buildOfflineLoginCard(BuildContext context, ColorTokens colors) {
     return _buildMenuItem(
       title: context.strings.alreadyHaveAnAccount,
@@ -235,6 +261,14 @@ class _SettingsBody extends StatelessWidget {
         ),
       ),
       onTap: () async {
+        // PHOTOVAULT: server connection. Pick a server before Ente's login.
+        if (PhotovaultServerService.instance.activeServer.value == null) {
+          final connected = await routeToPage<bool>(
+            context,
+            const ConnectServerPage(),
+          );
+          if (connected != true || !context.mounted) return;
+        }
         await routeToPage(context, const LoginPage());
       },
     );

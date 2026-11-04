@@ -54,6 +54,7 @@ import 'package:photos/services/memory_lane/memory_lane_service.dart';
 import 'package:photos/services/memory_share_service.dart';
 import "package:photos/services/notification_service.dart";
 import "package:photos/services/photos_contacts_service.dart";
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
 import "package:photos/services/process_activity.dart";
 import 'package:photos/services/push_service.dart';
 import 'package:photos/services/search_service.dart';
@@ -319,6 +320,17 @@ Future<void> _runMinimally(
       NetworkClient.instance.downloadDio,
       packageInfo,
     );
+    // PHOTOVAULT: server connection. Pick the home or public address before
+    // background backup talks to the server.
+    PhotovaultServerService.instance.init(
+      prefs,
+      endpointConfig,
+      watchNetwork: false,
+    );
+    await PhotovaultServerService.instance.refreshAddress().timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {},
+    );
     MLDataDB.initialize(
       preferRust: flagService.rustMlDb || localSettings.rustMlDbOverride,
     );
@@ -486,6 +498,23 @@ Future<void> _init(
       NetworkClient.instance.downloadDio,
       packageInfo,
     );
+
+    // PHOTOVAULT: server connection. Home/public address choice on start and
+    // on every connectivity change (foreground); awaited in the background so
+    // backup uses the right address.
+    PhotovaultServerService.instance.init(
+      preferences,
+      endpointConfig,
+      watchNetwork: !isBackground,
+    );
+    if (isBackground) {
+      await PhotovaultServerService.instance.refreshAddress().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {},
+      );
+    } else {
+      unawaited(PhotovaultServerService.instance.refreshAddress());
+    }
 
     if (!isBackground) {
       await localSettings.migrateGalleryLayoutPreferences();

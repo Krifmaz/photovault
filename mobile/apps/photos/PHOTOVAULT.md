@@ -101,19 +101,68 @@ kept; `playstore` is gone). Android `applicationId` is `app.photovault`
 per `contracts/apps.json`. The Kotlin/Java namespace stays `io.ente.photos` so
 no native code moves.
 
-### Server endpoint plumbing (kept, no UI here)
+### Server connection
 
-- `lib/core/network/endpoint_config.dart`: `EndpointConfig.endpoint` /
-  `setEndpoint()`, persisted under the prefs key `endpoint`; the compile-time
-  default comes from `--dart-define=endpoint=https://...`. `isProduction` is
-  always false, so no Ente-production-only path (Cloudflare upload worker,
-  "faster uploads", free-plan upsells) is taken.
-- The 7-tap developer-settings dialog that used to set it is deleted; the
-  Photovault connect screen (separate work) calls `setEndpoint()`.
+Built against `contracts/server-info.md` and `contracts/apps.json`. The
+contract model lives in ONE file, `lib/services/photovault/server_contract.dart`
+(`/photovault/info` fields, `/ping` fallback, 1.5 s home probe, QR payload,
+`_photovault._tcp` TXT keys); change that file when the contract changes.
+API paths are Ente's, unchanged: only the base URL in Ente's
+`EndpointConfig` is set.
+
+- `lib/core/network/endpoint_config.dart`: the built-in server is
+  `--dart-define=PHOTOVAULT_SERVER=<url>` (Ente's `endpoint` define still
+  works as a fallback). Empty = none; Ente's `api.ente.com` is no longer a
+  default. `isProduction` is always false, so no Ente-production-only path
+  (Cloudflare upload worker, "faster uploads", free-plan upsells) is taken.
+  Optional `--dart-define=PHOTOVAULT_SERVER_NAME=<label>` (contract).
+- New, pure Dart (unit-tested in `test/photovault/`):
+  `lib/services/photovault/server_contract.dart` (model, parsers),
+  `server_address.dart` (address normaliser: `host:port`, http/https, IPv6,
+  `photovault://connect` links; http by default for LAN-only names, https
+  otherwise), `server_address_selector.dart` (home/public choice: home if it
+  answers `/photovault/info` within 1.5 s with the same `publicUrl`, else
+  public), `server_info_client.dart` (Connect request and error kinds:
+  unreachable, TLS, not Photovault, HTTP error; a stock Ente server that only
+  answers `/ping` is accepted as a "Compatible server").
+- New, Flutter: `lib/services/photovault/photovault_server_service.dart`
+  (saved servers and active server in SharedPreferences `photovault.*`;
+  sets Ente's endpoint; re-checks home/public on start and on connectivity
+  change), `server_discovery.dart` (mDNS `_photovault._tcp` with the pure-Dart
+  `multicast_dns`, holding `ente_cast`'s Android multicast lock; Android
+  only), `photovault_strings.dart` (English UI text, not in the ARB files).
+- New UI: `lib/ui/photovault/connect_server_page.dart` ("Connect to your
+  server": logo, address field, Connect -> name/version card -> Continue;
+  saved servers; servers on this network; QR button; "Use without a server"
+  for Ente's offline gallery), `server_qr_scan_page.dart` (Ente's
+  `ente_qr_scanner`: CameraX + zxing-cpp, no Play services),
+  `server_settings_page.dart` (Settings > Server: name, version, home/public
+  address and which is in use, Switch server = Ente's logout, then the
+  connect screen), `photovault_server_chip.dart` (landing-page line "Connected
+  to X" with "Change server").
+- `lib/ui/home/landing_page_widget.dart`: shows the connect screen while no
+  server is active, then Ente's landing page unchanged except for the server
+  line and hiding "Create account" when the server reports
+  `signupsAllowed: false`. Ente's sign-in / sign-up pages are untouched.
+- `lib/ui/settings_page.dart`: "Server" entry; the offline-mode "Log in" card
+  asks for a server first when none is active.
+- `lib/core/configuration.dart`: `logout()` keeps the `photovault.*` keys and
+  Ente's `endpoint` key across its `SharedPreferences.clear()`, so servers
+  survive logout.
+- `lib/main.dart`: starts the server service after the service locator (both
+  foreground and background init; background awaits the address choice, at
+  most 5 s).
+- `plugins/ente_cast/lib/ente_cast.dart`: exports `withMulticastLock`
+  (the plugin already declares `CHANGE_WIFI_MULTICAST_STATE`).
+- `pubspec.yaml`: `ente_qr_scanner` (workspace path package, already used by
+  Ente Auth) and `multicast_dns` 0.3.3+1 (already in the lock file through
+  `ente_cast`). No new native library: zxing-cpp is already shipped by
+  `ente_qr`.
 - Public album links: `lib/services/collections_service.dart` remembers the
   origin a shared link was opened from (`getSharedPublicAlbumOrigin`) and
   `lib/ui/viewer/gallery/gallery_app_bar_widget.dart` "Open in browser" uses it
   (falling back to the endpoint) instead of albums.ente.com.
+- The 7-tap developer-settings dialog that used to set the endpoint is deleted.
 
 ### Telemetry, Firebase, Play services, billing
 
@@ -239,8 +288,9 @@ no native code moves.
   (models.ente.com, set in `rust/crates/ml/src/assets.rs`), memories/rewind music
   (music.ente.com, `lib/services/memories/memory_music_service.dart`). The map uses
   OpenStreetMap tiles. Self-hosting these needs a later change.
-- If no `endpoint` dart-define is given and no server is chosen, the default
-  endpoint is still Ente's upstream default (`api.ente.com`).
+- Server connection: LAN discovery runs on Android only (iOS needs Apple's
+  multicast entitlement or a native Bonjour browser, and `_photovault._tcp`
+  in `NSBonjourServices`). The connect/settings text is English only.
 - Unused ARB keys still mention Ente Auth/Locker, referrals and support e-mail;
   they are never displayed by Photos (see `PHOTOVAULT-GREP.md`).
 - Shared `ente_ui`/`ente_utils` helpers still name support@ente.com; Photos
