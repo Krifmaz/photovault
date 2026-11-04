@@ -5,7 +5,7 @@ package app.photovault.android.data
  * is saved or signed in, and every network or library call fails with a [CoreError.Storage] that names the
  * problem, so the connect screen shows it instead of a crash or fake content.
  */
-class UnavailableCore(private val reason: String) : CoreRepository {
+class UnavailableCore(val reason: String) : CoreRepository {
     private fun fail(): Nothing = throw CoreError.Storage("This app's encryption library could not be loaded ($reason).")
 
     override fun discoverServers(timeoutMs: Int): List<String> = emptyList()

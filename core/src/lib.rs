@@ -24,6 +24,7 @@ pub mod crypto;
 mod library;
 pub mod media;
 pub mod metadata;
+pub mod ml;
 pub mod model;
 mod places;
 mod server;

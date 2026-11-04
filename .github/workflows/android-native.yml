@@ -54,16 +54,23 @@ jobs:
         name: Test core
         run: cargo test --locked -p photovault-core --no-fail-fast
       - if: steps.has.outputs.core == 'true'
+        name: Check core with on-device ML (ente-ml)
+        run: cargo check --locked -p photovault-core --features ml --all-targets
+      - if: steps.has.outputs.core == 'true'
         name: Build core for Android
         run: |
           cargo install cargo-ndk --locked --version ^4
           export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME"
+          # --features ml: on-device faces and magic search (ente-ml); ONNX Runtime itself comes
+          # from Ente's AAR in the app (ort is load-dynamic, nothing is linked here).
           cargo ndk --platform 28 -t arm64-v8a -t x86_64 -o native/android/core/build/jniLibs \
-            build --locked --release -p photovault-core
+            build --locked --release -p photovault-core --features ml
           # The release profile strips symbols, UniFFI's metadata included, so the
-          # bindings come from the host's (unstripped) build of the same crate.
-          cargo build --locked -p photovault-core --lib
-          cargo run --locked -p photovault-core --features bindgen --bin uniffi-bindgen -- \
+          # bindings come from the host's (unstripped) build of the same crate, with
+          # the same features.
+          cargo build --locked -p photovault-core --lib --features ml
+          # (bindgen + ml: cargo run rebuilds the cdylib with these features, which must keep ml)
+          cargo run --locked -p photovault-core --features bindgen,ml --bin uniffi-bindgen -- \
             generate --library target/debug/libphotovault_core.so \
             --language kotlin --out-dir native/android/core/build/generated/uniffi --no-format
       - if: steps.has.outputs.core == 'true'
@@ -130,7 +137,11 @@ jobs:
             for abi in arm64-v8a x86_64; do
               grep -q "lib/$abi/libphotovault_core.so" "$RUNNER_TEMP/apk-files.txt" \
                 || { echo "::error::APK has no lib/$abi/libphotovault_core.so"; exit 1; }
+              # Ente's ONNX Runtime, which the core's ente-ml loads at run time
+              grep -q "lib/$abi/libonnxruntime.so" "$RUNNER_TEMP/apk-files.txt" \
+                || { echo "::error::APK has no lib/$abi/libonnxruntime.so"; exit 1; }
             done
+            ls -l app/build/outputs/apk/release/*.apk
           fi
       - if: steps.has.outputs.app == 'true'
         uses: actions/upload-artifact@v7

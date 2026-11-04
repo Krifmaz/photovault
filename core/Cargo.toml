@@ -22,6 +22,13 @@ bindgen = ["uniffi/cli"]
 # Kept for the contract's `cargo test -p photovault-core --features it`; the
 # real-server tests always run (they need no network).
 it = []
+# On-device ML inference (faces, magic search) with Ente's own Rust ML crate
+# (`rust/crates/ml`, kept in step with Ente by scripts/upstream-merge.sh) on
+# ONNX Runtime. `ort` is load-dynamic: libonnxruntime.so comes from the app
+# (Ente's ONNX Runtime AAR), nothing is linked at build time. Without this
+# feature search, people and memories still work from `mldata` that other
+# devices computed.
+ml = ["dep:ente-ml"]
 
 [dependencies]
 uniffi = "0.32"
@@ -43,7 +50,10 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "io-util
 # `links = "sqlite3"` crate can only appear once in the workspace).
 rusqlite = { version = "0.32", features = ["bundled"] }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+# float_roundtrip: re-written mldata keeps every embedding value bit-exact.
+serde_json = { version = "1", features = ["float_roundtrip"] }
+# mldata is gzipped JSON (pure-Rust backend).
+flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
 thiserror = "2"
 url = "2"
 bytes = "1"
@@ -53,9 +63,10 @@ kamadak-exif = "0.6"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 # Best-effort LAN discovery (`_photovault._tcp`).
 mdns-sd = "0.21"
-# Streamable videos (Ente's `vid_preview`): the playlist JSON is gzipped, and
-# HLS segments are AES-128-CBC (RFC 8216 §5.2). Pure Rust (miniz_oxide, RustCrypto).
-flate2 = "1"
+# Ente's ML crate (see feature `ml`).
+ente-ml = { path = "../rust/crates/ml", optional = true }
+# Streamable videos (Ente's `vid_preview`): the playlist JSON is gzipped (flate2,
+# above), and HLS segments are AES-128-CBC (RFC 8216 §5.2). Pure Rust (RustCrypto).
 aes = "0.8"
 cbc = "0.1"
 

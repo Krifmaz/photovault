@@ -59,6 +59,15 @@ an email containing `taken` is already registered.
   typed email and verifies it without a password, so core answers `NeedsRecoveryKey` and the recovery screen
   opens (core only accepts a recovery key after the server has authorized the account).
 
+- Memories (contract v1.2): a strip of covers is the grid's first full-span item (unseen first, seen dimmed;
+  grid indices are offset by one while it shows), and a memory opens as a story (`ui/memories`). They are read
+  from core on `Dispatchers.IO` with the local UTC offset, after the timeline opens and after each sync.
+- Machine learning (faces, magic search): settings from the account menu (`ui/settings`); background work is
+  WorkManager (`data/ml/MlWork.kt`): `sync_ml` after each app sync, then `run_ml_indexing` in batches of 25
+  while charging (setting, default on), battery not low and, until the models are downloaded from the server,
+  on an unmetered network. ONNX Runtime is Ente's AAR (`io.ente.onnxruntime:onnxruntime-webgpu-android`, Ivy
+  repository in `settings.gradle.kts`, SHA-256 pinned in `gradle/verification-metadata.xml`); it adds
+  `libonnxruntime.so` (30 MB arm64-v8a + 37 MB x86_64, stored uncompressed) to the APK.
 - Thumbnails come from core's `thumbnail(id)` through a Coil `Fetcher` on `Dispatchers.IO`, decoded at cell
   size into Coil's memory cache. Decrypted thumbnails are never written to Coil's disk cache (core keeps its
   own cache encrypted at rest). Viewer originals are decrypted into app-private `cache/viewer`, at most six

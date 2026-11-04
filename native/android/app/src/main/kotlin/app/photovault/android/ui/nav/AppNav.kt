@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,6 +21,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import app.photovault.android.AppGraph
 import app.photovault.android.BuildConfig
+import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.ml.MlPrefs
+import app.photovault.android.data.ml.MlWork
+import app.photovault.android.ui.memories.AfterSync
+import app.photovault.android.ui.memories.MemoriesViewModel
+import app.photovault.android.ui.memories.MemoryStoryScreen
+import app.photovault.android.ui.memories.MemoryStoryViewModel
+import app.photovault.android.ui.memories.MemoryViewerSource
+import app.photovault.android.ui.settings.MlSettingsScreen
+import app.photovault.android.ui.settings.MlSettingsViewModel
 import app.photovault.android.ui.backup.BackupScreen
 import app.photovault.android.ui.backup.BackupViewModel
 import app.photovault.android.ui.albums.AlbumScreen
@@ -149,6 +160,12 @@ fun AppNav(graph: AppGraph, start: Any) {
                     val vm = viewModel {
                         TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels(), clearDecrypted = graph::clearDecrypted, onSynced = graph::refreshWidgets)
                     }
+                    val memories = viewModel { MemoriesViewModel(graph.memoryFeed) }
+                    val context = LocalContext.current
+                    AfterSync(vm.status) {
+                        memories.refresh()
+                        MlWork.scheduler(context).afterSync()
+                    }
                     val handle = entry.savedStateHandle
                     val returned = remember(handle) { handle.getStateFlow<Int?>(NavResults.VIEWER_INDEX, null) }
                     CompositionLocalProvider(LocalNavAnimatedScope provides this) {
@@ -162,9 +179,54 @@ fun AppNav(graph: AppGraph, start: Any) {
                                 onSwitchServer = { nav.navigate(ConnectRoute) },
                                 onMap = { nav.navigate(MapRoute) { launchSingleTop = true } },
                                 onBackup = { nav.navigate(BackupRoute) { launchSingleTop = true } },
+                                memories = memories.memories,
+                                onOpenMemory = { nav.navigate(MemoryRoute(it.id)) },
+                                onOpenMlSettings = { nav.navigate(MlSettingsRoute) },
                             )
                         }
                     }
+                }
+                composable<MemoryRoute> { entry ->
+                    val route = entry.toRoute<MemoryRoute>()
+                    val vm = viewModel {
+                        MemoryStoryViewModel(graph.memoryFeed, graph.core, graph.memoryCache, route.memoryId, route.index, cleanupScope = graph.appScope)
+                    }
+                    val handle = entry.savedStateHandle
+                    val returned = remember(handle) { handle.getStateFlow<Int?>(NavResults.MEMORY_INDEX, null) }
+                    CompositionLocalProvider(LocalNavAnimatedScope provides this) {
+                        MemoryStoryScreen(
+                            vm = vm,
+                            returnIndex = returned,
+                            onReturnConsumed = { handle[NavResults.MEMORY_INDEX] = null },
+                            onClose = { nav.popBackStack<MemoryRoute>(inclusive = true) },
+                            onOpenPhoto = { id, index, fileId -> nav.navigate(MemoryViewerRoute(id, index, fileId)) },
+                        )
+                    }
+                }
+                composable<MemoryViewerRoute> { entry ->
+                    val route = entry.toRoute<MemoryViewerRoute>()
+                    val vm = viewModel {
+                        val feed = graph.memoryFeed
+                        val source = MemoryViewerSource(graph.core) { feed.findBlocking(route.memoryId)?.items.orEmpty() }
+                        ViewerViewModel(source, TimelineStore(source), graph.viewerCache, cleanupScope = graph.appScope, startIndex = route.index)
+                    }
+                    CompositionLocalProvider(LocalNavAnimatedScope provides this) {
+                        ViewerScreen(
+                            vm = vm,
+                            startIndex = route.index,
+                            onClose = { index ->
+                                nav.previousBackStackEntry?.savedStateHandle?.set(NavResults.MEMORY_INDEX, index)
+                                nav.popBackStack()
+                            },
+                        )
+                    }
+                }
+                composable<MlSettingsRoute> {
+                    val context = LocalContext.current
+                    val vm = viewModel {
+                        MlSettingsViewModel(graph.ml, MlPrefs(context), MlWork.scheduler(context))
+                    }
+                    MlSettingsScreen(vm, onBack = { nav.popBackStack() })
                 }
                 composable<MapRoute> {
                     val vm = viewModel { MapViewModel(graph.core) }
@@ -208,6 +270,8 @@ fun AppNav(graph: AppGraph, start: Any) {
                         )
                     }
                 }
+                // search, people and their viewer (MlNav.kt)
+                mlDestinations(graph, nav)
             }
         }
     }

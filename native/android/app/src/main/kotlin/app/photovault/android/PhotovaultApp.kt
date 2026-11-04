@@ -10,6 +10,7 @@ import app.photovault.android.data.NsdLanDiscovery
 import app.photovault.android.data.SignupProvider
 import app.photovault.android.data.SignupRepository
 import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.ml.MlRepository
 import app.photovault.android.data.albums.AlbumsProvider
 import app.photovault.android.data.albums.AlbumsRepository
 import app.photovault.android.data.VideoRepository
@@ -17,6 +18,8 @@ import app.photovault.android.data.VideoRepositoryProvider
 import app.photovault.android.ui.viewer.video.ExoPlaybackEngine
 import app.photovault.android.ui.viewer.video.PlaybackEngine
 import app.photovault.android.ui.image.buildImageLoader
+import app.photovault.android.ui.memories.MemoryFeed
+import app.photovault.android.ui.search.ResultLists
 import app.photovault.android.ui.timeline.TimelineLabels
 import app.photovault.android.widget.WidgetRefresh
 import coil3.ImageLoader
@@ -37,6 +40,16 @@ class AppGraph(private val context: Context) {
      * (MainActivity resolves the start screen on Dispatchers.IO).
      */
     val core: CoreRepository by lazy { CoreProvider.create(context) }
+
+    /**
+     * Search, people and memories (contract v1.2) over the same core: real with RealCore, the demo data with
+     * FakeCore, an unavailable stand-in with UnavailableCore. Reading it opens [core], so like [core] it is
+     * first read from background dispatchers (the screens' view models and Coil's face fetcher).
+     */
+    val ml: MlRepository by lazy { CoreProvider.createMl(core) }
+
+    /** Today's memories, shared by the timeline's strip and the story viewer (reads [ml] only on refresh). */
+    val memoryFeed: MemoryFeed by lazy { MemoryFeed({ ml }) }
 
     fun warmUp() {
         Thread({ core }, "photovault-core-init").apply { priority = Thread.NORM_PRIORITY }.start()
@@ -82,6 +95,9 @@ class AppGraph(private val context: Context) {
      */
     val viewerCache: File = File(context.cacheDir, "viewer")
 
+    /** Decrypted originals of the open memory story (at most a few; created by its view model on IO). */
+    val memoryCache: File = File(context.cacheDir, "memories")
+
     /**
      * Drops every decrypted image of the current account from memory and disk: Coil's memory cache (keyed
      * by file id, which another server reuses) and the viewer's originals. Called on sign-out and whenever
@@ -90,9 +106,25 @@ class AppGraph(private val context: Context) {
      */
     fun clearDecrypted() {
         SingletonImageLoader.get(context).memoryCache?.clear()
-        appScope.launch { viewerCache.listFiles()?.forEach { it.delete() } }
+        ResultLists.clear()
+        memoryFeed.clear()
+        appScope.launch {
+            viewerCache.listFiles()?.forEach { it.delete() }
+            memoryCache.listFiles()?.forEach { it.delete() }
+        }
         // widgets of the old account must not keep showing its photos
         refreshWidgets()
+    }
+
+    /**
+     * Deletes decrypted originals a previous process left behind (killed while the viewer or a memory story
+     * was open, so their view models never cleaned up). Runs at process start, before any screen exists.
+     */
+    fun wipeLeftovers() {
+        appScope.launch {
+            viewerCache.listFiles()?.forEach { it.delete() }
+            memoryCache.listFiles()?.forEach { it.delete() }
+        }
     }
 
     /** Re-renders the home-screen widgets (after a sync, sign-in or sign-out). */
@@ -115,13 +147,14 @@ class PhotovaultApp : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         graph = AppGraph(this).also {
             it.warmUp()
+            it.wipeLeftovers()
             it.watchNetwork()
             it.appScope.launch { it.backup.start() }
         }
     }
 
-    // The fetcher reads graph.core lazily on its IO dispatcher, so building the loader never opens core.
-    override fun newImageLoader(context: PlatformContext): ImageLoader = buildImageLoader(this) { graph.core }
+    // The fetchers read graph.core / graph.ml lazily on their IO dispatcher, so building the loader never opens core.
+    override fun newImageLoader(context: PlatformContext): ImageLoader = buildImageLoader(this, core = { graph.core }, ml = { graph.ml })
 }
 
 val Context.appGraph: AppGraph get() = (applicationContext as PhotovaultApp).graph

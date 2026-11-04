@@ -34,6 +34,18 @@ data object TimelineRoute
 @Serializable
 data class ViewerRoute(val index: Int, val fileId: Long)
 
+/** A memory as a full-screen story, opened at photo [index]. */
+@Serializable
+data class MemoryRoute(val memoryId: String, val index: Int = 0)
+
+/** The photo viewer over one memory's photos ([index] in the memory, [fileId] the photo). */
+@Serializable
+data class MemoryViewerRoute(val memoryId: String, val index: Int, val fileId: Long)
+
+/** Machine learning settings (faces and magic search). */
+@Serializable
+data object MlSettingsRoute
+
 /** Photos on a map. */
 @Serializable
 data object MapRoute
@@ -66,4 +78,5 @@ data object TrashRoute
 object NavResults {
     const val QR_PAYLOAD = "qr_payload"
     const val VIEWER_INDEX = "viewer_index"
+    const val MEMORY_INDEX = "memory_index"
 }

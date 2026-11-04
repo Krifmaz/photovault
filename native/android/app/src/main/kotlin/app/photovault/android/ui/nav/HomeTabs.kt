@@ -39,6 +39,7 @@ enum class HomeTab(
 ) {
     Photos(TimelineRoute, R.string.tab_photos, R.drawable.ic_photos, "tab_photos"),
     Albums(AlbumsRoute, R.string.tab_albums, R.drawable.ic_albums, "tab_albums"),
+    Search(SearchRoute, R.string.tab_search, R.drawable.ic_search, "tab_search"),
 }
 
 /**

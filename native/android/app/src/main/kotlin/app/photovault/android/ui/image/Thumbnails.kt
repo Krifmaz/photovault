@@ -2,6 +2,7 @@ package app.photovault.android.ui.image
 
 import android.content.Context
 import app.photovault.android.data.CoreRepository
+import app.photovault.android.data.ml.MlRepository
 import coil3.ImageLoader
 import coil3.decode.DataSource
 import coil3.decode.ImageSource
@@ -54,12 +55,16 @@ class ThumbKeyer : Keyer<Thumb> {
     override fun key(data: Thumb, options: Options): String = "thumb:${data.fileId}"
 }
 
-/** The app's single ImageLoader: thumbnails from core, full-size files from the viewer cache. */
-fun buildImageLoader(context: Context, core: () -> CoreRepository): ImageLoader =
+/** The app's single ImageLoader: thumbnails and face crops from core, full-size files from the viewer cache. */
+fun buildImageLoader(context: Context, core: () -> CoreRepository, ml: (() -> MlRepository)? = null): ImageLoader =
     ImageLoader.Builder(context)
         .components {
             add(ThumbnailFetcher.Factory(core))
             add(ThumbKeyer())
+            if (ml != null) {
+                add(FaceThumbnailFetcher.Factory(ml))
+                add(FaceThumbKeyer())
+            }
         }
         .memoryCache {
             MemoryCache.Builder()
