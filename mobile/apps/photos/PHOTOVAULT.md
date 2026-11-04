@@ -194,10 +194,9 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - `lib/ui/cast/pair_with_code.dart`: the cast URL shown for pairing is the
   remote flag, else the server's `castUrl` from `/photovault/info`, else
   `<publicUrl>/cast`, and only then `<endpoint>/cast`.
-- `lib/ui/cast/cast.dart`: no Chromecast "Auto pair" button (`showAutoPair`
-  is `false`): it launches Ente's registered receiver app, whose hosted cast
-  page talks to Ente and cannot pair with this server. The cast sheet offers
-  pair-by-code only, as the web app does.
+- `lib/ui/cast/cast.dart`: Chromecast "Auto pair" shows only when the app
+  has a Photovault receiver id (`canAutoPair`, see Chromecast below); without
+  one the cast sheet offers pair-by-code only, as the web app does.
 - `lib/core/configuration.dart`: `logout()` keeps the `photovault.*` keys and
   Ente's `endpoint` key across its `SharedPreferences.clear()`, so servers
   survive logout.
@@ -358,9 +357,33 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   `/public-collection/files/...`); Ente's files/thumbnails/public-albums
   worker hosts are removed.
 - `lib/services/memories/memory_music_service.dart`: the memories/Rewind music
-  track list is no longer fetched from Ente's music host; the manifest is
-  always empty, so memories play without music (tracks cached by an older
-  build are cleaned up).
+  track list and MP3s come from the server's mirror (`musicManifestUrl` in
+  `/photovault/info`), fetched through the address in use (home or public);
+  plain `http` is accepted only for tracks on the server's own addresses.
+  Ente's music host is used only when the server advertises no mirror.
+- `lib/services/photovault/server_assets.dart` (new): turns
+  `/photovault/info` into the model mirror, music manifest and Cast receiver
+  the app uses (`modelsUrl`, `musicManifestUrl`, `castAppId`; parsed in
+  `server_contract.dart`).
+- ML models: `../../../rust/crates/assets/src/mirror.rs` (new, hooked into
+  `store.rs` `download_targets`) rewrites `https://models.ente.com/<file>` to
+  the server's `modelsUrl`; the pinned sizes and SHA-256s still apply.
+  `../../../rust/bindings/frb/photos/src/api/ml_indexing_api.rs`
+  `set_models_mirror`; `lib/services/machine_learning/ml_model_download_service.dart`
+  (`syncModelsMirror`, called before every model preload, progress UI
+  unchanged) and `ocr/rust_ocr_backend.dart` set it. Without a mirror (or
+  before any server is set, `api/init.rs`) the prefix is blocked: no request
+  goes to Ente's host, local indexing is skipped (`ml_service.dart`
+  `_canIndexLocally`) and ML settings say the models are unavailable.
+  Memories music likewise: no mirror, no music (empty manifest).
+- Chromecast: `plugins/ente_cast/lib/src/service.dart` no longer launches
+  Ente's receiver app (`F5BCEC64`, which loads Ente's hosted cast page and
+  pairs through Ente's servers). `CastService(appID:)` takes the receiver from
+  the app: the server's `castAppId` (`PHOTOVAULT_CAST_APP_ID`), else
+  `--dart-define=PHOTOVAULT_CAST_APP_ID`. With none, `lib/ui/cast/cast.dart`
+  hides "Auto pair" (`canAutoPair`) and only "Pair using code" (the server's
+  `/cast` page) is offered. `ios/Runner/Info.plist`: the `_F5BCEC64` Bonjour
+  type is removed. Setup: `docs/src/chromecast.md`.
 - `lib/services/location_service.dart` and Rust
   (`../../../rust/crates/photos/src/location.rs` `LocationIndex::open_from`,
   `../../../rust/bindings/frb/photos/src/api/location_api.rs`
@@ -480,11 +503,17 @@ not ship):
 
 ## Known gaps
 
-- Still contacting an Ente-run host for a feature we keep, pending the
-  owner's decision: ML model downloads (models.ente.com, set in
-  `rust/crates/ml/src/assets.rs`, `ml/src/ocr/assets.rs`, `ml/src/scan/mod.rs`).
-  Memories/Rewind music is no longer fetched (no music). The map uses
-  OpenStreetMap tiles.
+- ML models and memories music come only from the server's mirror. Ente's
+  hosts (models.ente.com, music.ente.com) are never contacted: if the server
+  turns its mirror off (`PHOTOVAULT_ASSET_MIRROR=false`) or is a stock server,
+  on-device ML and memories music are unavailable. The
+  map uses OpenStreetMap tiles.
+- Location data (places, city search) needs the server's web build to
+  include `static-assets/location/v2/{cities,urban-centres,countries,disputes}.bin`.
+  `web/scripts/photovault-vendor-assets.mjs` vendors only the first two today;
+  until it also copies `countries.bin` and `disputes.bin`, the app's location
+  index fails to load (logged, places and city search are then unavailable).
+  Files already downloaded by an earlier build keep working.
 - Shared code Photos does not use still names Ente defaults:
   `../../packages/configuration` (`api.ente.com` default for Auth/Locker's
   `BaseConfiguration`), `../../packages/legacy` (legacy kit PDF: Ente support
@@ -506,12 +535,10 @@ not ship):
   already in `NSBonjourServices`). The connect/settings text is English only.
 - Unused ARB keys still mention Ente Auth/Locker, referrals and support e-mail;
   they are never displayed by Photos (see `PHOTOVAULT-GREP.md`).
-- Chromecast uses Ente's registered receiver app id (`F5BCEC64` in
-  `plugins/ente_cast/lib/src/service.dart`), which loads Ente's hosted cast
-  page. The id is kept (pending the owner's decision), but its only UI path,
-  "Auto pair", is hidden (`lib/ui/cast/cast.dart`). Pairing by code goes
-  through the server and `<server>/cast` instead (not tested here). Bringing
-  Auto pair back needs a Photovault receiver registered with Google.
+- Shared `ente_ui`/`ente_utils` helpers still name support@ente.com; Photos
+  does not call those paths.
+- Chromecast auto-pairing needs the owner's own Cast receiver registered with
+  Google (`docs/src/chromecast.md`); until then casting is by code only.
 - Some non-mascot illustrations keep Ente's green (e.g. `assets/on_ente.png`,
   `lock_screen_icon.png`, `recovery_key.png`, rewind badge backdrops).
 - The alternate app icons (Settings > App icon) all show the Photovault icon.

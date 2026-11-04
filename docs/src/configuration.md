@@ -111,6 +111,7 @@ accounts, family or cast apps somewhere else, or use passkeys.
 | --- | --- | --- |
 | `PHOTOVAULT_ALBUMS_URL` | `PHOTOVAULT_PUBLIC_URL` + `/shared-albums` in `/photovault/info` | Public albums; share links point here. |
 | `PHOTOVAULT_CAST_URL` | `PHOTOVAULT_PUBLIC_URL` + `/cast` in `/photovault/info` | Cast receiver. |
+| `PHOTOVAULT_CAST_APP_ID` | unset | Your own Google Cast receiver app id (8 hex digits), for Chromecast auto-pairing. Unset: pair with a code. See [Casting to a TV](chromecast.md). |
 | `PHOTOVAULT_ACCOUNTS_URL` | `http://localhost:3001` | Accounts app (passkeys, recovery). |
 | `PHOTOVAULT_FAMILY_URL` | `http://localhost:3003` | Family app. |
 | `PHOTOVAULT_EMBED_ALBUMS_URL`, `PHOTOVAULT_PASTE_URL`, `PHOTOVAULT_LOCKER_SHARE_URL`, `PHOTOVAULT_PUBLIC_MEMORIES_URL`, `PHOTOVAULT_CUSTOM_DOMAIN_CNAME` | unset | Other companion apps (museum's `apps.*` keys). |

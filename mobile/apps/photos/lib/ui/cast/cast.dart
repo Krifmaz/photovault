@@ -15,12 +15,6 @@ import "package:photos/ui/components/buttons/button_widget.dart";
 import "package:photos/ui/settings/cast/cast_settings_page.dart";
 import "package:photos/utils/dialog_util.dart";
 
-// PHOTOVAULT: strip - no Chromecast "Auto pair": it launches Ente's
-// registered receiver app, whose cast page talks to Ente's servers and cannot
-// pair with this server. Pair-by-code (via <server>/cast) stays. The upstream
-// code path is kept, so re-enabling it is a one-line change.
-bool get _photovaultAutoPair => false;
-
 Future<void> showCastSheet(
   BuildContext context,
   Collection collection, {
@@ -31,7 +25,8 @@ Future<void> showCastSheet(
   final textStyle = getEnteTextTheme(context);
   final gw = gateway ?? CastGateway(NetworkClient.instance.enteDio);
   final service = transport ?? castService;
-  final showAutoPair = _photovaultAutoPair && service.isSupported;
+  // PHOTOVAULT: server connection. Only with a receiver of our own.
+  final showAutoPair = service.canAutoPair;
   final logger = Logger("showCastSheet");
   if (!flagService.enableMultiCast) {
     final shouldStop = service.getActiveSessions().isNotEmpty;

@@ -392,7 +392,7 @@ impl AssetStore {
                 .iter()
                 .map(|file| DownloadTarget {
                     label: file.name.clone(),
-                    url: file.url.clone(),
+                    url: crate::mirror::mirrored_url(&file.url), // PHOTOVAULT: mirror
                     expected_size: file.size,
                     sha256: file.sha256.clone(),
                     destination: staging.join(&file.name),
@@ -400,7 +400,7 @@ impl AssetStore {
                 .collect(),
             AssetKind::TarGz { url, size, sha256 } => vec![DownloadTarget {
                 label: asset.components.last().cloned().unwrap_or_default(),
-                url: url.clone(),
+                url: crate::mirror::mirrored_url(url), // PHOTOVAULT: mirror
                 expected_size: *size,
                 sha256: sha256.clone(),
                 destination: staging.join(ARCHIVE_FILE),
