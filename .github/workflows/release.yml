@@ -126,6 +126,7 @@ jobs:
         with:
           key: ${{ matrix.target }}
       - name: Build
+        shell: bash   # the Linux jobs run in a container whose default sh (dash) lacks ${VAR:0:7}
         env:
           PHOTOVAULT_COMMIT: ${{ github.sha }}
         run: |
