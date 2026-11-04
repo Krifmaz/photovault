@@ -26,7 +26,6 @@ import app.photovault.android.ui.memories.MemoriesViewModel
 import app.photovault.android.ui.memories.MemoryStoryScreen
 import app.photovault.android.ui.memories.MemoryStoryViewModel
 import app.photovault.android.ui.memories.MemoryViewerSource
-import app.photovault.android.ui.memories.memoryFeed
 import app.photovault.android.ui.settings.MlSettingsScreen
 import app.photovault.android.ui.settings.MlSettingsViewModel
 import app.photovault.android.ui.connect.ConnectScreen
@@ -43,7 +42,6 @@ import app.photovault.android.ui.timeline.TimelineScreen
 import app.photovault.android.ui.timeline.TimelineViewModel
 import app.photovault.android.ui.viewer.ViewerScreen
 import app.photovault.android.ui.viewer.ViewerViewModel
-import java.io.File
 
 /**
  * Where the app opens: the timeline when signed in to the active server, sign-in when a server is chosen,
@@ -137,7 +135,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                     val vm = viewModel {
                         TimelineViewModel(graph.core, graph.timeline, graph.timelineLabels(), clearDecrypted = graph::clearDecrypted)
                     }
-                    val memories = viewModel { MemoriesViewModel(graph.memoryFeed()) }
+                    val memories = viewModel { MemoriesViewModel(graph.memoryFeed) }
                     val context = LocalContext.current
                     AfterSync(vm.status) {
                         memories.refresh()
@@ -163,9 +161,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                 composable<MemoryRoute> { entry ->
                     val route = entry.toRoute<MemoryRoute>()
                     val vm = viewModel {
-                        // next to the viewer's cache (app-private cacheDir); created by the view model on IO
-                        val cacheDir = File(graph.viewerCache.parentFile, "memories")
-                        MemoryStoryViewModel(graph.memoryFeed(), graph.core, cacheDir, route.memoryId, route.index, cleanupScope = graph.appScope)
+                        MemoryStoryViewModel(graph.memoryFeed, graph.core, graph.memoryCache, route.memoryId, route.index, cleanupScope = graph.appScope)
                     }
                     val handle = entry.savedStateHandle
                     val returned = remember(handle) { handle.getStateFlow<Int?>(NavResults.MEMORY_INDEX, null) }
@@ -182,7 +178,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                 composable<MemoryViewerRoute> { entry ->
                     val route = entry.toRoute<MemoryViewerRoute>()
                     val vm = viewModel {
-                        val feed = graph.memoryFeed()
+                        val feed = graph.memoryFeed
                         val source = MemoryViewerSource(graph.core) { feed.findBlocking(route.memoryId)?.items.orEmpty() }
                         ViewerViewModel(source, TimelineStore(source), graph.viewerCache, cleanupScope = graph.appScope, startIndex = route.index)
                     }

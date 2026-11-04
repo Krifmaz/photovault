@@ -3,6 +3,7 @@ package app.photovault.android.ui.nav
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -10,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import app.photovault.android.AppGraph
 import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.ml.MlWork
 import app.photovault.android.data.ml.SearchKind
 import app.photovault.android.data.ml.SearchSuggestion
 import app.photovault.android.ui.people.MergePeopleScreen
@@ -37,7 +39,8 @@ import app.photovault.android.ui.viewer.ViewerViewModel
  */
 fun NavGraphBuilder.mlDestinations(graph: AppGraph, nav: NavHostController) {
     composable<SearchRoute> {
-        val vm = viewModel { SearchViewModel(graph.ml) }
+        val context = LocalContext.current
+        val vm = viewModel { SearchViewModel(graph.ml, onMlEnabled = { MlWork.scheduler(context).reschedule() }) }
         SearchScreen(
             vm = vm,
             onBack = { nav.popBackStack() },

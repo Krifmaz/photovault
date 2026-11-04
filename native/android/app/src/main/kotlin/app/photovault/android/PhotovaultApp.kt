@@ -9,6 +9,7 @@ import app.photovault.android.data.NsdLanDiscovery
 import app.photovault.android.data.TimelineStore
 import app.photovault.android.data.ml.MlRepository
 import app.photovault.android.ui.image.buildImageLoader
+import app.photovault.android.ui.memories.MemoryFeed
 import app.photovault.android.ui.search.ResultLists
 import app.photovault.android.ui.timeline.TimelineLabels
 import coil3.ImageLoader
@@ -37,6 +38,9 @@ class AppGraph(private val context: Context) {
      */
     val ml: MlRepository by lazy { CoreProvider.createMl(core) }
 
+    /** Today's memories, shared by the timeline's strip and the story viewer (reads [ml] only on refresh). */
+    val memoryFeed: MemoryFeed by lazy { MemoryFeed({ ml }) }
+
     fun warmUp() {
         Thread({ core }, "photovault-core-init").apply { priority = Thread.NORM_PRIORITY }.start()
     }
@@ -52,6 +56,9 @@ class AppGraph(private val context: Context) {
      */
     val viewerCache: File = File(context.cacheDir, "viewer")
 
+    /** Decrypted originals of the open memory story (at most a few; created by its view model on IO). */
+    val memoryCache: File = File(context.cacheDir, "memories")
+
     /**
      * Drops every decrypted image of the current account from memory and disk: Coil's memory cache (keyed
      * by file id, which another server reuses) and the viewer's originals. Called on sign-out and whenever
@@ -61,7 +68,11 @@ class AppGraph(private val context: Context) {
     fun clearDecrypted() {
         SingletonImageLoader.get(context).memoryCache?.clear()
         ResultLists.clear()
-        appScope.launch { viewerCache.listFiles()?.forEach { it.delete() } }
+        memoryFeed.clear()
+        appScope.launch {
+            viewerCache.listFiles()?.forEach { it.delete() }
+            memoryCache.listFiles()?.forEach { it.delete() }
+        }
     }
 
     /** Re-runs core's home/public address choice when the device's network changes. */

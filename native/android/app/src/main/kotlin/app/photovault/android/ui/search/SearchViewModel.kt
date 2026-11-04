@@ -83,6 +83,8 @@ class SearchViewModel(
     private val ml: MlRepository,
     private val io: CoroutineDispatcher = Dispatchers.IO,
     private val debounceMs: Long = DEBOUNCE_MS,
+    /** Called once ML was turned on here (schedules background indexing, see MlWork). */
+    private val onMlEnabled: () -> Unit = {},
 ) : ViewModel() {
 
     private val query = MutableStateFlow("")
@@ -153,6 +155,7 @@ class SearchViewModel(
             try {
                 val status = ml.setMlEnabled(true)
                 _state.update { it.copy(mlEnabled = status.enabled) }
+                if (status.enabled) onMlEnabled()
                 // pull what other devices already indexed, so people show up right away
                 runCatching { ml.syncMl(null) }
             } catch (e: CoreError) {

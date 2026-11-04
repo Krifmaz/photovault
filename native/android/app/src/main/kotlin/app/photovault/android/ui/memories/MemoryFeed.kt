@@ -1,6 +1,5 @@
 package app.photovault.android.ui.memories
 
-import app.photovault.android.AppGraph
 import app.photovault.android.data.CoreError
 import app.photovault.android.data.ml.Memory
 import app.photovault.android.data.ml.MlRepository
@@ -103,21 +102,3 @@ class MemoryFeed(
 /** The device zone's offset from UTC at [nowUs], in seconds. */
 fun systemUtcOffsetSecs(nowUs: Long): Int =
     ZoneId.systemDefault().rules.getOffset(Instant.ofEpochMilli(Math.floorDiv(nowUs, 1000L))).totalSeconds
-
-private object MemoryFeedHolder {
-    var graph: AppGraph? = null
-    var feed: MemoryFeed? = null
-}
-
-/** The process-wide [MemoryFeed] of this [AppGraph] (one per process; AppGraph itself stays untouched). */
-fun AppGraph.memoryFeed(): MemoryFeed {
-    val graph = this
-    synchronized(MemoryFeedHolder) {
-        val existing = MemoryFeedHolder.feed
-        if (existing != null && MemoryFeedHolder.graph === graph) return existing
-        val created = MemoryFeed({ graph.ml })
-        MemoryFeedHolder.graph = graph
-        MemoryFeedHolder.feed = created
-        return created
-    }
-}
