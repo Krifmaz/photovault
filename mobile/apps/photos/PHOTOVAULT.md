@@ -430,8 +430,18 @@ not ship):
 - `test/photovault/screenshots_test.dart` (new): renders the connect screen
   (empty, saved and found servers, server answered, unreachable), the top of
   Settings (storage card and Server entry), Settings > Server and About, in light
-  and dark with the real themes and bundled fonts. With
-  `PHOTOVAULT_SCREENSHOT_DIR=<dir>` it writes `<screen>-<light|dark>.png` there.
+  and dark with the real themes and bundled fonts, plus the QR scan page
+  chrome (the camera view is black off-device). With
+  `PHOTOVAULT_SCREENSHOT_DIR=<dir>` it writes `<screen>-<light|dark>.png` there
+  (1080x2400 at 2.625).
+- `test/photovault/before_after/` (new): the Ente screens Photovault changes
+  (landing, sign-in, sign-up, email code, passwords, recovery key, Settings,
+  About, Account, Family, Free up space, Security, Streaming, ML, backup
+  banners, permissions, loading, empty states, Rewind banner, invite dialog),
+  written so the same test also runs on the pristine Ente import
+  (`tree_env.dart` here, `tree_env_upstream.dart` there).
+  `scripts/photovault/render_before_after.sh <dir>` renders both and writes
+  `<screen>-<mode>-before.png` / `-after.png`.
 - `lib/main.dart`, `lib/ui/account/onboarding_page_scaffold.dart`: analyzer
   fixes (unused imports left by the telemetry removal, a missing `const`).
 
