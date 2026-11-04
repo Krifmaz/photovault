@@ -57,12 +57,22 @@ pub(crate) async fn refresh_locked(inner: &Inner) -> Result<()> {
     let stored = load_cgroups(inner)?;
     let mut pushed = false;
     for p in pending {
-        // Only on top of the version it was computed from.
+        // Only on top of the version it was computed from, here and on the
+        // server: reclustering can take long, and another device may have
+        // renamed or merged the person meanwhile. A refused push is
+        // recomputed by the next refresh.
         if stored
             .iter()
             .any(|(id, t, _)| *id == p.id && *t == p.base_updated_at)
         {
-            entity::update(inner, CGROUP, &p.id, &p.data.to_value()).await?;
+            entity::update_if_unchanged(
+                inner,
+                CGROUP,
+                &p.id,
+                &p.data.to_value(),
+                p.base_updated_at,
+            )
+            .await?;
             pushed = true;
         }
     }

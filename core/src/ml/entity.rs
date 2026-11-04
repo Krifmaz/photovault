@@ -321,19 +321,48 @@ pub(crate) async fn create(inner: &Inner, kind: &str, data: &Value) -> Result<St
 
 /// Replace an entity's data.
 pub(crate) async fn update(inner: &Inner, kind: &str, id: &str, data: &Value) -> Result<()> {
+    put(inner, kind, id, data, None).await
+}
+
+/// Replace an entity's data only if the server still has the version
+/// with `expected_updated_at` (`expectedUpdatedAt`, museum's optimistic
+/// concurrency, as mobile sends it). Returns `false`, and changes nothing,
+/// when another client wrote it meanwhile (409).
+pub(crate) async fn update_if_unchanged(
+    inner: &Inner,
+    kind: &str,
+    id: &str,
+    data: &Value,
+    expected_updated_at: i64,
+) -> Result<bool> {
+    match put(inner, kind, id, data, Some(expected_updated_at)).await {
+        Ok(()) => Ok(true),
+        Err(e) if e.status() == Some(409) => Ok(false),
+        Err(e) => Err(e),
+    }
+}
+
+async fn put(
+    inner: &Inner,
+    kind: &str,
+    id: &str,
+    data: &Value,
+    expected_updated_at: Option<i64>,
+) -> Result<()> {
     let mut key = entity_key(inner, kind).await?;
     let enc = encrypt_data(kind, data, &key);
     crypto::wipe(&mut key);
     let (encrypted_data, header) = enc?;
+    let mut body =
+        json!({"id": id, "type": kind, "encryptedData": encrypted_data, "header": header});
+    if let Some(t) = expected_updated_at {
+        body["expectedUpdatedAt"] = json!(t);
+    }
     // The answer (the updated entity) is not needed: the next diff brings
     // the server's `updatedAt`.
     inner
         .api()?
-        .json_no_content(
-            Method::PUT,
-            "/user-entity/entity",
-            &json!({"id": id, "type": kind, "encryptedData": encrypted_data, "header": header}),
-        )
+        .json_no_content(Method::PUT, "/user-entity/entity", &body)
         .await?;
     inner
         .store()
