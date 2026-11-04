@@ -181,7 +181,6 @@ pub struct Index {
     pub(crate) hashes: HashMap<String, (i64, Vec<i64>)>,
 }
 
-#[allow(dead_code)] // accessors for the v1.2 search, faces and memories tracks
 impl Index {
     /// Every file once, newest first (used by search, faces and memories).
     pub(crate) fn all_items(&self) -> &[TimelineItem] {
