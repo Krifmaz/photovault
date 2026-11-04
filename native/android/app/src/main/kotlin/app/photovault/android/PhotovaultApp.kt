@@ -75,6 +75,17 @@ class AppGraph(private val context: Context) {
         }
     }
 
+    /**
+     * Deletes decrypted originals a previous process left behind (killed while the viewer or a memory story
+     * was open, so their view models never cleaned up). Runs at process start, before any screen exists.
+     */
+    fun wipeLeftovers() {
+        appScope.launch {
+            viewerCache.listFiles()?.forEach { it.delete() }
+            memoryCache.listFiles()?.forEach { it.delete() }
+        }
+    }
+
     /** Re-runs core's home/public address choice when the device's network changes. */
     fun watchNetwork() {
         NetworkWatcher(context, appScope) { core.refreshNetwork() }.start()
@@ -92,6 +103,7 @@ class PhotovaultApp : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         graph = AppGraph(this).also {
             it.warmUp()
+            it.wipeLeftovers()
             it.watchNetwork()
         }
     }
