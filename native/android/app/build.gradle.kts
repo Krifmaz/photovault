@@ -98,6 +98,11 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+        jniLibs {
+            // From Ente's ONNX Runtime AAR only libonnxruntime.so is used (ente-ml's `ort` dlopens it); the Java
+            // API's JNI glue is never loaded.
+            excludes += "**/libonnxruntime4j_jni.so"
+        }
     }
 }
 
@@ -131,6 +136,12 @@ dependencies {
     implementation(libs.zxing.core)
 
     implementation(libs.androidx.profileinstaller)
+
+    // Background ML indexing (data/ml/MlWork.kt).
+    implementation(libs.androidx.work.runtime)
+    // ONNX Runtime for ente-ml, exactly as Ente's photos app ships it (the Ivy repository has no metadata, so
+    // the artifact is named with @aar). Repository: settings.gradle.kts; SHA-256: gradle/verification-metadata.xml.
+    implementation("io.ente.onnxruntime:onnxruntime-webgpu-android:${libs.versions.enteOnnxRuntime.get()}@aar")
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
