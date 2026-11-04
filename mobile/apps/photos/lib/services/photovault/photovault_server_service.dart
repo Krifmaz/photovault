@@ -31,6 +31,10 @@ class PhotovaultServerService {
   static const _serversKey = "${_keyPrefix}servers";
   static const _activeKey = "${_keyPrefix}activeServer";
 
+  /// publicUrl -> the address the person connected through, when that was
+  /// neither the public nor the home URL (see [ServerAddressSelector.select]).
+  static const _reachedAtKey = "${_keyPrefix}reachedAt";
+
   /// Optional label for the built-in server (`contracts/apps.json`).
   static const builtInServerName = String.fromEnvironment(
     "PHOTOVAULT_SERVER_NAME",
@@ -117,13 +121,19 @@ class PhotovaultServerService {
   }
 
   /// Saves [info], makes it the active server and points Ente's endpoint at
-  /// its best address (home or public).
-  Future<void> activate(PhotovaultServerInfo info) async {
+  /// its best address (home or public). [answeredAddress] is the address
+  /// that answered the Connect request; it is kept as a last resort for
+  /// when the public URL cannot be reached from this network.
+  Future<void> activate(
+    PhotovaultServerInfo info, {
+    String? answeredAddress,
+  }) async {
     await _save(info);
     await _prefs!.setString(_activeKey, info.publicUrl);
+    await _setReachedAt(info, answeredAddress);
     // Endpoint first, so the landing page that listens to [activeServer]
     // never signs in against the previous address.
-    final address = await _selector.select(info);
+    final address = await _selector.select(info, reachedAt: _reachedAt(info));
     await _setEndpoint(address);
     activeServer.value = info;
   }
@@ -139,6 +149,7 @@ class PhotovaultServerService {
     final servers = savedServers
       ..removeWhere((s) => sameServerAddress(s.publicUrl, info.publicUrl));
     await _writeServers(servers);
+    await _setReachedAt(info, null);
     if (sameServerAddress(activeServer.value?.publicUrl, info.publicUrl)) {
       await clearActive();
     }
@@ -156,7 +167,10 @@ class PhotovaultServerService {
     final server = activeServer.value;
     if (server == null || _prefs == null) return;
     try {
-      final address = await _selector.select(server);
+      final address = await _selector.select(
+        server,
+        reachedAt: _reachedAt(server),
+      );
       await _setEndpoint(address);
       if (!server.isPhotovault) return;
       final fresh = await _client.probe(address, kHomeProbeTimeout * 2);
@@ -169,6 +183,43 @@ class PhotovaultServerService {
     } catch (e, s) {
       _logger.warning("Address refresh failed", e, s);
     }
+  }
+
+  Map<String, String> _reachedAtMap() {
+    final raw = _prefs?.getString(_reachedAtKey);
+    if (raw == null) return {};
+    try {
+      final map = jsonDecode(raw);
+      if (map is! Map) return {};
+      return {
+        for (final e in map.entries)
+          if (e.key is String && e.value is String)
+            e.key as String: e.value as String,
+      };
+    } catch (_) {
+      return {};
+    }
+  }
+
+  String? _reachedAt(PhotovaultServerInfo server) =>
+      _reachedAtMap()[tryNormalizeServerAddress(server.publicUrl) ??
+          server.publicUrl];
+
+  Future<void> _setReachedAt(
+    PhotovaultServerInfo server,
+    String? address,
+  ) async {
+    final key = tryNormalizeServerAddress(server.publicUrl) ?? server.publicUrl;
+    final map = _reachedAtMap();
+    final normalized = tryNormalizeServerAddress(address);
+    if (normalized == null ||
+        sameServerAddress(normalized, server.publicUrl) ||
+        sameServerAddress(normalized, server.homeUrl)) {
+      if (map.remove(key) == null) return;
+    } else {
+      map[key] = normalized;
+    }
+    await _prefs!.setString(_reachedAtKey, jsonEncode(map));
   }
 
   Future<void> _setEndpoint(String address) async {

@@ -76,4 +76,30 @@ void main() {
     );
     expect(sameServerAddress(null, "x"), isFalse);
   });
+
+  group("isHomeNetworkAddress", () {
+    test("LAN-only addresses", () {
+      for (final a in [
+        "10.0.1.7:8095",
+        "http://192.168.1.2",
+        "nas.local",
+        "photos.lan:8095",
+        "localhost",
+        "nas",
+        "[fe80::1]:8095",
+      ]) {
+        expect(isHomeNetworkAddress(a), isTrue, reason: a);
+      }
+    });
+    test("public addresses", () {
+      for (final a in [
+        "photos.example.com",
+        "https://photos.example.com",
+        "photos.example.com:8443",
+      ]) {
+        expect(isHomeNetworkAddress(a), isFalse, reason: a);
+      }
+      expect(isHomeNetworkAddress(""), isFalse);
+    });
+  });
 }

@@ -45,6 +45,14 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
 
+            <!-- PHOTOVAULT: server connection. photovault://connect?url=...
+                 links from the server's QR code (contracts/apps.json). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="photovault" android:host="connect" />
+            </intent-filter>
             <!-- PHOTOVAULT: removed the albums.ente.io / albums.ente.com
                  app-link intent filters (Ente's public album domains). -->
 

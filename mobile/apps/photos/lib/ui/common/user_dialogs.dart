@@ -2,6 +2,8 @@ import "dart:async";
 
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
+import "package:photos/services/photovault/photovault_strings.dart"; // PHOTOVAULT
 import "package:photos/ui/components/buttons/button_widget.dart";
 import "package:photos/ui/components/dialog_widget.dart";
 import "package:photos/ui/components/models/button_type.dart";
@@ -21,8 +23,14 @@ Future<void> showInviteDialog(BuildContext context, String email) async {
         labelText: context.strings.sendInvite,
         isInAlert: true,
         onTap: () async {
+          // PHOTOVAULT: server connection. The invitee needs the server.
           unawaited(
-            shareText(context.strings.shareTextRecommendUsingEnteForPhotos),
+            shareText(
+              PhotovaultStrings.inviteWithServer(
+                context.strings.shareTextRecommendUsingEnteForPhotos,
+                PhotovaultServerService.instance.activeServer.value,
+              ),
+            ),
           );
         },
       ),

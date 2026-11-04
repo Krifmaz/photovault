@@ -19,6 +19,8 @@ import "package:photos/models/metadata/common_keys.dart";
 import 'package:photos/services/account/user_service.dart';
 import 'package:photos/services/collections_service.dart';
 import 'package:photos/services/hidden_service.dart';
+import 'package:photos/services/photovault/photovault_server_service.dart'; // PHOTOVAULT
+import 'package:photos/services/photovault/photovault_strings.dart'; // PHOTOVAULT
 import 'package:photos/ui/components/action_sheet_widget.dart';
 import 'package:photos/ui/components/buttons/button_widget.dart';
 import 'package:photos/ui/components/models/button_type.dart';
@@ -352,9 +354,14 @@ class CollectionActions {
                 shouldSurfaceExecutionStates: false,
                 onTap: () {
                   Navigator.of(sheetContext).pop();
+                  // PHOTOVAULT: server connection. The invitee needs the
+                  // server.
                   unawaited(
                     shareText(
-                      context.strings.shareTextRecommendUsingEnteForPhotos,
+                      PhotovaultStrings.inviteWithServer(
+                        context.strings.shareTextRecommendUsingEnteForPhotos,
+                        PhotovaultServerService.instance.activeServer.value,
+                      ),
                     ),
                   );
                 },

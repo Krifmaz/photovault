@@ -4,6 +4,8 @@
 // ARB files so upstream string merges stay conflict-free; move into
 // `packages/strings` when these screens get translated.
 
+import "package:photos/services/photovault/server_address.dart";
+import "package:photos/services/photovault/server_contract.dart";
 import "package:photos/services/photovault/server_info_client.dart";
 
 class PhotovaultStrings {
@@ -46,6 +48,16 @@ class PhotovaultStrings {
 
   static String connectedTo(String name) => "Connected to $name";
 
+  /// Invite texts (sharing, family) end with the server to sign up on: its
+  /// public address and the connect link. Unchanged without a server.
+  static String inviteWithServer(String text, PhotovaultServerInfo? server) {
+    if (server == null) return text;
+    return "$text\n\nServer: ${server.publicUrl}\n${buildConnectLink(server)}";
+  }
+
+  static String connectLinkWhileSignedIn(String name) =>
+      "You're signed in${name.isEmpty ? "" : " to $name"}. To use another server, open Settings > Server and switch server.";
+
   static String switchServerBody(String name) =>
       "You'll be logged out of $name first. Your photos stay on the server.";
 
@@ -58,7 +70,10 @@ class PhotovaultStrings {
       case ServerConnectErrorKind.invalidAddress:
         return "\"$address\" isn't a server address. Try something like photos.example.com or 10.0.1.7:8095.";
       case ServerConnectErrorKind.unreachable:
-        return "Can't reach $address. Are you on your home Wi-Fi?";
+        // The home Wi-Fi hint only fits a LAN-only address.
+        return isHomeNetworkAddress(address)
+            ? "Can't reach $address. Are you on your home Wi-Fi?"
+            : "Can't reach $address. Check the address and your internet connection.";
       case ServerConnectErrorKind.tls:
         return "Couldn't make a secure connection to $address. Its certificate isn't trusted, or it doesn't speak HTTPS. For a home address, try http://$address.";
       case ServerConnectErrorKind.notPhotovault:

@@ -182,6 +182,21 @@ class PhotovaultServerInfo {
   }
 }
 
+/// The `photovault://connect?url=...&home=...&name=...` link for [server]
+/// (the same payload as the server's QR code; [parseConnectPayload] reads it).
+String buildConnectLink(PhotovaultServerInfo server) {
+  return Uri(
+    scheme: kConnectQrScheme,
+    host: kConnectQrHost,
+    queryParameters: {
+      "url": server.publicUrl,
+      if (server.homeUrl != null && server.homeUrl!.isNotEmpty)
+        "home": server.homeUrl!,
+      if (server.isPhotovault && server.name.isNotEmpty) "name": server.name,
+    },
+  ).toString();
+}
+
 /// A server address read from a QR code or a pasted link.
 class ConnectPayload {
   const ConnectPayload({required this.url, this.homeUrl, this.name});
@@ -267,4 +282,26 @@ DiscoveredServer? discoveredServerFromMdns({
     address: address,
     version: value("version"),
   );
+}
+
+/// True when [uri] is a public (or collect) album link made by [server]
+/// (`contracts/apps.json` shareLink: `<albumsUrl>/?t=<token>#<key>`, where
+/// albumsUrl defaults to `publicUrl/albums`). The host must be the host of
+/// the server's albums, public or home URL, and the link must carry a token.
+bool isServerPublicAlbumLink(Uri? uri, PhotovaultServerInfo? server) {
+  if (uri == null || server == null) return false;
+  final scheme = uri.scheme.toLowerCase();
+  if (scheme != "https" && scheme != "http") return false;
+  final token = uri.queryParameters["t"];
+  if (token == null || token.isEmpty) return false;
+  final host = uri.host.toLowerCase();
+  if (host.isEmpty) return false;
+  for (final base in [server.albumsUrl, server.publicUrl, server.homeUrl]) {
+    if (base == null) continue;
+    final baseHost = Uri.tryParse(base)?.host.toLowerCase();
+    if (baseHost != null && baseHost.isNotEmpty && baseHost == host) {
+      return true;
+    }
+  }
+  return false;
 }

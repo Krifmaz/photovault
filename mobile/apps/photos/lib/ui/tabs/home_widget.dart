@@ -50,6 +50,9 @@ import "package:photos/services/memory_home_widget_service.dart";
 import "package:photos/services/memory_share_service.dart";
 import "package:photos/services/notification_service.dart";
 import "package:photos/services/people_home_widget_service.dart";
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
+import "package:photos/services/photovault/photovault_strings.dart"; // PHOTOVAULT
+import "package:photos/services/photovault/server_contract.dart"; // PHOTOVAULT
 import "package:photos/services/sync/diff_fetcher.dart";
 import "package:photos/services/sync/local_sync_service.dart";
 import "package:photos/services/sync/remote_sync_service.dart";
@@ -67,6 +70,8 @@ import "package:photos/ui/home/home_bottom_nav_bar.dart";
 import "package:photos/ui/home/home_gallery_widget.dart";
 import "package:photos/ui/home/landing_page_widget.dart";
 import "package:photos/ui/home/loading_photos_widget.dart";
+import "package:photos/ui/notification/toast.dart"; // PHOTOVAULT
+import "package:photos/ui/photovault/connect_server_page.dart"; // PHOTOVAULT
 import "package:photos/ui/rituals/ritual_camera_page.dart";
 import "package:photos/ui/rituals/ritual_page.dart";
 import "package:photos/ui/rituals/ritual_privacy.dart";
@@ -820,7 +825,9 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   bool _isPublicAlbumDeepLink(Uri uri) {
-    if (!_isPublicAlbumHost(uri.host)) {
+    // PHOTOVAULT: server connection. Links made by the active server count
+    // as public album links too (see _isServerAlbumLink).
+    if (!_isPublicAlbumHost(uri.host) && !_isServerAlbumLink(uri)) {
       return false;
     }
     if (Platform.isIOS) {
@@ -834,8 +841,16 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   bool _isPublicAlbumUrl(String url) {
     final host = Uri.tryParse(url)?.host ?? "";
-    return _isPublicAlbumHost(host);
+    // PHOTOVAULT: server connection, see _isServerAlbumLink.
+    return _isPublicAlbumHost(host) || _isServerAlbumLink(Uri.tryParse(url));
   }
+
+  // PHOTOVAULT: server connection. Public and collect links point at the
+  // active server's albums URL (contracts/apps.json), not albums.ente.*.
+  bool _isServerAlbumLink(Uri? uri) => isServerPublicAlbumLink(
+    uri,
+    PhotovaultServerService.instance.activeServer.value,
+  );
 
   bool _isPublicAlbumHost(String host) {
     return host == "albums.ente.io" || host == "albums.ente.com";
@@ -1191,6 +1206,8 @@ class _HomeWidgetState extends State<HomeWidget> {
       if (initialLink != null) {
         _logger.info("Initial link received: host ${initialLink.host}");
         if (!mounted) return false;
+        // PHOTOVAULT: server connection (photovault://connect links).
+        if (_handleConnectLink(initialLink)) return true;
         _getCredentials(context, initialLink);
         return true;
       } else {
@@ -1204,6 +1221,8 @@ class _HomeWidgetState extends State<HomeWidget> {
       (link) {
         _logger.info("Link received: host ${link.host}");
         if (!mounted) return;
+        // PHOTOVAULT: server connection (photovault://connect links).
+        if (_handleConnectLink(link)) return;
         _getCredentials(context, link);
       },
       onError: (err) {
@@ -1211,6 +1230,39 @@ class _HomeWidgetState extends State<HomeWidget> {
       },
     );
     return false;
+  }
+
+  // PHOTOVAULT: server connection. A photovault://connect link (the
+  // server's QR code read by the camera app, or a tapped link) opens the
+  // connect screen with the address filled in. Signed-in or mid-sign-up
+  // sessions are left alone: switching servers goes through Settings > Server.
+  bool _handleConnectLink(Uri link) {
+    if (link.scheme.toLowerCase() != kConnectQrScheme ||
+        link.host.toLowerCase() != kConnectQrHost) {
+      return false;
+    }
+    final payload = parseConnectPayload(link.toString());
+    if (payload == null) {
+      _logger.info("Ignoring connect link without an address");
+      return true;
+    }
+    final config = Configuration.instance;
+    if (config.hasConfiguredAccount() ||
+        config.getToken() != null ||
+        config.getEncryptedToken() != null) {
+      final server = PhotovaultServerService.instance.activeServer.value;
+      showToast(
+        context,
+        PhotovaultStrings.connectLinkWhileSignedIn(
+          server == null || !server.isPhotovault ? "" : server.name,
+        ),
+      );
+      return true;
+    }
+    unawaited(
+      routeToPage<bool>(context, ConnectServerPage(initialPayload: payload)),
+    );
+    return true;
   }
 
   void _getCredentials(BuildContext context, Uri? link) {

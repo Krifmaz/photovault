@@ -89,4 +89,57 @@ void main() {
     await selector.select(_info());
     expect(seen, kHomeProbeTimeout);
   });
+
+  group("reachedAt (address the person connected through)", () {
+    const lan = "http://192.168.1.20:8095";
+
+    test("used when the public URL does not answer", () async {
+      final asked = <String>[];
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async {
+          asked.add(url);
+          return url == lan ? _info(home: null) : null;
+        },
+      );
+      expect(await selector.select(_info(home: null), reachedAt: lan), lan);
+      expect(asked, [_public, lan]);
+    });
+
+    test("public wins when it answers", () async {
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async => _info(home: null),
+      );
+      expect(await selector.select(_info(home: null), reachedAt: lan), _public);
+    });
+
+    test("ignored when it reports another server", () async {
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async =>
+            url == lan ? _info(public: "https://other.example.com") : null,
+      );
+      expect(await selector.select(_info(home: null), reachedAt: lan), _public);
+    });
+
+    test("home still comes first", () async {
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async => _info(),
+      );
+      expect(await selector.select(_info(), reachedAt: lan), _home);
+    });
+
+    test("no extra probe when it is the public URL", () async {
+      var probes = 0;
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async {
+          probes++;
+          return null;
+        },
+      );
+      expect(
+        await selector.select(_info(home: null), reachedAt: "$_public/"),
+        _public,
+      );
+      expect(probes, 0);
+    });
+  });
 }

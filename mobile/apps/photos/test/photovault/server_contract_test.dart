@@ -162,4 +162,80 @@ void main() {
       );
     });
   });
+
+  group("buildConnectLink", () {
+    test("round-trips through parseConnectPayload", () {
+      const info = PhotovaultServerInfo(
+        name: "Family & friends",
+        version: "0.2.0",
+        publicUrl: "https://photos.example.com",
+        homeUrl: "http://10.0.1.7:8095",
+      );
+      final link = buildConnectLink(info);
+      expect(link, startsWith("photovault://connect?"));
+      final p = parseConnectPayload(link)!;
+      expect(p.url, "https://photos.example.com");
+      expect(p.homeUrl, "http://10.0.1.7:8095");
+      expect(p.name, "Family & friends");
+    });
+    test("compatible server: address only", () {
+      final p = parseConnectPayload(
+        buildConnectLink(
+          PhotovaultServerInfo.compatible("https://ente.example.org"),
+        ),
+      )!;
+      expect(p.url, "https://ente.example.org");
+      expect(p.homeUrl, isNull);
+      expect(p.name, isNull);
+    });
+  });
+
+  group("isServerPublicAlbumLink", () {
+    const server = PhotovaultServerInfo(
+      name: "Family",
+      version: "0.2.0",
+      publicUrl: "https://photos.example.com",
+      homeUrl: "http://10.0.1.7:8095",
+      albumsUrl: "https://albums.example.com",
+    );
+    test("accepts links on the albums, public and home hosts", () {
+      for (final link in [
+        "https://albums.example.com/?t=abc#key",
+        "https://photos.example.com/albums/?t=abc#key",
+        "http://10.0.1.7:8095/albums/?t=abc#key",
+      ]) {
+        expect(isServerPublicAlbumLink(Uri.parse(link), server), isTrue);
+      }
+    });
+    test("rejects other hosts, links without a token, and no server", () {
+      expect(
+        isServerPublicAlbumLink(
+          Uri.parse("https://other.example.com/albums/?t=abc#key"),
+          server,
+        ),
+        isFalse,
+      );
+      expect(
+        isServerPublicAlbumLink(
+          Uri.parse("https://photos.example.com/albums/"),
+          server,
+        ),
+        isFalse,
+      );
+      expect(
+        isServerPublicAlbumLink(
+          Uri.parse("photovault://connect?t=abc"),
+          server,
+        ),
+        isFalse,
+      );
+      expect(
+        isServerPublicAlbumLink(
+          Uri.parse("https://photos.example.com/albums/?t=abc"),
+          null,
+        ),
+        isFalse,
+      );
+    });
+  });
 }

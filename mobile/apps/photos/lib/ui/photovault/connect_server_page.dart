@@ -28,7 +28,11 @@ class ConnectServerPage extends StatefulWidget {
     super.key,
     this.onConnected,
     this.onUseWithoutServer,
+    this.initialPayload,
   });
+
+  /// A `photovault://connect` link (or QR text) to look up straight away.
+  final ConnectPayload? initialPayload;
 
   /// Called after the chosen server became the active one. When null the
   /// page pops itself.
@@ -47,6 +51,9 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
   bool _busy = false;
   String? _error;
   PhotovaultServerInfo? _found;
+
+  /// The normalised address that answered for [_found].
+  String? _foundAddress;
   List<DiscoveredServer> _discovered = const [];
   bool _searching = false;
 
@@ -56,6 +63,13 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
     final builtIn = _service.builtInAddress;
     if (builtIn != null && _service.savedServers.isEmpty) {
       _controller.text = builtIn;
+    }
+    final payload = widget.initialPayload;
+    if (payload != null) {
+      _controller.text = payload.url;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_lookUpPayload(payload));
+      });
     }
     if (_service.discovery.isSupported) unawaited(_discover());
   }
@@ -78,21 +92,43 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
   }
 
   /// Fetches the server's description for [input] and shows it.
-  Future<void> _lookUp(String input) async {
+  Future<void> _lookUp(String input) => _lookUpFirst([input]);
+
+  /// A scanned or linked payload: the public address first, then the home
+  /// address it carries (a phone on the home LAN may only reach that one).
+  Future<void> _lookUpPayload(ConnectPayload payload) =>
+      _lookUpFirst([payload.url, payload.homeUrl]);
+
+  /// Tries each address in order and shows the first server that answers.
+  /// The field shows the address that answered.
+  Future<void> _lookUpFirst(List<String?> candidates) async {
     if (_busy) return;
     FocusScope.of(context).unfocus();
     setState(() {
       _busy = true;
       _error = null;
       _found = null;
+      _foundAddress = null;
     });
+    ServerConnectException? firstError;
     try {
-      final info = await _service.fetchInfo(input);
-      if (!mounted) return;
-      setState(() => _found = info);
-    } on ServerConnectException catch (e) {
-      if (!mounted) return;
-      setState(() => _error = PhotovaultStrings.connectError(e));
+      for (final input in candidates) {
+        if (input == null || input.trim().isEmpty) continue;
+        try {
+          final info = await _service.fetchInfo(input);
+          if (!mounted) return;
+          if (_controller.text != input) _controller.text = input;
+          setState(() {
+            _found = info;
+            _foundAddress = tryNormalizeServerAddress(input);
+          });
+          return;
+        } on ServerConnectException catch (e) {
+          firstError ??= e;
+        }
+      }
+      if (!mounted || firstError == null) return;
+      setState(() => _error = PhotovaultStrings.connectError(firstError!));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -109,10 +145,12 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
     });
     ServerConnectException? firstError;
     PhotovaultServerInfo? info;
+    String? answered;
     for (final address in [server.publicUrl, server.homeUrl]) {
       if (address == null) continue;
       try {
         info = await _service.fetchInfo(address);
+        answered = tryNormalizeServerAddress(address);
         break;
       } on ServerConnectException catch (e) {
         firstError ??= e;
@@ -126,12 +164,12 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
       });
       return;
     }
-    await _activate(info);
+    await _activate(info, answered);
   }
 
-  Future<void> _activate(PhotovaultServerInfo info) async {
+  Future<void> _activate(PhotovaultServerInfo info, String? answered) async {
     setState(() => _busy = true);
-    await _service.activate(info);
+    await _service.activate(info, answeredAddress: answered);
     if (!mounted) return;
     setState(() => _busy = false);
     if (widget.onConnected != null) {
@@ -152,13 +190,21 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
       return;
     }
     _controller.text = payload.url;
-    await _lookUp(payload.url);
+    await _lookUpPayload(payload);
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.componentColors;
     final saved = _service.savedServers;
+    // The build-time server (PHOTOVAULT_SERVER / PHOTOVAULT_SERVER_NAME),
+    // unless it is already saved.
+    final builtInAddress = _service.builtInAddress;
+    final builtIn =
+        builtInAddress != null &&
+            !saved.any((s) => sameServerAddress(s.publicUrl, builtInAddress))
+        ? builtInAddress
+        : null;
     final canPop = Navigator.of(context).canPop();
     return Scaffold(
       backgroundColor: colors.backgroundBase,
@@ -212,7 +258,7 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
               _FoundServerCard(
                 info: _found!,
                 busy: _busy,
-                onContinue: () => _activate(_found!),
+                onContinue: () => _activate(_found!, _foundAddress),
               )
             else
               ButtonComponent(
@@ -223,6 +269,21 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
                 shouldSurfaceExecutionStates: false,
                 onTap: () => _lookUp(_controller.text),
               ),
+            if (builtIn != null) ...[
+              const _SectionHeader(PhotovaultStrings.builtIn),
+              _ServerRow(
+                title: PhotovaultServerService.builtInServerName.isNotEmpty
+                    ? PhotovaultServerService.builtInServerName
+                    : displayServerAddress(builtIn),
+                subtitle: displayServerAddress(builtIn),
+                onTap: _busy
+                    ? null
+                    : () {
+                        _controller.text = builtIn;
+                        _lookUp(builtIn);
+                      },
+              ),
+            ],
             if (saved.isNotEmpty) ...[
               const _SectionHeader(PhotovaultStrings.savedServers),
               for (final server in saved)

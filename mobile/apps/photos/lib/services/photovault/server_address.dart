@@ -105,6 +105,17 @@ bool sameServerAddress(String? a, String? b) {
   return na != null && na == nb;
 }
 
+/// True for addresses that only make sense on a home network (IP literals,
+/// `localhost`, single-label names, `.local`, `.lan`, `.home`, `.internal`,
+/// `.home.arpa`): the same rule that picks `http` as the default scheme.
+bool isHomeNetworkAddress(String address) {
+  var text = address.trim();
+  final schemeMatch = RegExp(r"^[a-zA-Z][a-zA-Z0-9+.-]*://").firstMatch(text);
+  if (schemeMatch != null) text = text.substring(schemeMatch.end);
+  if (text.isEmpty) return false;
+  return _defaultSchemeFor(text) == "http";
+}
+
 String _defaultSchemeFor(String text) {
   var host = text;
   if (host.startsWith("[")) return "http"; // IPv6 literal

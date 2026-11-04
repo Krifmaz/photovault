@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:photos/models/user_details.dart';
 import 'package:photos/services/account/user_service.dart';
 import 'package:photos/services/family_service.dart';
+import 'package:photos/services/photovault/photovault_server_service.dart'; // PHOTOVAULT
+import 'package:photos/services/photovault/photovault_strings.dart'; // PHOTOVAULT
 import 'package:photos/theme/ente_theme.dart';
 import 'package:photos/ui/components/base_bottom_sheet.dart';
 import 'package:photos/ui/components/buttons/button_widget_v2.dart';
@@ -404,7 +406,13 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
             leadingWidget: const Icon(Icons.ios_share_outlined),
             shouldSurfaceExecutionStates: false,
             onTap: () async {
-              await shareText(l10n.shareTextRecommendUsingEnteForFamily);
+              // PHOTOVAULT: server connection. The invitee needs the server.
+              await shareText(
+                PhotovaultStrings.inviteWithServer(
+                  l10n.shareTextRecommendUsingEnteForFamily,
+                  PhotovaultServerService.instance.activeServer.value,
+                ),
+              );
               if (mounted) {
                 Navigator.of(context).pop();
               }
