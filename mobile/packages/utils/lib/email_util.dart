@@ -23,7 +23,6 @@ import "package:intl/intl.dart";
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 final Logger _logger = Logger('email_util');
 const MailComposer _mailComposer = MailComposer();
@@ -50,19 +49,23 @@ Future<void> sendLogs(
     icon: Icons.bug_report_outlined,
     body: dialogBody ?? context.strings.logsDialogBody,
     buttons: [
-      ButtonWidget(
-        isInAlert: true,
-        buttonType: ButtonType.neutral,
-        labelText: context.strings.reportABug,
-        buttonAction: ButtonAction.first,
-        shouldSurfaceExecutionStates: false,
-        onTap: () async {
-          await _sendLogs(context, toEmail, subject, body);
-          if (postShare != null) {
-            postShare();
-          }
-        },
-      ),
+      // PHOTOVAULT: strip - an empty `toEmail` means there is no support
+      // address (Photovault's shared-package callers pass ''), so the e-mail
+      // button is hidden and only View logs / Export logs remain.
+      if (toEmail.isNotEmpty)
+        ButtonWidget(
+          isInAlert: true,
+          buttonType: ButtonType.neutral,
+          labelText: context.strings.reportABug,
+          buttonAction: ButtonAction.first,
+          shouldSurfaceExecutionStates: false,
+          onTap: () async {
+            await _sendLogs(context, toEmail, subject, body);
+            if (postShare != null) {
+              postShare();
+            }
+          },
+        ),
       ButtonWidget(
         buttonType: ButtonType.secondary,
         labelText: context.strings.viewLogs,
@@ -156,14 +159,8 @@ Future<void> shareLogs(
   }
 }
 
-Future<void> openSupportPage(String? subject, String? body) async {
-  const url = "https://github.com/ente/ente/discussions/new?category=q-a";
-  if (subject != null && body != null) {
-    await launchUrl(Uri.parse("$url&title=$subject&body=$body"));
-  } else {
-    await launchUrl(Uri.parse(url));
-  }
-}
+// PHOTOVAULT: strip - removed `openSupportPage` (Ente's GitHub discussions);
+// nothing called it (Ente Auth has its own copy).
 
 Future<String> getZippedLogsFile({String logsSubPath = "logs"}) async {
   final logsPath = (await getApplicationSupportDirectory()).path;

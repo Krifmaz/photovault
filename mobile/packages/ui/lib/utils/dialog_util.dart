@@ -15,7 +15,6 @@ import 'package:ente_ui/components/loading_widget.dart';
 import 'package:ente_ui/components/progress_dialog.dart';
 import 'package:ente_ui/theme/colors.dart';
 import 'package:ente_utils/email_util.dart';
-import 'package:ente_utils/platform_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +38,9 @@ Future<ButtonResult?> showErrorDialog(
         isInAlert: true,
         buttonAction: ButtonAction.first,
         onTap: () async {
-          await sendEmail(context, to: "support@ente.com", body: body);
+          // PHOTOVAULT: strip - no support e-mail (was Ente's support address);
+          // opens the logs sheet (view / export) for the server's admin.
+          await sendLogs(context, '', postShare: () {});
         },
       ),
       const ButtonWidget(
@@ -119,11 +120,9 @@ Future<ButtonResult?> showGenericErrorDialog({
     context.strings.itLooksLikeSomethingWentWrongPleaseRetryAfterSome,
     error: error,
   );
-  bool isWindowCertError = false;
   if (Platform.isWindows &&
       error != null &&
       error.toString().contains("CERTIFICATE_VERIFY_FAILED")) {
-    isWindowCertError = true;
     errorBody =
         "Certificate verification failed. Please update your system certificates, & restart the app. If the issue persists, please contact support.";
   }
@@ -141,26 +140,15 @@ Future<ButtonResult?> showGenericErrorDialog({
         buttonAction: ButtonAction.first,
         isInAlert: true,
       ),
-      if (isWindowCertError)
-        ButtonWidget(
-          buttonType: ButtonType.neutral,
-          labelText: 'Update Certificates',
-          buttonAction: ButtonAction.third,
-          isInAlert: true,
-          onTap: () async {
-            await PlatformUtil.openWebView(
-              context,
-              context.strings.faq,
-              "https://ente.com/help/auth/troubleshooting/windows-login",
-            );
-          },
-        ),
+      // PHOTOVAULT: strip - removed the "Update Certificates" button (a
+      // help page on Ente's website); the message above still explains the fix.
       ButtonWidget(
         buttonType: ButtonType.secondary,
         labelText: context.strings.contactSupport,
         buttonAction: ButtonAction.second,
         onTap: () async {
-          await sendLogs(context, "support@ente.com", postShare: () {});
+          // PHOTOVAULT: strip - no support e-mail (Ente's was hard-coded).
+          await sendLogs(context, '', postShare: () {});
         },
       ),
     ],
@@ -185,7 +173,8 @@ Future<void> showGenericErrorBottomSheet({
       GradientButton(
         text: context.strings.contactSupport,
         onTap: () async {
-          await sendLogs(context, "support@ente.com", postShare: () {});
+          // PHOTOVAULT: strip - no support e-mail (Ente's was hard-coded).
+          await sendLogs(context, '', postShare: () {});
         },
       ),
     ],
