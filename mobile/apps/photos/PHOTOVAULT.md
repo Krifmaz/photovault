@@ -442,6 +442,12 @@ not ship):
   (`tree_env.dart` here, `tree_env_upstream.dart` there).
   `scripts/photovault/render_before_after.sh <dir>` renders both and writes
   `<screen>-<mode>-before.png` / `-after.png`.
+- `../../../.github/workflows/photovault-mobile.yml` job
+  `photos-emulator-screens` (non-blocking): x86_64 debug APK in an API 34
+  `aosp_atd` emulator, a server built from the repo's Dockerfile
+  (`WEB=none`, `PHOTOVAULT_SKIP_EMAIL_VERIFICATION`), driven by
+  `scripts/photovault/emulator_screens.py` (adb + uiautomator); uploads the
+  `photovault-emulator-screens` artifact.
 - `lib/main.dart`, `lib/ui/account/onboarding_page_scaffold.dart`: analyzer
   fixes (unused imports left by the telemetry removal, a missing `const`).
 
