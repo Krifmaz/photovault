@@ -33,7 +33,6 @@ import "package:photos/states/user_details_state.dart";
 import "package:photos/ui/photovault/connect_server_page.dart";
 import "package:photos/ui/photovault/server_qr_scan_page.dart";
 import "package:photos/ui/photovault/server_settings_page.dart";
-import "package:photos/ui/settings/about/about_us_page.dart";
 import "package:photos/ui/settings/storage_card_widget.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -312,14 +311,6 @@ void main() {
       await _pumpFrames(tester);
       expect(find.text(PhotovaultStrings.scanQr), findsOneWidget);
       await _shoot(tester, "qr-scan-$mode");
-    });
-
-    testWidgets("about: Based on Ente ($mode)", (tester) async {
-      await setUpView(tester);
-      await tester.pumpWidget(_app(brightness, const AboutUsPage()));
-      await _pumpFrames(tester);
-      expect(find.text("Based on Ente"), findsOneWidget);
-      await _shoot(tester, "about-$mode");
     });
   }
 }

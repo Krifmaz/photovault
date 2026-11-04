@@ -23,9 +23,8 @@ class EncoreTokens {
   /// Brand name shown in the UI (`brand.name`).
   static const String brandName = 'Photovault';
 
-  /// Upstream credit line (`brand.credit`).
-  // PHOTOVAULT: the only user-visible mention of Ente (About page), no link.
-  static const String credit = 'Based on Ente';
+  // PHOTOVAULT: no `brand.credit` here: the Android app has no About page
+  // (the attribution is in the repository's licence and README).
 
   /// UI font family (`font.family`). The apps already bundle Inter.
   static const String fontFamily = 'Inter';

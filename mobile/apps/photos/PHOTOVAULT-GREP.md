@@ -6,7 +6,7 @@ Generated for the Photovault fork of `mobile/apps/photos`. Patterns, run case-in
 
 Scope: `apps/photos/{lib,assets,android,ios,pubspec.yaml}` and `mobile/packages/*` (all shared packages, including the ARB strings). Excluded: build outputs, `.dart_tool`, generated `strings_localizations*.dart` (regenerated from the ARB files), `lib/generated/` protobufs, `GeneratedPluginRegistrant`, binary images (images were checked visually instead).
 
-Rule used: internal identifiers, class/package names, API paths and fields, comments, log messages and the About credit are acceptable; anything a user can see is not. Hits that were user-visible have been fixed in this branch; what is listed below is what remains, each with why it is acceptable or where it is a known gap.
+Rule used: internal identifiers, class/package names, API paths and fields, comments and log messages are acceptable; anything a user can see is not. Hits that were user-visible have been fixed in this branch; what is listed below is what remains, each with why it is acceptable or where it is a known gap.
 
 ## Update: second strip pass
 
@@ -340,7 +340,6 @@ podspec metadata, PHOTOVAULT comments and upstream comments.
 - `apps/photos/lib/ui/rituals/ritual_share_card.dart` (`duck`×8):
   - L7 `const String _duckyShareArtAsset = "assets/rituals/ritual_ducky_share.svg";`: Asset file name kept so code is untouched; the image was re-rendered without the mascot.
   - remaining hits are identifiers (class/field/variable names such as `StreamSubscription`, `EnteFile`, `Subscription` model); internal.
-- `apps/photos/lib/ui/settings/about/about_us_page.dart` (`ente (word)`×3): only comments; internal.
 - `apps/photos/lib/ui/settings/account/account_settings_page.dart` (`ente (word)`×1, `subscription`×1): only comments; internal.
 - `apps/photos/lib/ui/settings/app_icon_selection_screen.dart` (`duck`×1, `mascot`×1): only comments; internal.
 - `apps/photos/lib/ui/settings/backup/backup_item_card.dart` (`ente.com`×1, `ente (word)`×1):
@@ -582,7 +581,6 @@ podspec metadata, PHOTOVAULT comments and upstream comments.
 - `packages/ente_components/lib/theme/motion.dart` (`ente (word)`×1): only comments; internal.
 - `packages/ente_components/lib/theme/photovault/encore_color_tokens.dart` (`ente (word)`×5): only comments; internal.
 - `packages/ente_components/lib/theme/photovault/encore_tokens.dart` (`ente (word)`×3):
-  - L28 `static const String credit = 'Based on Ente';`: The required plain-text About credit ("Based on Ente").
   - remaining hits are comments; internal.
 - `packages/ente_components/lib/theme/radii.dart` (`ente (word)`×1): only comments; internal.
 - `packages/ente_components/lib/theme/shadows.dart` (`ente (word)`×1): only comments; internal.

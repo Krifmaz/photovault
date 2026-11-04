@@ -8,8 +8,9 @@ all crypto are unchanged. Every Dart/XML/plist/gradle hunk carries a
 `PHOTOVAULT` comment (ARB files, PNGs and generated SVGs cannot hold comments
 and are listed here).
 
-The only user-visible mention of Ente is the plain-text line "Based on Ente"
-in Settings > About (`EncoreTokens.credit`, no link, no logo).
+The app shows no mention of Ente. There is no About page: the attribution
+(Photovault is based on Ente, AGPL-3.0) is in the repository's licence and
+README.
 
 ## Where the theme lives
 
@@ -69,7 +70,8 @@ Photos app theme:
 
 Photos app branding:
 - `lib/ui/photovault/photovault_settings_footer.dart` (new): settings footer showing the app version only.
-- `lib/ui/settings/about/about_us_page.dart`: About shows only the "Based on Ente" credit (`EncoreTokens.credit` in `encore_tokens.dart`).
+- `lib/ui/settings/about/about_us_page.dart`: deleted. Settings has no About
+  entry (also removed from settings search); `EncoreTokens.credit` is gone.
 - `lib/app.dart`: `MaterialApp.title` is "Photovault".
 - `lib/services/notification_service.dart`: default notification channel name is "Photovault" (channel id unchanged).
 - `lib/ui/home/grant_permissions_widget.dart`: Photovault wordmark instead of Ente's (wider logo box).
@@ -297,9 +299,9 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - `lib/ui/account/email_entry_page.dart`: the "How did you hear about
   Photovault?" growth-attribution field is hidden (`_showReferralSourceField`
   is false); `setRefSource` still sends the route source or an empty string.
-- `lib/ui/settings/about/about_us_page.dart`: a "Logs" entry under the credit
-  opens Ente's `sendLogs` sheet (View logs / Export logs only), because Help
-  & Support, which used to hold them, is removed.
+- `lib/ui/settings_page.dart`: a "Logs" entry (where About was) opens Ente's
+  `sendLogs` sheet (View logs / Export logs only), because Help & Support,
+  which used to hold them, is removed.
 - Links to ente.com removed: `lib/ui/account/email_entry_page.dart` (terms),
   `password_entry_page.dart` ("How it works"), `lib/ui/settings/ml/ml_consent_sheet.dart`,
   `lib/ui/settings/streaming/video_streaming_settings_page.dart`,

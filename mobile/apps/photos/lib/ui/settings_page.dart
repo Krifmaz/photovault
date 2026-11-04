@@ -17,11 +17,10 @@ import "package:photos/services/photovault/photovault_strings.dart";
 import "package:photos/services/photovault/server_address.dart";
 import "package:photos/ui/account/login_page.dart";
 import "package:photos/ui/notification/toast.dart";
-// PHOTOVAULT: branding (footer with upstream credit)
+// PHOTOVAULT: branding (footer with the app version)
 import "package:photos/ui/photovault/connect_server_page.dart"; // PHOTOVAULT
 import "package:photos/ui/photovault/photovault_settings_footer.dart";
 import "package:photos/ui/photovault/server_settings_page.dart"; // PHOTOVAULT
-import "package:photos/ui/settings/about/about_us_page.dart";
 import "package:photos/ui/settings/account/account_settings_page.dart";
 import "package:photos/ui/settings/appearance/appearance_settings_page.dart";
 import "package:photos/ui/settings/backup/backup_settings_page.dart";
@@ -40,6 +39,7 @@ import "package:photos/ui/settings/streaming/video_streaming_settings_page.dart"
 import "package:photos/ui/settings/widget_settings_screen.dart";
 import "package:photos/ui/sharing/verify_identity_dialog.dart";
 import "package:photos/utils/dialog_util.dart";
+import "package:photos/utils/email_util.dart"; // PHOTOVAULT: logs
 
 class SettingsPage extends StatelessWidget {
   final ValueNotifier<String?> emailNotifier;
@@ -145,22 +145,21 @@ class _SettingsBody extends StatelessWidget {
               _buildFeaturesAndPlansCard(context),
               const SizedBox(height: 8),
             ],
-            // PHOTOVAULT: removed Merchandise, Rate us (AppEngagementSection)
-            // and Ente's Help & Support.
+            // PHOTOVAULT: removed Merchandise, Rate us (AppEngagementSection),
+            // Ente's Help & Support and the About page (the attribution is in
+            // the repository). Logs (view/export only) stay reachable here.
             _buildMenuItem(
-              title: context.strings.about,
-              icon: HugeIcons.strokeRoundedInformationCircle,
-              onTap: () async {
-                await routeToPage(context, const AboutUsPage());
-              },
+              title: context.strings.logs,
+              icon: HugeIcons.strokeRoundedNote01,
+              onTap: () => sendLogs(context, context.strings.logs, ""),
             ),
             if (hasLoggedIn && !isLocalGalleryMode) ...[
               const SizedBox(height: 8),
               _buildLogoutCard(context),
             ],
             // PHOTOVAULT: branding. Was MoreFromEnteFooter (Ente's other apps
-            // and social links); now just the app version (the credit line
-            // is in About; the version no longer opens Ente's changelog).
+            // and social links); now just the app version (it no longer
+            // opens Ente's changelog).
             const PhotovaultSettingsFooter(),
             if (hasLoggedIn &&
                 !isLocalGalleryMode &&

@@ -117,13 +117,12 @@ reason = "generated wasm-bindgen output; its Rust source (rust/bindings/wasm/*) 
 # About credit
 
 [[allow]]
-path = ["mobile/packages/ente_components/lib/theme/photovault/encore_tokens.dart",
-        "web/packages/base/components/utils/photovault/encore-tokens.ts",
+path = ["web/packages/base/components/utils/photovault/encore-tokens.ts",
         "desktop/src/main/photovault/brand.ts"]
 term = "ente"
 line = "^Based on Ente$"
 category = "about-credit"
-reason = "The \"Based on Ente\" credit line shown as plain text in About."
+reason = "The \"Based on Ente\" credit line shown as plain text in About (web and desktop; the Android app has no About page)."
 
 # ---------------------------------------------------------------------------
 # Pending user decision
