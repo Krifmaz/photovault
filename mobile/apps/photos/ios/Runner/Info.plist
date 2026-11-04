@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>BGTaskSchedulerPermittedIdentifiers</key>
+		<array>
+			<string>io.ente.frame.iOSBackgroundAppRefresh</string>
+			<string>io.ente.frame.iOSBackgroundProcessing</string>
+			<string>io.ente.photos.nativeBackgroundRefresh</string>
+			<string>io.ente.photos.nativeBackgroundProcessing</string>
+		</array>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>$(APP_DISPLAY_NAME)</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(FLUTTER_BUILD_NAME)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>MinimumOSVersion</key>
+		<string>15.1</string>
+		<key>FlutterDeepLinkingEnabled</key>
+		<false/>
+		<key>AppGroupId</key>
+		<string>$(CUSTOM_GROUP_ID)</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>ShareMedia-$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>io.ente.frame</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>ente</string>
+				</array>
+			</dict>
+			<!-- PHOTOVAULT: server connection. photovault://connect links from the
+			     server's QR code (contracts/apps.json deepLinkScheme). -->
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>CFBundleURLName</key>
+				<string>app.photovault.connect</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>photovault</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>public-albums</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>https</string>
+				</array>
+			</dict>
+		</array>
+		<key>CFBundleVersion</key>
+		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<!-- PHOTOVAULT: removed FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED (no Firebase). -->
+		<key>LSRequiresIPhoneOS</key>
+		<true/>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+			<key>NSAllowsArbitraryLoadsInWebContent</key>
+			<true/>
+		</dict>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
+		<key>FLTEnableImpeller</key>
+		<true/>
+		<key>FLTEnableWideGamut</key>
+		<true/>
+		<!-- PHOTOVAULT: brand name in permission prompts -->
+		<key>NSFaceIDUsageDescription</key>
+		<string>Please allow Photovault to lock itself with FaceID or TouchID</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Please allow access to your camera so that you can take photos within Photovault</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Please allow access to your photos so that Photovault can encrypt and back them up.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Allow Photovault to save photos and videos to Apple Photos.</string>
+		<key>NSMotionUsageDescription</key>
+		<string>Photovault uses device motion to let you look around panoramic photos.</string>
+		<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+		<true/>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>fetch</string>
+			<string>processing</string>
+			<string>remote-notification</string>
+		</array>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UIApplicationSceneManifest</key>
+		<dict>
+			<key>UIApplicationSupportsMultipleScenes</key>
+			<false/>
+			<key>UISceneConfigurations</key>
+			<dict>
+				<key>UIWindowSceneSessionRoleApplication</key>
+				<array>
+					<dict>
+						<key>UISceneClassName</key>
+						<string>UIWindowScene</string>
+						<key>UISceneDelegateClassName</key>
+						<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+						<key>UISceneConfigurationName</key>
+						<string>flutter</string>
+						<key>UISceneStoryboardFile</key>
+						<string>Main</string>
+					</dict>
+				</array>
+			</dict>
+		</dict>
+		<!-- Temporary workaround for iPad iOS 26 layout issue. Remove when fixed in Flutter: https://github.com/flutter/flutter/issues/170461 -->
+		<key>UIDesignRequiresCompatibility</key>
+		<true/>
+		<key>UIStatusBarHidden</key>
+		<false/>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false/>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true/>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_googlecast._tcp</string>
+			<string>_F5BCEC64._googlecast._tcp</string>
+			<!-- PHOTOVAULT: server connection (LAN discovery of the server). -->
+			<string>_photovault._tcp</string>
+		</array>
+		<key>NSLocalNetworkUsageDescription</key>
+		<!-- PHOTOVAULT: also covers finding your Photovault server. -->
+		<string>${PRODUCT_NAME} uses the local network to find your Photovault server and Cast-enabled devices on your Wi-Fi network.</string>
+	</dict>
+</plist>

@@ -1,0 +1,7 @@
+<resources>
+    <!-- PHOTOVAULT: brand name -->
+    <string name="app_name">Photovault</string>
+    <string name="backup">Backup</string>
+    <!-- PHOTOVAULT: removed asset_statements (Ente domain asset links) -->
+
+</resources>

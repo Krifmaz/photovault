@@ -1,0 +1,194 @@
+# PHOTOVAULT: mobile CI for the Photos app (mobile/apps/photos).
+#
+#   1. flutter analyze + flutter test (Ente's tests and test/photovault)
+#   2. arm64 release APK (flavor `independent`, applicationId app.photovault)
+#   3. uploads the APK and its SHA256SUMS as a workflow artifact
+#
+# Signing: with the repository secrets PHOTOVAULT_KEYSTORE_B64,
+# PHOTOVAULT_KEYSTORE_PASSWORD, PHOTOVAULT_KEY_ALIAS and PHOTOVAULT_KEY_PASSWORD
+# the APK is signed with the Photovault release key (Ente's SIGNING_* env
+# vars, read by android/app/build.gradle). Without them (forks, PRs from
+# forks) it is signed with a throwaway debug key and the artifact says so.
+#
+# Toolchain mirrors Ente's photos-build.yml: Flutter 3.47.8 (archive SHA-256
+# from Ente's setup-flutter action), Temurin 17, rustup, the runner's Android
+# SDK plus NDK 28.2.13676358 (Flutter 3.47.8's default). Actions are pinned by
+# the commit SHAs Ente uses.
+name: Photovault mobile
+
+on:
+    push:
+        paths:
+            - "mobile/**"
+            - "rust/**"
+            - ".github/workflows/photovault-mobile.yml"
+    pull_request:
+        paths:
+            - "mobile/**"
+            - "rust/**"
+            - ".github/workflows/photovault-mobile.yml"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: photovault-mobile-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    FLUTTER_VERSION: 3.47.8
+    FLUTTER_SHA256: baf7dcc5a3dbba60fe863bf493a6cf203195621f7786eaa5a1bba02cd0d87dd2
+    NDK_VERSION: 28.2.13676358
+
+jobs:
+    photos-android:
+        runs-on: ubuntu-latest
+        timeout-minutes: 120
+
+        defaults:
+            run:
+                working-directory: mobile/apps/photos
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+            - name: Free runner disk space
+              run: sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+
+            - name: Setup JDK 17
+              uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+              with:
+                  distribution: "temurin"
+                  java-version: "17"
+
+            - name: Restore Flutter SDK
+              id: flutter-cache
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  key: flutter-${{ runner.os }}-${{ runner.arch }}-${{ env.FLUTTER_VERSION }}
+                  path: ${{ runner.tool_cache }}/flutter/${{ env.FLUTTER_VERSION }}
+
+            - name: Install Flutter
+              shell: bash
+              working-directory: .
+              env:
+                  CACHE_HIT: ${{ steps.flutter-cache.outputs.cache-hit }}
+              run: |
+                  set -euo pipefail
+                  root="$RUNNER_TOOL_CACHE/flutter/$FLUTTER_VERSION"
+                  if [ "$CACHE_HIT" != true ]; then
+                      archive="$RUNNER_TEMP/flutter.tar.xz"
+                      curl --retry 3 --retry-all-errors -fsSL \
+                          "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" \
+                          -o "$archive"
+                      printf '%s  %s\n' "$FLUTTER_SHA256" "$archive" | sha256sum -c -
+                      mkdir -p "$root"
+                      tar xf "$archive" -C "$root"
+                      rm -f "$archive"
+                  fi
+                  echo "$root/flutter/bin" >> "$GITHUB_PATH"
+                  # Same as Ente CI: drop the untranslated-messages report.
+                  sed -i '/^untranslated-messages-file:/d' mobile/packages/strings/l10n.yaml
+
+            - name: Install Android SDK packages
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+                  yes | "$sdkmanager" --licenses > /dev/null || true
+                  # A corrupt NDK download ("Error reading Zip content") has been seen on
+                  # hosted runners: retry with a clean partial-download state.
+                  for attempt in 1 2 3; do
+                      if "$sdkmanager" --install "platforms;android-36" "build-tools;35.0.0" \
+                          "ndk;${NDK_VERSION}" "cmake;3.22.1" "platform-tools" > /dev/null; then
+                          break
+                      fi
+                      [ "$attempt" = 3 ] && exit 1
+                      rm -rf "$ANDROID_HOME/ndk/${NDK_VERSION}" "$ANDROID_HOME/.temp" "$HOME/.android/cache"
+                      sleep 15
+                  done
+                  echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+
+            - name: Install Rust Android target
+              run: rustup target add aarch64-linux-android
+
+            - name: Rust cache
+              uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+              with:
+                  workspaces: rust
+                  shared-key: photovault-mobile
+
+            - run: flutter --version
+            - run: flutter pub get --enforce-lockfile
+
+            - name: Generate Rust bindings
+              run: cargo codegen frb photos
+              working-directory: rust
+
+            - name: Analyze
+              run: flutter analyze
+
+            - name: Test
+              run: flutter test
+
+            - name: Prepare signing key
+              id: signing
+              shell: bash
+              env:
+                  PHOTOVAULT_KEYSTORE_B64: ${{ secrets.PHOTOVAULT_KEYSTORE_B64 }}
+              run: |
+                  set -euo pipefail
+                  if [ -n "${PHOTOVAULT_KEYSTORE_B64}" ]; then
+                      printf '%s' "${PHOTOVAULT_KEYSTORE_B64}" | base64 -d > "$RUNNER_TEMP/photovault-release.jks"
+                      echo "key_path=$RUNNER_TEMP/photovault-release.jks" >> "$GITHUB_OUTPUT"
+                      echo "suffix=release" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "::warning::No PHOTOVAULT_KEYSTORE_B64 secret: the APK is signed with a debug key."
+                      echo "key_path=" >> "$GITHUB_OUTPUT"
+                      echo "suffix=debugsigned" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Build arm64 release APK
+              shell: bash
+              env:
+                  SIGNING_KEY_PATH: ${{ steps.signing.outputs.key_path }}
+                  SIGNING_KEY_ALIAS: ${{ secrets.PHOTOVAULT_KEY_ALIAS }}
+                  SIGNING_KEY_PASSWORD: ${{ secrets.PHOTOVAULT_KEY_PASSWORD }}
+                  SIGNING_STORE_PASSWORD: ${{ secrets.PHOTOVAULT_KEYSTORE_PASSWORD }}
+                  APK_NAME: photovault-arm64-${{ steps.signing.outputs.suffix }}.apk
+              run: |
+                  set -euo pipefail
+                  [ -n "$SIGNING_KEY_PATH" ] || unset SIGNING_KEY_PATH
+                  flutter build apk --release --flavor independent \
+                      --target-platform android-arm64 \
+                      --dart-define=cronetHttpNoPlay=true \
+                      --dart-define=PHOTOVAULT_SERVER=
+                  mkdir -p artifacts
+                  mv build/app/outputs/flutter-apk/app-independent-release.apk "artifacts/$APK_NAME"
+                  (cd artifacts && sha256sum "$APK_NAME" > SHA256SUMS)
+                  rm -f "$RUNNER_TEMP/photovault-release.jks"
+
+            - name: Check APK
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  bt="$ANDROID_HOME/build-tools/35.0.0"
+                  apk=$(ls artifacts/*.apk)
+                  "$bt/apksigner" verify --print-certs "$apk"
+                  "$bt/aapt2" dump badging "$apk" | grep -E "^package: name='app.photovault'"
+                  # No Firebase, Play services, Sentry or Play Billing classes.
+                  tmp="$RUNNER_TEMP/apk"
+                  mkdir -p "$tmp" && unzip -q -o "$apk" 'classes*.dex' -d "$tmp"
+                  if strings "$tmp"/classes*.dex | grep -E "Lcom/google/firebase/|Lcom/google/android/gms/|Lio/sentry/|Lcom/android/billingclient/"; then
+                      echo "::error::APK contains Firebase, Play services, Sentry or Play Billing classes"
+                      exit 1
+                  fi
+
+            - name: Upload APK
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: photovault-android-arm64-${{ steps.signing.outputs.suffix }}
+                  path: mobile/apps/photos/artifacts/
+                  if-no-files-found: error

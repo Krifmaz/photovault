@@ -7,7 +7,9 @@
 #   1. test     cargo test for the whole workspace
 #   2. version  next tag from .github/release/next-version.sh
 #   3. build    every workspace binary for Linux x86_64/arm64 and macOS arm64
-#   4. image    ghcr.io/<owner>/photovault (amd64 + arm64)
+#      web      (alongside build) the web apps' static export (photos, albums, cast, accounts,
+#               embed) with web/scripts/photovault-build.sh, as photovault-web CI
+#   4. image    ghcr.io/<owner>/photovault (amd64 + arm64): server + web apps
 #   5. release  creates the tag and the GitHub Release with archives + SHA256SUMS
 #
 # The tag is only pushed once everything above succeeded. Pushes that only
@@ -99,11 +101,11 @@ jobs:
           # and any distro with glibc >= 2.36.
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-24.04
-            container: rust:1-bookworm
+            container: mirror.gcr.io/library/rust:1-bookworm
             arch: amd64
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-24.04
-            container: rust:1-bookworm
+            container: mirror.gcr.io/library/rust:1-bookworm
             arch: arm64
           - target: aarch64-apple-darwin
             os: macos-15
@@ -129,7 +131,11 @@ jobs:
         with:
           key: ${{ matrix.target }}
       - name: Build
-        run: cargo build --release --locked --workspace --bins --target ${{ matrix.target }}
+        env:
+          PHOTOVAULT_COMMIT: ${{ github.sha }}
+        run: |
+          export PHOTOVAULT_COMMIT="${PHOTOVAULT_COMMIT:0:7}"
+          cargo build --release --locked --workspace --bins --target ${{ matrix.target }}
       - name: Package
         shell: bash
         run: |
@@ -158,8 +164,66 @@ jobs:
           path: image/
           if-no-files-found: error
 
+  web:
+    needs: version
+    if: needs.version.outputs.skip == 'false'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      # Empty = the web app talks to the server it was served from.
+      NEXT_PUBLIC_ENTE_ENDPOINT: ""
+      WASM_PACK_VERSION: "0.15.1"
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+          cache-bin: true
+          key: web
+      - name: Rust toolchains (stable + the cast nightly)
+        run: |
+          rustup target add wasm32-unknown-unknown
+          channel="$(sed -n 's/^channel = "\(.*\)"/\1/p' ../rust/bindings/wasm/cast/rust-toolchain.toml)"
+          rustup toolchain install "$channel" --profile minimal \
+              --component rust-src --target wasm32-unknown-unknown
+      - name: wasm-pack
+        run: |
+          command -v wasm-pack >/dev/null && wasm-pack --version | grep -q "$WASM_PACK_VERSION" ||
+              cargo install wasm-pack --locked --version "$WASM_PACK_VERSION"
+      - name: Static export
+        env:
+          PHOTOVAULT_WEB_OUT: ${{ github.workspace }}/photovault-web
+        run: |
+          scripts/photovault-build.sh
+          test -f "$PHOTOVAULT_WEB_OUT/index.html"
+          for app in albums cast accounts embed; do test -f "$PHOTOVAULT_WEB_OUT/$app/index.html"; done
+      - name: Package
+        working-directory: .
+        run: |
+          mkdir -p dist
+          tar -C photovault-web -czf "dist/photovault-web-${{ needs.version.outputs.tag }}.tar.gz" .
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web
+          path: photovault-web
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-web
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
   image:
-    needs: [test, version, build]
+    needs: [test, version, build, web]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -171,8 +235,17 @@ jobs:
           pattern: image-*
           path: .github/release
           merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          name: web
+          path: .github/release/rootfs/app/web
       - name: Image root filesystem
-        run: mkdir -p .github/release/rootfs/data .github/release/rootfs/db
+        # /app/web holds the web job's export (Photos at the root, the other
+        # apps in subfolders); the image serves it on the API port.
+        run: |
+          mkdir -p .github/release/rootfs/data .github/release/rootfs/config
+          test -f .github/release/rootfs/app/web/index.html
+          test -f .github/release/rootfs/app/web/albums/index.html
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
         with:
@@ -198,7 +271,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   release:
-    needs: [version, build, image]
+    needs: [version, build, web, image]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

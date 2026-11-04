@@ -128,7 +128,7 @@ async fn verify_email(
     Body(req): Body<EmailVerificationRequest>,
 ) -> ApiResult<Json<login::EmailAuthorizationResponse>> {
     let email = users::normalize_email(&req.email);
-    login::verify_email_ott(&state, client.app(), &email, &req.ott).await?;
+    login::verify_email_ott_or_skip(&state, client.app(), &email, &req.ott).await?;
     Ok(Json(
         login::on_verification_success(&state, &client, &email, req.source.as_deref(), false)
             .await?,

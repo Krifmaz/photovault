@@ -1,0 +1,8 @@
+# PHOTOVAULT: strip - no CSP reports to Ente's reporter and no Ente hosts in the policy.
+/*
+    Cache-Control: no-store, must-revalidate
+    Strict-Transport-Security: max-age=63072000
+    X-Content-Type-Options: nosniff
+    X-Download-Options: noopen
+    X-XSS-Protection: 1; mode=block
+    Content-Security-Policy-Report-Only: default-src 'self'; img-src 'self' blob: data: https://*.openstreetmap.org; media-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'unsafe-eval' blob:; manifest-src 'self'; child-src 'self' blob:; object-src 'none'; connect-src 'self' data: blob: https://*.s3.eu-central-003.backblazeb2.com https://*.s3.eu-central-2.wasabisys.com; base-uri 'self'; form-action 'none';

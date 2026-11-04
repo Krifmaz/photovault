@@ -1,0 +1,409 @@
+import "package:ente_strings/ente_strings.dart";
+import "package:ente_ui/utils/toast_util.dart";
+import "package:flutter/material.dart";
+import "package:locker/core/errors.dart";
+import "package:locker/models/info/info_item.dart";
+import "package:locker/services/collections/collections_service.dart";
+import "package:locker/services/favorites_service.dart";
+import "package:locker/services/files/links/links_service.dart";
+import "package:locker/services/files/sync/metadata_updater_service.dart";
+import "package:locker/services/files/sync/models/file.dart";
+import "package:locker/services/info_file_service.dart";
+import "package:locker/services/trash/models/trash_file.dart";
+import "package:locker/ui/components/delete_confirmation_sheet.dart";
+import "package:locker/ui/components/file_edit_sheet.dart";
+import "package:locker/ui/components/locker_progress_dialog.dart";
+import "package:locker/ui/components/share_link_sheet.dart";
+import "package:locker/ui/components/subscription_required_sheet.dart";
+import "package:locker/ui/pages/account_credentials_page.dart";
+import "package:locker/ui/pages/base_info_page.dart";
+import "package:locker/ui/pages/emergency_contact_page.dart";
+import "package:locker/ui/pages/personal_note_page.dart";
+import "package:locker/ui/pages/physical_records_page.dart";
+import "package:locker/utils/bottom_sheet_illustration.dart";
+import "package:locker/utils/error_sheet.dart";
+import "package:logging/logging.dart";
+
+class FileActions {
+  static final _logger = Logger("FileActions");
+
+  static Future<void> editFile(
+    BuildContext context,
+    EnteFile file, {
+    VoidCallback? onSuccess,
+  }) async {
+    if (file is TrashFile) {
+      _logger.warning(
+        'Ignoring edit request for trashed file ${file.uploadedFileID}',
+      );
+      return;
+    }
+
+    if (InfoFileService.instance.isInfoFile(file)) {
+      await _editInfoFile(context, file);
+      return;
+    }
+
+    _logger.info('Opening edit dialog for file ${file.uploadedFileID}');
+
+    final editableCollections = await CollectionService.instance
+        .getCollectionsForUI(includeUncategorized: true);
+
+    final currentCollections = await CollectionService.instance
+        .getCollectionsForFile(file);
+
+    final favoriteCollection = await CollectionService.instance
+        .getOrCreateImportantCollection();
+
+    final currentCollectionIds = currentCollections.map((c) => c.id).toSet();
+
+    if (!context.mounted) return;
+    final result = await showFileEditSheet(
+      context,
+      file: file,
+      collections: editableCollections,
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    // Fetch collections in case new ones were created during file edit dialog
+    final updatedAllCollections = await CollectionService.instance
+        .getCollections();
+
+    final dialog = context.mounted
+        ? await showLockerProgressDialog(context, context.strings.pleaseWait)
+        : null;
+
+    try {
+      final currentTitle = file.displayName;
+      final hasMetadataChanged = result.title != currentTitle;
+
+      if (hasMetadataChanged) {
+        _logger.info('Updating file metadata: title changed');
+        final metadataUpdateSuccess = await MetadataUpdaterService.instance
+            .editFileName(file, result.title);
+
+        if (!metadataUpdateSuccess) {
+          await dialog?.hide();
+          if (!context.mounted) {
+            return;
+          }
+          showToast(
+            context,
+            context.strings.failedToUpdateFile(error: 'Metadata update failed'),
+          );
+          return;
+        }
+      }
+      final selectedCollectionIds = result.selectedCollections
+          .map((c) => c.id)
+          .toSet();
+
+      final wasFavorite = currentCollectionIds.contains(favoriteCollection.id);
+      final isFavoriteNow = selectedCollectionIds.contains(
+        favoriteCollection.id,
+      );
+
+      if (wasFavorite && !isFavoriteNow) {
+        await FavoritesService.instance.removeFromFavorites(file);
+      } else if (!wasFavorite && isFavoriteNow) {
+        await FavoritesService.instance.addToFavorites(file);
+      }
+
+      final regularCurrentIds = currentCollectionIds
+          .where((id) => id != favoriteCollection.id)
+          .toSet();
+      final regularSelectedIds = selectedCollectionIds
+          .where((id) => id != favoriteCollection.id)
+          .toSet();
+
+      final collectionsToRemove = regularCurrentIds.difference(
+        regularSelectedIds,
+      );
+
+      final collectionsToAdd = regularSelectedIds.difference(regularCurrentIds);
+
+      if (regularSelectedIds.isEmpty && collectionsToRemove.isNotEmpty) {
+        _logger.info('All collections deselected, moving to uncategorized');
+
+        for (final collectionId in collectionsToRemove) {
+          try {
+            final collection = updatedAllCollections.firstWhere(
+              (c) => c.id == collectionId,
+            );
+            await CollectionService.instance.moveFilesFromCurrentCollection(
+              context.mounted ? context : null,
+              collection,
+              [file],
+            );
+          } catch (e) {
+            final collection = updatedAllCollections.firstWhere(
+              (c) => c.id == collectionId,
+            );
+            _logger.severe(
+              'Failed to remove file from collection (ID: ${collection.id}): $e',
+            );
+          }
+        }
+      } else {
+        for (final collectionId in collectionsToAdd) {
+          final collection = updatedAllCollections.firstWhere(
+            (c) => c.id == collectionId,
+          );
+
+          try {
+            await CollectionService.instance.addToCollection(
+              collection,
+              file,
+              runSync: false,
+            );
+          } catch (e) {
+            _logger.severe(
+              'Failed to move file to collection (ID: ${collection.id}): $e',
+            );
+          }
+        }
+
+        for (final collectionId in collectionsToRemove) {
+          final collection = updatedAllCollections.firstWhere(
+            (c) => c.id == collectionId,
+          );
+          await CollectionService.instance.moveFilesFromCurrentCollection(
+            context.mounted ? context : null,
+            collection,
+            [file],
+          );
+        }
+      }
+
+      await CollectionService.instance.sync();
+      await dialog?.hide();
+      onSuccess?.call();
+
+      if (!context.mounted) {
+        return;
+      }
+
+      showToast(context, context.strings.fileUpdatedSuccessfully);
+    } catch (e) {
+      await dialog?.hide();
+      _logger.severe('Failed to update file collections: $e');
+
+      if (!context.mounted) {
+        return;
+      }
+      await showLockerErrorSheet(context, e);
+    }
+  }
+
+  static Future<void> _editInfoFile(BuildContext context, EnteFile file) async {
+    Widget page;
+    final infoItem = InfoFileService.instance.extractInfoFromFile(file);
+
+    if (infoItem == null) {
+      _logger.warning(
+        'File ${file.uploadedFileID} marked as info file but no info payload found',
+      );
+      return;
+    }
+
+    switch (infoItem.type) {
+      case InfoType.note:
+        page = PersonalNotePage(mode: InfoPageMode.edit, existingFile: file);
+        break;
+      case InfoType.accountCredential:
+        page = AccountCredentialsPage(
+          mode: InfoPageMode.edit,
+          existingFile: file,
+        );
+        break;
+      case InfoType.physicalRecord:
+        page = PhysicalRecordsPage(mode: InfoPageMode.edit, existingFile: file);
+        break;
+      case InfoType.emergencyContact:
+        page = EmergencyContactPage(
+          mode: InfoPageMode.edit,
+          existingFile: file,
+        );
+        break;
+    }
+
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => page));
+  }
+
+  static Future<void> shareFileLink(BuildContext context, EnteFile file) async {
+    LockerProgressDialog? dialog;
+    try {
+      dialog = await showLockerProgressDialog(
+        context,
+        context.strings.creatingLink,
+      );
+      final shareableLink = await LinksService.instance.getOrCreateLink(file);
+
+      await dialog.hide();
+
+      if (context.mounted) {
+        await showShareLinkSheet(
+          context,
+          shareableLink.fullURL!,
+          shareableLink.linkID,
+          file,
+        );
+      }
+    } catch (e, stackTrace) {
+      _logger.severe("Failed to create file link", e, stackTrace);
+      await dialog?.hide();
+
+      if (context.mounted) {
+        if (e is SharingNotPermittedForFreeAccountsError) {
+          await showSubscriptionRequiredSheet(context);
+        } else {
+          await showLockerErrorSheet(context, e);
+        }
+      }
+    }
+  }
+
+  static Future<void> deleteFile(
+    BuildContext context,
+    EnteFile file, {
+    VoidCallback? onSuccess,
+  }) async {
+    final confirmation = await showDeleteConfirmationSheet(
+      context,
+      title: context.strings.moveToTrashQuestion,
+      body: context.strings.itemsWillBeDeletedFromAllCollections(count: 1),
+      deleteButtonLabel: context.strings.deleteItemCount(count: 1),
+      illustration: LockerBottomSheetIllustration.fileDelete,
+    );
+
+    if (confirmation == null) {
+      return;
+    }
+
+    final dialog = context.mounted
+        ? await showLockerProgressDialog(context, context.strings.deletingFile)
+        : null;
+
+    try {
+      final collections = await CollectionService.instance
+          .getCollectionsForFile(file);
+      if (collections.isNotEmpty) {
+        await CollectionService.instance.trashFile(file, collections.first);
+      }
+
+      await dialog?.hide();
+
+      if (context.mounted) {
+        showToast(context, context.strings.fileDeletedSuccessfully);
+      }
+
+      onSuccess?.call();
+    } catch (e) {
+      await dialog?.hide();
+
+      if (context.mounted) {
+        await showLockerErrorSheet(context, e);
+      }
+    }
+  }
+
+  static bool isImportant(EnteFile file) {
+    return FavoritesService.instance.isFavoriteCache(file);
+  }
+
+  static Future<void> markImportant(
+    BuildContext context,
+    EnteFile file, {
+    VoidCallback? onSuccess,
+  }) async {
+    final isCurrentlyImportant = isImportant(file);
+    final dialog = await showLockerProgressDialog(
+      context,
+      isCurrentlyImportant
+          ? context.strings.removingFromImportant
+          : context.strings.markingAsImportant,
+    );
+
+    try {
+      if (isCurrentlyImportant) {
+        await FavoritesService.instance.removeFromFavorites(file);
+      } else {
+        await FavoritesService.instance.addToFavorites(file);
+      }
+
+      await dialog.hide();
+
+      if (context.mounted) {
+        showToast(
+          context,
+          !isCurrentlyImportant
+              ? context.strings.fileMarkedAsImportant
+              : context.strings.fileRemovedFromImportant,
+        );
+      }
+
+      onSuccess?.call();
+    } catch (e, stackTrace) {
+      _logger.severe("Failed to toggle important status: $e", e, stackTrace);
+      await dialog.hide();
+
+      if (context.mounted) {
+        await showLockerErrorSheet(context, e);
+      }
+    }
+  }
+
+  static Future<void> markMultipleImportant(
+    BuildContext context,
+    List<EnteFile> files, {
+    VoidCallback? onSuccess,
+  }) async {
+    final dialog = await showLockerProgressDialog(
+      context,
+      context.strings.markingAsImportant,
+    );
+
+    try {
+      final filesToMark = files
+          .where((file) => !FavoritesService.instance.isFavoriteCache(file))
+          .toList();
+
+      if (filesToMark.isEmpty) {
+        await dialog.hide();
+        if (context.mounted) {
+          showToast(context, context.strings.allFilesAlreadyMarkedAsImportant);
+        }
+        return;
+      }
+
+      await FavoritesService.instance.updateFavorites(filesToMark, true);
+
+      await dialog.hide();
+
+      if (context.mounted) {
+        showToast(
+          context,
+          context.strings.filesMarkedAsImportant(count: filesToMark.length),
+        );
+      }
+
+      onSuccess?.call();
+    } catch (e, stackTrace) {
+      _logger.severe(
+        "Failed to mark multiple files as important: $e",
+        e,
+        stackTrace,
+      );
+      await dialog.hide();
+
+      if (context.mounted) {
+        await showLockerErrorSheet(context, e);
+      }
+    }
+  }
+}

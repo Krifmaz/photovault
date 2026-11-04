@@ -1,0 +1,133 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace "io.ente.auth"
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+        warningsAsErrors false
+        checkReleaseBuilds false
+    }
+
+    defaultConfig {
+        applicationId "io.ente.auth"
+        minSdkVersion 24
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
+    }
+
+    signingConfigs {
+       release {
+           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : System.getenv("SIGNING_KEY_PATH") ? file(System.getenv("SIGNING_KEY_PATH")) : null
+           keyAlias keystoreProperties['keyAlias'] ? keystoreProperties['keyAlias'] : System.getenv("SIGNING_KEY_ALIAS")
+           keyPassword keystoreProperties['keyPassword'] ? keystoreProperties['keyPassword'] : System.getenv("SIGNING_KEY_PASSWORD")
+           storePassword keystoreProperties['storePassword'] ? keystoreProperties['storePassword'] : System.getenv("SIGNING_STORE_PASSWORD")
+       }
+    }
+    
+    flavorDimensions "default"
+    productFlavors {
+        independent {
+            dimension "default"
+            applicationIdSuffix ".independent"
+        }
+        playstore {
+            dimension "default"
+        }
+        fdroid {
+            dimension "default"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+        debug {
+          applicationIdSuffix '.debug'
+          versionNameSuffix "-debug"
+          externalNativeBuild {
+            cmake {
+              arguments "-DANDROID_PACKAGE_NAME=${android.defaultConfig.applicationId}${applicationIdSuffix}"
+            }
+          }
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false
+        }
+    }
+
+    android.applicationVariants.all { variant ->
+        if (variant.flavorName == "fdroid") {
+            variant.outputs.all { output ->
+                output.outputFileName = "app-fdroid-release.apk"
+            }
+        }
+    }
+}
+
+androidComponents {
+    onVariants(selector().withFlavor("default", "independent")) { variant ->
+        // Compress native libraries for direct APK distribution:
+        // https://developer.android.com/build/releases/agp-4-2-0-release-notes#compress-native-libs-dsl
+        variant.packaging.jniLibs.useLegacyPackaging.set(true)
+    }
+
+    onVariants(selector().withFlavor("default", "fdroid")) { variant ->
+        // Compress native libraries for direct APK distribution:
+        // https://developer.android.com/build/releases/agp-4-2-0-release-notes#compress-native-libs-dsl
+        variant.packaging.jniLibs.useLegacyPackaging.set(true)
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+}

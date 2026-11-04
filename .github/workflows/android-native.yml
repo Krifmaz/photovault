@@ -1,0 +1,138 @@
+# Builds Photovault Native (APK 2): photovault-core for Android (cargo-ndk),
+# its Kotlin bindings (UniFFI), and the Compose app.
+#
+#   push / PR touching core/ or native/  -> test core, build APK, upload artifact
+#   workflow_call                        -> used by release.yml to attach the APK
+#
+# Signing: set repository secrets PV_NATIVE_KEYSTORE_B64, PV_NATIVE_KEYSTORE_PASSWORD,
+# PV_NATIVE_KEY_ALIAS, PV_NATIVE_KEY_PASSWORD for a stable release key. Without
+# them the release APK is signed with a throwaway key (fresh install needed).
+name: Android native
+
+on:
+  push:
+    paths:
+      - "core/**"
+      - "native/**"
+      - ".github/workflows/android-native.yml"
+  pull_request:
+    paths:
+      - "core/**"
+      - "native/**"
+      - ".github/workflows/android-native.yml"
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-native-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Skip when core is absent
+        id: has
+        run: if [ -f core/Cargo.toml ]; then echo "core=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.has.outputs.core == 'true'
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add aarch64-linux-android x86_64-linux-android
+      - if: steps.has.outputs.core == 'true'
+        uses: Swatinem/rust-cache@v2
+      - if: steps.has.outputs.core == 'true'
+        name: Test core
+        run: cargo test --locked -p photovault-core --no-fail-fast
+      - if: steps.has.outputs.core == 'true'
+        name: Build core for Android
+        run: |
+          cargo install cargo-ndk --locked --version ^4
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME"
+          cargo ndk --platform 28 -t arm64-v8a -t x86_64 -o native/android/core/build/jniLibs \
+            build --locked --release -p photovault-core
+          # The release profile strips symbols, UniFFI's metadata included, so the
+          # bindings come from the host's (unstripped) build of the same crate.
+          cargo build --locked -p photovault-core --lib
+          cargo run --locked -p photovault-core --features bindgen --bin uniffi-bindgen -- \
+            generate --library target/debug/libphotovault_core.so \
+            --language kotlin --out-dir native/android/core/build/generated/uniffi --no-format
+      - if: steps.has.outputs.core == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: photovault-core-android
+          path: |
+            native/android/core/build/jniLibs
+            native/android/core/build/generated/uniffi
+          if-no-files-found: error
+
+  apk:
+    needs: core
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Skip when the app is absent
+        id: has
+        run: if [ -f native/android/settings.gradle.kts ]; then echo "app=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.has.outputs.app == 'true'
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: photovault-core-android
+          path: native/android/core/build
+      - if: steps.has.outputs.app == 'true'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - if: steps.has.outputs.app == 'true'
+        uses: gradle/actions/setup-gradle@v5
+      - if: steps.has.outputs.app == 'true'
+        name: Signing key
+        env:
+          KS: ${{ secrets.PV_NATIVE_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.PV_NATIVE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.PV_NATIVE_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.PV_NATIVE_KEY_PASSWORD }}
+        run: |
+          ks="$RUNNER_TEMP/release.jks"
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$ks"
+          else
+            echo "::warning::No PV_NATIVE_KEYSTORE_B64 secret: signing with a throwaway key"
+            KS_PASS=throwaway; KEY_PASS=throwaway; KEY_ALIAS=photovault
+            keytool -genkeypair -keystore "$ks" -storepass "$KS_PASS" -keypass "$KEY_PASS" \
+              -alias "$KEY_ALIAS" -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=Photovault Native"
+          fi
+          {
+            echo "PV_KEYSTORE=$ks"; echo "PV_KEYSTORE_PASSWORD=$KS_PASS"
+            echo "PV_KEY_ALIAS=$KEY_ALIAS"; echo "PV_KEY_PASSWORD=$KEY_PASS"
+          } >> "$GITHUB_ENV"
+      - if: steps.has.outputs.app == 'true'
+        name: Build and test
+        working-directory: native/android
+        run: |
+          # With core in the repo the APK must carry the real photovault-core, never the demo library.
+          extra=()
+          if [ -f ../../core/Cargo.toml ]; then extra+=(-Pphotovault.requireRealCore=true); fi
+          ./gradlew --no-daemon "${extra[@]}" testReleaseUnitTest lintRelease assembleRelease
+          if [ -f ../../core/Cargo.toml ]; then
+            unzip -l app/build/outputs/apk/release/*.apk > "$RUNNER_TEMP/apk-files.txt"
+            for abi in arm64-v8a x86_64; do
+              grep -q "lib/$abi/libphotovault_core.so" "$RUNNER_TEMP/apk-files.txt" \
+                || { echo "::error::APK has no lib/$abi/libphotovault_core.so"; exit 1; }
+            done
+          fi
+      - if: steps.has.outputs.app == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: photovault-native-apk
+          path: native/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error

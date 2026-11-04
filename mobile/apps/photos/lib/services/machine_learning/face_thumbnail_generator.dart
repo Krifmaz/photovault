@@ -1,0 +1,64 @@
+import 'dart:typed_data' show Uint8List;
+
+import "package:logging/logging.dart";
+import "package:photos/models/ml/face/box.dart";
+import "package:photos/utils/isolate/isolate_operations.dart";
+import "package:photos/utils/isolate/super_isolate.dart";
+
+final _unsupportedImageFormatError = RegExp(
+  r'^Exception: decode error: (The file extension .+ was not recognized as an image format|The image format .+ is not supported)$',
+);
+
+class UnsupportedFaceThumbnailException implements Exception {
+  final Object cause;
+
+  const UnsupportedFaceThumbnailException(this.cause);
+
+  @override
+  String toString() => "UnsupportedFaceThumbnailException: $cause";
+}
+
+@pragma('vm:entry-point')
+class FaceThumbnailGenerator extends SuperIsolate {
+  @override
+  Logger get logger => _logger;
+  final _logger = Logger('FaceThumbnailGenerator');
+
+  @override
+  String get isolateName => "FaceThumbnailGenerator";
+
+  @override
+  bool get shouldAutomaticDispose => true;
+
+  FaceThumbnailGenerator._privateConstructor();
+  static final FaceThumbnailGenerator instance =
+      FaceThumbnailGenerator._privateConstructor();
+  factory FaceThumbnailGenerator() => instance;
+
+  Future<List<Uint8List>> generateFaceThumbnails(
+    String imagePath,
+    List<FaceBox> faceBoxes,
+  ) async {
+    try {
+      _logger.info(
+        "Generating face thumbnails for ${faceBoxes.length} face boxes in $imagePath",
+      );
+      final List<Map<String, dynamic>> faceBoxesJson = faceBoxes
+          .map((box) => box.toJson())
+          .toList();
+      final List<Uint8List> faces = await runInIsolate(
+        IsolateOperation.generateFaceThumbnails,
+        {'imagePath': imagePath, 'faceBoxesList': faceBoxesJson},
+      ).then((value) => value.cast<Uint8List>());
+      _logger.info("Generated face thumbnails");
+      return faces;
+    } catch (e, s) {
+      _logger.severe("Failed to generate face thumbnails", e, s);
+
+      if (_unsupportedImageFormatError.hasMatch(e.toString())) {
+        Error.throwWithStackTrace(UnsupportedFaceThumbnailException(e), s);
+      }
+      rethrow;
+    }
+  }
+}

@@ -59,9 +59,16 @@
           "basePath": "/accounts",
           "export": "web/apps/accounts/out",
           "servedAt": "<web dir>/accounts/"
+        },
+        "embed": {
+          "path": "web/apps/embed",
+          "basePath": "/embed",
+          "export": "web/apps/embed/out",
+          "servedAt": "<web dir>/embed/",
+          "framing": "must stay framable: no X-Frame-Options or frame-ancestors on /embed"
         }
       },
-      "serverFallback": "extension-less paths under /albums/, /cast/, /accounts/ fall back to that sub-app's index.html, not the root one"
+      "serverFallback": "API routes (e.g. /cast/device-info, /cast/cast-data) always win; extension-less paths under /albums/, /cast/, /accounts/, /embed/ fall back to that sub-app's index.html, not the root one"
     }
   },
   "core": {

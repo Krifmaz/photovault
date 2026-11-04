@@ -1,0 +1,27 @@
+display_name: Ente Auth
+package_name: enteauth
+license: GPLv3
+
+metainfo: linux/packaging/enteauth.appdata.xml
+
+icon: assets/generation-icons/icon-windows-linux.png
+
+keywords:
+  - Authentication
+  - 2FA
+
+generic_name: Ente Auth
+
+categories:
+  - Utility
+
+startup_notify: false
+startup_wm_class: io.ente.auth
+
+# Bundled libp11-kit from the Ubuntu build depends on libffi.so.8.
+include:
+  - libffi.so.8
+
+supported_mime_type:
+  - x-scheme-handler/enteauth
+

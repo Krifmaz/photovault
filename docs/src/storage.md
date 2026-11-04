@@ -10,7 +10,7 @@ Two backends implement the same `ObjectStore` trait
 
 ## Local directory (`kind = "local"`)
 
-Objects are files under `storage.path`. The server signs and serves its own
+Objects are files under `PHOTOVAULT_STORAGE_PATH` (`/data` in the image). The server signs and serves its own
 URLs under `/storage/<key>` (HMAC-SHA256 with `secrets.jwt`, bound to the
 operation, key, expiry and, for v2 uploads, the exact length and MD5), and
 speaks the subset of S3 the apps use:
@@ -45,11 +45,51 @@ Errors are S3-style XML (`<Error><Code>…</Code></Error>`).
 
 ### Separate storage hostname
 
-`storage.public_url` (default: `public_url`) is the base of every signed URL.
+`PHOTOVAULT_STORAGE_PUBLIC_URL` (default: `PHOTOVAULT_PUBLIC_URL`) is the base of every signed URL.
 Pointing it at a second hostname, e.g. `https://storage.example.com`, that
 reaches the same container lets you give uploads different proxy settings
 (no body size limit, no buffering, long timeouts) or bypass a CDN with upload
 limits. See [HTTPS behind a reverse proxy](deployment/reverse-proxy.md).
+
+## Storage numbers
+
+The apps show "X of Y used". Photovault fills in real numbers instead of a
+plan size:
+
+* **used**: the bytes the account stores. In a family it is the family's
+  total, as in Ente.
+* **free**: what the backend can still take.
+  * Local: free space on the disk behind `PHOTOVAULT_STORAGE_PATH`, read with
+    `statvfs` (space available to normal users) and cached for a few seconds.
+  * S3: there is no such call, so it is `PHOTOVAULT_STORAGE_LIMIT` minus
+    everything stored on the server. Without `PHOTOVAULT_STORAGE_LIMIT` it is
+    unlimited.
+  * `PHOTOVAULT_STORAGE_LIMIT` also caps a local disk, for example to keep
+    part of a shared pool free.
+* **quota**: the account's quota (`photovault admin quota`), or
+  `PHOTOVAULT_DEFAULT_QUOTA` for new accounts. None by default.
+* **limit** = `min(quota, used + free)`. A side that is "none" or unlimited
+  is left out.
+
+When there is no limit at all (S3 without `PHOTOVAULT_STORAGE_LIMIT` and no
+quota), Ente's endpoints report **100 TiB** (`109951162777600` bytes), so
+the stock apps still show a number.
+
+The values go into Ente's existing fields (`/users/details/v2`:
+`usage` and `subscription.storage`; `/billing/subscription`), so the stock
+apps show them without changes.
+
+`GET /photovault/usage` (signed in, `X-Auth-Token`) returns the same numbers
+explicitly:
+
+```json
+{ "usedBytes": 52428800000, "limitBytes": 3800000000000, "freeBytes": 3747571200000,
+  "unlimited": false, "limitSource": "disk", "quotaBytes": null }
+```
+
+`limitSource` says which side set the limit: `quota`, `default-quota`,
+`disk`, `storage-limit` or `unlimited`. When `unlimited` is `true`,
+`limitBytes` and `freeBytes` are `null`.
 
 ## S3-compatible services (`kind = "s3"`)
 

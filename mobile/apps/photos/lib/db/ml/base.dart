@@ -1,0 +1,137 @@
+import "dart:typed_data";
+
+import "package:photos/models/ml/clip.dart";
+import "package:photos/models/ml/face/face.dart";
+import "package:photos/models/ml/face/face_with_embedding.dart";
+import "package:photos/models/ml/vector.dart";
+import "package:photos/services/filedata/model/file_data.dart";
+
+abstract class IMLDataDB<T> {
+  Future<void> bulkInsertFaces(List<Face> faces);
+  Future<void> updateFaceIdToClusterId(Map<String, String> faceIDToClusterID);
+  Future<Map<int, int>> faceIndexedFileIds({int minimumMlVersion});
+  Future<int> getFaceIndexedFileCount({int minimumMlVersion});
+  Future<Map<String, int>> clusterIdToFaceCount();
+  Future<Set<String>> getBadFaceSingletonClusterIDs();
+  Future<Set<String>> getClustersWithThreeOrMoreNotPersonFeedback();
+  Future<Set<String>> getPersonIgnoredClusters(String personID);
+  Future<Map<String, Set<String>>> getPersonToRejectedSuggestions();
+  Future<Set<String>> getPersonClusterIDs(String personID);
+  Future<Set<String>> getPersonsClusterIDs(List<String> personID);
+  Future<void> clearTable();
+  Future<FaceWithoutEmbedding?> getCoverFaceForPerson({
+    required T recentFileID,
+    String? personID,
+    String? avatarFaceId,
+    String? clusterID,
+  });
+  Future<List<FaceWithoutEmbedding>?> getFacesForGivenFileID(T fileUploadID);
+  Future<Map<int, List<FaceWithoutEmbedding>>>
+  getFileIDsToFacesWithoutEmbedding();
+  Future<Map<String, Iterable<String>>> getClusterToFaceIDs(
+    Set<String> clusterIDs,
+  );
+  Future<String?> getClusterIDForFaceID(String faceID);
+  Future<Map<String, Iterable<String>>> getAllClusterIdToFaceIDs();
+  Future<Iterable<String>> getFaceIDsForCluster(String clusterID);
+  Future<Map<String, Map<String, Set<String>>>> getPersonToClusterIdToFaceIds();
+  Future<Map<String, Set<String>>> getPersonToClusterIDs();
+  Future<Map<String, Set<String>>> getClusterIdToFaceIdsForPerson(
+    String personID,
+  );
+  Future<Set<String>> getFaceIDsForPerson(String personID);
+  Future<Map<String, String?>> getFaceIdsToClusterIds(Iterable<String> faceIds);
+  Future<Map<T, Set<String>>> getFileIdToClusterIds();
+  Future<void> forceUpdateClusterIds(Map<String, String> faceIDToClusterID);
+  Future<void> removeFaceIdToClusterId(Map<String, String> faceIDToClusterID);
+  Future<void> removePerson(String personID);
+  Future<int> getTotalFaceCount();
+  Future<int> getErroredFaceCount();
+  Future<Set<T>> getErroredFileIDs();
+  Future<void> pruneResolvedFaceErrorResults(List<T> fileIDs);
+  Future<Set<T>> getFileIDsWithErrorResults(List<T> fileIDs);
+  Future<void> deleteFaceIndexForFiles(List<T> fileIDs);
+  Future<void> deleteUnclusteredFaceIndexForFiles(List<T> fileIDs);
+  Future<int> getClusteredOrFacelessFileCount();
+  Future<double> getClusteredToIndexableFilesRatio();
+  Future<int> getUnclusteredFaceCount();
+  Future<void> assignClusterToPerson({
+    required String personID,
+    required String clusterID,
+  });
+  Future<void> bulkAssignClusterToPersonID(
+    Map<String, String> clusterToPersonID,
+  );
+  Future<void> captureNotPersonFeedback({
+    required String personID,
+    required String clusterID,
+  });
+  Future<void> bulkCaptureNotPersonFeedback(
+    Map<String, String> clusterToPersonID,
+  );
+  Future<void> removeNotPersonFeedback({
+    required String personID,
+    required String clusterID,
+  });
+  Future<void> removeClusterToPerson({
+    required String personID,
+    required String clusterID,
+  });
+  Future<Map<T, Set<String>>> getFileIdToClusterIDSet(String personID);
+  Future<Map<T, Set<String>>> getFileIdToClusterIDSetForCluster(
+    Set<String> clusterIDs,
+  );
+  Future<void> clusterSummaryUpdate(Map<String, (Uint8List, int)> summary);
+  Future<void> deleteClusterSummary(String clusterID);
+  Future<Map<String, String>> getClusterIDToPersonID();
+  Future<void> dropClustersAndPersonTable({bool faces});
+  Future<void> dropFacesFeedbackTables();
+  Future<List<T>> getFileIDsOfPersonID(String personID);
+  Future<List<T>> getFileIDsOfClusterID(String clusterID);
+  Future<Set<T>> getAllFileIDsOfFaceIDsNotInAnyCluster();
+  Future<Set<T>> getAllFilesAssociatedWithAllClusters({
+    List<String>? exceptClusters,
+  });
+
+  Future<List<EmbeddingVector>> getAllClipVectors();
+  Future<Map<int, int>> clipIndexedFileWithVersion();
+  Future<int> getClipIndexedFileCount({int minimumMlVersion});
+  Future<void> putClip(List<ClipEmbedding> embeddings);
+  Future<void> deleteClipEmbeddings(List<T> fileIDs);
+  Future<void> deleteClipIndexes();
+
+  Future<Map<int, int>> petIndexedFileIds({int minimumMlVersion});
+
+  Future<Set<int>> getFullyIndexedFileIds({required bool includePets});
+
+  Future<void> checkMigrateFillClipVectorDB({bool force});
+  Future<void> checkMigrateFillClusterCentroidVectorDB({bool force});
+  Future<Set<String>> getClustersForMemoryLane(Set<String> assigned);
+  Future<List<String>> getFaceIDsForClusterOrderedByScore(
+    String clusterID, {
+    int limit,
+  });
+  Future<List<String>> getFaceIDsForPersonOrderedByScore(
+    String personID, {
+    int limit,
+  });
+  Future<String?> getFaceIdUsedForPersonOrCluster(String personOrClusterId);
+  Future<List<double>?> getRepeatedTextEmbeddingCache(String query);
+  Future<void> putFaceIdCachedForPersonOrCluster(
+    String personOrClusterId,
+    String faceID,
+  );
+  Future<void> putRepeatedTextEmbeddingCache(
+    String query,
+    List<double> embedding,
+  );
+  Future<void> removeFaceIdCachedForPersonOrCluster(String personOrClusterID);
+  Future<void> putFDStatus(List<FDStatus> fdStatusList);
+  Future<Map<int, PreviewInfo>> getFileIDsVidPreview();
+  Future<Set<int>> getFileIDsWithFDData({DataType? type});
+
+  Future<int> getClipVectorizableFileCount({int minimumMlVersion});
+  Future<Map<String, String>> getFaceIdToPersonIdForFaces(
+    Iterable<String> faceIDs,
+  );
+}

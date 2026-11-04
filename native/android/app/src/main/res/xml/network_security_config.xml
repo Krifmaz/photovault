@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Self-hosted servers are often reached over plain HTTP on the home network (http://10.0.1.7:8095), and
+  video can be streamed from core's local playlist. Everything sent is already end-to-end encrypted by
+  core (Ente's scheme); TLS for the public address is done by core with rustls.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

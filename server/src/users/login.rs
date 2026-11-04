@@ -120,7 +120,11 @@ pub async fn send_email_ott(
         }
     } else {
         let st = sign_up_state(state, &email).await?;
-        if purpose == purpose::SIGNUP && !state.config.allow_signups && st != SignUpState::Complete
+        // An account an admin created (`photovault admin create-user`) is `Incomplete`:
+        // it may finish signing up while signups are closed.
+        if purpose == purpose::SIGNUP
+            && st == SignUpState::NoAccount
+            && !crate::settings::signups_allowed(state).await
         {
             return Err(permission_denied());
         }
@@ -155,22 +159,73 @@ pub async fn send_email_ott(
     let ott = hard.clone().unwrap_or_else(six_digit_code);
     add_ott(state, &email, app, &ott, now_micros() + OTT_VALIDITY).await?;
     if hard.is_none() {
+        if purpose != purpose::CHANGE && skip_applies(state, &email).await? {
+            tracing::info!(
+                "Email verification skipped for {email} (PHOTOVAULT_SKIP_EMAIL_VERIFICATION): any code is accepted"
+            );
+            return Ok(());
+        }
         let body = if purpose == purpose::CHANGE {
             format!(
-                "Use this code to confirm your new email address: {ott}\n\nThe code expires in one hour.\n"
+                "Use this code to confirm your new email address for Photovault: {ott}\n\nThe code expires in one hour.\n"
             )
         } else {
             format!(
-                "Your verification code is {ott}\n\nThe code expires in one hour. If you did not request it, ignore this email.\n"
+                "Your Photovault verification code is {ott}\n\nThe code expires in one hour. If you did not request it, ignore this email.\n"
             )
         };
-        crate::mail::deliver(
+        crate::mail::deliver_code(
             &state.config,
             &email,
-            &format!("Verification code: {ott}"),
+            &ott,
+            &format!("Photovault verification code: {ott}"),
             &body,
         )
         .await;
+    }
+    Ok(())
+}
+
+/// `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` applies to `email`: on, and the account (if any)
+/// has not turned on email two-factor (that code is always required).
+pub async fn skip_applies(state: &AppState, email: &str) -> ApiResult<bool> {
+    if !state.config.skip_email_verification {
+        return Ok(false);
+    }
+    let Some(id) = user_id_for_email(state, email).await? else {
+        return Ok(true);
+    };
+    let mfa: Option<(i64,)> = sqlx::query_as(
+        "SELECT CASE WHEN email_mfa THEN 1 ELSE 0 END FROM users WHERE user_id = $1",
+    )
+    .bind(id)
+    .fetch_optional(&state.db.pool)
+    .await?;
+    Ok(!matches!(mfa, Some((n,)) if n != 0))
+}
+
+/// [`verify_email_ott`] for sign-up and log-in. With `PHOTOVAULT_SKIP_EMAIL_VERIFICATION`
+/// any code is accepted, but only while a code requested through `/users/ott` is pending,
+/// so the sign-up policy checked there still holds.
+pub async fn verify_email_ott_or_skip(
+    state: &AppState,
+    app: App,
+    email: &str,
+    ott: &str,
+) -> ApiResult<()> {
+    if !skip_applies(state, email).await? {
+        return verify_email_ott(state, app, email, ott).await;
+    }
+    let hash = email_hash(&state.keys, email);
+    let r =
+        sqlx::query("DELETE FROM otts WHERE email_hash = $1 AND app = $2 AND expiration_time > $3")
+            .bind(&hash)
+            .bind(app.as_str())
+            .bind(now_micros())
+            .execute(&state.db.pool)
+            .await?;
+    if r.rows_affected() == 0 {
+        return Err(gone_plain());
     }
     Ok(())
 }
@@ -311,7 +366,7 @@ pub async fn on_verification_success(
             (id, tfa != 0)
         }
         None => {
-            if !state.config.allow_signups {
+            if !crate::settings::signups_allowed(state).await {
                 return Err(permission_denied());
             }
             (create_user(state, email, source).await?, false)

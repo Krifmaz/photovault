@@ -13,14 +13,50 @@ use clap::Subcommand;
 /// Admin subcommands.
 #[derive(Subcommand, Debug)]
 pub enum AdminCmd {
-    /// List users: id, email, storage quota (bytes), usage (bytes), admin flag.
+    /// List users: id, email, storage quota, usage (bytes), admin flag.
     ListUsers,
-    /// Set a user's storage quota, e.g. `set-storage alice@example.org 50GB`.
-    SetStorage {
+    /// Create an account. The person then signs in with this email in the app and
+    /// chooses their own password there (the server never sees it, so the end-to-end
+    /// encryption keys stay theirs). Works with signups closed.
+    CreateUser {
+        /// Email address.
+        email: String,
+        /// Storage quota, e.g. `500GB`, or `none` (default: PHOTOVAULT_DEFAULT_QUOTA).
+        #[arg(long)]
+        quota: Option<String>,
+        /// Also grant access to the `/admin` API.
+        #[arg(long)]
+        admin: bool,
+    },
+    /// Help someone who forgot their password. Photos are encrypted with a key that only
+    /// the password or the recovery key opens, so the server cannot set a new password:
+    /// this prints a sign-in code and the steps for "Forgot password" + recovery key.
+    /// `--erase --yes` instead deletes the account and creates an empty one with the same
+    /// email (all of its photos are lost).
+    ResetPassword {
         /// Email or user id.
         user: String,
-        /// Bytes, or a number with a KB/MB/GB/TB suffix (binary units).
+        /// Delete everything and start the account over.
+        #[arg(long)]
+        erase: bool,
+        /// Confirm `--erase`.
+        #[arg(long)]
+        yes: bool,
+    },
+    /// Set a user's storage quota, e.g. `set-quota alice@example.org 50GB`; `none` removes it
+    /// (the free space on the storage backend is then the limit).
+    #[command(name = "quota", aliases = ["set-quota", "set-storage"])]
+    SetQuota {
+        /// Email or user id.
+        user: String,
+        /// Bytes, a number with a KB/MB/GB/TB suffix (binary units), or `none`.
         size: String,
+    },
+    /// Open or close sign-up for new accounts (`on`/`off`), or show the state with no value.
+    /// Stored in the database; overrides PHOTOVAULT_ALLOW_SIGNUPS; takes effect at once.
+    Signups {
+        /// `on` or `off`.
+        state: Option<String>,
     },
     /// Show unexpired one-time codes sent to an email (useful without SMTP).
     PendingOtt {
@@ -125,6 +161,13 @@ pub async fn run(state: &AppState, cmd: AdminCmd) -> anyhow::Result<()> {
             .fetch_all(&state.db.pool)
             .await?;
             println!("id\temail\tquota\tusage\tadmin");
+            let show = |q: i64| {
+                if q > 0 {
+                    q.to_string()
+                } else {
+                    "none".to_string()
+                }
+            };
             for (id, ct, nonce, quota, deleted, admin) in rows {
                 let email = if deleted != 0 || ct.is_empty() {
                     "(deleted)".to_string()
@@ -133,18 +176,112 @@ pub async fn run(state: &AppState, cmd: AdminCmd) -> anyhow::Result<()> {
                 };
                 let usage = users::usage(&state.db, id).await.unwrap_or(0);
                 let admin = admin != 0 || users::extract::is_admin(state, id).await;
-                println!("{id}\t{email}\t{quota}\t{usage}\t{admin}");
+                println!("{id}\t{email}\t{}\t{usage}\t{admin}", show(quota));
             }
         }
-        AdminCmd::SetStorage { user, size } => {
+        AdminCmd::CreateUser {
+            email,
+            quota,
+            admin,
+        } => {
+            let email = users::normalize_email(&email);
+            anyhow::ensure!(email.contains('@'), "not an email address: {email}");
+            if users::user_id_for_email(state, &email)
+                .await
+                .map_err(api)?
+                .is_some()
+            {
+                anyhow::bail!("{email} already has an account");
+            }
+            let id = users::store::create_user(state, &email, Some("admin-cli"))
+                .await
+                .map_err(api)?;
+            if let Some(q) = quota {
+                let bytes = crate::config::parse_quota(&q)?;
+                sqlx::query("UPDATE users SET storage_quota = $1 WHERE user_id = $2")
+                    .bind(bytes)
+                    .bind(id)
+                    .execute(&state.db.pool)
+                    .await?;
+            }
+            if admin {
+                sqlx::query("UPDATE users SET is_admin = $1 WHERE user_id = $2")
+                    .bind(true)
+                    .bind(id)
+                    .execute(&state.db.pool)
+                    .await?;
+            }
+            let code = issue_code(state, &email).await?;
+            println!(
+                "user {id}: created {email}{}",
+                if admin { " (admin)" } else { "" }
+            );
+            println!(
+                "next: in the app choose \"Create account\" with {email}, enter code {code} (valid 24 hours), then choose a password"
+            );
+        }
+        AdminCmd::ResetPassword { user, erase, yes } => {
             let id = resolve_user(state, &user).await?;
-            let bytes = parse_size(&size)?;
+            let email = users::email_for_user(state, id)
+                .await
+                .map_err(api)?
+                .ok_or_else(|| anyhow::anyhow!("user {id} has no email"))?;
+            if erase {
+                anyhow::ensure!(
+                    yes,
+                    "refusing to erase {email} without --yes (all of its photos are deleted)"
+                );
+                users::lifecycle::delete_account(state, id, true)
+                    .await
+                    .map_err(api)?;
+                let new_id = users::store::create_user(state, &email, Some("admin-cli"))
+                    .await
+                    .map_err(api)?;
+                let code = issue_code(state, &email).await?;
+                println!("user {id}: erased; new empty account {new_id} for {email}");
+                println!(
+                    "next: in the app sign in with {email}, enter code {code} (valid 24 hours), then choose a new password"
+                );
+            } else {
+                let code = issue_code(state, &email).await?;
+                println!(
+                    "The server cannot reset {email}'s password: photos are end-to-end encrypted with a key only the password or the recovery key opens."
+                );
+                println!(
+                    "next: in the app enter {email}, tap \"Forgot password\", enter code {code} if asked (valid 24 hours), then the 24-word recovery key, and choose a new password"
+                );
+                println!(
+                    "no recovery key: `photovault admin reset-password {email} --erase --yes` starts the account over (its photos are lost)"
+                );
+            }
+        }
+        AdminCmd::Signups { state: value } => {
+            match value.as_deref().map(str::to_ascii_lowercase).as_deref() {
+                None => {}
+                Some("on" | "true" | "open") => {
+                    crate::settings::set(&state.db, crate::settings::SIGNUPS, "true").await?
+                }
+                Some("off" | "false" | "closed") => {
+                    crate::settings::set(&state.db, crate::settings::SIGNUPS, "false").await?
+                }
+                Some(other) => anyhow::bail!("use `signups on` or `signups off` (got {other})"),
+            }
+            let open = crate::settings::signups_allowed(state).await;
+            println!("signups are {}", if open { "on" } else { "off" });
+        }
+        AdminCmd::SetQuota { user, size } => {
+            let id = resolve_user(state, &user).await?;
+            let bytes = crate::config::parse_quota(&size)?;
             sqlx::query("UPDATE users SET storage_quota = $1 WHERE user_id = $2")
                 .bind(bytes)
                 .bind(id)
                 .execute(&state.db.pool)
                 .await?;
-            println!("user {id}: storage quota set to {bytes} bytes");
+            if bytes > 0 {
+                println!("user {id}: storage quota set to {bytes} bytes");
+            } else {
+                println!("user {id}: no quota (limited by free space on the storage backend)");
+            }
         }
         AdminCmd::PendingOtt { email } => {
             let otts = users::login::pending_otts(state, &email)
@@ -218,6 +355,17 @@ pub async fn run(state: &AppState, cmd: AdminCmd) -> anyhow::Result<()> {
         }
     }
     Ok(())
+}
+
+/// A 6-digit sign-in code for `email`, valid for 24 hours (Photos app).
+async fn issue_code(state: &AppState, email: &str) -> anyhow::Result<String> {
+    let n: u32 = rand::random_range(0..1_000_000);
+    let code = format!("{n:06}");
+    let expiry = now_micros() + 24 * 3600 * 1_000_000;
+    users::login::add_ott(state, email, App::Photos, &code, expiry)
+        .await
+        .map_err(api)?;
+    Ok(code)
 }
 
 /// Minimal HTTP/1.1 GET against `url` over plain TCP; fails unless the status is 2xx.

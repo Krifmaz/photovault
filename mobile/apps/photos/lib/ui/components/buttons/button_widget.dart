@@ -1,0 +1,575 @@
+import 'dart:async';
+
+import 'package:ente_pure_utils/ente_pure_utils.dart';
+import 'package:ente_ui/components/loading_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import "package:modal_bottom_sheet/modal_bottom_sheet.dart";
+import "package:photos/models/button_result.dart";
+import 'package:photos/models/execution_states.dart';
+import 'package:photos/models/typedefs.dart';
+import 'package:photos/theme/colors.dart';
+import 'package:photos/theme/ente_theme.dart';
+import 'package:photos/theme/text_style.dart';
+import 'package:photos/ui/components/models/button_type.dart';
+import 'package:photos/ui/components/models/custom_button_style.dart';
+import "package:photos/utils/dialog_util.dart";
+
+enum ButtonSize { small, large }
+
+enum ButtonAction { first, second, third, fourth, cancel, error }
+
+class ButtonWidget extends StatelessWidget {
+  final IconData? icon;
+  final Widget? iconWidget;
+  final String? labelText;
+  final ButtonType buttonType;
+  final FutureVoidCallback? onTap;
+  final bool isDisabled;
+  final ButtonSize buttonSize;
+
+  final bool shouldShowSuccessConfirmation;
+
+  final bool shouldSurfaceExecutionStates;
+
+  final Color? iconColor;
+
+  // buttonAction is returned only when isInAlert is true.
+  final ButtonAction? buttonAction;
+
+  final bool shouldStickToDarkTheme;
+
+  final bool isInAlert;
+
+  final ValueNotifier<String>? progressStatus;
+
+  const ButtonWidget({
+    required this.buttonType,
+    this.buttonSize = ButtonSize.large,
+    this.icon,
+    this.iconWidget,
+    this.labelText,
+    this.onTap,
+    this.shouldStickToDarkTheme = false,
+    this.isDisabled = false,
+    this.buttonAction,
+    this.isInAlert = false,
+    this.iconColor,
+    this.shouldSurfaceExecutionStates = true,
+    this.progressStatus,
+    this.shouldShowSuccessConfirmation = false,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = shouldStickToDarkTheme
+        ? darkScheme
+        : getEnteColorScheme(context);
+    final inverseColorScheme = shouldStickToDarkTheme
+        ? lightScheme
+        : getEnteColorScheme(context, inverse: true);
+    final textTheme = shouldStickToDarkTheme
+        ? darkTextTheme
+        : getEnteTextTheme(context);
+    final inverseTextTheme = shouldStickToDarkTheme
+        ? lightTextTheme
+        : getEnteTextTheme(context, inverse: true);
+    final buttonStyle = CustomButtonStyle(
+      defaultButtonColor: Colors.transparent,
+      defaultBorderColor: Colors.transparent,
+      defaultIconColor: Colors.transparent,
+      defaultLabelStyle: textTheme.body,
+    );
+    buttonStyle.defaultButtonColor = buttonType.defaultButtonColor(colorScheme);
+    buttonStyle.pressedButtonColor = buttonType.pressedButtonColor(colorScheme);
+    buttonStyle.disabledButtonColor = buttonType.disabledButtonColor(
+      colorScheme,
+      buttonSize,
+    );
+    buttonStyle.defaultBorderColor = buttonType.defaultBorderColor(
+      colorScheme,
+      buttonSize,
+    );
+    buttonStyle.pressedBorderColor = buttonType.pressedBorderColor(
+      colorScheme: colorScheme,
+      buttonSize: buttonSize,
+    );
+    buttonStyle.disabledBorderColor = buttonType.disabledBorderColor(
+      colorScheme,
+      buttonSize,
+    );
+    buttonStyle.defaultIconColor =
+        iconColor ??
+        buttonType.defaultIconColor(
+          colorScheme: colorScheme,
+          inverseColorScheme: inverseColorScheme,
+        );
+    buttonStyle.pressedIconColor = buttonType.pressedIconColor(
+      colorScheme,
+      buttonSize,
+    );
+    buttonStyle.disabledIconColor = buttonType.disabledIconColor(
+      colorScheme,
+      buttonSize,
+    );
+    buttonStyle.defaultLabelStyle = buttonType.defaultLabelStyle(
+      textTheme: textTheme,
+      inverseTextTheme: inverseTextTheme,
+    );
+    buttonStyle.pressedLabelStyle = buttonType.pressedLabelStyle(
+      textTheme,
+      colorScheme,
+      buttonSize,
+    );
+    buttonStyle.disabledLabelStyle = buttonType.disabledLabelStyle(
+      textTheme,
+      colorScheme,
+    );
+    buttonStyle.checkIconColor = buttonType.checkIconColor(colorScheme);
+
+    return ButtonChildWidget(
+      buttonStyle: buttonStyle,
+      buttonType: buttonType,
+      isDisabled: isDisabled,
+      buttonSize: buttonSize,
+      isInAlert: isInAlert,
+      onTap: onTap,
+      labelText: labelText,
+      icon: icon,
+      iconWidget: iconWidget,
+      buttonAction: buttonAction,
+      shouldSurfaceExecutionStates: shouldSurfaceExecutionStates,
+      progressStatus: progressStatus,
+      shouldShowSuccessConfirmation: shouldShowSuccessConfirmation,
+    );
+  }
+}
+
+class ButtonChildWidget extends StatefulWidget {
+  final CustomButtonStyle buttonStyle;
+  final FutureVoidCallback? onTap;
+  final ButtonType buttonType;
+  final String? labelText;
+  final IconData? icon;
+  final Widget? iconWidget;
+  final bool isDisabled;
+  final ButtonSize buttonSize;
+  final ButtonAction? buttonAction;
+  final bool isInAlert;
+  final bool shouldSurfaceExecutionStates;
+  final ValueNotifier<String>? progressStatus;
+  final bool shouldShowSuccessConfirmation;
+
+  const ButtonChildWidget({
+    required this.buttonStyle,
+    required this.buttonType,
+    required this.isDisabled,
+    required this.buttonSize,
+    required this.isInAlert,
+    required this.shouldSurfaceExecutionStates,
+    required this.shouldShowSuccessConfirmation,
+    this.progressStatus,
+    this.onTap,
+    this.labelText,
+    this.icon,
+    this.iconWidget,
+    this.buttonAction,
+    super.key,
+  });
+
+  @override
+  State<ButtonChildWidget> createState() => _ButtonChildWidgetState();
+}
+
+class _ButtonChildWidgetState extends State<ButtonChildWidget> {
+  late Color buttonColor;
+  late Color borderColor;
+  late Color iconColor;
+  late TextStyle labelStyle;
+  late Color checkIconColor;
+  late Color loadingIconColor;
+  ValueNotifier<String>? progressStatus;
+
+  // Keep the idle width while showing loading and success states.
+  double? widthOfButton;
+  final _debouncer = Debouncer(const Duration(milliseconds: 300));
+  Timer? _successResetTimer;
+  ExecutionState executionState = ExecutionState.idle;
+  Exception? _exception;
+
+  @override
+  void initState() {
+    super.initState();
+    _setButtonTheme();
+  }
+
+  @override
+  void didUpdateWidget(covariant ButtonChildWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _setButtonTheme();
+  }
+
+  @override
+  void dispose() {
+    _debouncer.cancelDebounceTimer();
+    _successResetTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (executionState == ExecutionState.successful &&
+        _successResetTimer == null) {
+      _successResetTimer = Timer(
+        Duration(seconds: widget.isInAlert ? 1 : 2),
+        () {
+          _successResetTimer = null;
+          if (!mounted) return;
+          setState(() {
+            executionState = ExecutionState.idle;
+          });
+        },
+      );
+    }
+    return GestureDetector(
+      onTap: _shouldRegisterGestures ? _onTap : null,
+      onTapDown: _shouldRegisterGestures ? _onTapDown : null,
+      onTapUp: _shouldRegisterGestures ? _onTapUp : null,
+      onTapCancel: _shouldRegisterGestures ? _onTapCancel : null,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(4)),
+          border: widget.buttonType == ButtonType.tertiaryCritical
+              ? Border.all(color: borderColor)
+              : null,
+        ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 16),
+          width: widget.buttonSize == ButtonSize.large ? double.infinity : null,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(4)),
+            color: buttonColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 175),
+              switchInCurve: Curves.easeInOutExpo,
+              switchOutCurve: Curves.easeInOutExpo,
+              child:
+                  executionState == ExecutionState.idle ||
+                      !widget.shouldSurfaceExecutionStates
+                  ? widget.buttonType.hasTrailingIcon
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              widget.labelText == null
+                                  ? const SizedBox.shrink()
+                                  : Flexible(
+                                      child: Padding(
+                                        padding: widget.icon == null
+                                            ? const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                              )
+                                            : const EdgeInsets.only(right: 16),
+                                        child: Text(
+                                          widget.labelText!,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          style: labelStyle,
+                                        ),
+                                      ),
+                                    ),
+                              _buttonIcon(),
+                            ],
+                          )
+                        : Builder(
+                            builder: (context) {
+                              SchedulerBinding.instance.addPostFrameCallback((
+                                timeStamp,
+                              ) {
+                                final box =
+                                    context.findRenderObject() as RenderBox;
+                                widthOfButton = box.size.width;
+                              });
+                              return Row(
+                                mainAxisSize:
+                                    widget.buttonSize == ButtonSize.large
+                                    ? MainAxisSize.max
+                                    : MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _buttonIcon(),
+                                  widget.icon == null &&
+                                              widget.iconWidget == null ||
+                                          widget.labelText == null
+                                      ? const SizedBox.shrink()
+                                      : const SizedBox(width: 8),
+                                  widget.labelText == null
+                                      ? const SizedBox.shrink()
+                                      : Flexible(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                            ),
+                                            child: Text(
+                                              widget.labelText!,
+                                              style: labelStyle,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                ],
+                              );
+                            },
+                          )
+                  : executionState == ExecutionState.inProgress
+                  ? SizedBox(
+                      width: widthOfButton,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          progressStatus == null
+                              ? const SizedBox.shrink()
+                              : ValueListenableBuilder<String>(
+                                  valueListenable: progressStatus!,
+                                  builder:
+                                      (
+                                        BuildContext context,
+                                        String value,
+                                        Widget? child,
+                                      ) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: 8.0,
+                                          ),
+                                          child: Text(
+                                            value,
+                                            style: lightTextTheme.smallBold,
+                                          ),
+                                        );
+                                      },
+                                ),
+                          EnteLoadingWidget(
+                            padding: 3,
+                            color: loadingIconColor,
+                          ),
+                        ],
+                      ),
+                    )
+                  : executionState == ExecutionState.successful
+                  ? SizedBox(
+                      width: widthOfButton,
+                      child: Icon(
+                        Icons.check_outlined,
+                        size: 20,
+                        color: checkIconColor,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _setButtonTheme() {
+    progressStatus = widget.progressStatus;
+    checkIconColor =
+        widget.buttonStyle.checkIconColor ??
+        widget.buttonStyle.defaultIconColor;
+    loadingIconColor = widget.buttonStyle.defaultIconColor;
+    if (widget.isDisabled) {
+      buttonColor =
+          widget.buttonStyle.disabledButtonColor ??
+          widget.buttonStyle.defaultButtonColor;
+      borderColor =
+          widget.buttonStyle.disabledBorderColor ??
+          widget.buttonStyle.defaultBorderColor;
+      iconColor =
+          widget.buttonStyle.disabledIconColor ??
+          widget.buttonStyle.defaultIconColor;
+      labelStyle =
+          widget.buttonStyle.disabledLabelStyle ??
+          widget.buttonStyle.defaultLabelStyle;
+    } else {
+      buttonColor = widget.buttonStyle.defaultButtonColor;
+      borderColor = widget.buttonStyle.defaultBorderColor;
+      iconColor = widget.buttonStyle.defaultIconColor;
+      labelStyle = widget.buttonStyle.defaultLabelStyle;
+    }
+  }
+
+  Widget _buttonIcon() {
+    if (widget.icon != null) {
+      return Icon(widget.icon, size: 20, color: iconColor);
+    }
+    if (widget.iconWidget == null) {
+      return const SizedBox.shrink();
+    }
+    return IconTheme.merge(
+      data: IconThemeData(size: 20, color: iconColor),
+      child: widget.iconWidget!,
+    );
+  }
+
+  bool get _shouldRegisterGestures =>
+      !widget.isDisabled && executionState == ExecutionState.idle;
+
+  void _onTap() async {
+    if (widget.onTap != null) {
+      _debouncer.run(
+        () => Future(() {
+          if (!mounted) return;
+          setState(() {
+            executionState = ExecutionState.inProgress;
+          });
+        }),
+      );
+      await widget.onTap!.call().then(
+        (value) {
+          _exception = null;
+        },
+        onError: (error, stackTrace) {
+          executionState = ExecutionState.error;
+          _exception = error is Exception ? error : Exception(error.toString());
+          _debouncer.cancelDebounceTimer();
+        },
+      );
+      widget.shouldShowSuccessConfirmation && _debouncer.isActive()
+          ? executionState = ExecutionState.successful
+          : null;
+      _debouncer.cancelDebounceTimer();
+      if (executionState == ExecutionState.successful) {
+        if (!mounted) return;
+        setState(() {});
+      }
+
+      // Let the debounced callback run before checking its execution state.
+      await Future.delayed(const Duration(milliseconds: 5));
+    }
+    if (executionState == ExecutionState.inProgress ||
+        executionState == ExecutionState.error) {
+      if (executionState == ExecutionState.inProgress) {
+        if (mounted) {
+          setState(() {
+            executionState = ExecutionState.successful;
+            Future.delayed(
+              Duration(
+                seconds: widget.shouldSurfaceExecutionStates
+                    ? (widget.isInAlert ? 1 : 2)
+                    : 0,
+              ),
+              () {
+                if (!mounted) return;
+                widget.isInAlert
+                    ? _popWithButtonAction(
+                        context,
+                        buttonAction: widget.buttonAction,
+                      )
+                    : null;
+                if (mounted) {
+                  setState(() {
+                    executionState = ExecutionState.idle;
+                  });
+                }
+              },
+            );
+          });
+        }
+      }
+      if (executionState == ExecutionState.error) {
+        if (!mounted) return;
+        setState(() {
+          executionState = ExecutionState.idle;
+        });
+        if (widget.isInAlert) {
+          unawaited(
+            Future.delayed(Duration.zero, () {
+              if (!mounted) return;
+              _popWithButtonAction(
+                context,
+                buttonAction: ButtonAction.error,
+                exception: _exception,
+              );
+            }),
+          );
+        }
+      }
+    } else {
+      if (widget.isInAlert) {
+        Future.delayed(
+          Duration(seconds: widget.shouldShowSuccessConfirmation ? 1 : 0),
+          () {
+            if (!mounted) return;
+            _popWithButtonAction(context, buttonAction: widget.buttonAction);
+          },
+        );
+      }
+    }
+  }
+
+  void _popWithButtonAction(
+    BuildContext context, {
+    required ButtonAction? buttonAction,
+    Exception? exception,
+  }) {
+    if (mounted) {
+      final route = ModalRoute.of(context);
+      final navigator = Navigator.of(context);
+      if (route != null &&
+          route.isCurrent &&
+          (route is PopupRoute || route is ModalSheetRoute) &&
+          navigator.canPop()) {
+        navigator.pop(ButtonResult(buttonAction, exception));
+      } else if (exception != null) {
+        showGenericErrorDialog(context: context, error: exception).ignore();
+      }
+    }
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    if (!mounted) return;
+    setState(() {
+      buttonColor =
+          widget.buttonStyle.pressedButtonColor ??
+          widget.buttonStyle.defaultButtonColor;
+      borderColor =
+          widget.buttonStyle.pressedBorderColor ??
+          widget.buttonStyle.defaultBorderColor;
+      iconColor =
+          widget.buttonStyle.pressedIconColor ??
+          widget.buttonStyle.defaultIconColor;
+      labelStyle =
+          widget.buttonStyle.pressedLabelStyle ??
+          widget.buttonStyle.defaultLabelStyle;
+    });
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    Future.delayed(const Duration(milliseconds: 84), () {
+      if (!mounted) return;
+      setState(() {
+        setAllStylesToDefault();
+      });
+    });
+  }
+
+  void _onTapCancel() {
+    if (!mounted) return;
+    setState(() {
+      setAllStylesToDefault();
+    });
+  }
+
+  void setAllStylesToDefault() {
+    buttonColor = widget.buttonStyle.defaultButtonColor;
+    borderColor = widget.buttonStyle.defaultBorderColor;
+    iconColor = widget.buttonStyle.defaultIconColor;
+    labelStyle = widget.buttonStyle.defaultLabelStyle;
+  }
+}

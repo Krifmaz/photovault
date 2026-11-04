@@ -1,0 +1,67 @@
+appId: io.ente.bhari-frame
+artifactName: ${productName}-${version}-${arch}.${ext}
+files:
+    - app/**/*
+    - out
+extraFiles:
+    - from: build
+      to: resources
+      filter: ["**/*", "!ffmpeg/{ffprobe,ffprobe.exe,.archive-sha256}"]
+beforeBuild: scripts/beforeBuild.js
+beforePack: scripts/beforePack.js
+protocols:
+    # PHOTOVAULT: brand name (the "ente" URL scheme is unchanged).
+    - name: Photovault
+      schemes: ["ente"]
+win:
+    target:
+        - target: nsis
+          arch: [x64, arm64]
+    # PHOTOVAULT: strip - no azureSignOptions: they named Ente's Azure signing
+    # account and publisher ("ENTE TECHNOLOGIES, INC."). Add Photovault's own
+    # here when there is a signing certificate; builds are unsigned until then.
+    signExts: [".dll", ".node"]
+nsis:
+    deleteAppDataOnUninstall: true
+linux:
+    target:
+        - target: AppImage
+          arch: [x64, arm64]
+        - target: deb
+          arch: [x64, arm64]
+        - target: rpm
+          arch: [x64, arm64]
+        - target: pacman
+          arch: [x64, arm64]
+    category: Photography
+    icon: ./build/icon.icns
+    # PHOTOVAULT: strip - package.json's author no longer names Ente (or has an
+    # e-mail), so give the deb/rpm maintainer explicitly.
+    maintainer: Photovault developers
+# Remove this override when upgrading electron-builder to 27.0.0.
+pacman:
+    depends:
+        - c-ares
+        - ffmpeg
+        - gtk3
+        - libevent
+        - libvpx
+        - libxslt
+        - libxss
+        - minizip
+        - nss
+        - re2
+        - snappy
+        - libnotify
+        - libappindicator-gtk3
+mac:
+    minimumSystemVersion: "13.3"
+    target:
+        target: default
+        arch: [universal]
+    category: public.app-category.photography
+    hardenedRuntime: true
+    mergeASARs: false
+    # Both macOS build passes contain separate x64 and arm64 binaries. Copy them
+    # into the universal app unchanged; the app selects one at runtime.
+    x64ArchFiles: "**/{napi,onnxruntime}/**"

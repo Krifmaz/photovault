@@ -1,0 +1,59 @@
+# Photovault on a domain, behind a reverse proxy (Nginx Proxy Manager, Caddy, Traefik).
+#
+# Two hostnames point at the same container (port 8080):
+#   photos.example.com           API and web app; what you enter in the apps
+#   storage.photos.example.com   photo up/downloads (signed URLs)
+# Keep the storage hostname out of Cloudflare's proxy (DNS only, grey cloud): see
+# docs/src/deployment/reverse-proxy.md.
+#
+# The reverse proxy must share the external network `proxy_net`
+# (`docker network create proxy_net` once). Port 8095 stays published so the apps
+# can use the LAN address at home.
+#
+#   mkdir -p /drivepool/photovault /opt/photovault
+#   chown -R 65532:65532 /drivepool/photovault /opt/photovault
+name: photovault
+services:
+  photovault:
+    image: ghcr.io/krifmaz/photovault:edge
+    restart: unless-stopped
+    ports:
+      # LAN access without the proxy. Remove if you only want the domain.
+      - "8095:8080"
+    environment:
+      # API and web app address (the reverse proxy's hostname).
+      PHOTOVAULT_PUBLIC_URL: https://photos.example.com
+      # Base of the signed upload/download URLs. Defaults to PHOTOVAULT_PUBLIC_URL.
+      PHOTOVAULT_STORAGE_PUBLIC_URL: https://storage.photos.example.com
+      # LAN address. The apps use it when it answers and the server is the same one.
+      PHOTOVAULT_HOME_URL: http://10.0.1.7:8095
+      # PHOTOVAULT_SERVER_NAME: Photovault
+      # PHOTOVAULT_DEFAULT_QUOTA: 500GB
+      # PHOTOVAULT_SMTP_HOST: smtp.example.com
+      # PHOTOVAULT_SMTP_PORT: "587"
+      # PHOTOVAULT_SMTP_USERNAME: photos@example.com
+      # PHOTOVAULT_SMTP_PASSWORD: change-me
+      # PHOTOVAULT_SMTP_FROM: Photovault <photos@example.com>
+    volumes:
+      - /drivepool/photovault:/data   # encrypted photos
+      - /opt/photovault:/config       # database + keys (local disk)
+    networks:
+      - proxy_net                     # the reverse proxy reaches photovault:8080 here
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+  # Optional LAN discovery (see compose.yaml and docs/src/discovery.md).
+  # photovault-mdns:
+  #   image: ghcr.io/krifmaz/photovault:edge
+  #   restart: unless-stopped
+  #   command: ["announce", "--server", "http://127.0.0.1:8095"]
+  #   network_mode: host
+  #   healthcheck: {disable: true}
+  #   read_only: true
+  #   security_opt: [no-new-privileges:true]
+  #   cap_drop: [ALL]
+
+networks:
+  proxy_net:
+    external: true
