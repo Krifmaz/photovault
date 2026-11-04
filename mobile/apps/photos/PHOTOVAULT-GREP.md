@@ -33,7 +33,7 @@ Rule used: internal identifiers, class/package names, API paths and fields, comm
 - Chromecast receiver app id `F5BCEC64` (`apps/photos/plugins/ente_cast/lib/src/service.dart`, outside the grep scope) loads Ente's hosted cast receiver; needs a Photovault receiver registered with Google. Pair-by-code uses `<server>/cast`.
 - Network phone-home kept for features that must stay: ML models (models.ente.com, set in `rust/crates/ml/src/assets.rs`), memories/Rewind music (music.ente.com), OpenStreetMap tiles for the map.
 - iOS `Podfile.lock` / `project.pbxproj` embed phases still name Firebase and Sentry frameworks until `pod install` is re-run on macOS (the Dart dependencies are gone). iOS share-extension `NSHumanReadableCopyright` still reads "Ente Technologies" (Ente's copyright on the code; not normally displayed).
-- The "Contact support" / "Raise ticket" buttons in a few error dialogs remain; they now only export logs for the user to share (no Ente address).
+- The "Contact support" / "Raise ticket" buttons in a few error dialogs remain; they now only export logs for the user to share (no Ente address). The error texts next to them no longer speak as a vendor ("contact our support team", "reach out to us", "Your plan already supports a family"): see the strings list in `PHOTOVAULT.md`.
 
 ## Photos app (`apps/photos`)
 
@@ -246,7 +246,7 @@ Rule used: internal identifiers, class/package names, API paths and fields, comm
 - `apps/photos/lib/states/location_state.dart` (`subscription`×1): only identifiers (class/field/variable names such as `StreamSubscription`, `EnteFile`, `Subscription` model); internal.
 - `apps/photos/lib/states/user_details_state.dart` (`subscription`×7): only identifiers (class/field/variable names such as `StreamSubscription`, `EnteFile`, `Subscription` model); internal.
 - `apps/photos/lib/theme/colors.dart` (`ente (word)`×2): only comments; internal.
-- `apps/photos/lib/ui/account/email_entry_page.dart` (`ente.com`×1, `ente (word)`×2, `referral`×18): only comments, identifiers (class/field/variable names such as `StreamSubscription`, `EnteFile`, `Subscription` model); internal.
+- `apps/photos/lib/ui/account/email_entry_page.dart` (`ente.com`×1, `ente (word)`×2, `referral`×18): correction to the first version of this report: one `referral` hit was user-visible, the "How did you hear about Photovault?" field (`hearUsWhereTitle`, Ente's growth attribution). It is now hidden (`_showReferralSourceField` returns false, PHOTOVAULT comment). The remaining hits are comments and identifiers (`showReferralSourceField`, `referralSource`, `setRefSource`, which still sends the route source or an empty string); internal.
 - `apps/photos/lib/ui/account/login_pwd_verification_page.dart` (`ente.com`×1, `ente (word)`×1):
   - L245 `"support@ente.com",`: `toEmail` argument that Photos' `sendLogs` ignores (logs are only exported/shared).
 - `apps/photos/lib/ui/account/onboarding_page_scaffold.dart` (`ente (word)`×1, `duck`×2): only comments; internal.

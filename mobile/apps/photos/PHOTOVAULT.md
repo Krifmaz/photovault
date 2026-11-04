@@ -115,14 +115,19 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   works as a fallback). Empty = none; Ente's `api.ente.com` is no longer a
   default. `isProduction` is always false, so no Ente-production-only path
   (Cloudflare upload worker, "faster uploads", free-plan upsells) is taken.
-  Optional `--dart-define=PHOTOVAULT_SERVER_NAME=<label>` (contract).
+  Optional `--dart-define=PHOTOVAULT_SERVER_NAME=<label>` (contract): the
+  connect screen shows the built-in server under "Built-in server" with
+  this label (else its address) until it is saved.
 - New, pure Dart (unit-tested in `test/photovault/`):
   `lib/services/photovault/server_contract.dart` (model, parsers),
   `server_address.dart` (address normaliser: `host:port`, http/https, IPv6,
   `photovault://connect` links; http by default for LAN-only names, https
   otherwise), `server_address_selector.dart` (home/public choice: home if it
   answers `/photovault/info` within 1.5 s with the same `publicUrl`, else
-  public), `server_info_client.dart` (Connect request and error kinds:
+  public; when the person connected through some other address, such as a
+  typed LAN address or an mDNS answer, and the public URL does not answer,
+  that address is used if it reports the same `publicUrl`; it is stored as
+  `photovault.reachedAt`), `server_info_client.dart` (Connect request and error kinds:
   unreachable, TLS, not Photovault, HTTP error; a stock Ente server that only
   answers `/ping` is accepted as a "Compatible server").
 - New, Flutter: `lib/services/photovault/photovault_server_service.dart`
@@ -133,8 +138,10 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   only), `photovault_strings.dart` (English UI text, not in the ARB files).
 - New UI: `lib/ui/photovault/connect_server_page.dart` ("Connect to your
   server": logo, address field, Connect -> name/version card -> Continue;
-  saved servers; servers on this network; QR button; "Use without a server"
-  for Ente's offline gallery), `server_qr_scan_page.dart` (Ente's
+  saved servers; servers on this network; QR button, which tries the QR's
+  public address and then its `home=` address; "Use without a server"
+  for Ente's offline gallery; the "can't reach" error suggests home Wi-Fi only
+  for LAN-only addresses), `server_qr_scan_page.dart` (Ente's
   `ente_qr_scanner`: CameraX + zxing-cpp, no Play services),
   `server_settings_page.dart` (Settings > Server: name, version, home/public
   address and which is in use, Switch server = Ente's logout, then the
@@ -146,6 +153,28 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   `signupsAllowed: false`. Ente's sign-in / sign-up pages are untouched.
 - `lib/ui/settings_page.dart`: "Server" entry; the offline-mode "Log in" card
   asks for a server first when none is active.
+- `lib/ui/components/banners/save_faces_banner.dart`,
+  `lib/ui/components/banners/name_face_banner.dart`: the offline-mode
+  "Sign up" button on the People banners also asks for a server first.
+- `photovault://connect?url=...&home=...&name=...` links (the server's QR read
+  by the camera app, or a tapped link): `android/app/src/main/AndroidManifest.xml`
+  (intent filter, scheme `photovault`, host `connect`), `ios/Runner/Info.plist`
+  (`CFBundleURLSchemes` `photovault`), and `lib/ui/tabs/home_widget.dart`
+  (`_handleConnectLink`, which opens the connect screen with the address filled
+  in and looks it up. When an account is signed in, or a sign-up is half done,
+  it only shows a toast that points to Settings > Server).
+- `ios/Runner/Info.plist`: `_photovault._tcp` in `NSBonjourServices`, the
+  local-network prompt mentions the server, stale
+  `FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED` key removed.
+- Invites: `lib/ui/common/user_dialogs.dart`, `lib/ui/family/invite_members_page.dart`,
+  `lib/ui/actions/collection/collection_sharing_actions.dart` append the active
+  server's public address and its `photovault://connect` link
+  (`PhotovaultStrings.inviteWithServer`, `buildConnectLink` in
+  `server_contract.dart`) to Ente's "Download ..." invite text, so an invitee
+  can find the server. The ARB values are untouched.
+- `lib/ui/cast/pair_with_code.dart`: the cast URL shown for pairing is the
+  remote flag, else the server's `castUrl` from `/photovault/info`, else
+  `<publicUrl>/cast`, and only then `<endpoint>/cast`.
 - `lib/core/configuration.dart`: `logout()` keeps the `photovault.*` keys and
   Ente's `endpoint` key across its `SharedPreferences.clear()`, so servers
   survive logout.
@@ -158,6 +187,12 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   Ente Auth) and `multicast_dns` 0.3.3+1 (already in the lock file through
   `ente_cast`). No new native library: zxing-cpp is already shipped by
   `ente_qr`.
+- Public album links shared into the app: `lib/ui/tabs/home_widget.dart`
+  (`_isServerAlbumLink`, `isServerPublicAlbumLink` in `server_contract.dart`)
+  also accepts links on the host of the active server's `albumsUrl`,
+  `publicUrl` or `homeUrl` that carry a `t=` token, next to Ente's
+  albums.ente.* check. No https app-link filter is added, because the host
+  is not known at build time.
 - Public album links: `lib/services/collections_service.dart` remembers the
   origin a shared link was opened from (`getSharedPublicAlbumOrigin`) and
   `lib/ui/viewer/gallery/gallery_app_bar_widget.dart` "Open in browser" uses it
@@ -237,6 +272,12 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - Rate-us prompts replaced by a plain OK dialog:
   `lib/ui/viewer/gallery/gallery_app_bar_widget.dart`,
   `lib/ui/settings/backup/free_space_options.dart`.
+- `lib/ui/account/email_entry_page.dart`: the "How did you hear about
+  Photovault?" growth-attribution field is hidden (`_showReferralSourceField`
+  is false); `setRefSource` still sends the route source or an empty string.
+- `lib/ui/settings/about/about_us_page.dart`: a "Logs" entry under the credit
+  opens Ente's `sendLogs` sheet (View logs / Export logs only), because Help
+  & Support, which used to hold them, is removed.
 - Links to ente.com removed: `lib/ui/account/email_entry_page.dart` (terms),
   `password_entry_page.dart` ("How it works"), `lib/ui/settings/ml/ml_consent_sheet.dart`,
   `lib/ui/settings/streaming/video_streaming_settings_page.dart`,
@@ -259,6 +300,15 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - `../../packages/strings/lib/l10n/arb/strings_*.arb`: server-neutral English
   for account deletion, verification-ID share, sharing limits, storage full,
   logs dialog, "Log in to Photovault"; new `askServerAdminToReset2fa`;
+  vendor-voice error texts made server-neutral ("ask your server
+  administrator", "Unable to connect to your server", "export the logs ...")
+  for `tempErrorContactSupportIfPersists`,
+  `itLooksLikeSomethingWentWrongPleaseRetryAfterSome`, `localSyncErrorMessage`,
+  `downloadDecryptionFailedMessage`, `mlProcessingIssueReachOut`,
+  `mlItemsCouldNotBeProcessed`, `networkConnectionRefusedErr`,
+  `networkHostLookUpErr`, `pleaseContactSupportIfTheProblemPersists`, and
+  `yourPlanSupportsFamily` ("Your account already supports a family"), with
+  their translations deleted;
   ente.com stripped from share texts; remaining "Ente" forms and
   transliterations in ja, ko, hu, he, sr, et, gu, ur replaced. Translations whose meaning changed were deleted so
   they fall back to English.
@@ -318,9 +368,17 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   (models.ente.com, set in `rust/crates/ml/src/assets.rs`), memories/rewind music
   (music.ente.com, `lib/services/memories/memory_music_service.dart`). The map uses
   OpenStreetMap tiles. Self-hosting these needs a later change.
+- Passkey 2FA still returns through `ente://passkey`, as upstream. With Ente
+  Photos or Ente Auth installed on the same phone, Android may offer a
+  chooser or open the other app. A `photovault://passkey` redirect is not
+  used yet: the accounts web app (`web/apps/accounts/src/services/passkey.ts`,
+  `isAllowedRedirectScheme`) rejects any scheme it does not list, on every host
+  including self-hosted ones, so the web fork has to allow `photovault:` first.
+- `ios/Podfile.lock` still lists Firebase and Sentry pods. Run `pod install`
+  on macOS to regenerate it before any `pod install --deployment` build.
 - Server connection: LAN discovery runs on Android only (iOS needs Apple's
-  multicast entitlement or a native Bonjour browser, and `_photovault._tcp`
-  in `NSBonjourServices`). The connect/settings text is English only.
+  multicast entitlement or a native Bonjour browser; `_photovault._tcp` is
+  already in `NSBonjourServices`). The connect/settings text is English only.
 - Unused ARB keys still mention Ente Auth/Locker, referrals and support e-mail;
   they are never displayed by Photos (see `PHOTOVAULT-GREP.md`).
 - Shared `ente_ui`/`ente_utils` helpers still name support@ente.com; Photos
