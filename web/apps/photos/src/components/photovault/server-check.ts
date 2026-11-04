@@ -16,6 +16,8 @@ export const serverCheckSuccessText = (check: ServerCheck) => {
                 version: check.info.version,
             });
         case "ente":
+            // Kind "ente" internally; the text avoids the brand (the only
+            // user-visible Ente mention is "Based on Ente" in About).
             return t("pv_server_ente_compatible");
         default:
             return undefined;
@@ -27,6 +29,18 @@ export const serverCheckErrorText = (check: ServerCheck) => {
     const host = serverDisplayName(check.origin);
     switch (check.kind) {
         case "unreachable": {
+            // PHOTOVAULT: connect - a https page can't fetch an http://
+            // server (mixed content), so "are you on your home Wi-Fi?" would
+            // be misleading.
+            if (
+                typeof window != "undefined" &&
+                window.location.protocol == "https:" &&
+                check.origin.startsWith("http:") &&
+                // Browsers exempt loopback from mixed-content blocking.
+                !/^http:\/\/(localhost|127\.|\[::1\])/i.test(check.origin)
+            ) {
+                return t("pv_server_mixed_content");
+            }
             let local = false;
             try {
                 local = isLocalNetworkHost(new URL(check.origin).hostname);

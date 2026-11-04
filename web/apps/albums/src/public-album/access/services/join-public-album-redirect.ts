@@ -16,7 +16,9 @@ const buildWebRedirectURL = (
     jwtToken?: string,
 ): string => {
     const hashSuffix = jwtToken ? `&jwt=${encodeURIComponent(jwtToken)}` : "";
-    return `https://photos.ente.com/?joinAlbum=${accessToken}&collectionId=${collectionId}#${currentHash}${hashSuffix}`;
+    // PHOTOVAULT: connect - Photos is served at the root of this origin
+    // (outside the /albums base path), not at photos.ente.com.
+    return `${window.location.origin}/?joinAlbum=${accessToken}&collectionId=${collectionId}#${currentHash}${hashSuffix}`;
 };
 
 const handleWebFallback = (
@@ -33,6 +35,9 @@ const handleWebFallback = (
     );
     window.location.href = redirectURL;
 };
+
+// PHOTOVAULT: strip
+const isPhotovaultBuild = true as boolean;
 
 const tryDeepLinkWithFallback = (
     deepLinkURL: string,
@@ -90,7 +95,9 @@ export const joinPublicAlbumViaRedirect = ({
         handleWebFallback(accessToken, collectionId, currentHash, jwtToken);
     };
 
-    if (navigator.userAgent.includes("Android")) {
+    // PHOTOVAULT: strip - no ente:// deep link: Ente's own app also handles
+    // it and would send the token to Ente's servers. Join on the web instead.
+    if (navigator.userAgent.includes("Android") && !isPhotovaultBuild) {
         // Older Android clients only recognize albums.ente.io in ente://
         // public-album join links. Newer ones also support albums.ente.com.
         const deepLinkURL = `ente://albums.ente.io/?action=join&t=${encodeURIComponent(accessToken)}#${currentHash}`;

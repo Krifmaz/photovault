@@ -11,6 +11,7 @@ import {
     type JoinAlbumContext,
 } from "ente-base/join-album";
 import log from "ente-base/log";
+import type { ServerCheck } from "ente-base/photovault/server"; // PHOTOVAULT: connect
 import { haveMasterKeyInSession } from "ente-base/session-storage";
 import { savedAuthToken } from "ente-base/token";
 import { canAccessIndexedDB } from "ente-gallery/services/files-db";
@@ -31,6 +32,15 @@ const Page: React.FC = () => {
     // the host after its developer settings dialog closed).
     const [serverKey, setServerKey] = useState(0);
     const refreshHost = useCallback(() => setServerKey((k) => k + 1), []);
+    // PHOTOVAULT: connect - hide "Sign up" when the server says
+    // `signupsAllowed: false` (contracts/server-info.md). A stock Ente server
+    // (no /photovault/info) keeps Ente's behaviour.
+    const [signupsAllowed, setSignupsAllowed] = useState(true);
+    const handleServerCheck = useCallback((check: ServerCheck) => {
+        const allowed = check.kind != "photovault" || check.info.signupsAllowed;
+        setSignupsAllowed(allowed);
+        if (!allowed) setShowLogin(true);
+    }, []);
 
     const router = useRouter();
 
@@ -116,7 +126,10 @@ const Page: React.FC = () => {
                         <LoginContents
                             key={serverKey}
                             {...{ host }}
-                            onSignUp={handleShowSignUp}
+                            // PHOTOVAULT: connect
+                            onSignUp={
+                                signupsAllowed ? handleShowSignUp : undefined
+                            }
                         />
                     ) : (
                         <SignUpContents
@@ -126,7 +139,10 @@ const Page: React.FC = () => {
                         />
                     )}
                     {/* PHOTOVAULT: connect */}
-                    <ServerField onChange={refreshHost} />
+                    <ServerField
+                        onChange={refreshHost}
+                        onCheck={handleServerCheck}
+                    />
                 </PhotosAuthShell>
             )}
         </TappableContainer>

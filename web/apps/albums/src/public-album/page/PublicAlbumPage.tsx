@@ -48,7 +48,7 @@ import { FocusVisibleButton } from "ente-base/components/mui/FocusVisibleButton"
 import { NavbarBase } from "ente-base/components/Navbar";
 import { useModalVisibility } from "ente-base/components/utils/modal";
 import { useBaseContext } from "ente-base/context";
-import { buildEnvBasePath, isDevBuild } from "ente-base/env"; // PHOTOVAULT: connect
+import { buildEnvBasePath } from "ente-base/env"; // PHOTOVAULT: connect
 import { isNamedError } from "ente-base/error";
 import {
     isHTTP401Error,
@@ -592,9 +592,10 @@ export default function PublicAlbumPage() {
 
     const commentsEnabled =
         publicCollection?.publicURLs[0]?.enableComment ?? false;
-    const joinEnabled =
-        (isDevBuild || !isCustomAPIOrigin) &&
-        (publicCollection?.publicURLs[0]?.enableJoin ?? false);
+    // PHOTOVAULT: connect - Ente turns "Join album" off for self-hosted
+    // servers only because Photos lives on another origin there. Here Photos
+    // is served at the root of this origin (see join-public-album-redirect).
+    const joinEnabled = publicCollection?.publicURLs[0]?.enableJoin ?? false;
     const handleDrop = useCallback((files: FileWithPath[]) => {
         setShouldRenderUpload(true);
         setDragAndDropFiles(files);

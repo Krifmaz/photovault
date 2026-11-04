@@ -31,6 +31,11 @@ import { serverCheckErrorText, serverCheckSuccessText } from "./server-check";
 interface ServerFieldProps {
     /** Called after the server in use has changed. */
     onChange: () => void;
+    /**
+     * Called with each check of the server in use (on mount and after a
+     * change), e.g. to read `signupsAllowed`.
+     */
+    onCheck?: (check: ServerCheck) => void;
 }
 
 const savedServer = () => {
@@ -48,7 +53,10 @@ const defaultServer = () =>
         page: pageOrigin(),
     });
 
-export const ServerField: React.FC<ServerFieldProps> = ({ onChange }) => {
+export const ServerField: React.FC<ServerFieldProps> = ({
+    onChange,
+    onCheck,
+}) => {
     const [current, setCurrent] = useState<string | undefined>();
     const [currentCheck, setCurrentCheck] = useState<ServerCheck | undefined>();
     const [expanded, setExpanded] = useState(false);
@@ -63,8 +71,10 @@ export const ServerField: React.FC<ServerFieldProps> = ({ onChange }) => {
         setCurrent(origin);
         setHasSaved(!!savedServer());
         setCurrentCheck(undefined);
-        setCurrentCheck(await checkServer(origin));
-    }, []);
+        const check = await checkServer(origin);
+        setCurrentCheck(check);
+        onCheck?.(check);
+    }, [onCheck]);
 
     useEffect(() => {
         void refresh();
@@ -101,6 +111,7 @@ export const ServerField: React.FC<ServerFieldProps> = ({ onChange }) => {
         setCurrent(origin);
         setCurrentCheck(check);
         setHasSaved(!!savedServer());
+        onCheck?.(check);
         onChange();
     };
 

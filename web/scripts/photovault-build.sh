@@ -8,6 +8,7 @@
 #   web/apps/albums/out    -> <web dir>/albums/     (public albums, basePath /albums)
 #   web/apps/cast/out      -> <web dir>/cast/       (cast receiver, basePath /cast)
 #   web/apps/accounts/out  -> <web dir>/accounts/   (passkeys, family, recovery)
+#   web/apps/embed/out     -> <web dir>/embed/      (public link "Embed" iframe, basePath /embed)
 #
 # Steps: npm ci, the wasm packages (prelogin, photos, cast), the static data
 # files (scripts/photovault-vendor-assets.sh), then `next build` of each app
@@ -17,7 +18,7 @@
 #   NEXT_PUBLIC_ENTE_ENDPOINT   API origin baked in as the default server.
 #                               Default: empty = the origin the page is served
 #                               from (one container serves API and web app).
-#   PHOTOVAULT_APPS             Apps to build, default "photos albums cast accounts".
+#   PHOTOVAULT_APPS             Apps to build, default "photos albums cast accounts embed".
 #   PHOTOVAULT_SKIP_NPM_CI=1    Reuse the existing node_modules.
 #   PHOTOVAULT_SKIP_WASM=1      Reuse the existing wasm pkg/ folders.
 #   PHOTOVAULT_WASM_NO_OPT=1    Build wasm without wasm-opt (debugging only;
@@ -43,7 +44,7 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 web="$(cd "$here/.." && pwd)"
 repo="$(cd "$web/.." && pwd)"
 
-apps="${PHOTOVAULT_APPS:-photos albums cast accounts}"
+apps="${PHOTOVAULT_APPS:-photos albums cast accounts embed}"
 export NEXT_PUBLIC_ENTE_ENDPOINT="${NEXT_PUBLIC_ENTE_ENDPOINT:-}"
 export NEXT_TELEMETRY_DISABLED=1
 
@@ -51,8 +52,8 @@ log() { printf '\n==> %s\n' "$*" >&2; }
 
 for app in $apps; do
     case "$app" in
-        photos | albums | cast | accounts) ;;
-        *) echo "unknown app: $app (expected photos, albums, cast, accounts)" >&2; exit 2 ;;
+        photos | albums | cast | accounts | embed) ;;
+        *) echo "unknown app: $app (expected photos, albums, cast, accounts, embed)" >&2; exit 2 ;;
     esac
 done
 
@@ -141,7 +142,7 @@ done
 # against the Photos export, so copy the ones Photos lacks there (never
 # overwriting Photos' own files).
 if [[ -d apps/photos/out ]]; then
-    for app in albums cast accounts; do
+    for app in albums cast accounts embed; do
         [[ -d "apps/$app/public" ]] || continue
         (cd "apps/$app/public" && find fonts images -type f 2>/dev/null || true) |
             while IFS= read -r f; do
@@ -158,7 +159,7 @@ if [[ -n "${PHOTOVAULT_WEB_OUT:-}" ]]; then
     rm -rf "$PHOTOVAULT_WEB_OUT"
     mkdir -p "$PHOTOVAULT_WEB_OUT"
     cp -a apps/photos/out/. "$PHOTOVAULT_WEB_OUT/"
-    for app in albums cast accounts; do
+    for app in albums cast accounts embed; do
         if [[ -f "apps/$app/out/index.html" ]]; then
             mkdir -p "$PHOTOVAULT_WEB_OUT/$app"
             cp -a "apps/$app/out/." "$PHOTOVAULT_WEB_OUT/$app/"

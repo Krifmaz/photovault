@@ -20,12 +20,14 @@ export const localServerFallback = "http://localhost:8080";
 export const savedServerStorageKey = "photovaultServer";
 
 /**
- * `GET /photovault/info`. Required fields per the contract are `name`,
- * `version`, `publicUrl`, `homeUrl` (and `product`, `signupsAllowed`); every
- * other field is optional and unknown fields are ignored.
+ * `GET /photovault/info`. Required fields per the contract are `product`
+ * (must be `"photovault"`), `name`, `version`, `publicUrl` and
+ * `signupsAllowed`; a 200 without them is "invalid". `homeUrl` is required
+ * but may be null (absent is tolerated). Every other field is optional and
+ * unknown fields are ignored.
  */
 export const ServerInfo = z.object({
-    product: z.literal("photovault").optional(),
+    product: z.literal("photovault"),
     name: z.string(),
     version: z.string(),
     commit: z.string().nullish(),
@@ -34,7 +36,7 @@ export const ServerInfo = z.object({
     homeUrl: z.string().nullish(),
     albumsUrl: z.string().nullish(),
     castUrl: z.string().nullish(),
-    signupsAllowed: z.boolean().optional(),
+    signupsAllowed: z.boolean(),
     features: z.array(z.string()).optional(),
 });
 

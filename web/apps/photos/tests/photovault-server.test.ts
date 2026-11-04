@@ -269,4 +269,16 @@ describe("checkServer", () => {
                 .kind,
         ).toBe("invalid");
     });
+
+    it("requires product and signupsAllowed", async () => {
+        const { product: _p, ...noProduct } = info;
+        const { signupsAllowed: _s, ...noSignups } = info;
+        for (const body of [noProduct, noSignups]) {
+            const fetchFn = (() =>
+                Promise.resolve(json(body))) as unknown as typeof fetch;
+            expect(
+                (await checkServer("https://x.example", { fetchFn })).kind,
+            ).toBe("invalid");
+        }
+    });
 });

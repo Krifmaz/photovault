@@ -5,7 +5,7 @@ import {
     resolveServerOrigin,
     savedServerStorageKey,
 } from "ente-base/photovault/server";
-import { buildEnvCustomAPIEndpoint } from "./env";
+import { buildEnvBasePath, buildEnvCustomAPIEndpoint } from "./env";
 
 // PHOTOVAULT: strip - never fall back to Ente's servers. Every Photovault
 // deployment is a "custom" (self-hosted) origin in Ente's terms, so the
@@ -49,6 +49,15 @@ export const apiURL = async (
 // take for "no custom origin" (thumbnails/files/public-albums CDN hosts) are
 // unreachable.
 export const customAPIOrigin = async (): Promise<string> => {
+    // PHOTOVAULT: connect - public-link pages (albums, embed) and the cast
+    // receiver belong to the server that serves them. They share an origin
+    // with Photos, so ignore a server that a Photos user saved here.
+    if (["/albums", "/embed", "/cast"].includes(buildEnvBasePath)) {
+        return resolveServerOrigin({
+            buildEnv: buildEnvCustomAPIEndpoint,
+            page: pageOrigin(),
+        });
+    }
     // PHOTOVAULT: connect - localStorage survives logout (KV DB does not);
     // Ente's KV "apiOrigin" is what workers can read, so keep it in sync.
     const local = savedServerOrigin();

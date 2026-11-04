@@ -59,8 +59,7 @@ Logo, name, icons:
 - `packages/gallery/components/viewer/photoswipe-core.ts`: logo button title.
 - `packages/base/app.ts`: static app titles (Photovault).
 - `packages/base/components/Head.tsx`: default description, albums title and
-  preview description. (The `ente.com` preview image URLs are only used for
-  Ente's own production endpoint and are left as is.)
+  preview description.
 - `apps/embed/src/pages/_app.tsx`, `apps/cast/src/pages/index.tsx`: name.
 - `apps/photos/src/components/CollectionSelector.tsx`,
   `apps/photos/src/utils/album-filters.ts`: "Ente" album filter label.
@@ -128,13 +127,14 @@ Server and network:
   `http://localhost:8080`) and `isCustomAPIOrigin` is always true, so Ente's
   existing self-hosted code paths run everywhere. The Ente-hosted branches
   (thumbnails/files/public-albums/cast-albums CDN hosts, uploader worker,
-  ente.com redirects, Ente og:image metadata, join-album redirect to
-  photos.ente.com) are left in place upstream-style but are unreachable. Also
-  new: `staticAssetURL()` for data Ente loads from assets.ente.com.
+  ente.com redirects, Ente og:image metadata) are left in place
+  upstream-style but are unreachable. Also new: `staticAssetURL()` for data
+  Ente loads from assets.ente.com. Desktop builds vendor the same files
+  (`desktop/package.json` `build-renderer*`, see desktop/PHOTOVAULT.md).
 - `apps/photos/src/services/places.ts`, `packages/new/photos/services/search/worker.ts`,
   `packages/gallery/services/ffmpeg/web.ts`: places index, world cities and the
   ffmpeg.wasm core load from `/static-assets/` on our origin.
-  `scripts/photovault-vendor-assets.sh` (new) copies them into
+  `scripts/photovault-vendor-assets.mjs` (new; `.sh` is a wrapper) copies them into
   `apps/photos/public/static-assets/` (git-ignored) before a build.
 - `packages/new/photos/services/settings.ts`: default cast/embed URLs and the
   custom-domain CNAME point at this server instead of cast/embed/my.ente.com.
@@ -182,6 +182,12 @@ Photos app (settings and gallery):
   Auth/Locker logos become plain icons, labels "Auth"/"Locker"; the logo PNGs
   `public/images/app-icons/**/{auth,locker}.png` are deleted.
 - `components/collections/CollectionShare.tsx`: no embed.ente.com fallback.
+- `components/collections/AlbumCastDialog.tsx`: no Chromecast "Auto pair"; it
+  launches Ente's registered receiver app (`F5BCEC64`, cast.ente.com talking
+  to Ente's API), which cannot pair with a Photovault server. The dialog opens
+  on the PIN flow (`utils/chromecast-sender.ts` itself is unchanged).
+- `components/sidebar/WatchFolder.tsx`: empty state says "Point Photovault at
+  a folder…" (was "Point ente…").
 - `services/export.ts`: export folder "Photovault" instead of "Ente Photos".
 
 Shared packages and other apps:
@@ -204,6 +210,10 @@ Shared packages and other apps:
   wordmark is no longer a link to ente.com.
 - `packages/contacts/legacy/components/LegacyAddContactContent.tsx`: Legacy
   texts without "Ente".
+- `apps/albums/.../access/services/join-public-album-redirect.ts`: "Join
+  album" goes to Photos at the root of this origin (`/?joinAlbum=…`), not
+  photos.ente.com, and never tries the `ente://` deep link (Ente's own app also
+  handles it and would send the token to Ente's servers).
 - `apps/albums`: no "Join Ente" buttons (`page/PublicAlbumPage.tsx`,
   `components/TripLayout/{TopNavButtons,MobileNavBar}.tsx`,
   `viewer/components/PublicAlbumSingleFileViewer.tsx`), wordmark not linked;
@@ -224,6 +234,8 @@ paths are unchanged: `apps/{photos,albums}/public/images/upload-{complete,progre
 `apps/photos/public/images/empty-album/duck.svg`,
 `apps/photos/public/images/empty-state/{ente_empty_state_figma,no-matches}.svg`,
 `apps/photos/public/images/feed/empty.png`,
+`apps/photos/public/images/family-plan/1x.png` (the Family screen's 3D figures
+illustration),
 `apps/accounts/public/images/family-invite{,-accepted,-invalid}.png` (rendered
 from `branding/icon-1024.png`).
 
@@ -232,9 +244,23 @@ unused `referral_share_text` and `delete_account_multi_app_warning` keys
 everywhere and `auth_developer_settings_subtitle` outside en-US (it named
 api.ente.io; other languages fall back to English); replaced the brand word in
 forms the first pass missed (lowercase "ente", "Enteä", Ente attached to CJK,
-Hangul or Telugu text). `title_auth`/`title_locker` ("Ente Auth"/"Ente Locker")
-stay: only Ente's Auth and Locker apps use them. en-US `view_logs_message` no
-longer says "email to us".
+Hangul or Telugu text), and inflected forms (de-DE `password_generation_failed`
+"des Entes" → "von Photovault", `ente_help` "Entes Hilfe" → "Photovault-Hilfe";
+fi-FI `password_generation_failed` "Enten" → "Photovaultin",
+`referral_source_hint` "Entestä" → "Photovaultista"). `title_auth`/`title_locker`
+("Ente Auth"/"Ente Locker") stay: only Ente's Auth and Locker apps use them;
+no other locale value contains an Ente word (checked by the script below).
+en-US `view_logs_message` no longer says "email to us".
+
+`scripts/photovault-locale-brand.mjs` (new) is the replacement as a script:
+generic rules ("Ente Photos", `Ente` not followed by a Latin letter or by
+Auth/Locker/Legacy/Ensu) plus per-locale inflections, then a check that lists
+any value still containing `\bEnte` + lowercase letters (other than
+Enter/Entend/Entent) or a lowercase `ente`; `--check` only checks.
+`scripts/photovault-brand-audit.mjs` (new) lists every string literal,
+template part and JSX text in the shipped apps that contains an Ente word
+(case-insensitive, inflections included); PHOTOVAULT-GREP.md explains each
+remaining hit.
 
 See `PHOTOVAULT-GREP.md` for the remaining grep hits and why each is left.
 
@@ -306,6 +332,41 @@ Changed files:
   builds an app for its own host (Ente's layout).
 - `apps/albums/src/public-album/page/PublicAlbumPage.tsx`: a path token
   (`/albums/<token>`) ignores the base path. Links with `?t=` are unaffected.
+  "Join album" is shown whenever the link has `enableJoin` (Ente hid it for
+  self-hosted servers only because Photos lived on another origin).
+- `apps/embed/next.config.js`, `apps/embed/src/pages/index.tsx`: the embed app
+  (the public link "Embed" option) gets `basePath` `/embed`
+  (`PHOTOVAULT_EMBED_BASE_PATH=""` for its own host) and a path token ignores
+  it. `apps/photos/.../CollectionShare.tsx` builds the iframe URL as
+  `<embedURL>/?t=<token>#<key>` instead of swapping the link's origin (which
+  kept the `/albums` path). `scripts/photovault-build.sh` builds it into
+  `<web dir>/embed/`.
+- `packages/base/origins.ts`: the public-link pages (albums, embed) and the
+  cast receiver use the build-time endpoint, else the origin that served them,
+  and ignore a server saved by a Photos user on the same origin (public links
+  belong to the server that serves them; avoids mixed content and "invalid
+  link" against a different saved server).
+- `apps/accounts/src/services/passkey.ts`: a same-origin passkey redirect
+  (Photos at `/` next to Accounts at `/accounts`) is always allowed. Upstream
+  restricts redirects when the host ends with `localhost`, so a production
+  server at `http://localhost:8080` rejected `/passkeys/finish`.
+- `apps/photos/src/components/collections/AlbumCastDialog.tsx`: the "Visit …
+  on the device" step shows host and path (`photos.example.com/cast`), not
+  only the host, since the receiver lives under `/cast`.
+- Sign-up: `packages/base/photovault/server.ts` requires `product:
+"photovault"` and `signupsAllowed` (a 200 without them is "invalid").
+  `ServerField` reports each check (`onCheck`); `pages/index.tsx` hides "Sign
+  up" and returns to the login view when the server says
+  `signupsAllowed: false`, by not passing `onSignUp` to
+  `packages/accounts/components/LoginContents.tsx` (now optional; `auth/LoginForm.tsx`
+  hides the prompt without it). A stock Ente server keeps Ente's behaviour.
+- `server-check.ts`: an http:// server typed on a page served over https
+  (blocked as mixed content) gets "This page is served over HTTPS and can't
+  connect to an http:// address…" instead of "Are you on your home Wi-Fi?".
+  A stock Ente server shows "Connected to a compatible server (no Photovault
+  info)" (the kind stays `ente` internally). This deliberately differs from
+  the contract's suggested "Ente-compatible server" wording, because the only
+  user-visible mention of Ente is "Based on Ente" in About.
 
 Not done for the web app: the contract's home/public address switching rule
 (the web app is served by the server it talks to, so there is nothing to
@@ -325,10 +386,11 @@ layout as the `photovault-web` artifact.
 | `web/apps/albums/out/`   | `/albums/`   | Public albums and collect links (`basePath` `/albums`). Links: `<publicUrl>/albums/?t=<token>#<key>`, or `/albums/<token>#<key>`.                                                |
 | `web/apps/cast/out/`     | `/cast/`     | Cast receiver (pairing code, slideshow).                                                                                                                                         |
 | `web/apps/accounts/out/` | `/accounts/` | Passkeys, family invites, account recovery.                                                                                                                                      |
+| `web/apps/embed/out/`    | `/embed/`    | Public link "Embed" iframe (`basePath` `/embed`). Not yet copied by the server Dockerfile (see below).                                                                           |
 
 Server rules: try `$uri`, `$uri.html`, `$uri/index.html`; for an extension-less
 path that matches nothing, serve the nearest sub-app's `index.html`
-(`/albums/…` → `albums/index.html`, likewise `/cast/`, `/accounts/`, else the
+(`/albums/…` → `albums/index.html`, likewise `/cast/`, `/accounts/`, `/embed/`, else the
 root `index.html`). `_next/static/` is content-hashed and can be cached
 immutable. This matches `PHOTOVAULT_WEB_DIR` in `contracts/server-env.md` and
 the server branch's Dockerfile (which copies `web/apps/<app>/out`).
@@ -340,13 +402,18 @@ Watch out: Ente's cast API also lives under `/cast/` (`POST /cast/device-info`,
 The server must route those API paths before the web-dir fallback, and only
 fall back to `cast/index.html` for paths that are not API routes.
 
-The `embed` and `memories` apps are not built (not in `contracts/apps.json`);
-the "embed" share option therefore points at a path the server does not serve
-yet.
+`web/apps/embed/out/` is served at `/embed/` (public link "Embed" iframe,
+`basePath` `/embed`, links `<publicUrl>/embed/?t=<token>#<key>`).
+`contracts/apps.json` and the server Dockerfile (which copies only `albums
+cast accounts`) do not list it yet; until they do, the server image has no
+`/embed/` and the Embed option's iframe shows nothing. The page must also be
+frameable from other sites (no `X-Frame-Options: DENY` / restrictive
+`frame-ancestors` on `/embed/`). The `memories` app is not built.
 
 ## Merging upstream
 
 Conflicts will mostly be in the files above. Re-apply by keeping upstream's
 change and re-adding the `PHOTOVAULT` hunk; for locales, take upstream's file
-and re-run the brand-name replacement (only `\bEnte\b` not followed by
-Auth/Locker/Legacy/Ensu, and "Ente Photos").
+and re-run `node scripts/photovault-locale-brand.mjs` (add any inflected form
+its check reports to the per-locale table), then
+`node scripts/photovault-brand-audit.mjs` for code strings.
