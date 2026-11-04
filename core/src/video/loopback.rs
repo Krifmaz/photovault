@@ -194,6 +194,11 @@ pub fn server() -> Result<Arc<Loopback>> {
         .map_err(|e| CoreError::storage(format!("cannot start the video server: {e}")))
 }
 
+/// The server if it was started.
+pub fn running() -> Option<Arc<Loopback>> {
+    SERVER.get().and_then(|r| r.as_ref().ok().cloned())
+}
+
 fn start() -> std::io::Result<Arc<Loopback>> {
     let std_listener = std::net::TcpListener::bind(("127.0.0.1", 0))?;
     std_listener.set_nonblocking(true)?;

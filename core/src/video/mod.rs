@@ -303,7 +303,7 @@ impl Core {
     /// their URLs stop working and their keys and decrypted segments are
     /// dropped.
     pub fn stop_streams(&self) {
-        if let Ok(s) = loopback::server() {
+        if let Some(s) = loopback::running() {
             s.stop_all();
         }
     }

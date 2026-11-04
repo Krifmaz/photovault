@@ -17,17 +17,17 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 private class FakeEngine : PlaybackEngine {
-    var listener: PlaybackEngine.Listener? = null
+    var events: PlaybackEngine.Listener? = null
     val calls = mutableListOf<String>()
     var loaded: VideoSource? = null
-    var muted = false
+    var isMuted = false
     var released = false
     override var positionMs = 0L
     override var durationMs = 0L
     override var bufferedMs = 0L
 
     override fun setListener(listener: PlaybackEngine.Listener?) {
-        this.listener = listener
+        events = listener
     }
 
     override fun load(source: VideoSource) {
@@ -49,7 +49,7 @@ private class FakeEngine : PlaybackEngine {
     }
 
     override fun setMuted(muted: Boolean) {
-        this.muted = muted
+        isMuted = muted
     }
 
     override fun stop() {
@@ -64,10 +64,10 @@ private class FakeEngine : PlaybackEngine {
     /** What ExoPlayer reports once a video starts playing. */
     fun startPlaying(duration: Long = 60_000) {
         durationMs = duration
-        listener!!.onState(EngineState.Ready)
-        listener!!.onVideoSize(1280, 720)
-        listener!!.onFirstFrame()
-        listener!!.onIsPlaying(true)
+        events!!.onState(EngineState.Ready)
+        events!!.onVideoSize(1280, 720)
+        events!!.onFirstFrame()
+        events!!.onIsPlaying(true)
     }
 }
 
@@ -177,7 +177,7 @@ class VideoPlaybackControllerTest {
         h.controller.onSurfaceTap()
         h.controller.togglePlay()
         assertEquals("pause", h.engine.calls.last())
-        h.engine.listener!!.onIsPlaying(false)
+        h.engine.events!!.onIsPlaying(false)
         advanceTimeBy(VideoPlaybackController.HIDE_DELAY_MS * 3)
         assertTrue(h.controller.state.value.controlsVisible)
         h.controller.togglePlay()
@@ -202,17 +202,17 @@ class VideoPlaybackControllerTest {
 
         // Mute sticks to the shared player across videos.
         h.controller.toggleMute()
-        assertTrue(h.engine.muted && h.controller.state.value.muted)
+        assertTrue(h.engine.isMuted && h.controller.state.value.muted)
         h.controller.open(video(2))
         runCurrent()
         assertTrue(h.controller.state.value.muted)
         h.controller.toggleMute()
-        assertFalse(h.engine.muted)
+        assertFalse(h.engine.isMuted)
 
         // At the end the controls show; play starts over.
         h.engine.startPlaying()
-        h.engine.listener!!.onIsPlaying(false)
-        h.engine.listener!!.onState(EngineState.Ended)
+        h.engine.events!!.onIsPlaying(false)
+        h.engine.events!!.onState(EngineState.Ended)
         val ended = h.controller.state.value
         assertEquals(VideoPhase.Ended, ended.phase)
         assertTrue(ended.controlsVisible && !ended.playing)
@@ -237,7 +237,7 @@ class VideoPlaybackControllerTest {
         h.controller.open(video(1))
         runCurrent()
         assertEquals(VideoPhase.Buffering, h.controller.state.value.phase)
-        h.engine.listener!!.onError("ERROR_CODE_IO_NETWORK_CONNECTION_FAILED")
+        h.engine.events!!.onError("ERROR_CODE_IO_NETWORK_CONNECTION_FAILED")
         assertEquals(VideoPhase.Error, h.controller.state.value.phase)
         assertFalse(h.controller.state.value.playing)
     }

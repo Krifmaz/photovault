@@ -87,8 +87,7 @@ private fun ActiveVideo(controller: VideoPlaybackController) {
     val s = state
     Box(Modifier.fillMaxSize().testTag("video_player")) {
         val engine = controller.engine as? ExoPlaybackEngine
-        val showSurface = engine != null &&
-            (s.phase == VideoPhase.Buffering || s.phase == VideoPhase.Ready || s.phase == VideoPhase.Ended)
+        val showSurface = s.phase == VideoPhase.Buffering || s.phase == VideoPhase.Ready || s.phase == VideoPhase.Ended
         if (showSurface && engine != null) {
             val ratio = if (s.videoWidth > 0 && s.videoHeight > 0) s.videoWidth.toFloat() / s.videoHeight else 16f / 9f
             PlayerSurface(
