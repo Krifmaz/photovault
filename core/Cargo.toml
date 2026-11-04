@@ -53,6 +53,11 @@ kamadak-exif = "0.6"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 # Best-effort LAN discovery (`_photovault._tcp`).
 mdns-sd = "0.21"
+# Streamable videos (Ente's `vid_preview`): the playlist JSON is gzipped, and
+# HLS segments are AES-128-CBC (RFC 8216 §5.2). Pure Rust (miniz_oxide, RustCrypto).
+flate2 = "1"
+aes = "0.8"
+cbc = "0.1"
 
 [dev-dependencies]
 photovault-server = { path = "../server" }

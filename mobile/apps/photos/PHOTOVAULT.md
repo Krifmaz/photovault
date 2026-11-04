@@ -163,6 +163,23 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   (`_handleConnectLink`, which opens the connect screen with the address filled
   in and looks it up. When an account is signed in, or a sign-up is half done,
   it only shows a toast that points to Settings > Server).
+- Email verification skip: when the active server's `/photovault/info` says
+  `"emailVerification": "skip"` (no SMTP; any 6-digit code is accepted after
+  `POST /users/ott`), sign-up and email-code login send the code `000000`
+  themselves instead of showing "Check your inbox", then continue exactly as
+  if it had been typed. If that code is refused (email 2FA accounts, stock
+  Ente server) the usual code screen is shown with no error. Absent field,
+  `smtp`, `log`, change of email, password reset and resends are unchanged.
+  The field is read from the cached active server (refreshed on start), so
+  there is no extra request. Files: `server_contract.dart`
+  (`emailVerification`, `skipsEmailVerification`, stored with the server),
+  new pure `lib/services/photovault/email_verification.dart`
+  (`shouldAutoSubmitEmailCode`, `kSkippedEmailCode`), and
+  `lib/services/account/user_service.dart` (`sendOtt` tries the code first;
+  `verifyEmail` returns whether it succeeded and takes `silentFailure`).
+  Photos' own `UserService` only; `packages/accounts` (Auth/Locker) is
+  untouched. Tests: `test/photovault/email_verification_test.dart`,
+  `test/photovault/email_verification_flow_test.dart`.
 - `ios/Runner/Info.plist`: `_photovault._tcp` in `NSBonjourServices`, the
   local-network prompt mentions the server, stale
   `FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED` key removed.
@@ -175,6 +192,9 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - `lib/ui/cast/pair_with_code.dart`: the cast URL shown for pairing is the
   remote flag, else the server's `castUrl` from `/photovault/info`, else
   `<publicUrl>/cast`, and only then `<endpoint>/cast`.
+- `lib/ui/cast/cast.dart`: Chromecast "Auto pair" shows only when the app
+  has a Photovault receiver id (`canAutoPair`, see Chromecast below); without
+  one the cast sheet offers pair-by-code only, as the web app does.
 - `lib/core/configuration.dart`: `logout()` keeps the `photovault.*` keys and
   Ente's `endpoint` key across its `SharedPreferences.clear()`, so servers
   survive logout.
@@ -365,11 +385,16 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   `open_location_index(assetRoot, assetBaseUrl)`): the location data files
   (cities, urban centres, countries, disputes; pinned sizes and SHA-256s are
   unchanged) are downloaded from `<endpoint>/static-assets/location/v2`, the
-  server's web app, instead of Ente's assets CDN. `LocationIndex::open` keeps
+  server's web app, instead of Ente's assets CDN (the server must run with
+  `PHOTOVAULT_WEB_DIR` pointing at a web build made with
+  `web/scripts/photovault-vendor-assets.mjs`, which vendors all four files;
+  otherwise places and city search are unavailable). `LocationIndex::open` keeps
   the upstream CDN default for the CLI only. Regenerate the bindings with
   `cargo codegen frb photos` (output is git-ignored).
 - `lib/ui/tabs/home_widget.dart`: links on Ente's albums hosts are no longer
   treated as public album links (only the active server's links are).
+- `lib/services/library_sharing_service.dart`: the missing-public-key error no
+  longer says "Ente" (it can reach the generic error dialog).
 - `lib/ui/viewer/gallery/gallery_app_bar_widget.dart`: "Open in browser" for a
   collect link falls back to `serverAlbumsBaseUrl` (new in
   `lib/services/photovault/server_contract.dart`: the server's `albumsUrl`,
@@ -397,6 +422,14 @@ not ship):
   the Linux setup sheet has no Ente help-page button and does not name Ente Auth.
 - `../../packages/ente_components/example/lib/main.dart`: sample link uses
   example.com.
+
+### Ente logos in shared packages
+
+- `packages/ente_components/assets/ente_wordmark.svg` and the Ente Auth and
+  Locker logos in `assets/apps/` are deleted and dropped from its
+  `pubspec.yaml`, so they are not bundled in the APK. `assets/apps/photos.png`
+  (the account-deletion summary row) is the Photovault icon at 1x/2x/3x.
+  The More-from-Ente section that drew the wordmark is not used by Photos.
 
 ### Mascot
 
@@ -442,8 +475,24 @@ not ship):
 - `test/photovault/screenshots_test.dart` (new): renders the connect screen
   (empty, saved and found servers, server answered, unreachable), the top of
   Settings (storage card and Server entry), Settings > Server and About, in light
-  and dark with the real themes and bundled fonts. With
-  `PHOTOVAULT_SCREENSHOT_DIR=<dir>` it writes `<screen>-<light|dark>.png` there.
+  and dark with the real themes and bundled fonts, plus the QR scan page
+  chrome (the camera view is black off-device). With
+  `PHOTOVAULT_SCREENSHOT_DIR=<dir>` it writes `<screen>-<light|dark>.png` there
+  (1080x2400 at 2.625).
+- `test/photovault/before_after/` (new): the Ente screens Photovault changes
+  (landing, sign-in, sign-up, email code, passwords, recovery key, Settings,
+  About, Account, Family, Free up space, Security, Streaming, ML, backup
+  banners, permissions, loading, empty states, Rewind banner, invite dialog),
+  written so the same test also runs on the pristine Ente import
+  (`tree_env.dart` here, `tree_env_upstream.dart` there).
+  `scripts/photovault/render_before_after.sh <dir>` renders both and writes
+  `<screen>-<mode>-before.png` / `-after.png`.
+- `../../../.github/workflows/photovault-mobile.yml` job
+  `photos-emulator-screens` (non-blocking): x86_64 debug APK in an API 34
+  `aosp_atd` emulator, a server built from the repo's Dockerfile
+  (`WEB=none`, `PHOTOVAULT_SKIP_EMAIL_VERIFICATION`), driven by
+  `scripts/photovault/emulator_screens.py` (adb + uiautomator); uploads the
+  `photovault-emulator-screens` artifact.
 - `lib/main.dart`, `lib/ui/account/onboarding_page_scaffold.dart`: analyzer
   fixes (unused imports left by the telemetry removal, a missing `const`).
 
@@ -488,3 +537,9 @@ not ship):
   `lock_screen_icon.png`, `recovery_key.png`, rewind badge backdrops).
 - The alternate app icons (Settings > App icon) all show the Photovault icon.
 - `PHOTOVAULT-GREP.md` (generated by a final grep) lists every remaining "ente"/telemetry/store hit and why it is acceptable.
+- `../../../scripts/strip-report.py` (repo root) checks the same in CI against
+  `scripts/strip-allowlist.toml`, over the sources and the built APK
+  (`photovault-mobile.yml`, report artifact `strip-report-apk`); the source
+  report is `docs/src/strip-report.md`.
+
+- `lib/ui/home/landing_page_widget.dart`: when the server refuses sign-ups, the landing page shows PhotovaultStrings.signupsClosed in place of "Create account".

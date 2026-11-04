@@ -3,6 +3,11 @@
 #   1. flutter analyze + flutter test (Ente's tests and test/photovault)
 #   2. arm64 release APK (flavor `independent`, applicationId app.photovault)
 #   3. uploads the APK and its SHA256SUMS as a workflow artifact
+#   4. scripts/strip-report.py --check over the source and the built APK
+#      (Ente hosts/branding left must be explained in
+#      scripts/strip-allowlist.toml); the report is uploaded as an artifact
+#   5. separate, non-blocking job: screenshots of an x86_64 debug build in an
+#      Android emulator (artifact photovault-emulator-screens)
 #
 # Signing: with the repository secrets PHOTOVAULT_KEYSTORE_B64,
 # PHOTOVAULT_KEYSTORE_PASSWORD, PHOTOVAULT_KEY_ALIAS and PHOTOVAULT_KEY_PASSWORD
@@ -21,11 +26,13 @@ on:
         paths:
             - "mobile/**"
             - "rust/**"
+            - "scripts/strip-*"
             - ".github/workflows/photovault-mobile.yml"
     pull_request:
         paths:
             - "mobile/**"
             - "rust/**"
+            - "scripts/strip-*"
             - ".github/workflows/photovault-mobile.yml"
     workflow_dispatch:
     # release.yml attaches the APK to every release
@@ -196,3 +203,223 @@ jobs:
                   name: photovault-android-arm64-${{ steps.signing.outputs.suffix }}
                   path: mobile/apps/photos/artifacts/
                   if-no-files-found: error
+
+            - name: Strip report (source + APK)
+              shell: bash
+              working-directory: .
+              run: |
+                  set -euo pipefail
+                  apk=$(ls mobile/apps/photos/artifacts/*.apk)
+                  python3 -I scripts/strip-report.py --check --apk "$apk" \
+                      --output "$RUNNER_TEMP/strip-report/strip-report-apk.md"
+
+            - name: Upload strip report
+              if: ${{ !cancelled() }}
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: strip-report-apk
+                  path: ${{ runner.temp }}/strip-report/
+                  if-no-files-found: warn
+
+    # Screenshots of the real app in an Android emulator (x86_64, API 34,
+    # aosp_atd: no Google APIs). A separate job with its own x86_64 debug
+    # build, so it never holds up or fails the APK artifact above
+    # (continue-on-error). A Photovault server is built from the repo's
+    # Dockerfile (server only, WEB=none) in the background while the APK
+    # builds, and run with PHOTOVAULT_SKIP_EMAIL_VERIFICATION so the sign-up
+    # flow can be driven; the emulator reaches it at 10.0.2.2. If the image
+    # does not build, only the pre-login screens and the offline gallery are
+    # captured. The UI is driven with adb (uiautomator + input) by
+    # mobile/apps/photos/scripts/photovault/emulator_screens.py.
+    photos-emulator-screens:
+        runs-on: ubuntu-latest
+        timeout-minutes: 150
+        continue-on-error: true
+
+        defaults:
+            run:
+                working-directory: mobile/apps/photos
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+            - name: Free runner disk space
+              run: sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+
+            - name: Build Photovault server image (background)
+              shell: bash
+              working-directory: .
+              run: |
+                  set -euo pipefail
+                  mkdir -p "$RUNNER_TEMP/server"
+                  nohup docker build --build-arg WEB=none -t photovault-ci . \
+                      > "$RUNNER_TEMP/server/docker-build.log" 2>&1 &
+                  echo $! > "$RUNNER_TEMP/server/docker-build.pid"
+
+            - name: Enable KVM
+              working-directory: .
+              run: |
+                  echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+                  sudo udevadm control --reload-rules
+                  sudo udevadm trigger --name-match=kvm
+
+            - name: Setup JDK 17
+              uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+              with:
+                  distribution: "temurin"
+                  java-version: "17"
+
+            - name: Restore Flutter SDK
+              id: flutter-cache
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  key: flutter-${{ runner.os }}-${{ runner.arch }}-${{ env.FLUTTER_VERSION }}
+                  path: ${{ runner.tool_cache }}/flutter/${{ env.FLUTTER_VERSION }}
+
+            - name: Install Flutter
+              shell: bash
+              working-directory: .
+              env:
+                  CACHE_HIT: ${{ steps.flutter-cache.outputs.cache-hit }}
+              run: |
+                  set -euo pipefail
+                  root="$RUNNER_TOOL_CACHE/flutter/$FLUTTER_VERSION"
+                  if [ "$CACHE_HIT" != true ]; then
+                      archive="$RUNNER_TEMP/flutter.tar.xz"
+                      curl --retry 3 --retry-all-errors -fsSL \
+                          "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" \
+                          -o "$archive"
+                      printf '%s  %s\n' "$FLUTTER_SHA256" "$archive" | sha256sum -c -
+                      mkdir -p "$root"
+                      tar xf "$archive" -C "$root"
+                      rm -f "$archive"
+                  fi
+                  echo "$root/flutter/bin" >> "$GITHUB_PATH"
+                  sed -i '/^untranslated-messages-file:/d' mobile/packages/strings/l10n.yaml
+
+            - name: Install Android SDK packages
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+                  yes | "$sdkmanager" --licenses > /dev/null || true
+                  for attempt in 1 2 3; do
+                      if "$sdkmanager" --install "platforms;android-36" "build-tools;35.0.0" \
+                          "ndk;${NDK_VERSION}" "cmake;3.22.1" "platform-tools" > /dev/null; then
+                          break
+                      fi
+                      [ "$attempt" = 3 ] && exit 1
+                      rm -rf "$ANDROID_HOME/ndk/${NDK_VERSION}" "$ANDROID_HOME/.temp" "$HOME/.android/cache"
+                      sleep 15
+                  done
+                  echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+
+            - name: Install Rust Android target
+              run: rustup target add x86_64-linux-android
+
+            - name: Rust cache
+              uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+              with:
+                  workspaces: rust
+                  shared-key: photovault-mobile-x64
+
+            - run: flutter pub get --enforce-lockfile
+
+            - name: Generate Rust bindings
+              run: cargo codegen frb photos
+              working-directory: rust
+
+            # numkong 7.8.6 (via usearch) forward-declares
+            # `extern "C" long syscall(long, ...) noexcept;` on Linux x86_64,
+            # which clashes with Android bionic's unistd.h (no noexcept) and
+            # stops the x86_64 Android build. arm64 never takes that branch.
+            # Drop the noexcept in the fetched copy, for this emulator-only
+            # debug build; the release APK job is untouched.
+            - name: Patch numkong header for Android x86_64
+              shell: bash
+              working-directory: .
+              run: |
+                  set -euo pipefail
+                  cargo fetch --manifest-path rust/bindings/frb/photos/Cargo.toml
+                  shopt -s nullglob
+                  hits=("$HOME"/.cargo/registry/src/*/numkong-*/include/numkong/capabilities.h)
+                  [ ${#hits[@]} -gt 0 ] || { echo "numkong header not found"; exit 1; }
+                  for f in "${hits[@]}"; do
+                      sed -i 's/^extern "C" long syscall(long, \.\.\.) noexcept;$/extern "C" long syscall(long, ...);/' "$f"
+                      grep -n 'long syscall' "$f"
+                  done
+
+            - name: Build x86_64 debug APK
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  # No built-in server: the app opens on the connect screen.
+                  flutter build apk --debug --flavor independent \
+                      --target-platform android-x64 \
+                      --dart-define=cronetHttpNoPlay=true \
+                      --dart-define=PHOTOVAULT_SERVER=
+                  cp build/app/outputs/flutter-apk/app-independent-debug.apk "$RUNNER_TEMP/photovault-x64-debug.apk"
+
+            - name: Start Photovault server
+              id: server
+              shell: bash
+              working-directory: .
+              run: |
+                  set -uo pipefail
+                  pid=$(cat "$RUNNER_TEMP/server/docker-build.pid")
+                  # Give the image build at most 30 more minutes.
+                  for _ in $(seq 360); do kill -0 "$pid" 2>/dev/null || break; sleep 5; done
+                  if ! docker image inspect photovault-ci > /dev/null 2>&1; then
+                      echo "::warning::Server image did not build in time; capturing pre-login screens only."
+                      tail -50 "$RUNNER_TEMP/server/docker-build.log" || true
+                      echo "url=" >> "$GITHUB_OUTPUT"
+                      exit 0
+                  fi
+                  docker run -d --name photovault -p 8080:8080 \
+                      -e PHOTOVAULT_PUBLIC_URL=http://10.0.2.2:8080 \
+                      -e PHOTOVAULT_SERVER_NAME="CI server" \
+                      -e PHOTOVAULT_SKIP_EMAIL_VERIFICATION=true \
+                      -e PHOTOVAULT_MDNS=false \
+                      photovault-ci
+                  for _ in $(seq 60); do
+                      curl -fsS http://127.0.0.1:8080/photovault/info && { echo; break; }
+                      sleep 2
+                  done
+                  if curl -fsS http://127.0.0.1:8080/photovault/info > /dev/null; then
+                      echo "url=10.0.2.2:8080" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "::warning::Server did not answer; capturing pre-login screens only."
+                      docker logs photovault || true
+                      echo "url=" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Capture screens in the emulator
+              uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+              env:
+                  PV_APK: ${{ runner.temp }}/photovault-x64-debug.apk
+                  PV_SHOTS: ${{ runner.temp }}/emulator-screens
+                  PV_SERVER: ${{ steps.server.outputs.url }}
+              with:
+                  api-level: 34
+                  target: aosp_atd
+                  arch: x86_64
+                  profile: pixel_6
+                  disable-animations: true
+                  emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+                  working-directory: mobile/apps/photos
+                  # One command: the action runs each script line in its own shell.
+                  script: adb install -r -g "$PV_APK" && python3 -I scripts/photovault/emulator_screens.py --package app.photovault.debug --out "$PV_SHOTS" ${PV_SERVER:+--server "$PV_SERVER"}
+
+            - name: Server log
+              if: ${{ always() }}
+              working-directory: .
+              run: mkdir -p "$RUNNER_TEMP/emulator-screens" && { docker logs photovault > "$RUNNER_TEMP/emulator-screens/server.log" 2>&1 || true; }
+
+            - name: Upload emulator screenshots
+              if: ${{ always() }}
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: photovault-emulator-screens
+                  path: ${{ runner.temp }}/emulator-screens/
+                  if-no-files-found: warn

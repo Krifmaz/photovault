@@ -1,0 +1,671 @@
+# PHOTOVAULT: strip report allowlist (new file).
+#
+# Explanations for the hits of scripts/strip-report.py. The report
+# (docs/src/strip-report.md) lists every hit with the entry that explains it;
+# a hit no entry explains fails `--check` in CI.
+#
+# [[allow]] entries:
+#   path     glob or list of globs, repo-relative ("*" also matches "/").
+#            APK members are "apk:<member>", web export files are
+#            "web-out:<dir as given, relative to the repo>/<file>".
+#   term     a term id of strip-report.py (TERMS), a list, or "*".
+#   line     optional regex the hit's text (the code or string on that line)
+#            must match. Use it: an entry should explain the hits it was
+#            written for, not whatever lands in that file later.
+#   when     optional: "translation-key-unreferenced" = the hit is a
+#            translation value whose key no scanned source file references.
+#   category one of [categories] below; reason: one line, why it stays.
+#
+# User-visible Ente branding is fixed in the code, not listed here. The only
+# user-visible Ente mention the project allows is the plain "Based on Ente"
+# credit in About.
+#
+# [[exclude]] paths are not scanned at all; the report lists them.
+
+[categories]
+about-credit = "The plain \"Based on Ente\" credit in About, the one allowed user-visible mention of Ente."
+internal-identifier = "Identifiers that are never shown as text: URI schemes, package/app ids, enum values, storage keys, CSS hooks, file names."
+api-field-name = "Names in the Ente API that the Photovault server implements (paths, JSON fields, models); renaming them breaks the protocol."
+server-plan-wording = "Generic plan/subscription wording for errors the Photovault server really returns (it keeps museum's per-user plan: quota and expiry, set by the admin). Not Ente branding."
+log-message = "Developer log or diagnostic text (logs, adb dumps, exceptions caught and logged); not shown in the UI."
+unused-string = "Translation value whose key no Photovault app code references any more; never displayed."
+upstream-only-app-not-built = "Code path or text that runs only for Ente's other apps (Auth, Locker, Legacy Kit, Space) or platforms Photovault does not ship."
+upstream-security-logic = "Upstream security checks that name Ente hosts; left untouched so security is not weakened."
+inert-config = "Configuration that names an Ente host or service but makes no request and shows nothing."
+replaced-asset-path = "Asset file name kept from upstream; the content (duck mascot) was replaced or is no longer drawn."
+pending-user-decision = "Still contacts an Ente host; left on purpose until the project owner decides (ML model downloads)."
+third-party-data = "Data inside a bundled third-party library (word lists etc.)."
+package-metadata = "Package/build metadata (pubspec description, package.json name) that is not shipped in or shown by the apps."
+
+# ---------------------------------------------------------------------------
+# Not scanned
+
+[[exclude]]
+path = "*/node_modules/*"
+reason = "third-party packages"
+[[exclude]]
+path = "*/build/*"
+reason = "build output"
+[[exclude]]
+path = "*/.dart_tool/*"
+reason = "Flutter tool cache"
+[[exclude]]
+path = "*/.gradle/*"
+reason = "Gradle cache"
+[[exclude]]
+path = "*/.cxx/*"
+reason = "native build cache"
+[[exclude]]
+path = "*/Pods/*"
+reason = "CocoaPods checkout"
+[[exclude]]
+path = "web/apps/*/.next/*"
+reason = "Next.js build cache (the export is scanned with --web-out instead)"
+[[exclude]]
+path = "web/apps/*/out/*"
+reason = "web static export (scanned with --web-out)"
+[[exclude]]
+path = "*/test/*"
+reason = "tests, not shipped"
+[[exclude]]
+path = "*/tests/*"
+reason = "tests, not shipped"
+[[exclude]]
+path = "*/Tests/*"
+reason = "tests, not shipped"
+[[exclude]]
+path = "*/integration_test/*"
+reason = "tests, not shipped"
+[[exclude]]
+path = "rust/*/tests.rs"
+reason = "Rust test modules, not shipped"
+[[exclude]]
+path = "rust/*/test_*.rs"
+reason = "Rust test modules, not shipped"
+[[exclude]]
+path = "*.test.ts"
+reason = "tests, not shipped"
+[[exclude]]
+path = "*.g.dart"
+reason = "generated code (json_serializable etc.); its source is scanned"
+[[exclude]]
+path = "*.freezed.dart"
+reason = "generated code; its source is scanned"
+[[exclude]]
+path = "mobile/packages/strings/lib/l10n/strings_localizations*.dart"
+reason = "generated from the .arb files, which are scanned"
+[[exclude]]
+path = "mobile/apps/photos/lib/generated/*"
+reason = "generated from the .arb files, which are scanned"
+[[exclude]]
+path = "mobile/apps/photos/scripts/*"
+reason = "developer scripts (perf tests, asset renderers); not compiled into the app"
+[[exclude]]
+path = "mobile/packages/ente_components/example/*"
+reason = "component catalog example app; not built or shipped"
+[[exclude]]
+path = "*/pubspec.lock"
+reason = "dependency lockfile, not shipped"
+[[exclude]]
+path = "*/package-lock.json"
+reason = "dependency lockfile, not shipped"
+[[exclude]]
+path = "web/packages/wasm/*/pkg/*"
+reason = "generated wasm-bindgen output; its Rust source (rust/bindings/wasm/*) is scanned"
+
+# ---------------------------------------------------------------------------
+# About credit
+
+[[allow]]
+path = ["mobile/packages/ente_components/lib/theme/photovault/encore_tokens.dart",
+        "web/packages/base/components/utils/photovault/encore-tokens.ts",
+        "desktop/src/main/photovault/brand.ts"]
+term = "ente"
+line = "^Based on Ente$"
+category = "about-credit"
+reason = "The \"Based on Ente\" credit line shown as plain text in About."
+
+# ---------------------------------------------------------------------------
+# Pending user decision
+
+[[allow]]
+path = "mobile/apps/photos/lib/services/remote_assets_service.dart"
+term = "ente.com"
+line = "models\\.ente\\.com"
+category = "pending-user-decision"
+reason = "ML models still download from models.ente.com (owner to decide); this is the host check for those downloads."
+
+[[allow]]
+path = "mobile/apps/photos/lib/services/photovault/server_assets.dart"
+term = "ente.com"
+line = "enteMusicManifestUrl = \"https://music\\.ente\\.com/tracks\\.json\""
+category = "pending-user-decision"
+reason = "Memories music fallback, used only when the server advertises no music mirror (musicManifestUrl, contracts/asset-mirror.md)."
+[[allow]]
+path = "rust/bindings/frb/photos/src/api/ml_indexing_api.rs"
+term = "ente.com"
+line = "set_url_mirror\\(\"https://models\\.ente\\.com/\""
+category = "pending-user-decision"
+reason = "Maps models.ente.com to the server's model mirror (modelsUrl); the Ente host is the fallback when the server has no mirror."
+
+# ---------------------------------------------------------------------------
+# Mobile: Photos app
+
+[[allow]]
+path = "mobile/apps/photos/android/app/src/main/AndroidManifest.xml"
+term = "ente"
+line = "android:scheme=\"ente\""
+category = "internal-identifier"
+reason = "ente:// deep-link scheme, kept for the passkey 2FA return (ente://passkey) and notification taps (PHOTOVAULT.md, Known gaps)."
+[[allow]]
+path = "mobile/apps/photos/ios/Runner/Info.plist"
+term = "ente"
+line = "<string>ente</string>"
+category = "internal-identifier"
+reason = "ente:// URL scheme registration on iOS, same as the Android one."
+[[allow]]
+path = ["mobile/apps/photos/lib/ui/account/passkey_page.dart",
+        "mobile/apps/photos/lib/services/notification_service.dart",
+        "mobile/apps/photos/lib/services/sync/remote_sync_service.dart"]
+term = "ente"
+line = "ente://"
+category = "internal-identifier"
+reason = "ente:// deep links handled by the app itself (passkey return, notification payloads)."
+[[allow]]
+path = ["mobile/apps/photos/lib/services/social_notification_coordinator.dart",
+        "mobile/apps/photos/lib/services/rituals/rituals_service.dart",
+        "mobile/apps/photos/lib/ui/tabs/home_widget.dart"]
+term = "ente"
+line = "^(ente|ente https)$"
+category = "internal-identifier"
+reason = "ente:// URI scheme in notification payloads and the deep-link scheme check."
+[[allow]]
+path = "mobile/apps/photos/android/app/src/main/res/xml/network_security_config.xml"
+term = ["ente.io", "ente.com"]
+line = "<domain includeSubdomains=\"true\">ente\\.(io|com)</domain>"
+category = "inert-config"
+reason = "Upstream rule forcing TLS for Ente domains; it makes no request."
+[[allow]]
+path = "mobile/apps/photos/android/app/src/fdroid/AndroidManifest.xml"
+term = "sentry"
+line = "io\\.sentry\\."
+category = "inert-config"
+reason = "Manifest merge rules that remove Sentry's meta-data (tools:node=\"remove\"); no Sentry SDK is built in."
+[[allow]]
+path = "mobile/apps/photos/android/app/src/main/kotlin/io/ente/photos/AdbDiagnostics.kt"
+term = "ente"
+line = "Ente log"
+category = "log-message"
+reason = "Text of the adb-only diagnostics dump (developer use over USB debugging), not app UI."
+[[allow]]
+path = "mobile/apps/photos/lib/main.dart"
+term = "firebase"
+line = "'firebase(BgSync\\w*|Push)'"
+category = "log-message"
+reason = "Upstream background-sync trace labels; no Firebase SDK is built in."
+[[allow]]
+path = "mobile/apps/photos/lib/services/machine_learning/face_ml/feedback/cluster_feedback.dart"
+term = "ente"
+line = "require an Ente account"
+category = "log-message"
+reason = "Logged reason for skipping person suggestions in local-only mode; not shown."
+[[allow]]
+path = "mobile/apps/photos/lib/ui/wrapped/wrapped_viewer_page.dart"
+term = "ente"
+line = "^Failed to .*Ente Rewind"
+category = "log-message"
+reason = "Logged failure messages of the Rewind viewer; not shown."
+[[allow]]
+path = "mobile/apps/photos/lib/utils/delete_file_util.dart"
+term = "ente"
+line = "^Ente device$"
+category = "log-message"
+reason = "Word in the log line \"failed to empty <Ente|device> trash\"; the dialog shown is generic."
+[[allow]]
+path = "mobile/apps/photos/lib/ui/tabs/home_widget.dart"
+term = "subscription"
+line = "link subscription\\.$"
+category = "log-message"
+reason = "Log line about the deep-link stream subscription (a Dart stream), not billing."
+[[allow]]
+path = ["mobile/apps/photos/lib/ui/tabs/albums_tab.dart",
+        "mobile/apps/photos/lib/ui/tabs/shared/all_links_page.dart",
+        "mobile/apps/photos/lib/ui/viewer/gallery/archive_page.dart",
+        "mobile/apps/photos/lib/ui/viewer/gallery/trash_page.dart"]
+term = "duck"
+line = "^assets/ente-[a-z]+-ducky\\.riv$"
+category = "replaced-asset-path"
+reason = "The Rive duck animations are deleted; EmptyStateComponent draws the Photovault glyph instead (PHOTOVAULT.md, Mascot)."
+[[allow]]
+path = ["mobile/apps/photos/lib/gateways/billing/billing_gateway.dart",
+        "mobile/apps/photos/lib/models/user_details.dart",
+        "mobile/packages/accounts/lib/models/user_details.dart",
+        "mobile/packages/accounts/lib/ente_accounts.dart"]
+term = "subscription"
+line = "(^/billing/|^subscription$|models/subscription\\.dart$)"
+category = "api-field-name"
+reason = "Billing API paths and the `subscription` JSON field of /users/details; the server answers them (no payments UI is left)."
+[[allow]]
+path = ["mobile/apps/photos/lib/gateways/storage_bonus/storage_bonus_gateway.dart",
+        "mobile/apps/photos/lib/gateways/storage_bonus/models/bonus.dart",
+        "mobile/packages/accounts/lib/models/bonus.dart"]
+term = "referral"
+line = "(^/storage-bonus/referral-|^SIGN_UP REFERRAL$)"
+category = "api-field-name"
+reason = "Storage-bonus API paths and bonus type names of the Ente API; the referrals UI is removed."
+
+# ---------------------------------------------------------------------------
+# Mobile: shared packages compiled into Photos
+
+[[allow]]
+path = ["mobile/apps/photos/pubspec.yaml", "mobile/apps/photos/plugins/*/pubspec.yaml",
+        "mobile/packages/*/pubspec.yaml"]
+term = "ente"
+line = "^description: "
+category = "package-metadata"
+reason = "pubspec description; not compiled into the app."
+[[allow]]
+path = "mobile/packages/configuration/lib/constants.dart"
+term = ["ente.com", "ente.io"]
+line = "^const k(Default|Legacy)ProductionEndpoint = 'https://api\\.ente\\.(com|io)';$"
+category = "upstream-only-app-not-built"
+reason = "Default endpoint of BaseConfiguration for Ente Auth/Locker; Photos uses its own EndpointConfig with no Ente default."
+[[allow]]
+path = "mobile/packages/ente_components/assets/ente_wordmark.svg"
+term = "ente"
+line = "<g id=\"ente\">"
+category = "internal-identifier"
+reason = "SVG group id inside the shared wordmark asset (Photos shows its own Photovault wordmark)."
+[[allow]]
+path = "mobile/packages/ente_components/lib/components/more_from_ente_section.dart"
+term = "ente"
+line = "^Ente \\$label$"
+category = "upstream-only-app-not-built"
+reason = "\"More from Ente\" widget used by Ente's other apps; Photos no longer shows it (settings_page.dart)."
+[[allow]]
+path = "mobile/packages/ente_qr_scanner/lib/src/ente_qr_scanner_controller.dart"
+term = "ente"
+line = "on Ente QR scanner channel"
+category = "log-message"
+reason = "MissingPluginException text for an unknown platform-channel method (programming error), not UI."
+[[allow]]
+path = ["mobile/packages/local_auth_linux/linux/local_auth_linux_plugin.cc",
+        "mobile/packages/lock_screen/lib/auth_util.dart"]
+term = "ente"
+line = "Ente Auth Polkit policy"
+category = "upstream-only-app-not-built"
+reason = "Linux desktop system-auth setup text; Photovault ships no Flutter Linux build."
+[[allow]]
+path = "mobile/packages/network/lib/network.dart"
+term = "ente"
+line = "^ente_auth Ente Auth$"
+category = "upstream-only-app-not-built"
+reason = "Maps the Windows/Linux package name of Ente Auth to its client id; never true for Photos."
+[[allow]]
+path = "mobile/packages/logging/lib/super_logging.dart"
+term = "sentry"
+line = "sentry(Dsn|RetryDelay|IsEnabled)"
+category = "inert-config"
+reason = "Upstream logging config fields; Photos passes no DSN and no Sentry SDK is built in."
+
+# Translations (mobile/packages/strings is shared with Ente Auth and Locker).
+[[allow]]
+path = ["mobile/packages/strings/lib/l10n/arb/*.arb", "web/packages/base/locales/*/translation.json",
+        "web-out:*/_next/static/chunks/*.js", "apk:lib/*/libapp.so"]
+term = "*"
+when = "translation-key-unreferenced"
+category = "unused-string"
+reason = "No Photovault app code references this key (billing, referrals, Auth/Locker or removed support texts)."
+[[allow]]
+path = "mobile/packages/strings/lib/l10n/arb/*.arb"
+term = "rate us"
+line = "^Rate us$"
+category = "unused-string"
+reason = "rateUs is read only by packages/ui AppEngagementSection, which Photos no longer shows."
+[[allow]]
+path = "mobile/packages/strings/lib/l10n/arb/*.arb"
+term = "referral"
+line = "^Referral(s| stats)$"
+category = "unused-string"
+reason = "referrals/referralStats keys: no l10n accessor uses them (the matches are model fields of the same name); the referrals UI is removed."
+[[allow]]
+path = "mobile/packages/strings/lib/l10n/arb/*.arb"
+term = "subscription"
+line = "^Subscription$"
+category = "unused-string"
+reason = "subscription key: no l10n accessor uses it (the matches are the UserDetails field); the plans UI is removed."
+
+# ---------------------------------------------------------------------------
+# Web
+
+[[allow]]
+path = "web/packages/base/locales/en-US/translation.json"
+term = "referral"
+line = "^Referrals$"
+category = "unused-string"
+reason = "\"referrals\" key: no t() call uses it (the match is the search id utility.referrals); the Referrals screen is removed."
+[[allow]]
+path = "web/packages/base/locales/en-US/translation.json"
+term = "subscription"
+line = "^Subscription$"
+category = "unused-string"
+reason = "\"subscription\" key: no t() call uses it (the matches are sidebar action ids); the plan UI is removed."
+[[allow]]
+path = "web/packages/base/locales/en-US/translation.json"
+term = "subscription"
+line = "^(Subscription expired|An active subscription is required to create this link\\. Please check your subscription status\\.|You need a paid subscription to change this link setting)$"
+category = "server-plan-wording"
+reason = "Shown for the server's 402/expired-plan errors on upload and link creation (museum semantics the server keeps)."
+[[allow]]
+path = ["web/packages/gallery/services/upload/upload-service.ts",
+        "web/apps/albums/src/public-album/upload/pipeline/upload-service.ts"]
+term = "subscription"
+line = "^Subscription expired$"
+category = "server-plan-wording"
+reason = "Internal error message constant for the server's expired-plan upload error; the UI shows the translated text."
+[[allow]]
+path = ["web/apps/photos/src/components/sidebar/Sidebar.tsx",
+        "web/apps/photos/src/components/sidebar/accounts/Account.tsx",
+        "web/apps/photos/src/components/sidebar/theme.ts",
+        "web/apps/photos/src/components/gallery/hooks/use-gallery-operations.ts",
+        "web/apps/photos/src/services/search/sidebar-search-registry.ts",
+        "web/packages/new/photos/services/search/types.ts"]
+term = "subscription"
+line = "^(subscription|\\./(accounts/)?subscription|account\\.subscription|.*\\[data-sidebar-subscription\\].*)$"
+category = "internal-identifier"
+reason = "Sidebar action/search ids, module paths and CSS hooks; the plan selector they used to open is removed (family management opens instead)."
+[[allow]]
+path = ["web/apps/photos/src/services/search/sidebar-search-registry.ts",
+        "web/packages/new/photos/services/search/types.ts"]
+term = "referral"
+line = "^utility\\.referrals$"
+category = "internal-identifier"
+reason = "Sidebar search id of the removed Referrals entry (kept in the id union only)."
+[[allow]]
+path = "web/apps/albums/src/public-album/data/storage/public-albums-fdb.ts"
+term = "referral"
+line = "^public-referral-code$"
+category = "internal-identifier"
+reason = "Browser storage key for the public-link referral code; not shown."
+[[allow]]
+path = "web/packages/accounts/components/auth/SignUpForm.tsx"
+term = "referral"
+line = "^referral$"
+category = "upstream-only-app-not-built"
+reason = "Referral field rendered only when !isPhotovaultApp (Ente Auth/Locker sign-up)."
+[[allow]]
+path = "web/packages/accounts/components/auth/SignUpForm.tsx"
+term = "ente.com"
+line = "href=\"https://ente\\.com/(terms|privacy)\""
+category = "upstream-only-app-not-built"
+reason = "Terms checkbox rendered only when !isPhotovaultApp (Ente Auth/Locker sign-up)."
+[[allow]]
+path = "web/packages/accounts/pages/two-factor/recover.tsx"
+term = ["support@ente", "ente.com"]
+line = "support@ente\\.com"
+category = "upstream-only-app-not-built"
+reason = "Shown only when !isPhotovaultApp; Photovault apps say \"contact the administrator of your server\"."
+[[allow]]
+path = "web/apps/accounts/src/pages/passkeys/verify.tsx"
+term = "ente"
+line = "^Locker is available only to Ente photos paid users"
+category = "upstream-only-app-not-built"
+reason = "Error shown only when the passkey flow was started by Ente Locker (lockerRegistrationDisabled)."
+[[allow]]
+path = "web/apps/accounts/src/services/passkey.ts"
+term = ["ente.com", "ente.io", "ente.sh"]
+line = "\\.endsWith\\(\"\\.ente\\.(com|io|sh)\"\\)"
+category = "upstream-security-logic"
+reason = "Passkey redirect allow-list of upstream; left as is so the redirect check is not weakened."
+[[allow]]
+path = "web/apps/accounts/src/services/passkey.ts"
+term = "ente"
+line = "^ente:$"
+category = "internal-identifier"
+reason = "ente: is an allowed passkey redirect scheme (the mobile app returns through ente://passkey)."
+[[allow]]
+path = "web/packages/base/app.ts"
+term = "ente"
+line = "^Ente (Auth|Locker|Legacy Kit|Space)$"
+category = "upstream-only-app-not-built"
+reason = "Titles of Ente's other web apps (auth, locker, legacy, space), which Photovault does not build or serve."
+[[allow]]
+path = ["web/apps/photos/src/components/gallery/hooks/use-gallery-preferences.ts",
+        "web/apps/photos/src/components/gallery/navigation/use-gallery-navigation.ts",
+        "web/apps/photos/src/components/gallery/sections/albums/AlbumsOverview.tsx",
+        "web/apps/photos/src/components/gallery/sections/albums/AlbumsSection.tsx",
+        "web/apps/photos/src/components/gallery/sections/albums/use-album-actions.ts",
+        "web/apps/photos/src/components/gallery/sections/feed/FeedSection.tsx",
+        "web/apps/photos/src/utils/album-filters.ts"]
+term = "ente"
+line = "^(ente|ente shared received empty-albums|ente Photovault Photovault)$"
+category = "internal-identifier"
+reason = "Album filter value \"ente\" (all albums); its label and title are \"Photovault\"."
+[[allow]]
+path = ["web/apps/photos/src/components/photovault/server-check.ts",
+        "web/packages/base/photovault/server.ts"]
+term = "ente"
+line = "^ente$"
+category = "internal-identifier"
+reason = "ServerCheck kind \"ente\" (a plain Ente-compatible server); the text shown avoids the brand."
+[[allow]]
+path = ["web/apps/photos/src/pages/_app.tsx", "desktop/src/main.ts", "desktop/src/main/ipc.ts",
+        "desktop/src/main/stream.ts"]
+term = "ente"
+line = "^ente(://app)?$"
+category = "internal-identifier"
+reason = "ente:// scheme of the desktop app (bundled renderer and deep links); kept as an identifier (desktop/PHOTOVAULT.md)."
+[[allow]]
+path = "desktop/electron-builder.yml"
+term = "ente"
+line = "schemes: \\[\"ente\"\\]"
+category = "internal-identifier"
+reason = "ente:// protocol registration of the desktop app (desktop/PHOTOVAULT.md)."
+[[allow]]
+path = "desktop/src/main/services/auto-launcher.ts"
+term = "ente"
+line = "^ente$"
+category = "internal-identifier"
+reason = "Auto-launch entry name, kept on purpose so existing entries keep working (desktop/PHOTOVAULT.md); the window and menus say Photovault."
+[[allow]]
+path = "desktop/src/main/utils/temp.ts"
+term = "ente"
+line = "^ente ente-\\$\\{uid\\}$"
+category = "internal-identifier"
+reason = "Temp directory name prefix."
+[[allow]]
+path = "desktop/package.json"
+term = "ente"
+line = "\"name\": \"ente\""
+category = "package-metadata"
+reason = "npm package name (determines the userData folder); productName is Photovault (desktop/PHOTOVAULT.md)."
+[[allow]]
+path = "web/packages/new/photos/components/ImageEditorOverlay.tsx"
+term = "ente"
+line = "^Error saving copy to ente$"
+category = "log-message"
+reason = "log.error text; the user sees the generic error."
+[[allow]]
+path = ["web/apps/photos/src/components/SearchBar.tsx",
+        "web/packages/accounts/components/auth/AuthPageShell.tsx",
+        "web/apps/photos/src/components/gallery/sections/albums/AlbumEmptyState.tsx",
+        "web/packages/gallery/components/UploadCompletion.tsx",
+        "web/packages/gallery/components/upload-progress/UploadProgressDialog.tsx"]
+term = "duck"
+line = "^/images/(auth-ducky|empty-album/duck|upload-complete-duck|upload-progress-sleeping-duck)\\.svg$"
+category = "replaced-asset-path"
+reason = "Image file names kept; the duck art was replaced by the Photovault glyph (web/PHOTOVAULT.md)."
+
+# ---------------------------------------------------------------------------
+# Web static export (--web-out): the same code as above, minified. Bundled
+# translation files are covered by the translation-key rule further up.
+
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = "ente"
+line = "^Based on Ente$"
+category = "about-credit"
+reason = "The \"Based on Ente\" credit (encore-tokens.ts pvCredit) shown in About."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = "ente"
+line = "^(ente|ente:|ente://app)$"
+category = "internal-identifier"
+reason = "Album filter value / ServerCheck kind \"ente\", the ente:// desktop scheme and the passkey redirect scheme (see the source entries)."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = "ente"
+line = "^Ente (Auth|Locker|Legacy Kit|Space)$"
+category = "upstream-only-app-not-built"
+reason = "staticAppTitle entries of Ente's other web apps (web/packages/base/app.ts); never selected in a Photovault build."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = "ente"
+line = "^Error saving copy to ente$"
+category = "log-message"
+reason = "log.error text of the image editor (ImageEditorOverlay.tsx)."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = ["support@ente", "ente.com"]
+line = "^(mailto:)?support@ente\\.com$"
+category = "upstream-only-app-not-built"
+reason = "Two-factor recovery text for Ente's apps (packages/accounts/pages/two-factor/recover.tsx); Photovault apps show the server-administrator text."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = ["ente.com", "ente.io", "ente.sh"]
+line = "^\\.ente\\.(com|io|sh)$"
+category = "upstream-security-logic"
+reason = "Passkey redirect allow-list (apps/accounts/src/services/passkey.ts), unchanged from upstream."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = "sentry"
+line = ",fishcake,sentry,libertad,"
+category = "third-party-data"
+reason = "The word \"sentry\" in the common-password list of the bundled password-strength checker (zxcvbn)."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = "ente.com"
+line = "^https://ente\\.com/(terms|privacy)$"
+category = "upstream-only-app-not-built"
+reason = "Sign-up terms checkbox (packages/accounts SignUpForm.tsx), rendered only when !isPhotovaultApp."
+[[allow]]
+path = "web-out:*/_next/static/chunks/*.js"
+term = "ente"
+line = "^Locker is available only to Ente photos paid users"
+category = "upstream-only-app-not-built"
+reason = "Passkey error shown only when the flow was started by Ente Locker (apps/accounts passkeys/verify.tsx)."
+
+# ---------------------------------------------------------------------------
+# Rust crates built into the apps (frb photos for mobile, wasm photos/cast/
+# prelogin for web, napi photos for desktop, and their path dependencies).
+
+[[allow]]
+path = ["rust/crates/ml/src/assets.rs", "rust/crates/ml/src/ocr/assets.rs", "rust/crates/ml/src/scan/mod.rs"]
+term = "ente.com"
+line = "https://models\\.ente\\.com/"
+category = "pending-user-decision"
+reason = "ML model downloads from models.ente.com; where the models come from is left to the owner."
+[[allow]]
+path = "rust/crates/photos/src/location.rs"
+term = "ente.com"
+line = "^const ASSET_URL: &str = \"https://assets\\.ente\\.com/location/v2\";$"
+category = "upstream-only-app-not-built"
+reason = "LocationIndex::open default, used only by Ente's CLI; the apps call open_from with <server>/static-assets/location/v2."
+[[allow]]
+path = "rust/crates/core/src/urls.rs"
+term = "ente.com"
+line = "^pub const PRODUCTION_API_ORIGIN: &str = \"https://api\\.ente\\.com\";$"
+category = "upstream-only-app-not-built"
+reason = "ente_core default API origin for Ente's CLI; the apps always pass their configured endpoint."
+[[allow]]
+path = "rust/crates/accounts/src/auth/payload.rs"
+term = "ente.com"
+line = "^Some\\(\"api\\.ente\\.com\" \\| \"api\\.ente\\.in\" \\| \"localhost\"\\)$"
+category = "upstream-security-logic"
+reason = "enforce_auth_payloads: stricter login-token checks only for Ente's API hosts; makes no request, left as is."
+[[allow]]
+path = "rust/crates/accounts/src/admin.rs"
+term = ["subscription", "ente"]
+line = "^/admin/user/subscription$|Test mail from Ente"
+category = "upstream-only-app-not-built"
+reason = "Admin client calls used only by Ente's CLI; no binding the apps build exposes them."
+[[allow]]
+path = "rust/crates/photos/src/files.rs"
+term = "ente"
+line = "Update your Ente server"
+category = "upstream-only-app-not-built"
+reason = "Error of files::download, used only by Ente's CLI and photos-export; the apps do not call it."
+[[allow]]
+path = "rust/crates/legacy/src/error.rs"
+term = "ente"
+line = "^legacy contact is not on Ente$"
+category = "internal-identifier"
+reason = "Display text of ContactNotOnEnte; Photos matches the variant (LegacyError_ContactNotOnEnte, web: contact_not_on_ente) and shows its own invite dialog, never this text."
+[[allow]]
+path = "rust/crates/ml/src/onnx/coreml_cache.rs"
+term = "ente"
+line = "^ente$"
+category = "internal-identifier"
+reason = "Directory name of the Core ML compile cache (Library/Caches/ente/ml/coreml); never shown."
+
+# ---------------------------------------------------------------------------
+# Built APK (--apk). Written from the sources above; the APK is built only in
+# CI (photovault-mobile.yml), so check these against the first report of a
+# real build. Compiled translations are covered by the translation-key rule.
+
+[[allow]]
+path = ["apk:lib/*/libapp.so", "apk:lib/*/libente*.so"]
+term = "ente.com"
+line = "models\\.ente\\.com"
+category = "pending-user-decision"
+reason = "ML model downloads from models.ente.com (rust/crates/ml, remote_assets_service.dart), owner to decide."
+[[allow]]
+path = "apk:lib/*/libente*.so"
+term = "ente.com"
+line = "assets\\.ente\\.com/location/v2"
+category = "upstream-only-app-not-built"
+reason = "LocationIndex::open default for the CLI (rust/crates/photos/src/location.rs); the app calls open_from with its server."
+[[allow]]
+path = "apk:lib/*/libente*.so"
+term = "ente.com"
+line = "api\\.ente\\.com"
+category = "upstream-security-logic"
+reason = "ente_core PRODUCTION_API_ORIGIN (CLI default; the app passes its endpoint) and the extra auth-payload checks for Ente's API host (rust/crates/accounts/src/auth/payload.rs)."
+[[allow]]
+path = "apk:lib/*/libapp.so"
+term = ["ente.com", "ente.io"]
+line = "^https://api\\.ente\\.(com|io)$"
+category = "upstream-only-app-not-built"
+reason = "packages/configuration kDefault/kLegacyProductionEndpoint (BaseConfiguration default of Ente Auth/Locker); Photos uses its own EndpointConfig."
+[[allow]]
+# Resource shrinking renames res files (seen as res/8G.xml), so match any
+# res/*.xml; the line rule keeps it to the two bare domain names.
+path = ["apk:res/xml/network_security_config.xml", "apk:res/*.xml"]
+term = ["ente.io", "ente.com"]
+line = "^ente\\.(io|com)$"
+category = "inert-config"
+reason = "Compiled network_security_config.xml: upstream rule forcing TLS for Ente domains; makes no request."
+[[allow]]
+path = "apk:lib/*/libapp.so"
+term = "ente.com"
+line = "^ente\\.common\\.EVector&?$"
+category = "internal-identifier"
+reason = "Protobuf package name ente.common (lib/generated/protos/ente/common/vector.pb.dart); \"ente.com\" matches the start of \"ente.common\". Not a host, never shown."
+[[allow]]
+path = "apk:assets/flutter_assets/packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html"
+term = "duck"
+line = "function Runner\\(outerContainerId"
+category = "third-party-data"
+reason = "flutter_inappwebview's bundled offline T-Rex runner game (DUCKING sprite state); not the Ente mascot and never opened by Photovault."
+[[allow]]
+path = "apk:AndroidManifest.xml"
+term = "ente"
+line = "^ente$"
+category = "internal-identifier"
+reason = "ente:// deep-link scheme (passkey return, notifications), see the source entry."
+[[allow]]
+path = "apk:assets/flutter_assets/AssetManifest.json"
+term = "duck"
+line = "ducky"
+category = "replaced-asset-path"
+reason = "Asset file names kept from upstream; the duck art was re-rendered as the Photovault glyph (PHOTOVAULT.md, Mascot)."

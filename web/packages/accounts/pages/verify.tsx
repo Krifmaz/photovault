@@ -18,6 +18,7 @@ import {
     openPasskeyVerificationURL,
     passkeyVerificationRedirectURL,
 } from "ente-accounts/services/passkey";
+import { unstashSkipEmailCode } from "ente-accounts/services/photovault/email-code"; // PHOTOVAULT: email-skip
 import {
     stashedRedirect,
     unstashRedirect,
@@ -32,11 +33,18 @@ import type { SingleInputFormProps } from "ente-base/components/SingleInputForm"
 import { useBaseContext } from "ente-base/context";
 import { isNamedError } from "ente-base/error";
 import log from "ente-base/log";
+import { skippedEmailCode } from "ente-base/photovault/server"; // PHOTOVAULT: email-skip
 import { clearSessionStorage } from "ente-base/session-storage";
 import { saveAuthToken } from "ente-base/token";
 import { t } from "i18next";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useEffectEvent, // PHOTOVAULT: email-skip
+    useRef,
+    useState,
+} from "react";
 
 export interface VerifyEmailPresentationProps {
     email: string;
@@ -65,11 +73,20 @@ const Page: React.FC = () => {
 
     const router = useRouter();
 
+    // PHOTOVAULT: email-skip - true while the code is being submitted
+    // automatically (server does not email codes); the code screen is shown
+    // only if that fails.
+    const [autoSubmitting, setAutoSubmitting] = useState(false);
+    const autoSubmitStarted = useRef(false);
+
     useEffect(() => {
         void redirectionIfNeededOrEmail().then((redirectOrEmail) => {
             if (typeof redirectOrEmail == "string") {
                 void router.replace(redirectOrEmail);
             } else {
+                // PHOTOVAULT: email-skip
+                if (unstashSkipEmailCode(redirectOrEmail.email))
+                    setAutoSubmitting(true);
                 setEmail(redirectOrEmail.email);
             }
         });
@@ -141,6 +158,25 @@ const Page: React.FC = () => {
         }
     };
 
+    // PHOTOVAULT: email-skip - submit the code as if typed; on a wrong code
+    // or any error, show the normal code screen.
+    const autoSubmit = useEffectEvent(async () => {
+        let failed = false;
+        try {
+            await onSubmit(skippedEmailCode, () => {
+                failed = true;
+            });
+        } catch {
+            failed = true;
+        }
+        if (failed) setAutoSubmitting(false);
+    });
+    useEffect(() => {
+        if (!autoSubmitting || !email || autoSubmitStarted.current) return;
+        autoSubmitStarted.current = true;
+        void autoSubmit();
+    }, [autoSubmitting, email]);
+
     const resendEmail = useCallback(async () => {
         setResend("sending");
         await sendOTT(email, undefined);
@@ -175,6 +211,16 @@ const Page: React.FC = () => {
                 presentation={passkeyPresentation}
                 {...{ logout, showMiniDialog }}
             />
+        );
+    }
+
+    // PHOTOVAULT: email-skip - a loading state instead of the code screen.
+    if (autoSubmitting) {
+        return (
+            <>
+                <LoadingIndicator />
+                <SecondFactorChoice {...secondFactorChoiceProps} />
+            </>
         );
     }
 

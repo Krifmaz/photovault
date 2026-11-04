@@ -3,6 +3,7 @@ import { useGalleryUploads } from "@/components/gallery/hooks/use-gallery-upload
 import { useFileMutations } from "@/components/gallery/media/use-file-mutations";
 import type { GalleryBarMode } from "@/components/gallery/reducer";
 import type { GallerySectionOperations } from "@/components/gallery/sections/types";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import { useSaveGroups } from "ente-gallery/components/utils/save-groups";
 import { ItemVisibility } from "ente-media/file-metadata";
 import { haveOnlySystemCollections } from "ente-new/photos/services/collection-summary";
@@ -136,7 +137,10 @@ export const useGalleryOperations = (
             open: publicLinkToast.open,
             onCopy: () => {
                 if (publicLinkToast.url)
-                    void navigator.clipboard.writeText(publicLinkToast.url);
+                    void copyTextToClipboard(
+                        // PHOTOVAULT: clipboard
+                        publicLinkToast.url,
+                    );
             },
             onClose: () =>
                 setPublicLinkToast((prev) => ({ ...prev, open: false })),

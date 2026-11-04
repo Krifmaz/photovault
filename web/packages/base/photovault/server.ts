@@ -37,6 +37,9 @@ export const ServerInfo = z.object({
     albumsUrl: z.string().nullish(),
     castUrl: z.string().nullish(),
     signupsAllowed: z.boolean(),
+    // PHOTOVAULT: email-skip - "smtp" | "log" | "skip"; a string so that a
+    // future value does not make the whole body "invalid".
+    emailVerification: z.string().nullish(),
     features: z.array(z.string()).optional(),
 });
 
@@ -182,6 +185,55 @@ export const connectQRPayload = (
     if (info.homeUrl) params.push(`home=${encodeURIComponent(info.homeUrl)}`);
     params.push(`name=${encodeURIComponent(info.name)}`);
     return `photovault://connect?${params.join("&")}`;
+};
+
+/**
+ * PHOTOVAULT: email-skip - the code sent in place of the emailed one when the
+ * server's `emailVerification` is `"skip"` (it then accepts any 6-digit code
+ * while an OTT from `POST /users/ott` is pending).
+ */
+export const skippedEmailCode = "000000";
+
+/**
+ * PHOTOVAULT: email-skip - true when the client should submit
+ * {@link skippedEmailCode} itself instead of showing the "Check your inbox"
+ * screen: the server says `emailVerification: "skip"` and the account has no
+ * email 2FA (those still need their real code, so trying would only burn an
+ * attempt). Absent, `"smtp"`, `"log"`, unknown values and stock Ente servers
+ * (no mode) keep the code screen.
+ */
+export const shouldAutoSubmitEmailCode = (
+    emailVerification: string | null | undefined,
+    { isEmailMFAEnabled = false }: { isEmailMFAEnabled?: boolean } = {},
+) => emailVerification == "skip" && !isEmailMFAEnabled;
+
+/**
+ * PHOTOVAULT: email-skip - the server's `emailVerification` mode, from a
+ * single `GET /photovault/info` (no `/ping` fallback, short timeout). Never
+ * throws: a stock Ente server, an error or a timeout give `undefined`.
+ */
+export const fetchEmailVerificationMode = async (
+    origin: string,
+    {
+        timeoutMs = 3000,
+        fetchFn = globalThis.fetch.bind(globalThis),
+    }: { timeoutMs?: number; fetchFn?: typeof fetch } = {},
+): Promise<string | undefined> => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const res = await fetchFn(origin + serverInfoPath, {
+            signal: controller.signal,
+            cache: "no-store",
+        });
+        if (!res.ok) return undefined;
+        const info = ServerInfo.safeParse(await res.json());
+        return (info.success && info.data.emailVerification) || undefined;
+    } catch {
+        return undefined;
+    } finally {
+        clearTimeout(timer);
+    }
 };
 
 const PingResponse = z.object({ message: z.literal("pong") });

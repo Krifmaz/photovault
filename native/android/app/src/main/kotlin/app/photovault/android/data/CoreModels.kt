@@ -48,6 +48,9 @@ data class TimelineItem(
     val title: String,
 )
 
+/** `MapPoint` record [contract v1.2]: a timeline file with a location (WGS 84 degrees). */
+data class MapPoint(val fileId: Long, val latitude: Double, val longitude: Double, val takenAtUs: Long)
+
 /** `Collection` record (named PhotoCollection so it does not shadow kotlin.collections.Collection). */
 data class PhotoCollection(
     val id: Long,

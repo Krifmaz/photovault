@@ -1,5 +1,6 @@
 import { Box, Skeleton, styled, Typography } from "@mui/material";
 import { EnteLogo } from "ente-base/components/EnteLogo";
+import { pvGlyphDarkVars } from "ente-base/components/photovault/wordmark"; // PHOTOVAULT: branding
 import { AlbumDescription } from "ente-new/photos/components/gallery/ListHeader";
 import { memo } from "react";
 import type { JourneyPoint } from "./types";
@@ -135,6 +136,7 @@ const LogoContainer = styled(Box)(() => ({
     top: "20px",
     left: "20px",
     color: "white",
+    ...pvGlyphDarkVars, // PHOTOVAULT: branding - on the cover photo
 }));
 
 const ContentContainer = styled(Box)({

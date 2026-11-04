@@ -369,7 +369,7 @@
     "add_family_member": "Add family member",
     "add_member": "Add member",
     "invite_family_member": "Invite family member",
-    "family_invite_hint": "They must already have an Photovault account.",
+    "family_invite_hint": "They must already have a Photovault account.",
     "family_invite_title": "Join a family on Photovault",
     "family_invite_description": "{{email}} invited you to share their plan. Your photos and videos will stay private.",
     "accept_family_invite": "Accept invite",
@@ -761,7 +761,7 @@
     "share_link_section_title": "Or share a link",
     "remove_link": "Remove link",
     "link_created": "Link created",
-    "public_link_description": "Anyone with this link can open the album without an Photovault account.",
+    "public_link_description": "Anyone with this link can open the album without a Photovault account.",
     "open_album": "Open album",
     "create_public_link": "Create public link",
     "public_link_created": "Public link created",
@@ -1252,5 +1252,13 @@
     "pv_server_qr_hint": "Scan this code with the Photovault app to connect it to this server.",
     "pv_server_retry": "Try again",
     "pv_auth_own_server": "Stored on your own server",
-    "pv_auth_your_keys": "Only you hold the keys"
+    "pv_auth_your_keys": "Only you hold the keys",
+    "pv_family_description": "Share your storage with up to five family members. Everyone gets their own private space.",
+    "pv_family_shared_storage": "Shared storage",
+    "pv_family_managed_by": "You are in a family managed by",
+    "pv_leave_family": "Leave family",
+    "pv_leave_family_confirm": "Are you sure that you want to leave this family?",
+    "pv_family_invite_description": "{{email}} invited you to share their storage. Your photos and videos will stay private.",
+    "pv_family_invite_accepted_description": "You are now sharing {{email}}'s storage.",
+    "pv_signups_closed": "Sign-up is closed on this server. Ask its admin for an account."
 }

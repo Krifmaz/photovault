@@ -2,6 +2,7 @@ import { Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GlobalStyles, keyframes, styled } from "@mui/material";
 import { EnteLogo } from "ente-base/components/EnteLogo";
+import { pvGlyphDarkVars } from "ente-base/components/photovault/wordmark"; // PHOTOVAULT: branding
 import type React from "react";
 import {
     authAboveMobileMediaQuery,
@@ -196,7 +197,9 @@ const FrameCurves = styled("div")(({ theme }) => ({
         display: "block",
         position: "absolute",
         inset: 0,
-        backgroundImage: 'url("/images/auth-frame-curves.svg")',
+        // PHOTOVAULT: theme - optional curves image (per scheme).
+        backgroundImage:
+            'var(--auth-ui-curves, url("/images/auth-frame-curves.svg"))',
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -359,7 +362,9 @@ const BrandPanelRoot = styled("div", {
             position: "absolute",
             inset: 0,
             pointerEvents: "none",
-            backgroundImage: 'url("/images/auth-frame-curves.svg")',
+            // PHOTOVAULT: theme - optional curves image for the brand panel.
+            backgroundImage:
+                'var(--auth-ui-brand-curves, url("/images/auth-frame-curves.svg"))',
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
             backgroundSize: "cover",
@@ -392,6 +397,7 @@ const Wordmark = styled("div", {
     position: "relative",
     zIndex: 1,
     "& > svg": { width: "auto", height: "100%" }, // PHOTOVAULT: branding
+    ...pvGlyphDarkVars, // PHOTOVAULT: branding - the brand panel is dark
 }));
 
 const PanelCopy = styled("div", {
@@ -509,6 +515,9 @@ const IllustrationClip = styled("div", {
           }),
     "&::after": {
         content: '""',
+        // PHOTOVAULT: branding - optional; Photovault's glyph has no camera
+        // flash, so its sign-in pages turn the sparkle off.
+        display: "var(--auth-ui-sparkle-display, block)",
         width:
             size === "desktop" ? "34px" : size === "tablet" ? "26px" : "20px",
         aspectRatio: "1",

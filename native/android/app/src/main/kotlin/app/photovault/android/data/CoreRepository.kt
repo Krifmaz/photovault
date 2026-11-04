@@ -43,6 +43,10 @@ interface CoreRepository {
     fun timelinePage(offset: Long, limit: Int): List<TimelineItem>
     fun collections(): List<PhotoCollection>
     fun collectionPage(collectionId: Long, offset: Long, limit: Int): List<TimelineItem>
+    /** [contract v1.2] Timeline files with a location, newest first. */
+    fun mapPoints(): List<MapPoint>
+    /** [contract v1.2] Timeline files taken on today's local date in earlier years, newest first. */
+    fun onThisDay(nowUs: Long, utcOffsetSecs: Int, limit: Int): List<TimelineItem>
     suspend fun thumbnail(fileId: Long): ByteArray
     suspend fun download(fileId: Long, destPath: String): String
     suspend fun streamPlaylist(fileId: Long): String?

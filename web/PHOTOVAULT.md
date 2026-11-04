@@ -70,7 +70,22 @@ Logo, name, icons:
 - `apps/photos/public/images/auth-ducky.svg`: sign-in illustration replaced by
   the Photovault glyph (same canvas size).
 - `apps/photos/public/images/auth-frame-curves.svg`: decorative curves in gold
-  instead of green.
+  instead of green (fallback file). The sign-in pages draw the curves from the
+  tokens instead: `apps/photos/src/components/photovault/auth-curves.ts` (new)
+  builds the same path as a data URL in a token colour, passed as the
+  `curves` (page, per-scheme `accent2`) and `brand-curves` (dark panel,
+  `pvDark.accent2`) variables; `AuthPageShell.tsx` reads them with the file as
+  fallback. The duck's camera-flash sparkle (`IllustrationClip::after`) is
+  turned off with `sparkle-display: none` (the variable is unset in Auth and
+  Locker, which keep it).
+- `packages/base/components/photovault/wordmark.ts`: the glyph's gradient reads
+  `--pv-glyph-from`/`--pv-glyph-to`, which `encore-theme.ts` sets on `:root`
+  (CssBaseline) to the scheme's accent: gold to charcoal in light mode (the
+  cream glyph was nearly invisible there), gold to cream in dark mode. Always
+  dark surfaces pin the dark colours with `pvGlyphDarkVars`: the sign-in
+  brand panel (`AuthPageShell.tsx` `Wordmark`), the public-album photo viewer
+  (`photoswipe.ts`, `PublicAlbumSingleFileViewer.tsx`) and the trip cover
+  (`TripCover.tsx`). Apps without the Encore theme keep the dark colours.
 - `apps/memories/public/images/ente-brand-tag.svg`: Ente tag replaced by the
   Photovault glyph (same size).
 
@@ -100,6 +115,15 @@ gold where the text was white:
   `apps/photos/public/images/empty-state/no-matches.svg`,
   `apps/photos/public/images/empty-album/background.svg`,
   `apps/albums/src/public-album/upload/components/enter-name.svg`
+
+Primary buttons (token rule: `accent` to `accent2` gradient with `onAccent`
+text, per scheme, via `pvVar`):
+
+- `packages/base/components/SingleInput.styles.ts` (`v2SubmitButtonSx`, used by
+  the Family screen's "Add family member" and other dialogs), and the
+  `color="accent"` buttons in `apps/photos/src/components/{UploadConfirmationDialog,collections/EditAlbumDetailsDialog,app-lock/AppLockUnlockForm,gallery/sections/albums/GalleryEmptyState}.tsx`.
+  These had fixed dark text (`pvOnGold`) on the theme's light-mode charcoal
+  gradient; they now use `onAccent` (cream in light mode, dark in dark mode).
 
 Text on the (now cream) accent:
 
@@ -148,7 +172,9 @@ Server and network:
   `packages/gallery/services/ffmpeg/web.ts`: places index, world cities and the
   ffmpeg.wasm core load from `/static-assets/` on our origin.
   `scripts/photovault-vendor-assets.mjs` (new; `.sh` is a wrapper) copies them into
-  `apps/photos/public/static-assets/` (git-ignored) before a build.
+  `apps/photos/public/static-assets/` (git-ignored) before a build. It also
+  copies `location/v2/{countries,disputes}.bin`, which only the mobile app
+  uses (it loads its location index from `<server>/static-assets/location/v2`).
 - `packages/new/photos/services/settings.ts`: default cast/embed URLs and the
   custom-domain CNAME point at this server instead of cast/embed/my.ente.com.
 - `packages/new/photos/services/user-details.ts`: plans, Stripe and payments-app
@@ -167,8 +193,19 @@ Photos app (settings and gallery):
   "subscription" action) we open family management, so family stays reachable.
 - `components/sidebar/accounts/{Account,subscription,ManageMemberSubscription}.tsx`,
   `components/FamilyManagement.tsx`: "Manage plan" row becomes "Family" with
-  storage only (no billing period); no Stripe customer portal; families can be
-  created without a paid plan (the server decides).
+  storage only (upstream's family/member-limit storage, no billing period); no
+  Stripe customer portal; families can be created without a paid plan (the
+  server decides). No "plan" wording on the family screens: "Family" / "Share
+  your storage with up to five family members…", "Shared storage", "Leave
+  family", "You are in a family managed by", and on
+  `apps/accounts/src/pages/family.tsx` "…invited you to share their storage"
+  (titles use Ente's translated `family` key). The reworded strings are new
+  `pv_family_*` / `pv_leave_family*` keys in `en-US` only, read through
+  `packages/base/photovault/i18n.ts` (new, `pvT(pvKey, upstreamKey)`): a
+  locale without the `pv_*` key shows Ente's translated string (e.g.
+  `leave_family_plan`) rather than English. Known limitation: in those
+  locales the family screens still say "plan" until the `pv_*` strings are
+  translated.
 - Deleted: `components/PlanSelector.tsx`, `pages/plan.tsx`,
   `components/sidebar/ReferralSettings.tsx`, `services/storage-bonus.ts`,
   `components/{WhatsNew,DesktopWhatsNew}.tsx`, `services/changelog.ts`,
@@ -277,6 +314,9 @@ template part and JSX text in the shipped apps that contains an Ente word
 remaining hit.
 
 See `PHOTOVAULT-GREP.md` for the remaining grep hits and why each is left.
+Repo-wide, `scripts/strip-report.py` (with `scripts/strip-allowlist.toml`)
+checks the web, mobile and desktop sources and the static export in CI and
+writes `docs/src/strip-report.md`; every remaining hit needs an entry there.
 
 ## Server connection (`PHOTOVAULT: connect`)
 
@@ -319,7 +359,12 @@ Changed files:
 - `apps/photos/src/pages/index.tsx`: Ente's hidden "tap seven times" developer
   endpoint dialog is removed and `components/auth/DevSettingsDialog.tsx`
   deleted; `ServerField` is shown under the login/sign-up form, and the forms'
-  own host line is left empty (the field shows it).
+  own host line is left empty (the field shows it). The `/login` and `/signup`
+  routes do the same: `packages/accounts/components/auth/AuthPageProvider.ts`
+  has an optional `ServerField` slot (set in `apps/photos/src/auth-page-config.ts`)
+  that `packages/accounts/pages/{login,signup}.tsx` render instead of the bare
+  host line. In the field's edit state, Connect and Cancel ignore the auth
+  button's 2 px hover lift so they stay level.
 - `apps/photos/src/components/photovault/{ServerField.tsx,server-check.ts}`
   (new): the collapsed server field (shows name and address; "Change" expands
   it; checks `GET /photovault/info` and shows name + version, or errors such as
@@ -386,13 +431,46 @@ Not done for the web app: the contract's home/public address switching rule
 (the web app is served by the server it talks to, so there is nothing to
 switch), and showing `/photovault/usage` "unlimited" on the storage card.
 
+## Email code on servers without SMTP (`PHOTOVAULT: email-skip`)
+
+`/photovault/info` may carry `emailVerification`: `"smtp"`, `"log"` or
+`"skip"` (contracts/server-info.md). With `"skip"` the server accepts any
+6-digit code while an OTT from `POST /users/ott` is pending, so the apps do
+not show the "Check your inbox" screen:
+
+- `packages/base/photovault/server.ts`: optional `emailVerification` in the
+  info model (a string, so a future value does not make the body invalid),
+  `skippedEmailCode` (`"000000"`), `shouldAutoSubmitEmailCode()` (only
+  `"skip"`, and not for accounts with email 2FA, which still need their real
+  code) and `fetchEmailVerificationMode()` (one `GET /photovault/info`, 3 s
+  timeout, never throws; a stock Ente server gives no mode). Tests in
+  `apps/photos/tests/photovault-server.test.ts`.
+- `packages/accounts/services/photovault/email-code.ts` (new): reads the mode
+  of the configured server and keeps a one-shot sessionStorage note
+  (`photovaultSkipEmailCode` = the email) for /verify.
+- `packages/accounts/components/SignUpContents.tsx` and `LoginContents.tsx`
+  (the email-code login branch only, not SRP): fetch the mode in parallel
+  with `sendOTT` (no extra wait; sign-up awaits it after key generation) and
+  leave the note when the code can be skipped.
+- `packages/accounts/pages/verify.tsx`: when the note matches the email, shows
+  a loading indicator and submits `skippedEmailCode` through the page's own
+  `onSubmit`, so success continues exactly as a typed code (`/generate` for a
+  new account, `/credentials`, two-factor or passkey). A wrong code or any
+  error shows the normal code screen. A reload of /verify shows the code
+  screen (the note is consumed).
+
+Absent field, `"smtp"`, `"log"` and stock Ente servers keep upstream's flow.
+Keys, SRP and 2FA are unchanged; only the email check is automated.
+
 ## Serving the web apps (static export)
 
 Build: `web/scripts/photovault-build.sh` (npm ci, wasm for prelogin/photos/cast,
 the `/static-assets/` data files, then `next build` of each app with the
 repo's own workspace commands; see the script header for its variables). CI:
 `.github/workflows/photovault-web.yml` runs the same and uploads the served
-layout as the `photovault-web` artifact.
+layout as the `photovault-web` artifact, then runs
+`scripts/strip-report.py --check --web-out` over it (report uploaded as
+`strip-report-web`).
 
 | Build output             | Serve at     | Notes                                                                                                                                                                            |
 | ------------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -431,3 +509,8 @@ change and re-adding the `PHOTOVAULT` hunk; for locales, take upstream's file
 and re-run `node scripts/photovault-locale-brand.mjs` (add any inflected form
 its check reports to the per-locale table), then
 `node scripts/photovault-brand-audit.mjs` for code strings.
+
+- `packages/accounts/components/auth/LoginForm.tsx`: when the server refuses sign-ups, show "Sign-up is closed on this server. Ask its admin for an account." (`pv_signups_closed`) instead of hiding the prompt silently.
+- `packages/accounts/pages/signup.tsx`: a direct /signup visit on a server with sign-ups off goes to /login (which says sign-up is closed).
+- `packages/accounts/components/SignUpContents.tsx`: when sign-up fails and the server reports `signupsAllowed: false`, show "Sign-up is closed on this server" instead of "Something went wrong".
+- `packages/base/photovault/clipboard.ts` (new), `packages/base/components/utils/hooks.ts`, and the copy call sites in photos/albums: copy also works on plain http:// servers (execCommand fallback, then a prompt to copy by hand).

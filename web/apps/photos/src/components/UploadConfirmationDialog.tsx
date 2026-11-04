@@ -29,8 +29,8 @@ import type { ChangeEvent, ReactElement } from "react";
 import {
     pvAlpha,
     pvGold,
-    pvGoldHover,
     pvOnGold,
+    pvVar,
 } from "ente-base/components/utils/photovault/encore-tokens";
 
 interface UploadConfirmationDialogProps {
@@ -463,14 +463,14 @@ const confirmButtonSx = (theme: Theme) => ({
     py: "14px",
     gap: "10px",
     borderRadius: "20px",
-    color: pvOnGold, // PHOTOVAULT: theme
-    backgroundColor: green,
+    color: pvVar.onAccent, // PHOTOVAULT: theme - primary button from the tokens (scheme-aware)
+    backgroundColor: pvVar.accent,
     boxShadow: "none",
     fontSize: 14,
     fontWeight: 500,
     lineHeight: "20px",
     textTransform: "none",
-    "&:hover": { backgroundColor: pvGoldHover, boxShadow: "none" }, // PHOTOVAULT: theme
+    "&:hover": { backgroundColor: pvVar.accent2, boxShadow: "none" }, // PHOTOVAULT: theme
     "&.Mui-disabled": {
         color: "rgba(0 0 0 / 0.6)",
         backgroundColor: "rgba(0 0 0 / 0.12)",

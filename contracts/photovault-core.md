@@ -54,6 +54,9 @@ Rules:
   id: i64, collection_id: i64, kind: FileKind, taken_at_us: i64,
   width: u32, height: u32, duration_ms: Option<u32>, has_stream: bool, title: String,
 }
+// [contract v1.2] map: a timeline file with a location (pubMagic lat/long over metadata latitude/longitude;
+// 0,0 and out-of-range mean none, as in Ente's apps)
+#[derive(uniffi::Record)] pub struct MapPoint { file_id: i64, latitude: f64, longitude: f64, taken_at_us: i64 }
 #[derive(uniffi::Record)] pub struct Collection {
   id: i64, name: String, kind: String, cover_file_id: Option<i64>, count: u64, updated_at_us: i64,
 }
@@ -99,6 +102,9 @@ Rules:
   fn timeline_page(&self, offset: u64, limit: u32) -> Vec<TimelineItem>;   // newest first, local only
   fn collections(&self) -> Vec<Collection>;
   fn collection_page(&self, collection_id: i64, offset: u64, limit: u32) -> Vec<TimelineItem>;
+  fn map_points(&self) -> Vec<MapPoint>;                                     // [contract v1.2] newest first
+  // [contract v1.2] timeline items taken on now's local date (utc offset) in earlier years, newest first
+  fn on_this_day(&self, now_us: i64, utc_offset_secs: i32, limit: u32) -> Vec<TimelineItem>;
   async fn thumbnail(&self, file_id: i64) -> Result<Vec<u8>, CoreError>;  // decrypted, disk cache encrypted at rest
   async fn download(&self, file_id: i64, dest_path: String) -> Result<String, CoreError>;
   async fn stream_playlist(&self, file_id: i64) -> Result<Option<String>, CoreError>;
@@ -113,3 +119,164 @@ Tests the core track hands back with: SRP and key-derivation against `server/tes
 files/thumbnails/metadata produced by Ente's web client, a full sign-in + sync + upload + download round
 trip against the real server (`cargo test -p photovault-core --features it`), and `uniffi-bindgen` Kotlin
 generation in CI. Additive changes (new methods/fields) need a contracts commit; renames do not happen in v1.
+
+## v1.2: backup
+
+Camera-folder backup in Photovault Native (`native/android/.../backup/`). Additive: one new method, in its own
+file (`core/src/backup.rs`) with its own `#[uniffi::export] impl Core` block.
+
+```rust
+#[uniffi::export] impl Core {
+  // The album the device folder `folder_name` backs up into, as Ente's mobile app does it
+  // (CollectionsService.getOrCreateForPath): the signed-in user's own collection of type "folder" with that
+  // name, else a new one: POST /collections, type "folder", name and attributes.encryptedPath both the folder
+  // name secretbox'd with the new collection key (same ciphertext and nonce), attributes.version 1.
+  // Pass the id to enqueue_upload. Blank names are a Storage error.
+  async fn backup_album(&self, folder_name: String) -> Result<i64, CoreError>;
+}
+```
+
+The app side keeps everything else on the device: which MediaStore files were queued (a ledger of ids,
+timestamps and sizes per account, no names or content), the settings, and the WorkManager schedule. Uploads,
+encryption, resume and de-duplication by hash stay in core's existing queue (`enqueue_upload`, `run_uploads`,
+`upload_status`). Tested by `core/tests/backup_album.rs` against the real server.
+
+## Albums, sharing and trash (contract v1.2, additive)
+
+Implemented in `core/src/albums.rs` (its own `#[uniffi::export] impl Core` block). Requests and
+crypto exactly as Ente's apps: album keys secretbox'd with the master key, shared with a sealed box to
+the sharee's public key (`GET /users/public-key`), file keys re-encrypted with the target album's key
+on add/restore/move, the public link's album key appended as `#<base58(key)>`, link passwords as
+Ente's `deriveInteractiveKey` (Argon2id, interactive limits, random salt as `nonce`). Hiding an album
+sets `visibility = 2` in its magic metadata; hiding files moves them to the default hidden collection
+(`subType = 1`), created if missing. Trash entries and keys of deleted albums are sealed kv rows.
+
+```rust
+#[derive(uniffi::Enum)] pub enum ShareRole { Viewer, Collaborator, Admin, Owner, Unknown }
+#[derive(uniffi::Record)] pub struct Sharee { user_id: i64, email: String, role: ShareRole }
+#[derive(uniffi::Record)] pub struct PublicLink {
+  url: String,                    // with "#<base58 album key>"
+  valid_till_us: i64,             // 0 = never
+  device_limit: u32,              // 0 = unlimited
+  enable_download: bool, enable_collect: bool, enable_join: bool, password_enabled: bool,
+}
+#[derive(uniffi::Record)] pub struct PublicLinkUpdate {
+  valid_till_us: Option<i64>, device_limit: Option<u32>, enable_download: Option<bool>,
+  enable_collect: Option<bool>, enable_join: Option<bool>,
+  password: Option<String>,       // Some("") removes the password
+}
+#[derive(uniffi::Record)] pub struct AlbumDetails {
+  collection: Collection, owned: bool, owner_email: String, my_role: ShareRole,
+  hidden: bool, archived: bool, is_default_hidden: bool,
+  sharees: Vec<Sharee>, public_link: Option<PublicLink>,
+}
+#[derive(uniffi::Record)] pub struct TrashEntry { item: TimelineItem, delete_by_us: i64 }
+
+#[uniffi::export] impl Core {
+  fn albums(&self) -> Vec<AlbumDetails>;          // same set and order as collections()
+  fn hidden_albums(&self) -> Vec<AlbumDetails>;   // hidden albums + the default hidden collection
+  fn album_details(&self, collection_id: i64) -> Option<AlbumDetails>;
+  async fn create_album(&self, name: String) -> Result<Collection, CoreError>;
+  async fn rename_album(&self, collection_id: i64, name: String) -> Result<(), CoreError>;
+  async fn delete_album(&self, collection_id: i64, keep_files: bool) -> Result<(), CoreError>;
+  async fn add_to_album(&self, collection_id: i64, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn remove_from_album(&self, collection_id: i64, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn set_album_hidden(&self, collection_id: i64, hidden: bool) -> Result<(), CoreError>;
+  async fn hide_files(&self, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn unhide_files(&self, file_ids: Vec<i64>, collection_id: Option<i64>) -> Result<(), CoreError>;
+  async fn share_album(&self, collection_id: i64, email: String, role: ShareRole) -> Result<Vec<Sharee>, CoreError>;
+  async fn unshare_album(&self, collection_id: i64, email: String) -> Result<Vec<Sharee>, CoreError>;
+  async fn leave_album(&self, collection_id: i64) -> Result<(), CoreError>;
+  async fn create_public_link(&self, collection_id: i64) -> Result<PublicLink, CoreError>;
+  async fn update_public_link(&self, collection_id: i64, update: PublicLinkUpdate) -> Result<PublicLink, CoreError>;
+  async fn delete_public_link(&self, collection_id: i64) -> Result<(), CoreError>;
+  async fn sync_trash(&self) -> Result<u64, CoreError>;
+  fn trash_count(&self) -> u64;
+  fn trash_page(&self, offset: u64, limit: u32) -> Vec<TrashEntry>;   // most recently trashed first
+  async fn move_to_trash(&self, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn restore_from_trash(&self, file_ids: Vec<i64>, collection_id: Option<i64>) -> Result<(), CoreError>;
+  async fn delete_from_trash(&self, file_ids: Vec<i64>) -> Result<(), CoreError>;
+  async fn empty_trash(&self) -> Result<(), CoreError>;
+}
+```
+
+`thumbnail(file_id)` also serves trashed files. Every mutation updates the local index before it
+returns. The Android app reaches these through `data/albums/AlbumsRepository` (not `CoreRepository`).
+
+## v1.2: signup
+
+Create account, exactly as Ente's apps do it (`rust/crates/accounts/src/signup.rs`, `auth/key_gen.rs`;
+the photos app's `UserService.generateKey` / `setAttributes`). Module `core/src/signup.rs`, its own
+`#[uniffi::export] impl Core` block. No new records or error variants: failures use the v1 `CoreError`.
+
+```rust
+#[uniffi::export] impl Core {
+  // POST /users/ott {email, purpose: "signup", mobile: true}. Refused before sending when the active
+  // server's ServerInfo.signups_allowed is false (asked fresh from /photovault/info, the saved copy if
+  // that does not answer): Server { status: 403 }. Email already registered: Server { status: 409 }.
+  async fn signup_send_code(&self, email: String) -> Result<(), CoreError>;
+  // POST /users/verify-email. Wrong/expired code: IncorrectCode. An answer with key attributes, a sealed
+  // token or a second factor is an existing account: Server { status: 409 }. Keeps {email, id, token}
+  // in memory (never on disk) for the next steps.
+  async fn signup_verify_code(&self, email: String, code: String) -> Result<(), CoreError>;
+  // Makes the keys on the device and returns the recovery key as 24 BIP39 (English) words. Nothing is
+  // uploaded. masterKey, recoveryKey: 32 random bytes; masterKeyEncryptedWithRecoveryKey and
+  // recoveryKeyEncryptedWithMasterKey: secretbox (+ nonces). KEK: Argon2id over the password with a 16-byte
+  // kekSalt, Ente's deriveSensitiveKey: 1 GiB / 4 ops, or 256 MiB / 16 ops when `low_memory` (Ente's
+  // low-spec start), halving memory and doubling ops while the derivation fails, down to 128 MiB (the
+  // server minimum); mem x ops is always 4 GiB. encryptedKey = secretbox(masterKey, KEK). X25519 key pair;
+  // encryptedSecretKey = secretbox(secretKey, masterKey). SRP: login sub-key of the KEK, srpUserID = UUID v4,
+  // 16-byte srpSalt, verifier. The same password again returns the same words; another password makes new
+  // keys (until they are uploaded).
+  async fn signup_prepare(&self, password: String, low_memory: bool) -> Result<String, CoreError>;
+  // After the user saved the recovery key: GET /users/session-validity/v2, PUT /users/attributes
+  // {keyAttributes} (skipped if the same attributes are already there), POST /users/srp/setup +
+  // POST /users/srp/complete (server M2 checked), GET /users/srp/attributes must match (srpUserID, srpSalt,
+  // kekSalt, memLimit, opsLimit). Then the account is signed in on this device (as after `login`).
+  // Safe to retry after a failure.
+  async fn signup_finish(&self) -> Result<Account, CoreError>;
+  // The signed-in account's recovery key as 24 words (recoveryKeyEncryptedWithMasterKey opened with the
+  // master key). Local only.
+  fn recovery_key_words(&self) -> Result<String, CoreError>;
+}
+```
+
+Apps pass `low_memory = ActivityManager.isLowRamDevice() || totalMem < 4 GiB || availMem < 1.5 GiB` on
+Android. Tests: `core/tests/signup.rs` (sign-up through core against the in-process server, SRP login from
+a second core and from a hand-rolled SRP client, the key attributes opened with Ente's steps, checked
+against Ente's own `vectors/keys.json` + `sealed_token.json`, recovery with the shown words, closed sign-ups).
+
+## v1.2: video (streamable videos)
+
+Ente's streamable videos (file data type `vid_preview`), played without the key or any decrypted byte
+leaving core except into the player's buffer. Code: `core/src/video/` (format notes with Ente source
+references in `playlist.rs`). Stream generation is not part of core (Ente's apps, the compute node).
+
+```rust
+#[derive(uniffi::Record)] pub struct VideoStream {
+  playlist_url: String,   // http://127.0.0.1:<port>/<token>/<stream>/index.m3u8
+  width: u32, height: u32, // stream size, 0 if unknown
+  duration_ms: u64,        // sum of the segment durations
+  size_bytes: u64,         // bytes of the encrypted segment object
+}
+#[uniffi::export] impl Core {
+  async fn video_stream(&self, file_id: i64) -> Result<Option<VideoStream>, CoreError>;
+  fn stop_streams(&self);                                   // viewer closed: end every stream
+  async fn sync_streams(&self) -> Result<u64, CoreError>;   // re-read stream status now; files with a stream
+}
+```
+
+* `stream_playlist(file_id)` (v1) now returns `video_stream(file_id)?.playlist_url`. `None`: no stream
+  (not a video, `sv: 1` in public magic metadata, none generated, or an invalid playlist): play the original
+  from `download`.
+* The URL is served by core's loopback HTTP server: bound to `127.0.0.1`, random port, a 32-byte random
+  token and a 16-byte random stream id in every path. The playlist has no key; segment `n` (`n.ts`) is fetched
+  from the preview object with an HTTP range request and decrypted (AES-128-CBC) in memory on request
+  (`Range: bytes=` honoured). At most 4 streams, 30 minutes idle expiry, `stop_streams` ends them all.
+* `TimelineItem.has_stream` (v1 field) is set from Ente's file data status diff
+  (`POST /files/data/status-diff`, type `vid_preview`), run at the end of every `sync` (best effort) and kept in
+  the `video_streams` table (store migration step 2). The diff covers the account's own files only: for a
+  video shared by someone else `has_stream` stays false and `video_stream` asks the server on demand (Ente's
+  apps do the same). Apps may therefore call `video_stream` for every video and fall back to `download`.
+* Server endpoints used: `GET /files/data/fetch?fileID&type=vid_preview&preferNoContent=true`,
+  `GET /files/data/preview?fileID&type=vid_preview`, `POST /files/data/status-diff`.

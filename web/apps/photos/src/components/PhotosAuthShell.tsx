@@ -1,3 +1,4 @@
+import { pvAuthCurves } from "@/components/photovault/auth-curves"; // PHOTOVAULT: theme
 import { AuthPageShell } from "ente-accounts/components/auth/AuthPageShell";
 import type { AuthPresentationConfig } from "ente-accounts/components/auth/styles";
 import { isDesktop } from "ente-base/app";
@@ -44,6 +45,10 @@ const pvAuthScheme = (c: PVScheme) => ({
     "button-secondary": c.panel2,
     "button-secondary-hover": c.border,
     "button-secondary-active": c.border,
+    // Curves in gold: the page's follow the scheme, the brand panel is dark.
+    curves: pvAuthCurves(c.accent2),
+    "brand-curves": pvAuthCurves(pvDark.accent2),
+    "sparkle-display": "none",
 });
 
 const photosAuthTheme: AuthPresentationConfig = {

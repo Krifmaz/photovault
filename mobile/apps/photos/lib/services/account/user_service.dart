@@ -24,6 +24,8 @@ import 'package:photos/models/user_details.dart';
 import "package:photos/service_locator.dart";
 import "package:photos/services/collections_service.dart";
 import "package:photos/services/machine_learning/face_ml/person/person_service.dart";
+import "package:photos/services/photovault/email_verification.dart"; // PHOTOVAULT
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
 import 'package:photos/src/rust/third_party/ente_frb_lib/accounts.dart'
     as accounts;
 import 'package:photos/ui/account/login_page.dart';
@@ -121,6 +123,20 @@ class UserService {
       );
       await dialog.hide();
       if (!context.mounted || isResend) return;
+      // PHOTOVAULT: email verification skip. The server accepts any code, so
+      // submit one as if typed; on failure show the code screen as usual.
+      if (shouldAutoSubmitEmailCode(
+        server: PhotovaultServerService.instance.activeServer.value,
+        purpose: purpose,
+        isChangeEmail: isChangeEmail,
+      )) {
+        final verified = await verifyEmail(
+          context,
+          kSkippedEmailCode,
+          silentFailure: true,
+        );
+        if (verified || !context.mounted) return;
+      }
       unawaited(
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -399,11 +415,15 @@ class UserService {
     }
   }
 
-  Future<void> verifyEmail(
+  // PHOTOVAULT: email verification skip. Returns whether the code was
+  // accepted; [silentFailure] skips the error sheets (the caller falls back to
+  // the code screen).
+  Future<bool> verifyEmail(
     BuildContext context,
     String ott, {
     bool isResettingPasswordScreen = false,
     bool isForgotPassword = false,
+    bool silentFailure = false,
   }) async {
     final dialog = createProgressDialog(context, context.strings.pleaseWait);
     await dialog.show();
@@ -444,7 +464,7 @@ class UserService {
           page = const PasswordEntryPage(mode: PasswordEntryMode.set);
         }
       }
-      if (!context.mounted) return;
+      if (!context.mounted) return true; // PHOTOVAULT
       await Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (BuildContext context) {
@@ -453,10 +473,16 @@ class UserService {
         ),
         (route) => route.isFirst,
       );
+      return true; // PHOTOVAULT
     } catch (e) {
       await dialog.hide();
+      // PHOTOVAULT: email verification skip (fall back to the code screen).
+      if (silentFailure) {
+        _logger.info("Automatic email code not accepted, asking for it", e);
+        return false;
+      }
       _logger.severe(e);
-      if (!context.mounted) return;
+      if (!context.mounted) return false; // PHOTOVAULT
       if (e == const AccountsError.emailCodeExpired()) {
         await showAlertBottomSheet(
           context,
@@ -464,7 +490,7 @@ class UserService {
           message: context.strings.yourVerificationCodeHasExpired,
           assetPath: 'assets/warning-grey.png',
         );
-        if (!context.mounted) return;
+        if (!context.mounted) return false; // PHOTOVAULT
         Navigator.of(context).pop();
       } else if (e == const AccountsError.incorrectEmailCode()) {
         await showAlertBottomSheet(
@@ -481,6 +507,7 @@ class UserService {
           assetPath: 'assets/warning-grey.png',
         );
       }
+      return false; // PHOTOVAULT
     }
   }
 

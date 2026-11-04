@@ -4,4 +4,7 @@
     <color name="encore_bg">#F6F6FB</color>
     <!-- launcher tile: branding/icon.svg background -->
     <color name="ic_launcher_background">#1C1C1E</color>
+    <!-- widgets: encore-tokens.json panel / text -->
+    <color name="encore_panel">#FFFFFF</color>
+    <color name="encore_text">#16161F</color>
 </resources>

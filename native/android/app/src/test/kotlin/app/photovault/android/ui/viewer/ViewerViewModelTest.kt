@@ -4,11 +4,14 @@ import app.photovault.android.MainDispatcherRule
 import app.photovault.android.data.CoreError
 import app.photovault.android.data.FileKind
 import app.photovault.android.data.TimelineStore
+import app.photovault.android.data.VideoStream
 import app.photovault.android.data.fake.FakeCore
+import app.photovault.android.data.fake.FakeVideoRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Rule
@@ -73,5 +76,46 @@ class ViewerViewModelTest {
         advanceUntilIdle()
         assertTrue(vm.loaded.value)
         assertTrue(vm.items.value.size > 250)
+    }
+
+    @Test
+    fun videosPlayCoresStreamWhenThereIsOne() = runTest(main.dispatcher) {
+        core.addServer("photos.example.com")
+        core.login("me@example.com", "secret")
+        store.refresh()
+        val videos = store.items.value.filter { it.kind == FileKind.Video }.take(3)
+        val url = "http://127.0.0.1:4242/token/stream/index.m3u8"
+        val repo = FakeVideoRepository(
+            streams = mapOf(videos[0].id to VideoStream(url, 1280, 720, 61_000, 9_000_000)),
+            failing = setOf(videos[2].id),
+        )
+        val vm = ViewerViewModel(core, store, tmp.newFolder("viewer"), io = main.dispatcher, videos = repo)
+        assertEquals(VideoSource(url, isHls = true), vm.video(videos[0]))
+        // No stream (even without hasStream, core is asked: a shared video may have one): the original,
+        // which the demo library cannot provide.
+        try {
+            vm.video(videos[1])
+            fail("expected the demo's download error")
+        } catch (e: CoreError) {
+            assertTrue(e.message!!.isNotBlank())
+        }
+        // A failing stream falls back to the original as well.
+        try {
+            vm.video(videos[2])
+            fail("expected the demo's download error")
+        } catch (e: CoreError.Network) {
+            assertFalse(e.message!!.contains("stream unavailable"))
+        }
+        assertEquals(videos.map { it.id }, repo.requested)
+    }
+
+    @Test
+    fun closingThePlayerEndsCoresStreams() = runTest(main.dispatcher) {
+        val repo = FakeVideoRepository()
+        val vm = ViewerViewModel(core, store, tmp.newFolder("viewer"), io = main.dispatcher, videos = repo)
+        // The viewer announces itself, so core's streams end only when the last open viewer closes.
+        assertEquals(1, repo.openCount)
+        vm.playback.release()
+        assertEquals(1, repo.stopCount)
     }
 }

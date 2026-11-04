@@ -20,8 +20,8 @@ dev_dependencies:
 
 flutter:
   assets:
+    # PHOTOVAULT: branding. Ente wordmark and Ente app logos removed; photos.png is the Photovault icon.
     - assets/apps/
-    - assets/ente_wordmark.svg
   fonts:
     - family: Inter
       fonts:

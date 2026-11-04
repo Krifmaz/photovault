@@ -41,8 +41,8 @@ import { CoverPickerDialog } from "./CoverPickerDialog";
 // PHOTOVAULT: theme - Encore colours instead of Ente green.
 import {
     pvGold,
-    pvGoldHover,
     pvOnGold,
+    pvVar,
 } from "ente-base/components/utils/photovault/encore-tokens";
 
 export interface AlbumDetails {
@@ -336,7 +336,6 @@ const CoverTile = styled("div")`
 `;
 
 const green = pvGold; // PHOTOVAULT: theme
-const greenHover = pvGoldHover;
 const errorColor = "#fa1336";
 
 const paperSx = (theme: Theme) => ({
@@ -473,10 +472,10 @@ const saveButtonSx = (theme: Theme) => ({
     lineHeight: "20px",
     fontWeight: 500,
     textTransform: "none",
-    color: pvOnGold, // PHOTOVAULT: theme
-    backgroundColor: green,
+    color: pvVar.onAccent, // PHOTOVAULT: theme - primary button from the tokens (scheme-aware)
+    backgroundColor: pvVar.accent,
     boxShadow: "none",
-    "&:hover": { backgroundColor: greenHover, boxShadow: "none" },
+    "&:hover": { backgroundColor: pvVar.accent2, boxShadow: "none" },
     "&.Mui-disabled": {
         color: "#d6d6d6",
         backgroundColor: "#eaeaea",
@@ -488,5 +487,10 @@ const saveButtonSx = (theme: Theme) => ({
 });
 
 const saveButtonBusySx = {
-    "&.Mui-disabled": { color: pvOnGold, backgroundColor: green, opacity: 0.7 }, // PHOTOVAULT: theme
+    // PHOTOVAULT: theme
+    "&.Mui-disabled": {
+        color: pvVar.onAccent,
+        backgroundColor: pvVar.accent,
+        opacity: 0.7,
+    },
 };
