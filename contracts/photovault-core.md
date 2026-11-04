@@ -113,3 +113,72 @@ Tests the core track hands back with: SRP and key-derivation against `server/tes
 files/thumbnails/metadata produced by Ente's web client, a full sign-in + sync + upload + download round
 trip against the real server (`cargo test -p photovault-core --features it`), and `uniffi-bindgen` Kotlin
 generation in CI. Additive changes (new methods/fields) need a contracts commit; renames do not happen in v1.
+
+## v1.2: search, faces, memories
+
+Additive. Code in `core/src/ml/` (one `#[uniffi::export] impl Core` block per file); Rust types are in
+`core/src/ml/mod.rs`. Everything uses Ente's own data, so it is shared with the stock Ente apps and the
+compute node both ways:
+
+* **`mldata`** (face + CLIP indexes per file): Ente's format exactly (`core/src/ml/mldata.rs`, ported from
+  the compute node; fixtures in `core/tests/ml_fixtures/`): JSON, gzipped, encrypted with the file key as
+  one secretstream blob, `PUT /files/data` with `type = "mldata"`; pulled with `/files/data/status-diff`
+  and `/files/data/fetch`. Unknown keys are kept on rewrite. Versions: face 1, CLIP 1. `client` =
+  `app.photovault.native/<version>`. Flags: `RUNTIME_RUST` (+ `WEBGPU` when used).
+* **Models** come only from the user's server (`GET /photovault/models/<file>`, PR #14), verified against
+  the size and SHA-256 Ente pins. Inference is Ente's `rust/crates/ml` (`ente-ml`) on ONNX Runtime (cargo
+  feature `ml`; the app ships Ente's ONNX Runtime AAR, `ort` loads `libonnxruntime.so` dynamically).
+* **People** are `cgroup` user entities (`/user-entity/...`, per-type entity key wrapped with the master
+  key), clustering follows Ente's algorithm and thresholds; location tags are `location` entities.
+* The ML on/off switch is Ente's remote flag `faceSearchEnabled` (`/remote-store`).
+* Local tables `ml_data`, `ml_local`, `ml_entities` (`core/src/ml/store.rs`) hold sealed JSON only.
+* `on_this_day(now_us, utc_offset_secs, limit)` (map/widgets track) stays; `memories` is the richer API.
+
+```rust
+#[derive(uniffi::Record)] pub struct MlStatus { enabled: bool, inference_available: bool, models_ready: bool,
+  model_bytes_done: u64, model_bytes_total: u64, files_total: u64, files_indexed: u64, files_pending: u64,
+  running: bool, last_error: Option<String> }
+#[uniffi::export(with_foreign)] pub trait MlListener: Send + Sync { fn on_status(&self, status: MlStatus); }
+#[derive(uniffi::Enum)] pub enum SearchKind { Magic, Person, Album, Date, Place, FileName, Caption, FileType }
+#[derive(uniffi::Record)] pub struct SearchSuggestion { kind: SearchKind, key: String, label: String, count: u64,
+  cover_file_id: Option<i64>, cover_face_id: Option<String> }
+#[derive(uniffi::Record)] pub struct FaceRef { face_id: String, file_id: i64, x: f32, y: f32, width: f32,
+  height: f32, score: f32, blur: f32 }                       // box normalised to [0, 1]
+#[derive(uniffi::Record)] pub struct Person { id: String,    // cgroup id, or "cluster:<id>" when unnamed
+  name: Option<String>, is_hidden: bool, file_count: u64, cover: Option<FaceRef>, birth_date: Option<String> }
+#[derive(uniffi::Record)] pub struct FileFace { face: FaceRef, person_id: Option<String>, person_name: Option<String> }
+#[derive(uniffi::Enum)] pub enum MemoryKind { OnThisDay, People, Trip, Time, Clip, Filler }
+#[derive(uniffi::Record)] pub struct Memory { id: String, kind: MemoryKind, title: String, subtitle: Option<String>,
+  items: Vec<TimelineItem>, cover_file_id: i64, seen: bool, person_id: Option<String> }
+
+impl Core {
+  // ML control (index.rs)
+  fn ml_status(&self) -> MlStatus;
+  async fn set_ml_enabled(&self, enabled: bool) -> Result<MlStatus, CoreError>;
+  async fn sync_ml(&self, listener: Option<Arc<dyn MlListener>>) -> Result<MlStatus, CoreError>;     // after each sync
+  async fn run_ml_indexing(&self, max_files: u32, listener: Option<Arc<dyn MlListener>>) -> Result<MlStatus, CoreError>;
+  // search (search.rs)
+  fn search_suggestions(&self, query: String, limit: u32) -> Vec<SearchSuggestion>;
+  fn search_discovery(&self) -> Vec<SearchSuggestion>;
+  async fn search_results(&self, kind: SearchKind, key: String) -> Result<Vec<TimelineItem>, CoreError>;
+  async fn magic_search(&self, query: String, limit: u32) -> Result<Vec<TimelineItem>, CoreError>;
+  // people (faces.rs)
+  fn people(&self, include_hidden: bool, min_files: u32) -> Vec<Person>;
+  fn person(&self, person_id: String) -> Option<Person>;
+  fn person_files(&self, person_id: String) -> Vec<TimelineItem>;
+  fn file_faces(&self, file_id: i64) -> Vec<FileFace>;
+  fn person_suggestions(&self, person_id: String) -> Vec<Person>;
+  async fn face_thumbnail(&self, face_id: String) -> Result<Vec<u8>, CoreError>;           // square JPEG
+  async fn name_person(&self, person_id: String, name: String) -> Result<Person, CoreError>;
+  async fn merge_people(&self, into_id: String, from_id: String) -> Result<Person, CoreError>;
+  async fn answer_suggestion(&self, person_id: String, cluster_id: String, accept: bool) -> Result<(), CoreError>;
+  async fn set_person_hidden(&self, person_id: String, hidden: bool) -> Result<(), CoreError>;
+  async fn set_person_cover(&self, person_id: String, face_id: String) -> Result<(), CoreError>;
+  async fn set_person_birth_date(&self, person_id: String, birth_date: Option<String>) -> Result<(), CoreError>;
+  async fn remove_faces_from_person(&self, person_id: String, face_ids: Vec<String>) -> Result<(), CoreError>;
+  async fn delete_person(&self, person_id: String) -> Result<(), CoreError>;
+  // memories (memories.rs)
+  fn memories(&self, now_us: i64, utc_offset_secs: i32) -> Vec<Memory>;
+  fn mark_memory_seen(&self, memory_id: String) -> Result<(), CoreError>;
+}
+```

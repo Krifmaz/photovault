@@ -181,6 +181,32 @@ pub struct Index {
     pub(crate) hashes: HashMap<String, (i64, Vec<i64>)>,
 }
 
+impl Index {
+    /// Every file once, newest first (used by search, faces and memories).
+    pub(crate) fn all_items(&self) -> &[TimelineItem] {
+        &self.all
+    }
+
+    /// Files shown in the timeline, newest first.
+    pub(crate) fn timeline_items(&self) -> impl Iterator<Item = &TimelineItem> {
+        self.timeline.iter().map(|&p| &self.all[p as usize])
+    }
+
+    /// Visible collections.
+    pub(crate) fn visible_collections(&self) -> &[Collection] {
+        &self.collections
+    }
+
+    /// Files of a collection, newest first.
+    pub(crate) fn collection_items(&self, id: i64) -> impl Iterator<Item = &TimelineItem> {
+        self.by_collection
+            .get(&id)
+            .into_iter()
+            .flatten()
+            .map(|&p| &self.all[p as usize])
+    }
+}
+
 /// Decrypt a remote collection with the session's keys.
 pub(crate) fn decrypt_collection(c: &RemoteCollection, s: &Session) -> Result<CollectionRec> {
     let owned = c.owner.id == s.account.user_id;

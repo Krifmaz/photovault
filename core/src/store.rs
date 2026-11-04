@@ -130,6 +130,7 @@ impl Store {
         conn.pragma_update(None, "synchronous", "NORMAL")?;
         conn.busy_timeout(std::time::Duration::from_secs(5))?;
         conn.execute_batch(SCHEMA)?;
+        crate::ml::store::migrate(&conn)?;
         let mut store = Self { conn, key };
         let reset = if supplied {
             store.adopt_key(dir)?
@@ -315,6 +316,7 @@ impl Store {
              DELETE FROM kv WHERE k NOT IN ('active_server', 'key_check') \
              AND k NOT LIKE 'home_allowed:%';",
         )?;
+        crate::ml::store::wipe(&tx)?;
         tx.commit()?;
         Ok(())
     }
@@ -354,6 +356,8 @@ fn reseal_tx(conn: &mut Connection, old: &[u8], key: &[u8]) -> Result<()> {
             };
         }
     }
+    // ML rows are re-fetched from the server rather than re-sealed.
+    crate::ml::store::wipe(&tx)?;
     tx.commit()?;
     Ok(())
 }

@@ -82,6 +82,8 @@ pub struct Inner {
     pub(crate) sync_lock: tokio::sync::Mutex<()>,
     pub(crate) upload_lock: tokio::sync::Mutex<()>,
     pub(crate) live_upload: Mutex<LiveUpload>,
+    /// Search, faces and memories state.
+    pub(crate) ml: crate::ml::MlState,
 }
 
 impl Inner {
@@ -97,6 +99,7 @@ impl Inner {
         crate::crypto::init();
         std::fs::create_dir_all(&cache_dir)?;
         let (store, reset) = Store::open_with(&data_dir, device_key)?;
+        let ml = crate::ml::MlState::new(&data_dir);
         if reset {
             // The store was sealed under a key we no longer have: its account
             // data is unreadable. Drop the encrypted object cache with it.
@@ -116,6 +119,7 @@ impl Inner {
             sync_lock: tokio::sync::Mutex::new(()),
             upload_lock: tokio::sync::Mutex::new(()),
             live_upload: Mutex::new(LiveUpload::default()),
+            ml,
         });
         inner.rebuild_index()?;
         if active.is_some() {
