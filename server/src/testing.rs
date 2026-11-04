@@ -68,6 +68,8 @@ impl TestServer {
             log_format: "pretty".into(),
             allow_signups: true,
             config_dir: dir.0.join("config"),
+            // Museum behaviour (codes checked) unless a test opts in.
+            skip_email_verification: Some(false),
             ..Config::default()
         };
         tweak(&mut config);

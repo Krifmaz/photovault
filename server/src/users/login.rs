@@ -192,7 +192,7 @@ pub async fn send_email_ott(
 /// `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` applies to `email`: on, and the account (if any)
 /// has not turned on email two-factor (that code is always required).
 pub async fn skip_applies(state: &AppState, email: &str) -> ApiResult<bool> {
-    if !state.config.skip_email_verification {
+    if !state.config.skips_email_verification() {
         return Ok(false);
     }
     let Some(id) = user_id_for_email(state, email).await? else {

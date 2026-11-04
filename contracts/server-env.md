@@ -29,7 +29,7 @@ Precedence: environment variable > `--config` TOML > `/config/keys.toml` (keys o
 | `PHOTOVAULT_LOG_FORMAT` | `pretty` | `pretty` or `json`; one line per event |
 | `PHOTOVAULT_ALLOW_SIGNUPS` | `false` | Open sign-up |
 | `PHOTOVAULT_ADMINS` | unset | Admin user ids (comma-separated) |
-| `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` | `false` | Accept any code / skip OTT for single-user installs |
+| `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` | `auto` = on without SMTP, off with SMTP | Accept any code at sign-up / log-in (email two-factor excluded). `/photovault/info` reports `emailVerification: "skip"`; apps then skip the code screen (submit any 6 digits after `/users/ott`) |
 | `PHOTOVAULT_SMTP_HOST`, `_PORT`, `_USERNAME`, `_PASSWORD`, `_PASSWORD_FILE`, `_FROM`, `_TLS` | unset; `_TLS`=`starttls` | `_TLS`: `starttls` \| `tls` \| `none`. Without SMTP the code is logged as `Verification code for <email>: <code>` |
 | `PHOTOVAULT_JWT_SECRET`, `PHOTOVAULT_ENCRYPTION_KEY`, `PHOTOVAULT_HASHING_KEY` | from `keys.toml` | If set, used as-is and `keys.toml` is not written |
 | `PHOTOVAULT_WEBAUTHN_RP_ID`, `_RP_ORIGINS` | derived from public URL | Passkeys |

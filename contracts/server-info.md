@@ -39,7 +39,7 @@ A stock Ente museum returns 404 here; clients then fall back to `GET /ping` and 
 | `modelsUrl` | string \| null | base for ML model files, replaces `https://models.ente.com` (see [asset-mirror.md](asset-mirror.md)); null when the mirror is off |
 | `musicManifestUrl` | string \| null | replaces `https://music.ente.com/tracks.json`; null when the mirror is off |
 | `signupsAllowed` | bool | apps hide "Create account" when false |
-| `emailVerification` | `"smtp"` \| `"log"` \| `"skip"` | how codes are delivered |
+| `emailVerification` | `"smtp"` \| `"log"` \| `"skip"` | how codes are delivered. `"skip"` (the default without SMTP): any 6-digit code is accepted after `POST /users/ott`, so clients should send one automatically and not show the code screen |
 | `storage` | `"local"` \| `"s3"` | |
 | `features` | string[] | unknown entries must be ignored by clients |
 

@@ -229,7 +229,7 @@ async fn admin_created_account_with_signups_closed() {
 
 #[tokio::test]
 async fn skip_email_verification_accepts_any_code_for_pending_requests() {
-    let srv = TestServer::start_with(|c| c.skip_email_verification = true)
+    let srv = TestServer::start_with(|c| c.skip_email_verification = Some(true))
         .await
         .unwrap();
     let c = Client::new(&srv);
@@ -253,6 +253,47 @@ async fn skip_email_verification_accepts_any_code_for_pending_requests() {
         .post(
             "/users/verify-email",
             json!({"email": "solo@example.org", "ott": "111111"}),
+        )
+        .await;
+    assert_eq!(s, 200, "{v}");
+}
+
+#[tokio::test]
+async fn without_smtp_email_codes_are_skipped_by_default() {
+    use photovault_server::config::{Config, SmtpConfig};
+    // Unset + no SMTP: skip. Unset + SMTP: check codes. Explicit false: check codes.
+    let mut cfg = Config::default();
+    assert!(cfg.skips_email_verification());
+    cfg.smtp = Some(SmtpConfig {
+        host: "smtp.example.com".into(),
+        port: 587,
+        username: None,
+        password: None,
+        from: "Photovault <p@example.com>".into(),
+        tls: None,
+    });
+    assert!(!cfg.skips_email_verification());
+    cfg.smtp = None;
+    cfg.skip_email_verification = Some(false);
+    assert!(!cfg.skips_email_verification());
+
+    let srv = TestServer::start_with(|c| c.skip_email_verification = None)
+        .await
+        .unwrap();
+    let c = Client::new(&srv);
+    let (_, v) = c.get("/photovault/info").await;
+    assert_eq!(v["emailVerification"], "skip");
+    let (s, _) = c
+        .post(
+            "/users/ott",
+            json!({"email": "home@example.org", "purpose": "signup"}),
+        )
+        .await;
+    assert_eq!(s, 200);
+    let (s, v) = c
+        .post(
+            "/users/verify-email",
+            json!({"email": "home@example.org", "ott": "000000"}),
         )
         .await;
     assert_eq!(s, 200, "{v}");
