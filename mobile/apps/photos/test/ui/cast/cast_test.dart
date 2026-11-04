@@ -132,8 +132,8 @@ void main() {
 
     requests.succeed();
     await tester.pumpAndSettle();
-    // PHOTOVAULT: strip - Auto pair (Ente's receiver app) is hidden.
-    expect(find.text("Auto pair"), findsNothing);
+    // PHOTOVAULT: the fake has a server-provided receiver (canAutoPair).
+    expect(find.text("Auto pair"), findsOneWidget);
     expect(find.text("Pair using code"), findsOneWidget);
     expect(transport.closeCount, 0);
 
