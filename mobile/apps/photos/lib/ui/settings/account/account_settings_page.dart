@@ -7,14 +7,11 @@ import "package:ente_lock_screen/local_authentication_service.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
 import "package:hugeicons/hugeicons.dart";
-import "package:photos/service_locator.dart";
 import "package:photos/services/account/user_service.dart";
 import "package:photos/ui/account/change_email_dialog.dart";
 import "package:photos/ui/account/password_entry_page.dart";
 import "package:photos/ui/account/recovery_key_page.dart";
-import "package:photos/ui/payment/subscription.dart";
 import "package:photos/utils/dialog_util.dart";
-import "package:url_launcher/url_launcher_string.dart";
 
 class AccountSettingsPage extends StatelessWidget {
   const AccountSettingsPage({super.key});
@@ -26,13 +23,7 @@ class AccountSettingsPage extends StatelessWidget {
     return SettingsPageScaffold(
       title: l10n.account,
       children: [
-        SettingsItem(
-          title: l10n.manageSubscription,
-          icon: HugeIcons.strokeRoundedCreditCard,
-          showOnlyLoadingState: true,
-          onTap: () async => _onManageSubscriptionTapped(context),
-        ),
-        const SizedBox(height: 8),
+        // PHOTOVAULT: payments removed ("Manage subscription").
         SettingsItem(
           title: l10n.changeEmail,
           icon: HugeIcons.strokeRoundedMail01,
@@ -53,16 +44,7 @@ class AccountSettingsPage extends StatelessWidget {
           showOnlyLoadingState: true,
           onTap: () async => _onRecoveryKeyTapped(context),
         ),
-        const SizedBox(height: 8),
-        SettingsItem(
-          title: l10n.exportYourData,
-          icon: HugeIcons.strokeRoundedDownload04,
-          onTap: () async {
-            await launchUrlString(
-              "https://ente.com/help/photos/migration/export/",
-            );
-          },
-        ),
+        // PHOTOVAULT: removed "Export your data" (a link to Ente's help site).
         const SizedBox(height: 8),
         SettingsItem(
           title: l10n.deleteAccount,
@@ -71,45 +53,6 @@ class AccountSettingsPage extends StatelessWidget {
           onTap: () async => _onDeleteAccountTapped(context),
         ),
       ],
-    );
-  }
-
-  Future<void> _onManageSubscriptionTapped(BuildContext context) async {
-    try {
-      final userDetails = await UserService.instance.getUserDetailsV2(
-        memoryCount: false,
-      );
-      if (!context.mounted) {
-        return;
-      }
-      final isFamilyMember =
-          userDetails.isPartOfFamily() &&
-          !(userDetails.currentFamilyMember()?.isAdmin ?? false);
-      if (isFamilyMember) {
-        await billingService.launchFamilyPortal(
-          context,
-          userDetails,
-          refreshOnOpen: false,
-        );
-        return;
-      }
-    } catch (error) {
-      if (!context.mounted) {
-        return;
-      }
-      await showGenericErrorDialog(context: context, error: error);
-      return;
-    }
-
-    if (!context.mounted) {
-      return;
-    }
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return getSubscriptionPage();
-        },
-      ),
     );
   }
 

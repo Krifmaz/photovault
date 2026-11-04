@@ -657,7 +657,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Eu compreendo que isso excluirá todos os meus dados no Photovault, Ente Auth e Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -1981,7 +1980,6 @@
   "localBackupSidebarTitle": "Backup local",
   "localGallery": "Galeria local",
   "localIndexing": "Processamento local",
-  "localSyncErrorMessage": "Ocorreu um erro devido à sincronização de localização das fotos estar levando mais tempo que o esperado. Entre em contato conosco.",
   "location": "Localização",
   "locationName": "Nome da localização",
   "locationPickerTip": "Você também pode adicionar um local centrado em uma foto através das informações da foto",
@@ -2016,7 +2014,6 @@
     "description": "Login with TOTP button label"
   },
   "logs": "Registros",
-  "logsDialogBody": "Isso enviará através dos registros para ajudar-nos a resolver seu problema. Saiba que, nome de arquivos serão incluídos para ajudar a buscar problemas com arquivos específicos.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2177,7 +2174,6 @@
   "moveToHiddenAlbum": "Mover ao álbum oculto",
   "movingFilesToAlbum": "Movendo arquivos para o álbum...",
   "name": "Nome",
-  "networkHostLookUpErr": "Não foi possível conectar-se ao Photovault, verifique suas configurações de rede e entre em contato com o suporte se o erro persistir.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2502,7 +2498,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Por favor, entre em contato conosco em support@ente.com e estaremos felizes em ajudá-lo!",
-  "pleaseContactSupportIfTheProblemPersists": "Por favor, contate o suporte se o problema persistir",
   "pleaseEmailUsAt": "Envie-nos um e-mail para {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3211,21 +3206,19 @@
   "shareKey": "Compartilhar chave",
   "shareLink": "Compartilhar link",
   "shareMemory": "Compartilhar memória",
-  "shareMyVerificationID": "Aqui está meu ID de verificação: {verificationID} do ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "Compartilhe o armazenamento com 5 membros",
-  "shareTextConfirmOthersVerificationID": "Ei, poderia confirmar se este é o seu ID de verificação do ente.com: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Baixe o Photovault para eu poder adicioná-lo ao meu plano familiar\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Baixe o Photovault para podermos compartilhar fotos e vídeos facilmente na qualidade original\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Baixe o Photovault para eu poder adicioná-lo ao meu plano familiar",
+  "shareTextRecommendUsingEnteForPhotos": "Baixe o Photovault para podermos compartilhar fotos e vídeos facilmente na qualidade original",
   "shareWithNonenteUsers": "Compartilhar com usuários fora do Photovault",
   "shareYourSubscription": "Compartilhe sua assinatura com entes queridos",
   "sharing": "Compartilhando...",
@@ -3403,8 +3396,6 @@
   "subject": "Sujeito",
   "submit": "Enviar",
   "subscribe": "Inscrever-se",
-  "subscribeToChangeLinkSetting": "É necessária uma assinatura paga para alterar a opção deste link.",
-  "subscribeToEnableSharing": "Você precisa de uma inscrição paga ativa para ativar o compartilhamento.",
   "subscription": "Assinatura",
   "subWillBeCancelledOn": "Sua assinatura será cancelada em {endDate}",
   "@subWillBeCancelledOn": {
@@ -3846,7 +3837,6 @@
   },
   "yourMap": "Seu mapa",
   "yourPhotosLookUnique": "Suas fotos parecem únicas",
-  "yourPlanSupportsFamily": "Seu plano já suporta uma família",
   "yourPlanWasSuccessfullyDowngraded": "Seu plano foi rebaixado com sucesso",
   "yourPlanWasSuccessfullyUpgraded": "Seu plano foi atualizado com sucesso",
   "yourPurchaseWasSuccessful": "Sua compra foi efetuada com sucesso",

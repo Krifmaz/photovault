@@ -160,7 +160,7 @@
       }
     }
   },
-  "applePhotosUnsupportedResource": "આ ફાઇલને એપલ ફોટોઝમાં સેવ કરી શકાઈ નથી. તમે તેને હજુ પણ એન્ટેમાં જોઈ શકો છો.",
+  "applePhotosUnsupportedResource": "આ ફાઇલને એપલ ફોટોઝમાં સેવ કરી શકાઈ નથી. તમે તેને હજુ પણ Photovaultમાં જોઈ શકો છો.",
   "@applePhotosUnsupportedResource": {
     "description": "Shown when iOS Photos rejects a file while saving to gallery because the media resource is invalid or unsupported"
   },
@@ -428,7 +428,6 @@
   "doubleTapToViewHiddenCode": "કોડ જોવા માટે તમે એન્ટ્રી પર બે વાર ટેપ કરી શકો છો",
   "download": "ડાઉનલોડ કરો",
   "downloadApplicationUpdate": "અપડેટ ડાઉનલોડ કરો",
-  "downloadDecryptionFailedMessage": "આ આઇટમ ડાઉનલોડ કરી શકાઈ નથી. કૃપા કરીને અમારો સંપર્ક કરો, જેથી અમે મદદ કરી શકીએ.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -663,7 +662,7 @@
       }
     }
   },
-  "importTypeEnteEncrypted": "એન્ટે એન્ક્રિપ્ટેડ નિકાસ",
+  "importTypeEnteEncrypted": "Photovault એન્ક્રિપ્ટેડ નિકાસ",
   "incorrectDetails": "ખોટી વિગતો",
   "incorrectPasswordTitle": "ખોટો પાસવર્ડ",
   "@incorrectPasswordTitle": {
@@ -680,7 +679,6 @@
   "invalidReferralCode": "અમાન્ય કોડ",
   "invite": "આમંત્રણ",
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "આ વસ્તુઓ કાયમી ધોરણે ડિલીટ થવા પહેલાં બાકી રહેલા દિવસોની સંખ્યા દર્શાવે છે",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "કંઈક ખોટું થયું હોય તેવું લાગે છે. કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો. જો સમસ્યા યથાવત રહે, તો કૃપા કરીને અમારી સપોર્ટ ટીમનો સંપર્ક કરો.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -715,12 +713,10 @@
   },
   "limit": "સીમા",
   "localBackupDailyManualCopy": "જ્યારે તમે એપ ખોલો છો, ત્યારે તે દિવસનું એક લોકલ બેકઅપ બનાવે છે. મેન્યુઅલ બેકઅપ લેવા માટે \"હમણાં બેકઅપ લો\" નો ઉપયોગ કરો. બેકઅપની મહત્તમ ૫ ફાઇલો સાચવી રાખવામાં આવે છે.",
-  "localSyncErrorMessage": "કંઈક ગડબડ થઈ હોય તેવું લાગે છે, કારણ કે સ્થાનિક ફોટાઓનું સિંક થવામાં અપેક્ષા કરતાં વધુ સમય લાગી રહ્યો છે. કૃપા કરીને અમારી સપોર્ટ ટીમનો સંપર્ક કરો",
   "loggingOut": "લૉગ આઉટ થઈ રહ્યું છે...",
   "@loggingOut": {
     "description": "Message shown while logging out"
   },
-  "logsDialogBody": "આનાથી અમને તમારી સમસ્યાનું નિરાકરણ કરવામાં મદદ મળે તેવા લોગ્સ મોકલવામાં આવશે. કૃપા કરીને નોંધ લો કે ચોક્કસ ફાઇલોને લગતી સમસ્યાઓને ટ્રેક કરવામાં મદદ મળે તે માટે ફાઇલના નામોનો પણ સમાવેશ કરવામાં આવશે.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -784,7 +780,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "કૃપા કરીને support@ente.com પર સંપર્ક કરો, અમને મદદ કરવામાં આનંદ થશે!",
-  "pleaseContactSupportIfTheProblemPersists": "જો સમસ્યા યથાવત રહે, તો કૃપા કરીને સપોર્ટનો સંપર્ક કરો",
   "pleaseLoginAgain": "કૃપા કરીને ફરી લોગિન કરો",
   "pleaseSendTheLogsTo": "કૃપા કરીને લોગ\n{toEmail} પર મોકલો",
   "@pleaseSendTheLogsTo": {
@@ -934,7 +929,6 @@
   "viewLogsAction": "લોગ જુઓ",
   "yes": "હા",
   "youHaveNoFileSuggestedForDeletion": "તમારી પાસે એવી કોઈ ફાઇલો નથી કે જેને કાઢી નાખવા માટે સૂચવવામાં આવી હોય",
-  "yourPlanSupportsFamily": "તમારી યોજના પહેલેથી જ પરિવારને આવરી લે છે",
   "yourSubscriptionWasUpdatedSuccessfully": "તમારું સબ્સ્ક્રિપ્શન સફળતાપૂર્વક અપડેટ થયું",
   "cameraPermissionSettings": "કેમેરા એક્સેસ બંધ છે. આગળ વધવા માટે તેને સેટિંગ્સમાં સક્ષમ કરો.",
   "legacyKitSheetIntro": "જો હું ક્યારેય હાજર ન હોઉં, અથવા મારા એકાઉન્ટની ઍક્સેસ ગુમાવી બેસું, તો આ શીટ તમને મારા ફોટા, દસ્તાવેજો અને અન્ય સામગ્રી પાછી મેળવવામાં મદદ કરશે.",
@@ -944,6 +938,5 @@
   "noEnteAccountWithThisEmail": "આ ઈમેલ સાથે કોઈ Photovault એકાઉન્ટ નથી.",
   "shareALinkInline": "એક લિંક શેર કરો.",
   "personAlreadyHasAccess": "આ વ્યક્તિ પાસે પહેલેથી જ એક્સેસ છે.",
-  "notEnoughStorageTitle": "પૂરતી સ્ટોરેજ નથી",
-  "notEnoughStorageBody": "Photovault પર નવા ફોટા ઉમેરવા માટે તમારી પાસે પૂરતી ખાલી જગ્યા નથી. વધુ ફોટા ઉમેરવાનું ચાલુ રાખવા માટે જગ્યા ખાલી કરો અથવા અપગ્રેડ કરો."
+  "notEnoughStorageTitle": "પૂરતી સ્ટોરેજ નથી"
 }

@@ -4,7 +4,6 @@ import "package:ente_strings/ente_strings.dart";
 import 'package:flutter/material.dart';
 import "package:hugeicons/hugeicons.dart";
 import 'package:photos/core/errors.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import "package:photos/ui/settings/backup/free_space_options.dart";
 import 'package:photos/utils/email_util.dart';
 
@@ -15,37 +14,23 @@ class HeaderErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (_error is NoActiveSubscriptionError) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
-        child: BannerComponent(
-          leadingIcon: HugeIcons.strokeRoundedInformationCircle,
-          title: context.strings.subscribe,
-          subtitle: context.strings.yourSubscriptionHasExpired,
-          state: BannerComponentState.failure,
-          trailingWidget: const Icon(Icons.arrow_forward),
-          onTap: () async {
-            await routeToPage(
-              context,
-              getSubscriptionPage(),
-              forceCustomPageRoute: true,
-            );
-          },
-        ),
-      );
-    } else if (_error is StorageLimitExceededError) {
+    // PHOTOVAULT: payments removed. Ente's "Subscribe"/"Upgrade" banners
+    // opened the plan page; storage-full now points to "Free up space", and
+    // an expired subscription (never sent by Photovault) falls through to
+    // the generic backup-failed banner.
+    if (_error is StorageLimitExceededError) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
         child: BannerComponent(
           leadingIcon: HugeIcons.strokeRoundedDatabase,
-          title: context.strings.upgrade,
-          subtitle: context.strings.storageLimitExceeded,
+          title: context.strings.storageLimitExceeded,
+          subtitle: context.strings.backupFailed,
           state: BannerComponentState.failure,
           trailingWidget: const Icon(Icons.arrow_forward),
           onTap: () async {
             await routeToPage(
               context,
-              getSubscriptionPage(),
+              const FreeUpSpaceOptionsScreen(),
               forceCustomPageRoute: true,
             );
           },

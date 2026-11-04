@@ -40,7 +40,8 @@ class RecoveryKeyPage extends StatefulWidget {
 
 class _RecoveryKeyPageState extends State<RecoveryKeyPage> {
   final _recoveryKeyFile = File(
-    Configuration.instance.getTempDirectory() + "ente-recovery-key.txt",
+    Configuration.instance.getTempDirectory() +
+        "photovault-recovery-key.txt" /* PHOTOVAULT: branding */,
   );
 
   @override

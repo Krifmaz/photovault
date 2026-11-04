@@ -150,11 +150,9 @@ void main() {
     await tester.enterText(fields.at(2), "correct horse battery staple");
     await settle(tester, 15);
     final button = find.byKey(const ValueKey("createAccountButton"));
-    expect(tester.widget<ButtonComponent>(button).isDisabled, isTrue);
-
-    await tester.ensureVisible(find.byType(CheckboxComponent));
-    await tester.tap(find.byType(CheckboxComponent));
-    await settle(tester);
+    // PHOTOVAULT: the terms-of-service checkbox was removed, so a valid
+    // email and matching passwords are enough to enable submission.
+    expect(find.byType(CheckboxComponent), findsNothing);
     expect(tester.widget<ButtonComponent>(button).isDisabled, isFalse);
 
     await tester.enterText(fields.at(2), "different");

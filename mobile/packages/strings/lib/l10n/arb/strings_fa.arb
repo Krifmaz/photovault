@@ -567,11 +567,9 @@
       "count": {}
     }
   },
-  "networkConnectionRefusedErr": "نمی‌توان به Photovault متصل شد. لطفاً کمی بعد دوباره امتحان کنید. در صورتی که مشکل برطرف نشد، لطفا به پشتیبانی اطلاع دهید.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "نمی‌توان به Photovault متصل شد. لطفاً وضعیت شبکه را بررسی کنید و اگر خطا برطرف نشد، به پشتیبانی اطلاع دهید.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },

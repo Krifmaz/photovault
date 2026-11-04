@@ -11,12 +11,8 @@ enum AppIcon {
   iconGreen("Default", "IconGreen", "assets/launcher_icon/icon-green.png"),
   iconLight("Light", "IconLight", "assets/launcher_icon/icon-light.png"),
   iconDark("Dark", "IconDark", "assets/launcher_icon/icon-dark.png"),
-  iconOG("OG", "IconOG", "assets/launcher_icon/icon-og.png"),
-  iconDuckyHuggingE(
-    "Ducky",
-    "IconDuckyHuggingE",
-    "assets/launcher_icon/icon-ducky-hugging-e.png",
-  );
+  // PHOTOVAULT: branding. Removed the "Ducky" (mascot) icon.
+  iconOG("OG", "IconOG", "assets/launcher_icon/icon-og.png");
 
   final String name;
   final String id;

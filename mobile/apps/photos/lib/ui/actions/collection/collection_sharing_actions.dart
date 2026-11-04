@@ -19,11 +19,12 @@ import "package:photos/models/metadata/common_keys.dart";
 import 'package:photos/services/account/user_service.dart';
 import 'package:photos/services/collections_service.dart';
 import 'package:photos/services/hidden_service.dart';
+import 'package:photos/services/photovault/photovault_server_service.dart'; // PHOTOVAULT
+import 'package:photos/services/photovault/photovault_strings.dart'; // PHOTOVAULT
 import 'package:photos/ui/components/action_sheet_widget.dart';
 import 'package:photos/ui/components/buttons/button_widget.dart';
 import 'package:photos/ui/components/models/button_type.dart';
 import 'package:photos/ui/notification/toast.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/ui/sharing/widgets/sharing_role.dart';
 import 'package:photos/utils/dialog_util.dart';
 import 'package:photos/utils/email_util.dart';
@@ -353,9 +354,14 @@ class CollectionActions {
                 shouldSurfaceExecutionStates: false,
                 onTap: () {
                   Navigator.of(sheetContext).pop();
+                  // PHOTOVAULT: server connection. The invitee needs the
+                  // server.
                   unawaited(
                     shareText(
-                      context.strings.shareTextRecommendUsingEnteForPhotos,
+                      PhotovaultStrings.inviteWithServer(
+                        context.strings.shareTextRecommendUsingEnteForPhotos,
+                        PhotovaultServerService.instance.activeServer.value,
+                      ),
                     ),
                   );
                 },
@@ -759,25 +765,7 @@ class CollectionActions {
       title: Text(context.strings.sorry),
       content: Text(context.strings.subscribeToEnableSharing),
       actions: [
-        ButtonWidget(
-          buttonType: ButtonType.primary,
-          isInAlert: true,
-          shouldStickToDarkTheme: false,
-          buttonAction: ButtonAction.first,
-          shouldSurfaceExecutionStates: true,
-          labelText: context.strings.subscribe,
-          onTap: () async {
-            Navigator.of(context)
-                .push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) {
-                      return getSubscriptionPage();
-                    },
-                  ),
-                )
-                .ignore();
-          },
-        ),
+        // PHOTOVAULT: payments removed (the "Subscribe" button).
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: ButtonWidget(

@@ -700,7 +700,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Capisco che tutti i miei dati di Photovault, Ente Auth e Ente Locker saranno eliminati.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -1091,7 +1090,6 @@
   "doubleTapToViewHiddenCode": "Puoi toccare due volte una voce per visualizzare il codice",
   "download": "Scarica",
   "downloadApplicationUpdate": "Scarica l'aggiornamento",
-  "downloadDecryptionFailedMessage": "Impossibile scaricare questo elemento. Contattaci così possiamo aiutarti.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -1929,7 +1927,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Gli elementi mostrano il numero di giorni rimanenti prima della cancellazione permanente",
   "itemsStored": "Elementi memorizzati",
   "itemsWillBeRemovedFromAlbum": "Gli elementi selezionati saranno rimossi da questo album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Sembra che qualcosa sia andato storto. Riprova tra un po'. Se l'errore persiste, contatta il nostro team di supporto.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2067,7 +2064,6 @@
   "localBackupSidebarTitle": "Backup locale",
   "localGallery": "Galleria locale",
   "localIndexing": "Elaborazione locale",
-  "localSyncErrorMessage": "Sembra che qualcosa sia andato storto dal momento che la sincronizzazione delle foto locali richiede più tempo del previsto. Si prega di contattare il nostro team di supporto",
   "location": "Luogo",
   "locationName": "Nome della località",
   "locationPickerTip": "Puoi anche aggiungere una posizione centrata su una foto dalla schermata Info della foto",
@@ -2101,7 +2097,6 @@
     "description": "Login with TOTP button label"
   },
   "logs": "Log",
-  "logsDialogBody": "Invia i log per aiutarci a risolvere il tuo problema. Si prega di notare che i nomi dei file saranno inclusi per aiutare a tenere traccia di problemi con file specifici.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2270,11 +2265,9 @@
   "moveToHiddenAlbum": "Sposta in album nascosto",
   "movingFilesToAlbum": "Spostamento dei file nell'album...",
   "name": "Nome",
-  "networkConnectionRefusedErr": "Impossibile connettersi a Photovault, riprova tra un po' di tempo. Se l'errore persiste, contatta l'assistenza.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Impossibile connettersi a Photovault, controlla le impostazioni di rete e contatta l'assistenza se l'errore persiste.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2628,7 +2621,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Contatta support@ente.com e saremo felici di aiutarti!",
-  "pleaseContactSupportIfTheProblemPersists": "Riprova. Se il problema persiste, ti invitiamo a contattare l'assistenza",
   "pleaseEmailUsAt": "Per favore invia un'email a {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3406,7 +3398,6 @@
   "shareKey": "Condividi chiave",
   "shareLink": "Condividi link",
   "shareMemory": "Condividi ricordo",
-  "shareMyVerificationID": "Ecco il mio ID di verifica: {verificationID} per ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3414,14 +3405,13 @@
   },
   "shareNotSupportedForSharedFiles": "La condivisione non è supportata per i file condivisi",
   "shareStorageWith5Members": "Condividi lo spazio con 5 membri",
-  "shareTextConfirmOthersVerificationID": "Ehi, puoi confermare che questo è il tuo ID di verifica per ente.com: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Scarica Photovault così posso aggiungerti al mio piano famiglia\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Scarica Photovault così possiamo condividere foto e video in qualità originale\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Scarica Photovault così posso aggiungerti al mio piano famiglia",
+  "shareTextRecommendUsingEnteForPhotos": "Scarica Photovault così possiamo condividere foto e video in qualità originale",
   "shareThisLink": "Questo link permette a chiunque lo riceva di accedere al tuo elemento. Puoi rimuovere l'accesso in qualsiasi momento eliminando il link.",
   "shareWithNonenteUsers": "Condividi con utenti che non hanno un account Photovault",
   "shareYourLegacyBannerDescription": "Aiuta i cari ad accedere a informazioni importanti, in tua assenza.",
@@ -3608,8 +3598,6 @@
   "subject": "Soggetto",
   "submit": "Invia",
   "subscribe": "Iscriviti",
-  "subscribeToChangeLinkSetting": "Devi avere un abbonamento a pagamento per cambiare le impostazioni di questo link.",
-  "subscribeToEnableSharing": "È necessario un abbonamento a pagamento attivo per abilitare la condivisione.",
   "subscription": "Abbonamento",
   "subscriptionRequiredForSharing": "Hai bisogno di un abbonamento a pagamento per condividere link",
   "subWillBeCancelledOn": "L'abbonamento verrà cancellato il {endDate}",
@@ -3665,7 +3653,6 @@
     }
   },
   "tellUsWhatYouThink": "Dicci cosa ne pensi",
-  "tempErrorContactSupportIfPersists": "Sembra che qualcosa sia andato storto. Riprova tra un po'. Se l'errore persiste, contatta il nostro team di supporto.",
   "terminate": "Termina",
   "@terminate": {
     "description": "Terminate button label"
@@ -4123,7 +4110,6 @@
   },
   "yourMap": "La tua mappa",
   "yourPhotosLookUnique": "Le tue foto sembrano uniche",
-  "yourPlanSupportsFamily": "Il tuo piano supporta già una famiglia",
   "yourPlanWasSuccessfullyDowngraded": "Il tuo piano è stato aggiornato con successo",
   "yourPlanWasSuccessfullyUpgraded": "Il tuo piano è stato aggiornato con successo",
   "yourPurchaseWasSuccessful": "Acquisto andato a buon fine",

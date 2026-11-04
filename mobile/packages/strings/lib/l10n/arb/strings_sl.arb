@@ -408,7 +408,6 @@
   "@ok": {
     "description": "Generic OK button label"
   },
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Zdi se, da je šlo nekaj narobe. Po določenem času poskusite znova. Če se napaka nadaljuje, se obrnite na našo ekipo za podporo.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -469,11 +468,9 @@
     }
   },
   "moveToAlbum": "Premakni v album",
-  "networkConnectionRefusedErr": "Ne morete se povezati z Photovault, poskusite znova čez nekaj časa. Če se napaka nadaljuje, se obrnite na podporo.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Ne morete se povezati z Photovault, preverite omrežne nastavitve in se obrnite na podporo, če se napaka nadaljuje.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -802,7 +799,6 @@
     "description": "Message prompting user to tap to unlock"
   },
   "tellUsWhatYouThink": "Povejte nam kaj mislite",
-  "tempErrorContactSupportIfPersists": "Zdi se, da je šlo nekaj narobe. Po določenem času poskusite znova. Če se napaka nadaljuje, se obrnite na našo ekipo za podporo.",
   "terminate": "Končaj",
   "@terminate": {
     "description": "Terminate button label"

@@ -123,9 +123,9 @@ class _TwoFactorRecoveryPageState extends State<TwoFactorRecoveryPage> {
                   showAlertBottomSheet(
                     context,
                     title: context.strings.contactSupport,
-                    message: context.strings.dropSupportEmail(
-                      supportEmail: "support@ente.com",
-                    ),
+                    // PHOTOVAULT: no Ente support; the server's admin can
+                    // reset two-factor authentication.
+                    message: context.strings.askServerAdminToReset2fa,
                     assetPath: 'assets/warning-grey.png',
                   );
                 },

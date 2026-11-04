@@ -1526,7 +1526,6 @@
   "localBackupSidebarTitle": "本機備份",
   "localGallery": "本地相簿",
   "localIndexing": "本機處理",
-  "localSyncErrorMessage": "本機照片同步所花時間比預期長，似乎出了問題。請聯絡我們的客服支援團隊",
   "location": "位置",
   "locationName": "地點名稱",
   "locationPickerTip": "您也可以從照片的資訊畫面中，新增以相片為中心的位置",
@@ -1566,7 +1565,6 @@
   },
   "logout": "登出",
   "logs": "紀錄日誌",
-  "logsDialogBody": "這將傳送紀錄以協助我們偵錯您的問題。請注意，檔名會一併包含，以便追蹤特定檔案的問題。",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2052,7 +2050,6 @@
   "playStream": "播放串流",
   "pleaseCheckPasswordAndTryAgain": "請檢查您的密碼並重試。",
   "pleaseContactSupportAndWeWillBeHappyToHelp": "請聯絡 support@ente.com，我們將樂意協助！",
-  "pleaseContactSupportIfTheProblemPersists": "如果問題持續存在，請聯絡客服支援",
   "pleaseEmailUsAt": "請寄信到 {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2747,15 +2744,14 @@
   "shareKey": "分享金鑰",
   "shareLink": "分享連結",
   "shareMemory": "分享回憶",
-  "shareMyVerificationID": "這是我在 ente.com 的驗證 ID：{verificationID}。",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "與 5 位成員共享空間",
-  "shareTextRecommendUsingEnteForFamily": "下載 Photovault，讓我可以將你加入我的家庭方案\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "下載 Photovault，讓我們輕鬆分享原始畫質的照片與影片\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "下載 Photovault，讓我可以將你加入我的家庭方案",
+  "shareTextRecommendUsingEnteForPhotos": "下載 Photovault，讓我們輕鬆分享原始畫質的照片與影片",
   "shareWithNonenteUsers": "與非 Photovault 使用者分享",
   "shareYourSubscription": "與摯愛分享您的訂閱",
   "sharing": "正在分享……",
@@ -2928,8 +2924,6 @@
   "subject": "主題",
   "submit": "送出",
   "subscribe": "訂閱",
-  "subscribeToChangeLinkSetting": "您需要付費訂閱才能更改此連結設定。",
-  "subscribeToEnableSharing": "您需要有效的付費訂閱才能啟用分享功能。",
   "subscription": "訂閱",
   "subWillBeCancelledOn": "您的訂閱將於 {endDate} 取消",
   "@subWillBeCancelledOn": {
@@ -3390,7 +3384,6 @@
   },
   "yourMap": "您的地圖",
   "yourPhotosLookUnique": "您的照片看起來都很獨特",
-  "yourPlanSupportsFamily": "您的方案已支援家庭功能",
   "yourPlanWasSuccessfullyDowngraded": "您的方案已成功降級",
   "yourPlanWasSuccessfullyUpgraded": "您的方案已成功升級",
   "yourPurchaseWasSuccessful": "您的購買已成功",

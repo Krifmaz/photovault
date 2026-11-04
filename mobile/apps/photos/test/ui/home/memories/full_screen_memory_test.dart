@@ -3,6 +3,7 @@ import "dart:convert";
 import "dart:io";
 
 import "package:dio/dio.dart";
+import "package:ente_components/ente_components.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -24,7 +25,6 @@ import "package:photos/services/memories/memory_music_controller.dart";
 import "package:photos/services/memories/memory_music_player.dart";
 import "package:photos/ui/home/memories/full_screen_memory.dart";
 import "package:photos/ui/home/memories/memory_music_session.dart";
-import "package:photos/ui/notification/update/change_log_page.dart";
 import "package:photos/ui/viewer/file/file_widget.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -160,7 +160,7 @@ void main() {
     expect(player.playing, isTrue);
 
     unawaited(
-      showChangeLogSheet(tester.element(find.byType(FullScreenMemory))),
+      _showPopupSheet(tester.element(find.byType(FullScreenMemory))),
     );
     await tester.pump();
     final pausedProgress = progress(tester);
@@ -172,7 +172,7 @@ void main() {
     expect(progress(tester), pausedProgress);
     expect(zoom(tester), pausedZoom);
 
-    Navigator.of(tester.element(find.byType(ChangeLogPage))).pop();
+    Navigator.of(tester.element(find.byType(_PopupSheet))).pop();
     await tester.pump();
     expect(progress(tester), pausedProgress);
     expect(media(tester).isActive, isTrue);
@@ -193,7 +193,7 @@ void main() {
     player.loadCompleted = loadCompleted.future;
     await openMemory(tester);
     unawaited(
-      showChangeLogSheet(tester.element(find.byType(FullScreenMemory))),
+      _showPopupSheet(tester.element(find.byType(FullScreenMemory))),
     );
     await tester.pump();
 
@@ -213,7 +213,7 @@ void main() {
       ),
     );
     await tester.pump();
-    Navigator.of(tester.element(find.byType(ChangeLogPage))).pop();
+    Navigator.of(tester.element(find.byType(_PopupSheet))).pop();
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
     expect(progress(tester), 0);
@@ -267,4 +267,20 @@ class _MemoryMusicPlayer implements MemoryMusicPlayer {
 
   @override
   Future<void> dispose() async {}
+}
+
+// PHOTOVAULT: the What's New sheet (ChangeLogPage) was removed; any bottom
+// sheet shown the same way exercises the same pause/resume behaviour.
+Future<void> _showPopupSheet(BuildContext context) async {
+  await showBottomSheetComponent<void>(
+    context: context,
+    builder: (context) => const _PopupSheet(),
+  );
+}
+
+class _PopupSheet extends StatelessWidget {
+  const _PopupSheet();
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(height: 200);
 }

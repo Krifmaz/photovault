@@ -7,8 +7,7 @@ import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:hugeicons/hugeicons.dart";
-import "package:photos/ui/settings/developer_settings_tap_area.dart";
-import "package:rive/rive.dart" as rive;
+import "package:photos/ui/photovault/photovault_glyph.dart";
 
 enum OnboardingIllustration {
   login("assets/onboarding_login.riv", 0.535, -30.8, 3.9),
@@ -80,6 +79,8 @@ class OnboardingPageScaffold extends StatefulWidget {
 
   // Only pin actions on pages that never show the keyboard.
   final bool pinActions;
+  // PHOTOVAULT: the 7-tap developer settings (custom endpoint) are removed;
+  // this flag is kept for upstream callers and ignored.
   final bool showDeveloperSettingsTapArea;
   final double bodyHorizontalPadding;
   final bool manageInputFocus;
@@ -102,9 +103,9 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
   static const double _footerSpacing = Spacing.lg;
   static const double _footerInset = Spacing.xxl;
 
-  rive.FileLoader? _fileLoader;
+  // PHOTOVAULT: branding. The Rive duck (file loader, view model, entry
+  // animation and pose triggers) is replaced by a static glyph.
   late final Widget _illustrationWidget;
-  rive.ViewModelInstance? _viewModel;
   String? _latestTrigger;
   Timer? _deferredTrigger;
   DateTime _entryCompletesAt = DateTime.now();
@@ -146,41 +147,17 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
     return inset + (Spacing.sm - inset) * _keyboardProgress;
   }
 
-  // Wait for entry to finish; interrupting it can freeze the pose.
+  // PHOTOVAULT: branding. Pose triggers are kept for upstream callers but
+  // do nothing (the glyph does not animate).
   void trigger(String name) {
     _latestTrigger = name;
-    if (_viewModel == null || _illustrationPausedAt != null) {
-      return;
-    }
-    _deferredTrigger?.cancel();
-    final remaining = _entryCompletesAt.difference(DateTime.now());
-    if (remaining <= Duration.zero) {
-      _trigger(name);
-      return;
-    }
-    _deferredTrigger = Timer(remaining, () {
-      if (mounted) _trigger(name);
-    });
   }
 
   @override
   void initState() {
     super.initState();
-    _fileLoader = _loadIllustration();
     _illustrationWidget = _buildIllustration();
     _scheduleContentMeasurement();
-  }
-
-  // Keep onboarding usable when the native Rive runtime is unavailable.
-  rive.FileLoader? _loadIllustration() {
-    try {
-      return rive.FileLoader.fromAsset(
-        widget.illustration.asset,
-        riveFactory: rive.Factory.flutter,
-      );
-    } catch (_) {
-      return null;
-    }
   }
 
   @override
@@ -220,8 +197,6 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
     );
     _userGestureInProgress?.removeListener(_onUserGestureChanged);
     _deferredTrigger?.cancel();
-    _viewModel = null;
-    _fileLoader?.dispose();
     super.dispose();
   }
 
@@ -271,36 +246,6 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
         input.bringIntoView(input.textEditingValue.selection.extent);
       }
     });
-  }
-
-  void _onLoaded(rive.RiveLoaded state) {
-    _viewModel = state.viewModelInstance;
-    final artboard = state.controller.artboard;
-    for (var i = 0; i < artboard.animationCount(); i++) {
-      final animation = artboard.animationAt(i);
-      if (animation.name.toLowerCase() == "entry") {
-        _entryDuration = Duration(
-          milliseconds: (animation.duration * 1000).round(),
-        );
-      }
-      animation.dispose();
-    }
-    _playEntry();
-    final latest = _latestTrigger;
-    if (latest != null) trigger(latest);
-  }
-
-  Duration _entryDuration = const Duration(seconds: 5);
-
-  void _playEntry() {
-    _entryCompletesAt = (_illustrationPausedAt ?? DateTime.now()).add(
-      _entryDuration,
-    );
-    _trigger("entry");
-  }
-
-  void _trigger(String name) {
-    _viewModel?.trigger(name)?.trigger();
   }
 
   void _onHeaderAnimationEnd() {
@@ -469,11 +414,11 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            Positioned.fill(
+            const Positioned.fill(
               bottom: -_cardRadius,
               // PHOTOVAULT: theme. Charcoal header (Encore) in both modes;
               // keeps the white back button readable.
-              child: const _OnboardingBackdrop(color: encoreLightAccent),
+              child: _OnboardingBackdrop(color: encoreLightAccent),
             ),
             if (hasHeaderBar)
               Positioned(
@@ -500,65 +445,59 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
                   ],
                 ),
               ),
-            if (_fileLoader != null)
-              Positioned(
-                top:
-                    mediaQuery.padding.top +
-                    illustration.topOffset * illustrationScale +
-                    (compactIllustrationScale > 0
-                        ? (visibleHeaderHeight - widget.headerHeight) *
-                              illustrationScale *
-                              0.18
-                        : 0),
-                left: 0,
-                right: 0,
-                height: illustration.height,
-                child: IgnorePointer(
-                  child: Visibility(
-                    visible: illustrationScale > 0,
-                    maintainState: true,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Transform.translate(
-                        offset: Offset(
-                          illustration.centerOffset * illustrationScale,
-                          0,
-                        ),
-                        child: Transform.scale(
-                          scale: illustrationScale,
-                          alignment: Alignment.topCenter,
-                          child: _illustrationWidget,
-                        ),
+            Positioned(
+              top:
+                  mediaQuery.padding.top +
+                  illustration.topOffset * illustrationScale +
+                  (compactIllustrationScale > 0
+                      ? (visibleHeaderHeight - widget.headerHeight) *
+                            illustrationScale *
+                            0.18
+                      : 0),
+              left: 0,
+              right: 0,
+              height: illustration.height,
+              child: IgnorePointer(
+                child: Visibility(
+                  visible: illustrationScale > 0,
+                  maintainState: true,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Transform.translate(
+                      offset: Offset(
+                        illustration.centerOffset * illustrationScale,
+                        0,
+                      ),
+                      child: Transform.scale(
+                        scale: illustrationScale,
+                        alignment: Alignment.topCenter,
+                        child: _illustrationWidget,
                       ),
                     ),
                   ),
                 ),
               ),
+            ),
           ],
         );
       },
     );
   }
 
+  // PHOTOVAULT: branding. Static Photovault glyph in Encore gold on the
+  // charcoal header, in the box Ente's Rive duck used; no animation.
   Widget _buildIllustration() {
-    if (_fileLoader == null) return const SizedBox.shrink();
-    return RepaintBoundary(
-      child: SizedBox(
-        width: widget.illustration.width,
-        height: widget.illustration.height,
-        child: rive.RiveWidgetBuilder(
-          fileLoader: _fileLoader!,
-          dataBind: rive.DataBind.auto(),
-          onLoaded: _onLoaded,
-          builder: (context, state) {
-            if (state is rive.RiveLoaded) {
-              return rive.RiveWidget(
-                controller: state.controller,
-                fit: rive.Fit.contain,
-              );
-            }
-            return const SizedBox.shrink();
-          },
+    final glyphSize = widget.illustration.height * 0.42;
+    return SizedBox(
+      width: widget.illustration.width,
+      height: widget.illustration.height,
+      child: Align(
+        alignment: const Alignment(0, -0.1),
+        child: PhotovaultGlyph(
+          width: glyphSize,
+          height: glyphSize,
+          scale: 1,
+          color: encoreDarkAccent2,
         ),
       ),
     );
@@ -606,12 +545,7 @@ class OnboardingPageScaffoldState extends State<OnboardingPageScaffold> {
       overflow: TextOverflow.ellipsis,
       style: TextStyles.display2.copyWith(color: colors.textBase),
     );
-    final titleContent = widget.showDeveloperSettingsTapArea
-        ? DeveloperSettingsTapArea(
-            behavior: HitTestBehavior.translucent,
-            child: title,
-          )
-        : title;
+    final titleContent = title; // PHOTOVAULT: no developer settings tap area
     final isKeyboardOpen = mediaQuery.viewInsets.bottom > 0;
     final hasPinnedFooter =
         widget.actions.isNotEmpty && (widget.pinActions || isKeyboardOpen);

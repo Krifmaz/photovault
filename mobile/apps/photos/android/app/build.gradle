@@ -1,13 +1,9 @@
 plugins {
-    id "com.google.gms.google-services" version "4.4.4" apply false
+    // PHOTOVAULT: de-Google. The Google services plugin (Firebase) is removed.
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.20'
-}
-
-if (file("google-services.json").exists()) {
-    apply plugin: "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -29,7 +25,9 @@ if (flutterVersionName == null) {
 }
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
+// PHOTOVAULT: signing. A key.properties path can also come from
+// $PHOTOVAULT_KEY_PROPERTIES (e.g. the signing folder outside the repo).
+def keystorePropertiesFile = System.getenv("PHOTOVAULT_KEY_PROPERTIES") ? file(System.getenv("PHOTOVAULT_KEY_PROPERTIES")) : rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -71,7 +69,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.ente.photos"
+        // PHOTOVAULT: package id. Namespace and Kotlin packages stay io.ente.photos.
+        applicationId = "app.photovault"
         minSdk = 26
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -94,17 +93,16 @@ android {
     }
 
     flavorDimensions "default"
+    // PHOTOVAULT: de-Google. `independent` is the flavor we build and has no
+    // suffix, so release is exactly app.photovault (debug: app.photovault.debug).
+    // The Play Store flavor is removed.
     productFlavors {
         independent {
             dimension "default"
-            applicationIdSuffix ".independent"
         }
         dev {
             dimension "default"
             applicationIdSuffix ".dev"
-        }
-        playstore {
-            dimension "default"
         }
         fdroid {
             dimension "default"
@@ -118,7 +116,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // PHOTOVAULT: signing. Without a release key (no key.properties and
+            // no SIGNING_* env vars) fall back to the debug key, e.g. in CI forks.
+            signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile(
                 "proguard-android-optimize.txt",

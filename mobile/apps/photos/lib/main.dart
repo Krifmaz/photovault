@@ -13,7 +13,6 @@ import "package:ente_lock_screen/ui/lock_screen.dart";
 import "package:ente_pure_utils/ente_pure_utils.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:ente_ui/theme/theme_config.dart" as ente_ui;
-import 'package:flutter/foundation.dart';
 import "package:flutter/gestures.dart";
 import 'package:flutter/material.dart';
 import "package:flutter/rendering.dart";
@@ -27,7 +26,6 @@ import "package:package_info_plus/package_info_plus.dart";
 import 'package:path_provider/path_provider.dart';
 import 'package:photos/app.dart';
 import 'package:photos/core/configuration.dart';
-import 'package:photos/core/constants.dart';
 import 'package:photos/core/error-reporting/super_logging.dart';
 import 'package:photos/core/errors.dart';
 import 'package:photos/core/event_bus.dart';
@@ -40,7 +38,6 @@ import "package:photos/locale.dart";
 import 'package:photos/module/upload/service/file_uploader.dart';
 import 'package:photos/module/upload/service/local_file_update_service.dart';
 import "package:photos/service_locator.dart";
-import "package:photos/services/account/purchase_update_listener.dart";
 import "package:photos/services/account/user_service.dart";
 import 'package:photos/services/app_lifecycle_service.dart';
 import 'package:photos/services/collections_service.dart';
@@ -55,6 +52,7 @@ import 'package:photos/services/memory_lane/memory_lane_service.dart';
 import 'package:photos/services/memory_share_service.dart';
 import "package:photos/services/notification_service.dart";
 import "package:photos/services/photos_contacts_service.dart";
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
 import "package:photos/services/process_activity.dart";
 import 'package:photos/services/push_service.dart';
 import 'package:photos/services/search_service.dart';
@@ -68,10 +66,8 @@ import "package:photos/src/rust/frb_generated.dart";
 import 'package:photos/ui/wallpaper/wallpaper_page.dart';
 import "package:photos/utils/bg_task_utils.dart";
 import "package:photos/utils/device_info.dart";
-import "package:photos/utils/email_util.dart";
 import "package:photos/utils/intent_util.dart";
 import "package:photos/utils/photos_crypto_api_adapter.dart";
-import 'package:rive/rive.dart' as rive;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final _logger = Logger("main");
@@ -108,7 +104,7 @@ Future<void> wallpaperMain() => runWallpaperApp();
 void main() async {
   debugRepaintRainbowEnabled = false;
   WidgetsFlutterBinding.ensureInitialized();
-  await configureStoreKit();
+  // PHOTOVAULT: payments removed (no StoreKit purchase listener).
   ente_ui.AppThemeConfig.initialize(ente_ui.EnteApp.photos);
   await initIsIPad();
   if (isIPad) {
@@ -125,7 +121,8 @@ void main() async {
       }
     });
   }
-  await rive.RiveNative.init();
+  // PHOTOVAULT: branding. Rive (only used for Ente's mascot animations) is
+  // removed, so there is no RiveNative.init().
   MediaKit.ensureInitialized();
 
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
@@ -321,6 +318,17 @@ Future<void> _runMinimally(
       NetworkClient.instance.downloadDio,
       packageInfo,
     );
+    // PHOTOVAULT: server connection. Pick the home or public address before
+    // background backup talks to the server.
+    PhotovaultServerService.instance.init(
+      prefs,
+      endpointConfig,
+      watchNetwork: false,
+    );
+    await PhotovaultServerService.instance.refreshAddress().timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {},
+    );
     MLDataDB.initialize(
       preferRust: flagService.rustMlDb || localSettings.rustMlDbOverride,
     );
@@ -360,7 +368,7 @@ Future<void> _runMinimally(
 
     if (shouldStop?.call() ?? false) return;
     _logger.info("[BG TASK] update notification");
-    updateService.showUpdateNotification().ignore();
+    // PHOTOVAULT: removed Ente's self-update notification (ente.com).
     _logger.info("[BG TASK] sync starting");
     await _sync('bgTaskActiveProcess');
     _logger.info("[BG TASK] sync completed");
@@ -449,12 +457,9 @@ Future<void> _init(
     final TimeLogger tlog = TimeLogger();
     Future.delayed(const Duration(seconds: 15), () {
       if (!initComplete && !isBackground) {
+        // PHOTOVAULT: no Ente support (Ente opened a mail to its support
+        // address with the logs here).
         _logger.severe("Stuck on splash screen for >= 15 seconds");
-        triggerSendLogs(
-          "support@ente.com",
-          "Stuck on splash screen for >= 15 seconds on ${Platform.operatingSystem}",
-          null,
-        );
       }
     });
     if (!isBackground) _heartBeatOnInit(0);
@@ -491,6 +496,23 @@ Future<void> _init(
       NetworkClient.instance.downloadDio,
       packageInfo,
     );
+
+    // PHOTOVAULT: server connection. Home/public address choice on start and
+    // on every connectivity change (foreground); awaited in the background so
+    // backup uses the right address.
+    PhotovaultServerService.instance.init(
+      preferences,
+      endpointConfig,
+      watchNetwork: !isBackground,
+    );
+    if (isBackground) {
+      await PhotovaultServerService.instance.refreshAddress().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {},
+      );
+    } else {
+      unawaited(PhotovaultServerService.instance.refreshAddress());
+    }
 
     if (!isBackground) {
       await localSettings.migrateGalleryLayoutPreferences();
@@ -696,19 +718,13 @@ Future<void> _sync(String caller) async {
   }
 }
 
-Future runWithLogs(
-  Function() function, {
-  String prefix = "",
-  Duration? sentryInitTimeout,
-}) async {
+Future runWithLogs(Function() function, {String prefix = ""}) async {
+  // PHOTOVAULT: telemetry removed (no Sentry DSN, tunnel or init timeout).
   await SuperLogging.main(
     LogConfig(
       body: function,
       logDirPath: (await getApplicationSupportDirectory()).path + "/logs",
       maxLogFiles: 5,
-      sentryDsn: kDebugMode ? sentryDebugDSN : sentryDSN,
-      tunnel: sentryTunnel,
-      sentryInitTimeout: sentryInitTimeout,
       enableInDebugMode: true,
       prefix: prefix,
     ),

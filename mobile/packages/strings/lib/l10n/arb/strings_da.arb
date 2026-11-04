@@ -596,7 +596,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "Valgte elementer vil blive fjernet fra dette album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Det ser ud til at noget gik galt. Forsøg venligst igen efter lidt tid. Hvis fejlen varer ved, kontakt da venligst support.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -659,11 +658,9 @@
   "mlConsent": "Aktiver maskinlæring",
   "moments": "Øjeblikke",
   "name": "Navn",
-  "networkConnectionRefusedErr": "Ude af stand til at forbinde til Photovault. Forsøg igen efter et stykke tid. Hvis fejlen varer ved, kontakt da venligst support.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Ude af stand til at forbinde til Photovault. Tjek venligst dine netværksindstillinger og kontakt support hvis fejlen varer ved.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1015,7 +1012,6 @@
     "description": "Strong password strength label"
   },
   "subscribe": "Abonner",
-  "subscribeToEnableSharing": "Du skal have et aktivt betalt abonnement for at aktivere deling.",
   "subscriptionRequiredForSharing": "Du har brug for et betalt abonnement for at dele links",
   "success": "Succes",
   "suggestFeatures": "Foreslå funktioner",
@@ -1024,7 +1020,6 @@
   "@tapToUnlock": {
     "description": "Message prompting user to tap to unlock"
   },
-  "tempErrorContactSupportIfPersists": "Det ser ud til at noget gik galt. Forsøg venligst igen efter lidt tid. Hvis fejlen varer ved, kontakt da venligst vores support.",
   "terminateSession": "Afslut session?",
   "@terminateSession": {
     "description": "Title for terminate session dialog"

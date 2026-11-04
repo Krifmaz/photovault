@@ -19,13 +19,11 @@ import "package:photos/services/machine_learning/ml_service.dart";
 import "package:photos/services/machine_learning/semantic_search/semantic_search_service.dart";
 import 'package:photos/services/sync/sync_service.dart';
 import "package:photos/theme/ente_theme.dart";
-import "package:photos/ui/common/web_page.dart";
 import "package:photos/ui/components/alert_bottom_sheet.dart";
 import "package:photos/ui/components/buttons/button_widget_v2.dart";
 import "package:photos/ui/notification/toast.dart";
+import "package:photos/ui/photovault/photovault_glyph.dart";
 import "package:photos/utils/dialog_util.dart";
-import "package:rive/rive.dart" as rive;
-import "package:styled_text/styled_text.dart";
 
 class GrantPermissionsWidget extends StatefulWidget {
   const GrantPermissionsWidget({super.key, this.startWithoutAccount = false});
@@ -44,7 +42,6 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
     const Duration(milliseconds: 500),
     leading: true,
   );
-  late final rive.FileLoader _permissionsAnimationLoader;
 
   // PHOTOVAULT: branding. Wider "Photovault" wordmark (Ente: 50).
   static const double _logoWidth = 96;
@@ -52,10 +49,6 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
   @override
   void initState() {
     super.initState();
-    _permissionsAnimationLoader = rive.FileLoader.fromAsset(
-      "assets/home_tab.riv",
-      riveFactory: rive.Factory.flutter,
-    );
     WidgetsBinding.instance.addObserver(this);
     unawaited(_enterLocalGalleryIfPermitted());
   }
@@ -63,7 +56,6 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _permissionsAnimationLoader.dispose();
     _onlyNewActionDebouncer.cancelDebounceTimer();
     super.dispose();
   }
@@ -221,19 +213,9 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
     );
   }
 
+  // PHOTOVAULT: branding. Static glyph instead of Ente's Rive duck.
   Widget _buildPermissionsAnimation() {
-    return rive.RiveWidgetBuilder(
-      fileLoader: _permissionsAnimationLoader,
-      builder: (BuildContext context, rive.RiveState state) {
-        if (state is rive.RiveLoaded) {
-          return rive.RiveWidget(
-            controller: state.controller,
-            fit: rive.Fit.contain,
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    );
+    return const PhotovaultGlyph(width: 155, height: 168);
   }
 
   Future<void> _onTapOnlyNewPhotos() async {
@@ -496,8 +478,7 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
                           shouldShowSuccessState: false,
                           onTap: _onTapOfflineGrantPermission,
                         ),
-                        const Flexible(child: SizedBox(height: 42)),
-                        _buildOfflineTermsAndPrivacy(context),
+                        // PHOTOVAULT: removed Ente's terms/privacy links.
                         const Flexible(child: SizedBox(height: 24)),
                       ],
                     ),
@@ -508,55 +489,6 @@ class _GrantPermissionsWidgetState extends State<GrantPermissionsWidget>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildOfflineTermsAndPrivacy(BuildContext context) {
-    final colorScheme = getEnteColorScheme(context);
-    final textStyle = TextStyles.body.copyWith(
-      color: colorScheme.contentLight.withValues(alpha: 0.8),
-    );
-
-    return StyledText(
-      text: context.strings.byAgreeing,
-      textAlign: TextAlign.center,
-      style: textStyle,
-      tags: {
-        'terms': StyledTextActionTag(
-          (String? text, Map<String?, String?> attrs) =>
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return WebPage(
-                      context.strings.termsOfServicesTitle,
-                      "https://ente.com/terms",
-                    );
-                  },
-                ),
-              ),
-          style: textStyle.copyWith(
-            decoration: TextDecoration.underline,
-            decorationColor: textStyle.color,
-          ),
-        ),
-        'policy': StyledTextActionTag(
-          (String? text, Map<String?, String?> attrs) =>
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return WebPage(
-                      context.strings.privacyPolicyTitle,
-                      "https://ente.com/privacy",
-                    );
-                  },
-                ),
-              ),
-          style: textStyle.copyWith(
-            decoration: TextDecoration.underline,
-            decorationColor: textStyle.color,
-          ),
-        ),
-      },
     );
   }
 

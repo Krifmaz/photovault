@@ -1015,7 +1015,6 @@
   "localBackupDailyManualCopy": "يتم إنشاء نسخة احتياطية محلية كل يوم عند فتح التطبيق. استخدم «انسخ احتياطيًا الآن» لتشغيل النسخ الاحتياطي اليدوي. يتم الحفاظ على ما يصل إلى 5 نسخ.",
   "localBackupSidebarTitle": "النسخ الاحتياطي المحلي",
   "localGallery": "المعرض المحلي",
-  "localSyncErrorMessage": "يبدو أن خطأً ما قد حدث لأن مزامنة الصور المحلية تستغرق وقتًا أطول من المتوقع. يرجى التواصل مع فريق الدعم لدينا.",
   "location": "الموقع",
   "locationName": "اسم الموقع",
   "locations": "المواقع",
@@ -1040,7 +1039,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "تسجيل الخروج",
-  "logsDialogBody": "سيؤدي هذا إلى إرسال السجلات لمساعدتنا في تصحيح مشكلتك. يرجى ملاحظة أنه سيتم تضمين أسماء الملفات للمساعدة في تتبع المشكلات المتعلقة بملفات معينة.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1330,7 +1328,6 @@
   "playOriginal": "تشغيل الأصلي",
   "playstoreSubscription": "اشتراك متجر Play",
   "playStream": "تشغيل البث",
-  "pleaseContactSupportIfTheProblemPersists": "يرجى الاتصال بالدعم إذا استمرت المشكلة.",
   "pleaseEmailUsAt": "يرجى مراسلتنا عبر البريد الإلكتروني على {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -1816,7 +1813,6 @@
   "storageLimitExceeded": "تم تجاوز حد التخزين",
   "streamDetails": "تفاصيل البث",
   "subscribe": "اشتراك",
-  "subscribeToEnableSharing": "المشاركة متاحة فقط للاشتراكات المدفوعة النشطة.",
   "subscription": "الاشتراك",
   "subscriptionRequiredForSharing": "تحتاج إلى اشتراك مدفوع لمشاركة الروابط",
   "subWillBeCancelledOn": "سيتم إلغاء اشتراكك في {endDate}",

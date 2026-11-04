@@ -23,8 +23,6 @@ import 'package:photos/services/sync/sync_service.dart';
 import "package:photos/theme/ente_theme.dart";
 import 'package:photos/ui/account/verify_recovery_page.dart';
 import 'package:photos/ui/components/home_header_widget.dart';
-import 'package:photos/ui/home/christmas/christmas_lights_banner.dart';
-import 'package:photos/ui/home/christmas/christmas_utils.dart';
 import 'package:photos/ui/home/header_error_widget.dart';
 import "package:photos/ui/home/large_backup_screen.dart";
 import "package:photos/ui/settings/backup/backup_settings_screen.dart";
@@ -120,7 +118,7 @@ class _StatusBarWidgetState extends State<StatusBarWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (isChristmasPeriod()) const ChristmasLightsBanner(),
+        // PHOTOVAULT: removed Ente's seasonal Christmas lights banner (Rive).
         HomeHeaderWidget(
           centerWidget: _showStatus && !_showErrorBanner
               ? GestureDetector(

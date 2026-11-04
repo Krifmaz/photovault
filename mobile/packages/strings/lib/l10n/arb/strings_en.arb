@@ -743,7 +743,7 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "I understand this deletes my data across Photovault, Ente Auth, and Ente Locker.",
+  "confirmDeleteAccountAcrossApps": "I understand this permanently deletes my account and all of its data on this server.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -1144,7 +1144,7 @@
   "doubleTapToViewHiddenCode": "You can double tap on an entry to view code",
   "download": "Download",
   "downloadApplicationUpdate": "Download update",
-  "downloadDecryptionFailedMessage": "This item could not be downloaded. Please reach out to us so we can help.",
+  "downloadDecryptionFailedMessage": "This item could not be downloaded. Please export the logs and share them with your server administrator.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -2161,7 +2161,7 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "Selected items will be removed from this album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "It looks like something went wrong. Please retry after some time. If the error persists, please contact our support team.",
+  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "It looks like something went wrong. Please retry after some time. If the error persists, ask your server administrator.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2469,7 +2469,7 @@
   "localBackupSidebarTitle": "Local backup",
   "localGallery": "Local gallery",
   "localIndexing": "Local processing",
-  "localSyncErrorMessage": "Looks like something went wrong since local photos sync is taking more time than expected. Please reach out to our support team",
+  "localSyncErrorMessage": "Looks like something went wrong since local photos sync is taking more time than expected. Please export the logs and share them with your server administrator.",
   "location": "Location",
   "locationName": "Location name",
   "locationPickerTip": "You can also add a location centered on a photo from the photo's info screen",
@@ -2512,7 +2512,8 @@
   "@loginTerms": {
     "description": "Terms agreement text for login"
   },
-  "loginToEnte": "Login to Photovault",
+  "loginToEnte": "Log in to Photovault",
+  "askServerAdminToReset2fa": "Ask the administrator of your Photovault server to reset two-factor authentication for your account.",
   "loginToExistingAccount": "Login to existing account",
   "loginWithAuthAccount": "Login with your Auth account",
   "loginWithTOTP": "Login with TOTP",
@@ -2521,7 +2522,7 @@
   },
   "logout": "Logout",
   "logs": "Logs",
-  "logsDialogBody": "This will send across logs to help us debug your issue. Please note that file names will be included to help track issues with specific files.",
+  "logsDialogBody": "This will export the app's logs so you can share them with your server administrator. Please note that file names will be included to help track issues with specific files.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2674,7 +2675,7 @@
     }
   },
   "mlIndexingDescription": "Please note that machine learning will result in higher bandwidth and battery usage until all items are processed. Consider using the desktop app for faster processing, and all results will be synced automatically.",
-  "mlItemsCouldNotBeProcessed": "{count, plural, one{{count} item could not be processed for machine learning. Please reach out to us so we can help.} other{{count} items could not be processed for machine learning. Please reach out to us so we can help.}}",
+  "mlItemsCouldNotBeProcessed": "{count, plural, one{{count} item could not be processed for machine learning. Please export the logs and share them with your server administrator.} other{{count} items could not be processed for machine learning. Please export the logs and share them with your server administrator.}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -2683,7 +2684,7 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "Please reach out to us so we can help.",
+  "mlProcessingIssueReachOut": "Please export the logs and share them with your server administrator.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2765,11 +2766,11 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Unable to connect to Photovault, please retry after sometime. If the error persists, please contact support.",
+  "networkConnectionRefusedErr": "Unable to connect to your server, please retry after some time. If the error persists, ask your server administrator.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Unable to connect to Photovault, please check your network settings and contact support if the error persists.",
+  "networkHostLookUpErr": "Unable to connect to your server, please check your network settings and ask your server administrator if the error persists.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2942,7 +2943,7 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "You have one account across Photovault, Ente Auth, and Ente Locker.",
+  "oneAccountAcrossEnteApps": "Your account and all of its data will be deleted from this Photovault server.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -3211,7 +3212,7 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Please contact support@ente.com and we will be happy to help!",
-  "pleaseContactSupportIfTheProblemPersists": "Please contact support if the problem persists",
+  "pleaseContactSupportIfTheProblemPersists": "Please ask your server administrator if the problem persists",
   "pleaseEmailUsAt": "Please email us at {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -4259,7 +4260,7 @@
     "description": "Subtitle for sending a viewing link to the current photo or video from the file viewer"
   },
   "shareMemory": "Share memory",
-  "shareMyVerificationID": "Here's my verification ID: {verificationID} for ente.com.",
+  "shareMyVerificationID": "Here's my Photovault verification ID: {verificationID}",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -4267,15 +4268,15 @@
   },
   "shareNotSupportedForSharedFiles": "Share is not supported for shared files",
   "shareStorageWith5Members": "Share storage with 5 members",
-  "shareTextConfirmOthersVerificationID": "Hey, can you confirm that this is your ente.com verification ID: {verificationID}",
+  "shareTextConfirmOthersVerificationID": "Hey, can you confirm that this is your Photovault verification ID: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos",
   "shareTextReferralInvite": "Get 20 GB free with Photovault! Download the app at https://ente.com/invite and use code {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -4484,8 +4485,8 @@
   "subject": "Subject",
   "submit": "Submit",
   "subscribe": "Subscribe",
-  "subscribeToChangeLinkSetting": "You need a paid subscription to change this link setting.",
-  "subscribeToEnableSharing": "You need an active paid subscription to enable sharing.",
+  "subscribeToChangeLinkSetting": "Your account on this server does not allow changing this link setting. Ask your server administrator.",
+  "subscribeToEnableSharing": "Your account on this server does not allow sharing. Ask your server administrator.",
   "subscriptionLearnMore": "Learn more",
   "subscriptionCurrentPlan": "Current plan",
   "subscriptionFaqDescription": "Your questions, answered",
@@ -4572,7 +4573,7 @@
     }
   },
   "tellUsWhatYouThink": "Tell us what you think",
-  "tempErrorContactSupportIfPersists": "It looks like something went wrong. Please retry after some time. If the error persists, please contact our support team.",
+  "tempErrorContactSupportIfPersists": "It looks like something went wrong. Please retry after some time. If the error persists, ask your server administrator.",
   "terminate": "Terminate",
   "@terminate": {
     "description": "Terminate button label"
@@ -5121,7 +5122,7 @@
   },
   "yourMap": "Your map",
   "yourPhotosLookUnique": "Your photos look unique",
-  "yourPlanSupportsFamily": "Your plan already supports a family",
+  "yourPlanSupportsFamily": "Your account already supports a family",
   "yourPlanWasSuccessfullyDowngraded": "Your plan was successfully downgraded",
   "yourPlanWasSuccessfullyUpgraded": "Your plan was successfully upgraded",
   "yourPurchaseWasSuccessful": "Your purchase was successful",
@@ -5305,5 +5306,5 @@
     }
   },
   "notEnoughStorageTitle": "Not enough storage",
-  "notEnoughStorageBody": "You do not have enough free space on Photovault to add new photos. Free up space or upgrade to keep adding."
+  "notEnoughStorageBody": "You do not have enough free space on Photovault to add new photos. Free up space to keep adding."
 }

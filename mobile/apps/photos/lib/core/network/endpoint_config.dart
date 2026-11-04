@@ -8,10 +8,14 @@ class EndpointConfig {
 
   final SharedPreferences _preferences;
 
-  static const defaultEndpoint = String.fromEnvironment(
-    "endpoint",
-    defaultValue: kDefaultProductionEndpoint,
-  );
+  // PHOTOVAULT: server connection. Built-in server chosen at build time with
+  // --dart-define=PHOTOVAULT_SERVER=<url> (Ente's `endpoint` define still
+  // works). Empty means none: the "Connect to your server" screen asks for
+  // one, and Ente's production endpoint is never a default.
+  static const _photovaultServer = String.fromEnvironment("PHOTOVAULT_SERVER");
+  static const defaultEndpoint = _photovaultServer != ""
+      ? _photovaultServer
+      : String.fromEnvironment("endpoint");
   static const preferencesKey = "endpoint";
 
   String get endpoint {
@@ -20,9 +24,11 @@ class EndpointConfig {
     );
   }
 
-  bool get isProduction {
-    return endpoint == kDefaultProductionEndpoint;
-  }
+  // PHOTOVAULT: never Ente's production service. Upstream gates Ente-only
+  // behaviour on this (Cloudflare upload proxy and "faster uploads" toggle,
+  // free-plan family upsell, strict logout); Photovault always talks to a
+  // self-hosted server.
+  bool get isProduction => false;
 
   Future<void> setEndpoint(String endpoint) async {
     await _preferences.setString(preferencesKey, endpoint);

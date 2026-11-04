@@ -326,8 +326,7 @@ class BackgroundTasks {
           ?task.stopReason?.name,
         ]);
       },
-      prefix: "[bg]",
-      sentryInitTimeout: const Duration(seconds: 5),
+      prefix: "[bg]", // PHOTOVAULT: telemetry removed (Sentry init timeout)
     );
     return result;
   }

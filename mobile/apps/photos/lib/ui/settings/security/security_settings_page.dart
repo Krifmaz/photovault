@@ -13,7 +13,6 @@ import "package:hugeicons/hugeicons.dart";
 import "package:local_auth/local_auth.dart";
 import "package:logging/logging.dart";
 import "package:photos/core/configuration.dart";
-import "package:photos/core/error-reporting/super_logging.dart";
 import "package:photos/core/event_bus.dart";
 import "package:photos/events/user_details_changed_event.dart";
 import "package:photos/models/user_details.dart";
@@ -96,22 +95,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           icon: HugeIcons.strokeRoundedSquareLock02,
           onTap: () async => _onAppLockTap(context),
         ),
-        const SizedBox(height: 8),
-        SettingsItem(
-          title: l10n.crashReporting,
-          icon: HugeIcons.strokeRoundedBug02,
-          trailing: ToggleSwitchComponent.async(
-            value: () => SuperLogging.shouldReportCrashes(),
-            onChanged: () async {
-              await SuperLogging.setShouldReportCrashes(
-                !SuperLogging.shouldReportCrashes(),
-              );
-              if (mounted) {
-                setState(() {});
-              }
-            },
-          ),
-        ),
+        // PHOTOVAULT: telemetry removed (the "Crash reporting" toggle).
         if (showAccountSecurity) ...[
           const SizedBox(height: 8),
           SettingsItem(

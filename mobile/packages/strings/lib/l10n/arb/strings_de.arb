@@ -742,7 +742,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Ich verstehe, dass dadurch meine Daten in Photovault, Ente Auth und Ente Locker gelöscht werden.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -1143,7 +1142,6 @@
   "doubleTapToViewHiddenCode": "Sie können auf einen Eintrag doppelt tippen, um den Code anzuzeigen",
   "download": "Herunterladen",
   "downloadApplicationUpdate": "Aktualisierung herunterladen",
-  "downloadDecryptionFailedMessage": "Dieses Element konnte nicht heruntergeladen werden. Bitte kontaktiere uns, damit wir helfen können.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -2293,7 +2291,6 @@
   "localBackupSidebarTitle": "Lokale Sicherung",
   "localGallery": "Lokale Galerie",
   "localIndexing": "Lokale Verarbeitung",
-  "localSyncErrorMessage": "Es sieht so aus, als ob etwas schiefgelaufen ist, da die lokale Foto-Synchronisierung länger dauert als erwartet. Bitte kontaktiere unser Support-Team",
   "location": "Standort",
   "locationName": "Standortname",
   "locationPickerTip": "Du kannst auch vom Infobildschirm eines Fotos aus einen Ort zentriert um das Foto hinzufügen",
@@ -2345,7 +2342,6 @@
   },
   "logout": "Ausloggen",
   "logs": "Protokolle",
-  "logsDialogBody": "Dies wird über Logs gesendet, um uns zu helfen, Ihr Problem zu beheben. Bitte beachten Sie, dass Dateinamen aufgenommen werden, um Probleme mit bestimmten Dateien zu beheben.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2497,7 +2493,6 @@
     }
   },
   "mlIndexingDescription": "Bitte beachte, dass das maschinelle Lernen zu einem höheren Daten- und Akkuverbrauch führen wird, bis alle Elemente indiziert sind. Du kannst die Desktop-App für eine schnellere Indizierung verwenden, alle Ergebnisse werden automatisch synchronisiert.",
-  "mlItemsCouldNotBeProcessed": "{count, plural, one{Ein Element konnte nicht für das maschinelle Lernen verarbeitet werden. Bitte kontaktiere uns, damit wir helfen können.} other{{count} Elemente konnten nicht für das maschinelle Lernen verarbeitet werden. Bitte kontaktiere uns, damit wir helfen können.}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -2506,7 +2501,6 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "Bitte kontaktiere uns, damit wir helfen können.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2588,11 +2582,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Photovault ist im Moment nicht erreichbar. Bitte versuchen Sie es später erneut. Sollte das Problem bestehen bleiben, wenden Sie sich bitte an den Support.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Photovault ist im Moment nicht erreichbar. Bitte überprüfen Sie Ihre Netzwerkeinstellungen. Sollte das Problem bestehen bleiben, wenden Sie sich bitte an den Support.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2760,7 +2752,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Sie haben ein einziges Konto für Photovault, Ente Auth und Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -3013,7 +3004,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Bitte kontaktiere support@ente.com und wir helfen dir gerne!",
-  "pleaseContactSupportIfTheProblemPersists": "Bitte wenden Sie sich an den Support, falls das Problem weiterhin besteht",
   "pleaseEmailUsAt": "Bitte sende uns eine E-Mail an {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3984,7 +3974,6 @@
     "description": "Subtitle for sending a viewing link to the current photo or video from the file viewer"
   },
   "shareMemory": "Erinnerung teilen",
-  "shareMyVerificationID": "Hier ist meine Verifizierungs-ID: {verificationID} für ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3992,15 +3981,14 @@
   },
   "shareNotSupportedForSharedFiles": "Freigabe wird für freigegebene Dateien nicht unterstützt",
   "shareStorageWith5Members": "Teile Speicher mit 5 Mitgliedern",
-  "shareTextConfirmOthersVerificationID": "Hey, kannst du bestätigen, dass dies deine ente.com Verifizierungs-ID ist: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Laden Sie Photovault herunter, damit wir problemlos Dateien in Originalqualität freigeben können https://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Lade Photovault herunter, damit ich dich zu meinem Familientarif hinzufügen kann\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Hol dir Photovault, damit wir ganz einfach Fotos und Videos in Originalqualität teilen können\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Laden Sie Photovault herunter, damit wir problemlos Dateien in Originalqualität freigeben können",
+  "shareTextRecommendUsingEnteForFamily": "Lade Photovault herunter, damit ich dich zu meinem Familientarif hinzufügen kann",
+  "shareTextRecommendUsingEnteForPhotos": "Hol dir Photovault, damit wir ganz einfach Fotos und Videos in Originalqualität teilen können",
   "shareTextReferralInvite": "Erhalte 20 GB kostenlos mit Photovault! Lade die App unter https://ente.com/invite herunter und nutze den Code {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -4209,8 +4197,6 @@
   "subject": "Betreff",
   "submit": "Abschicken",
   "subscribe": "Abonnieren",
-  "subscribeToChangeLinkSetting": "Du benötigst ein kostenpflichtiges Abonnement, um diese Link-Einstellung zu ändern.",
-  "subscribeToEnableSharing": "Du benötigst ein aktives, bezahltes Abonnement, um das Teilen zu aktivieren.",
   "subscription": "Abonnement",
   "subscriptionRequiredForSharing": "Du benötigst ein kostenpflichtiges Abonnement, um Links zu teilen",
   "subWillBeCancelledOn": "Dein Abo endet am {endDate}",
@@ -4268,7 +4254,6 @@
     }
   },
   "tellUsWhatYouThink": "Sagen Sie uns, was Sie denken",
-  "tempErrorContactSupportIfPersists": "Es sieht so aus, als sei etwas schiefgelaufen. Bitte versuchen Sie es nach einiger Zeit erneut. Wenn der Fehler weiterhin besteht, wenden Sie sich bitte an unsere Kundenbetreuung.",
   "terminate": "Beenden",
   "@terminate": {
     "description": "Terminate button label"
@@ -4753,7 +4738,6 @@
   },
   "yourMap": "Deine Karte",
   "yourPhotosLookUnique": "Deine Fotos sehen einzigartig aus",
-  "yourPlanSupportsFamily": "Dein Tarif unterstützt bereits eine Familie",
   "yourPlanWasSuccessfullyDowngraded": "Dein Tarif wurde erfolgreich heruntergestuft",
   "yourPlanWasSuccessfullyUpgraded": "Dein Abo wurde erfolgreich hochgestuft",
   "yourPurchaseWasSuccessful": "Dein Einkauf war erfolgreich",
@@ -4888,6 +4872,5 @@
       }
     }
   },
-  "notEnoughStorageTitle": "Zu wenig Speicherplatz",
-  "notEnoughStorageBody": "Du hast nicht genug freien Speicherplatz auf Photovault, um neue Fotos hinzuzufügen. Gib Speicherplatz frei oder führe ein Upgrade durch, um weitere hinzuzufügen."
+  "notEnoughStorageTitle": "Zu wenig Speicherplatz"
 }

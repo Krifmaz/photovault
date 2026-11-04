@@ -1498,7 +1498,6 @@
   "localBackupSidebarTitle": "Локальна резервна копія",
   "localGallery": "Локальна галерея",
   "localIndexing": "Локальна обробка",
-  "localSyncErrorMessage": "Схоже, щось пішло не так, оскільки локальна синхронізація фотографій займає більше часу, ніж очікувалося. Зверніться до нашої служби підтримки",
   "location": "Розташування",
   "locationName": "Назва місце розташування",
   "locations": "Розташування",
@@ -1526,7 +1525,6 @@
   },
   "logout": "Вийти",
   "logs": "Журнали",
-  "logsDialogBody": "Це призведе до надсилання журналів, які допоможуть нам усунути вашу проблему. Зверніть увагу, що назви файлів будуть включені, щоби допомогти відстежувати проблеми з конкретними файлами.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1646,7 +1644,6 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не вдалося під'єднатися до Photovault. Спробуйте знову через деякий час. Якщо помилка не зникне, зв'яжіться з нашою командою підтримки.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
@@ -1928,7 +1925,6 @@
   "playstoreSubscription": "Передплата Play Store",
   "playStream": "Відтворити потік",
   "pleaseCheckPasswordAndTryAgain": "Будь ласка, перевірте пароль і спробуйте ще раз.",
-  "pleaseContactSupportIfTheProblemPersists": "Зверніться до служби підтримки, якщо проблема не зникне",
   "pleaseEmailUsAt": "Напишіть нам на {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2565,7 +2561,7 @@
   "sharedWith": "Поділено з",
   "shareLink": "Поділитися посиланням",
   "shareStorageWith5Members": "Поділитися сховищем із 5 учасниками",
-  "shareTextRecommendUsingEnteForFamily": "Установи Photovault, щоб мені можна було додати тебе до сімейного тарифу\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Установи Photovault, щоб мені можна було додати тебе до сімейного тарифу",
   "shareThisLink": "Це посилання дозволяє будь-кому, хто його отримає, отримати доступ до вашого елемента. Ви можете скасувати доступ у будь-який час, видаливши посилання.",
   "shareWithNonenteUsers": "Поділитися з користувачами без Photovault",
   "shareYourSubscription": "Поділіться своєю підпискою з близькими",
@@ -2684,7 +2680,6 @@
   "subject": "Тема",
   "submit": "Підтвердити",
   "subscribe": "Передплачувати",
-  "subscribeToEnableSharing": "Вам потрібна активна передплата, щоб увімкнути спільне поширення.",
   "subscription": "Передплата",
   "subscriptionRequiredForSharing": "Для поширення посилань потрібна платна підписка",
   "subWillBeCancelledOn": "Вашу передплату буде скасовано {endDate}",
@@ -3149,7 +3144,6 @@
   },
   "yourMap": "Ваша мапа",
   "yourPhotosLookUnique": "Ваші фотографії виглядають унікально",
-  "yourPlanSupportsFamily": "Ваш план уже підтримує сім'ю",
   "yourPlanWasSuccessfullyDowngraded": "Ваш план був успішно знижено",
   "yourPlanWasSuccessfullyUpgraded": "Ваш план успішно покращено",
   "yourPurchaseWasSuccessful": "Ваша покупка пройшла успішно",

@@ -144,7 +144,7 @@
   "addTo": "הוסף ל",
   "addToAlbum": "הוסף לאלבום",
   "addToCollection": "להוסיף לאוסף",
-  "addToEnte": "הוסף ל-ente",
+  "addToEnte": "הוסף ל-Photovault",
   "addToHiddenAlbum": "להוסיף לאלבום מוסתר",
   "addToPerson": "להוסיף לאדם",
   "@addToPerson": {
@@ -491,7 +491,7 @@
     }
   },
   "emailHint": "הכנס את כתובת הדוא״ל שלך",
-  "emailNoEnteAccountPhotos": "לא נמצא חשבון ente ל-{email}.\n\nשלח להם הזמנה על מנת לשתף תמונות.",
+  "emailNoEnteAccountPhotos": "לא נמצא חשבון Photovault ל-{email}.\n\nשלח להם הזמנה על מנת לשתף תמונות.",
   "@emailNoEnteAccountPhotos": {
     "placeholders": {
       "email": {}
@@ -741,7 +741,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "הפריטים שנבחרו יוסרו מהאלבום הזה",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "נראה שמשהו לא פעל כשורה. אנא נסה שוב אחרי כמה זמן. אם הבעיה ממשיכה, אנא צור קשר עם צוות התמיכה שלנו.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -824,11 +823,9 @@
   "moveToAlbum": "הזז לאלבום",
   "movingFilesToAlbum": "מעביר קבצים לאלבום...",
   "name": "שם",
-  "networkConnectionRefusedErr": "לא ניתן להתחבר ל-Photovault, אנא נסו בשנית מאוחר יותר. אם השגיאה נמשכת, אנא צרו קשר עם התמיכה.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "לא ניתן להתחבר ל-Photovault, אנא בידקו את הגדרות הרשת שלכם וצרו קשר עם התמיכה אם השגיאה נמשכת.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -879,7 +876,7 @@
   },
   "notifications": "התראות",
   "offlineModeWarning": "בחרת להמשיך ללא גיבויים. אנא בצע גיבויים ידניים כדי לוודא שהקודים שלך בטוחים.",
-  "onEnte": "ב<branding>אנטע</branding>",
+  "onEnte": "ב<branding>Photovault</branding>",
   "@onEnte": {
     "description": "The text displayed above albums backed up to Ente",
     "type": "text"
@@ -1196,7 +1193,7 @@
   "shareCodes": "שיתוף הקודים",
   "shareCodesDuration": "בחירת משך הזמן שבמהלכו ברצונך לשתף את הקודים.",
   "shareLink": "שתף קישור",
-  "shareWithNonenteUsers": "שתף עם משתמשים שהם לא של ente",
+  "shareWithNonenteUsers": "שתף עם משתמשים שהם לא של Photovault",
   "sharing": "משתף...",
   "shouldHideCode": "הסתר קודים",
   "showLargeIcons": "הצג סמלים גדולים",
@@ -1290,7 +1287,6 @@
     "description": "Message prompting user to tap to unlock"
   },
   "tellUsWhatYouThink": "ספרו לנו מה דעתכם",
-  "tempErrorContactSupportIfPersists": "נראה שמשהו לא פעל כשורה. אנא נסה שוב אחרי כמה זמן. אם הבעיה ממשיכה, אנא צור קשר עם צוות התמיכה שלנו.",
   "terminate": "סיים",
   "@terminate": {
     "description": "Terminate button label"

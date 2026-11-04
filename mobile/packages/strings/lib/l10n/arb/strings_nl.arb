@@ -1283,7 +1283,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Bestanden tonen het aantal resterende dagen voordat ze permanent worden verwijderd",
   "itemsStored": "Items opgeslagen",
   "itemsWillBeRemovedFromAlbum": "Geselecteerde items zullen worden verwijderd uit dit album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Het lijkt erop dat er iets fout is gegaan. Probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met ons supportteam.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1404,7 +1403,6 @@
   "localBackupSidebarTitle": "Lokale back-up",
   "localGallery": "Lokale galerij",
   "localIndexing": "Lokale verwerking",
-  "localSyncErrorMessage": "Het lijkt erop dat er iets mis is gegaan omdat het synchroniseren van lokale foto's meer tijd kost dan verwacht. Neem contact op met ons supportteam",
   "location": "Locatie",
   "locationName": "Locatie naam",
   "locations": "Locaties",
@@ -1434,7 +1432,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Uitloggen",
-  "logsDialogBody": "Dit zal logboeken verzenden om ons te helpen uw probleem op te lossen. Houd er rekening mee dat bestandsnamen zullen worden meegenomen om problemen met specifieke bestanden bij te houden.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1566,11 +1563,9 @@
   "moveToHiddenAlbum": "Verplaatsen naar verborgen album",
   "movingFilesToAlbum": "Bestanden verplaatsen naar album...",
   "name": "Naam",
-  "networkConnectionRefusedErr": "Kan geen verbinding maken met Photovault, probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met support.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Kan geen verbinding maken met Photovault, controleer uw netwerkinstellingen en neem contact op met ondersteuning als de fout zich blijft voordoen.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1867,7 +1862,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Neem alstublieft contact op met support@ente.com en we helpen u graag!",
-  "pleaseContactSupportIfTheProblemPersists": "Neem contact op met klantenservice als het probleem aanhoudt",
   "pleaseEmailUsAt": "Stuur ons een e-mail op {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2468,7 +2462,6 @@
   "sharedWith": "Gedeeld met",
   "shareKey": "Sleutel delen",
   "shareLink": "Link delen",
-  "shareMyVerificationID": "Dit is mijn verificatie-ID: {verificationID} voor ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -2476,14 +2469,13 @@
   },
   "shareNotSupportedForSharedFiles": "Delen wordt niet ondersteund voor gedeelde bestanden",
   "shareStorageWith5Members": "Opslagruimte delen met 5 deelnemers",
-  "shareTextConfirmOthersVerificationID": "Hey, kunt u bevestigen dat dit uw ente.com verificatie ID is: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Download Photovault zodat ik je kan toevoegen aan mijn familie abonnement\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Photovault zodat we gemakkelijk foto's en video's van originele kwaliteit kunnen delen\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault zodat ik je kan toevoegen aan mijn familie abonnement",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault zodat we gemakkelijk foto's en video's van originele kwaliteit kunnen delen",
   "shareThisLink": "Met deze link kan iedereen die hem ontvangt je item openen. Je kunt de toegang op elk moment intrekken door de link te verwijderen.",
   "shareWithNonenteUsers": "Delen met niet-Photovault gebruikers",
   "sharing": "Delen...",
@@ -2605,8 +2597,6 @@
   "subject": "Onderwerp",
   "submit": "Verzenden",
   "subscribe": "Abonneer",
-  "subscribeToChangeLinkSetting": "Je hebt een betaald abonnement nodig om deze koppelingsinstelling te wijzigen.",
-  "subscribeToEnableSharing": "Je hebt een actief betaald abonnement nodig om delen mogelijk te maken.",
   "subscription": "Abonnement",
   "subscriptionRequiredForSharing": "Je hebt een betaald abonnement nodig om links te delen",
   "subWillBeCancelledOn": "Uw abonnement loopt af op {endDate}",
@@ -2663,7 +2653,6 @@
     }
   },
   "tellUsWhatYouThink": "Vertel ons wat je vindt",
-  "tempErrorContactSupportIfPersists": "Het lijkt erop dat er iets fout is gegaan. Probeer het later opnieuw. Als de fout zich blijft voordoen, neem dan contact op met ons supportteam.",
   "terminate": "Beëindigen",
   "@terminate": {
     "description": "Terminate button label"

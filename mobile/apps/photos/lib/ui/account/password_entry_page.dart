@@ -14,11 +14,9 @@ import 'package:photos/events/subscription_purchased_event.dart';
 import 'package:photos/services/account/user_service.dart';
 import "package:photos/ui/account/onboarding_page_scaffold.dart";
 import 'package:photos/ui/account/recovery_key_page.dart';
-import 'package:photos/ui/common/web_page.dart';
 import "package:photos/ui/components/alert_bottom_sheet.dart";
 import "package:photos/ui/components/models/button_type.dart";
 import 'package:photos/ui/notification/toast.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/utils/dialog_util.dart';
 import "package:styled_text/styled_text.dart";
 
@@ -284,27 +282,7 @@ class _PasswordEntryPageState extends State<PasswordEntryPage> {
                     );
                   },
                 ),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ButtonComponent(
-                    variant: ButtonComponentVariant.link,
-                    label: context.strings.howItWorks,
-                    size: ButtonComponentSize.small,
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return WebPage(
-                              context.strings.howItWorks,
-                              "https://ente.com/architecture",
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                // PHOTOVAULT: removed "How it works" (a link to ente.com).
                 const SizedBox(height: 24),
                 ButtonComponent(
                   label: title,
@@ -393,15 +371,11 @@ class _PasswordEntryPageState extends State<PasswordEntryPage> {
           await UserService.instance.setAttributes(result);
           await dialog.hide();
           Configuration.instance.resetVolatilePassword();
+          // PHOTOVAULT: payments removed. Ente opened the plan picker here;
+          // we go straight to the app, as its "continue with free" did.
           if (mounted) {
-            await Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (BuildContext context) {
-                  return getSubscriptionPage(isOnBoarding: true);
-                },
-              ),
-              (route) => route.isFirst,
-            );
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Bus.instance.fire(SubscriptionPurchasedEvent());
           }
           Bus.instance.fire(AccountConfiguredEvent());
         } catch (e, s) {

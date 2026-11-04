@@ -1053,7 +1053,6 @@
   "localBackupDailyManualCopy": "Ствараць адну лакальную рэзервовую копію ў дзень пры адкрыцці праграмы. Выкарыстоўвайце \"Зарэзерваваць\", каб запусціць стварэнне рэзервовай копіі ўручную. Захоўваецца да 5 файлаў з рэзервовымі копіямі.",
   "localBackupSidebarTitle": "Лакальная рэзервовая копія",
   "localGallery": "Лакальная галерэя",
-  "localSyncErrorMessage": "Здаецца, што нешта пайшло не так. Паколькі лакальная сінхранізацыя фатаграфій займае больш часу, чым чакалася. Звяжыцеся з нашай службай падтрымкі",
   "location": "Месцазнаходжанне",
   "locationName": "Назва месцазнаходжання",
   "locationPickerTip": "Вы таксама можаце дадаць месцазнаходжанне ў цэнтры фатаграфіі з экрана інфармацыі пра фота",
@@ -1086,7 +1085,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Выйсці",
-  "logsDialogBody": "Гэта дзеянне прывядзе да адпраўкі журналаў, якія дапамогуць нам адладзіць вашу праблему. Звярніце ўвагу, што назвы файлаў будуць уключаны для адсочвання праблем з канкрэтнымі файламі.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1172,11 +1170,9 @@
   "moveToHiddenAlbum": "Перамясціць у схаваны альбом",
   "movingFilesToAlbum": "Перамяшчэнне файлаў у альбом...",
   "name": "Назва",
-  "networkConnectionRefusedErr": "Немагчыма падключыцца да Photovault. Паспрабуйце яшчэ раз праз некаторы час. Звярніцеся ў службу падтрымкі кліентаў, калі праблема застанецца.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Немагчыма падключыцца да сервера Photovault. Праверце свае сеткавыя налады. Звярніцеся ў службу падтрымкі кліентаў, калі праблема застанецца.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1417,7 +1413,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Звяжыцеся са службай падтрымкі, калі праблема застанецца",
   "pleaseEmailUsAt": "Адпраўце ліст на паштовы адрас {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2013,8 +2008,6 @@
   },
   "submit": "Пацвердзіць",
   "subscribe": "Падпісацца",
-  "subscribeToChangeLinkSetting": "Каб змяніць гэты параметр спасылкі, вам патрэбна платная падпіска.",
-  "subscribeToEnableSharing": "У вас павінна быць актыўная платная падпіска, каб уключыць абагульванне.",
   "subscription": "Падпіска",
   "subWillBeCancelledOn": "Ваша падпіска будзе скасавана {endDate}",
   "@subWillBeCancelledOn": {

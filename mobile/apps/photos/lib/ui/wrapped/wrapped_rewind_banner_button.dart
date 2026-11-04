@@ -1,3 +1,4 @@
+import "package:ente_components/theme/photovault/encore_tokens.dart";
 import "package:flutter/material.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/services/wrapped/models.dart";
@@ -5,7 +6,6 @@ import "package:photos/services/wrapped/wrapped_service.dart";
 import "package:photos/theme/ente_theme.dart";
 import "package:photos/ui/notification/toast.dart";
 import "package:photos/ui/wrapped/wrapped_viewer_page.dart";
-import "package:rive/rive.dart" as rive;
 
 class WrappedRewindBannerButton extends StatefulWidget {
   const WrappedRewindBannerButton({
@@ -23,24 +23,9 @@ class WrappedRewindBannerButton extends StatefulWidget {
 }
 
 class _WrappedRewindBannerButtonState extends State<WrappedRewindBannerButton> {
-  late final rive.FileLoader _riveFileLoader;
-  double? _artboardAspectRatio;
-
-  @override
-  void initState() {
-    super.initState();
-    _riveFileLoader = rive.FileLoader.fromAsset(
-      "assets/ente_rewind_banner.riv",
-      riveFactory: rive.Factory.flutter,
-    );
-  }
-
-  @override
-  void dispose() {
-    _riveFileLoader.dispose();
-    super.dispose();
-  }
-
+  // PHOTOVAULT: branding. Ente's animated Rive banner background
+  // ("ente_rewind_banner.riv", which also set the height from its artboard)
+  // is replaced by a plain panel colour at the default height.
   @override
   Widget build(BuildContext context) {
     final textTheme = getEnteTextTheme(context);
@@ -57,18 +42,7 @@ class _WrappedRewindBannerButtonState extends State<WrappedRewindBannerButton> {
           onTap: () => _handleTap(context),
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              final double availableWidth =
-                  constraints.hasBoundedWidth && constraints.maxWidth.isFinite
-                  ? constraints.maxWidth
-                  : MediaQuery.sizeOf(context).width;
-              double? resolvedHeight = widget.height;
-              if (resolvedHeight == null &&
-                  _artboardAspectRatio != null &&
-                  _artboardAspectRatio! > 0 &&
-                  availableWidth.isFinite) {
-                resolvedHeight = availableWidth / _artboardAspectRatio!;
-              }
-              resolvedHeight ??= 128;
+              final double resolvedHeight = widget.height ?? 128;
 
               return ClipRRect(
                 borderRadius: borderRadius,
@@ -78,27 +52,8 @@ class _WrappedRewindBannerButtonState extends State<WrappedRewindBannerButton> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Positioned.fill(
-                        child: rive.RiveWidgetBuilder(
-                          fileLoader: _riveFileLoader,
-                          stateMachineSelector: const rive.StateMachineNamed(
-                            "State Machine 1",
-                          ),
-                          onLoaded: _handleRiveLoaded,
-                          builder:
-                              (BuildContext context, rive.RiveState state) {
-                                if (state is rive.RiveLoaded) {
-                                  return rive.RiveWidget(
-                                    controller: state.controller,
-                                    fit: rive.Fit.cover,
-                                  );
-                                }
-                                if (state is rive.RiveFailed) {
-                                  return const ColoredBox(color: Colors.black);
-                                }
-                                return const SizedBox.expand();
-                              },
-                        ),
+                      const Positioned.fill(
+                        child: ColoredBox(color: encoreLightAccent),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -110,7 +65,7 @@ class _WrappedRewindBannerButtonState extends State<WrappedRewindBannerButton> {
                           children: [
                             Flexible(
                               child: Text(
-                                "Ente Rewind 2025",
+                                "Rewind 2025", // PHOTOVAULT: branding
                                 style: textTheme.h3Bold.copyWith(
                                   fontSize:
                                       (textTheme.h3Bold.fontSize ?? 24) + 2,
@@ -147,28 +102,12 @@ class _WrappedRewindBannerButtonState extends State<WrappedRewindBannerButton> {
     );
   }
 
-  void _handleRiveLoaded(rive.RiveLoaded loaded) {
-    if (!mounted) return;
-    final rive.AABB bounds = loaded.controller.artboard.bounds;
-    final double height = bounds.height;
-    final double width = bounds.width;
-    if (height <= 0 || width <= 0) {
-      return;
-    }
-    final double aspectRatio = width / height;
-    if (aspectRatio == _artboardAspectRatio) {
-      return;
-    }
-    setState(() {
-      _artboardAspectRatio = aspectRatio;
-    });
-  }
-
   void _handleTap(BuildContext context) {
     final WrappedEntryState currentState = wrappedService.state;
     final WrappedResult? result = currentState.result;
     if (result == null || result.cards.isEmpty) {
-      showShortToast(context, "Ente Rewind isn't ready yet");
+      // PHOTOVAULT: branding
+      showShortToast(context, "Rewind isn't ready yet");
       return;
     }
     Navigator.of(context).push(

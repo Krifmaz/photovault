@@ -14,8 +14,9 @@ class RewindBanner extends StatelessWidget {
         state.resumeIndex > 0 &&
         state.resumeIndex < (state.result?.cards.length ?? 0);
     final String semanticsLabel = hasProgress && !state.isComplete
-        ? "Resume Ente Rewind 2025"
-        : "Open Ente Rewind 2025";
+        // PHOTOVAULT: branding ("Ente Rewind").
+        ? "Resume Rewind 2025"
+        : "Open Rewind 2025";
 
     const double bleed = 12;
     const double bannerHeight = 164;

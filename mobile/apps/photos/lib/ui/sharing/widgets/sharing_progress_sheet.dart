@@ -3,8 +3,8 @@ import "dart:async";
 import "package:ente_components/ente_components.dart";
 import "package:ente_strings/ente_strings.dart";
 import "package:flutter/material.dart";
+import "package:photos/ui/photovault/photovault_glyph.dart";
 import "package:photos/utils/dialog_util.dart";
-import "package:rive/rive.dart" as rive;
 
 Future<bool> showSharingProgressSheet(
   BuildContext context, {
@@ -42,28 +42,13 @@ class _SharingProgressSheet extends StatefulWidget {
 }
 
 class _SharingProgressSheetState extends State<_SharingProgressSheet> {
-  static const _animationAsset = "assets/invite.riv";
-  static const _stateMachineName = "State Machine 1";
-  static const _successName = "success";
-
-  late final rive.FileLoader _animationLoader;
-  rive.ViewModelInstanceTrigger? _successTrigger;
-  bool _sharingSucceeded = false;
-
+  // PHOTOVAULT: branding. Ente's Rive duck ("invite.riv", which closed the
+  // sheet from its success event) is replaced by a static glyph; the sheet
+  // now closes as soon as sharing succeeds.
   @override
   void initState() {
     super.initState();
-    _animationLoader = rive.FileLoader.fromAsset(
-      _animationAsset,
-      riveFactory: rive.Factory.flutter,
-    );
     unawaited(_runTask());
-  }
-
-  @override
-  void dispose() {
-    _animationLoader.dispose();
-    super.dispose();
   }
 
   @override
@@ -75,23 +60,10 @@ class _SharingProgressSheetState extends State<_SharingProgressSheet> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox.square(
+          const SizedBox.square(
             dimension: 143,
             child: ExcludeSemantics(
-              child: rive.RiveWidgetBuilder(
-                fileLoader: _animationLoader,
-                stateMachineSelector: const rive.StateMachineNamed(
-                  _stateMachineName,
-                ),
-                dataBind: rive.DataBind.auto(),
-                onLoaded: _onRiveLoaded,
-                builder: (context, state) => state is rive.RiveLoaded
-                    ? rive.RiveWidget(
-                        controller: state.controller,
-                        fit: rive.Fit.contain,
-                      )
-                    : const SizedBox.expand(),
-              ),
+              child: PhotovaultGlyph(width: 143, height: 143),
             ),
           ),
           const SizedBox(height: 30),
@@ -116,24 +88,9 @@ class _SharingProgressSheetState extends State<_SharingProgressSheet> {
       Navigator.of(context).pop(false);
       return;
     }
-    _sharingSucceeded = true;
-    _successTrigger?.trigger();
-  }
-
-  void _onRiveLoaded(rive.RiveLoaded state) {
-    state.controller.stateMachine.addEventListener(_onRiveEvent);
-    _successTrigger = state.viewModelInstance?.trigger(_successName);
-    if (_sharingSucceeded) {
-      _successTrigger?.trigger();
-    }
-  }
-
-  Future<void> _onRiveEvent(rive.Event event) async {
-    if (event.name == _successName) {
-      await Future<void>.delayed(const Duration(milliseconds: 250));
-      if (mounted) {
-        Navigator.of(context).pop(true);
-      }
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    if (mounted) {
+      Navigator.of(context).pop(true);
     }
   }
 }

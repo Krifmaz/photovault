@@ -703,7 +703,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Я понимаю, что это приведет к удалению моих данных из Photovault, Ente Auth и Ente Locker.",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -1094,7 +1093,6 @@
   "doubleTapToViewHiddenCode": "Вы можете нажать дважды на запись для просмотра кода",
   "download": "Скачать",
   "downloadApplicationUpdate": "Скачать обновление",
-  "downloadDecryptionFailedMessage": "Этот элемент не может быть загружен. Свяжитесь с нами, чтобы мы могли помочь.",
   "@downloadDecryptionFailedMessage": {
     "description": "Message shown in the viewer when a downloaded item cannot be decrypted"
   },
@@ -1954,7 +1952,6 @@
     }
   },
   "itemsWillBeRemovedFromAlbum": "Выбранные элементы будут удалены из этого альбома",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Похоже, что-то пошло не так. Пожалуйста, повторите попытку через некоторое время. Если ошибка повторится, обратитесь в нашу службу поддержки.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2191,7 +2188,6 @@
   "localBackupSidebarTitle": "Локальная резервная копия",
   "localGallery": "Локальная галерея",
   "localIndexing": "Локальная обработка",
-  "localSyncErrorMessage": "Похоже, что-то пошло не так: синхронизация фото занимает больше времени, чем ожидалось. Пожалуйста, обратитесь в поддержку",
   "location": "Местоположение",
   "locationName": "Название местоположения",
   "locationPickerTip": "Вы также можете добавить местоположение по центру фотографии из экрана информации о фотографии",
@@ -2231,7 +2227,6 @@
   },
   "logout": "Выйти",
   "logs": "Логи",
-  "logsDialogBody": "Это отправит нам логи, чтобы помочь разобраться с вашей проблемой. Обратите внимание, что имена файлов будут включены для отслеживания проблем с конкретными файлами.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2341,7 +2336,6 @@
   "mlConsentConfirmation": "Я понимаю и хочу включить машинное обучение",
   "mlConsentDescription": "Если вы включите машинное обучение, Photovault будет извлекать информацию такую, как геометрия лица, из файлов, включая те, которыми с вами поделились.\n\nЭтот процесс будет происходить на вашем устройстве, и любая сгенерированная биометрическая информация будет защищена сквозным шифрованием.",
   "mlIndexingDescription": "Обратите внимание, что машинное обучение увеличит использование трафика и батареи, пока все элементы не будут обработаны. Рассмотрите использование приложения для компьютера для более быстрой обработки. Результаты будут автоматически синхронизированы.",
-  "mlProcessingIssueReachOut": "Пожалуйста, свяжитесь с нами, чтобы мы могли вам помочь.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -2422,11 +2416,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не удаётся подключиться к Photovault. Пожалуйста, повторите попытку через некоторое время. Если ошибка сохраняется, обратитесь в службу поддержки.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Не удаётся подключиться к Photovault. Пожалуйста, проверьте настройки сети и обратитесь в службу поддержки, если ошибка сохраняется.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2593,7 +2585,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "У вас один аккаунт для Photovault, Ente Auth и Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -2859,7 +2850,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Пожалуйста, свяжитесь с support@ente.com, и мы будем рады помочь!",
-  "pleaseContactSupportIfTheProblemPersists": "Пожалуйста, обратитесь в поддержку, если проблема сохраняется",
   "pleaseEmailUsAt": "Пожалуйста, напишите нам на {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3759,7 +3749,6 @@
   "shareKey": "Поделиться ключом",
   "shareLink": "Поделиться ссылкой",
   "shareMemory": "Поделиться воспоминаниями",
-  "shareMyVerificationID": "Вот мой идентификатор подтверждения: {verificationID} для ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3767,15 +3756,14 @@
   },
   "shareNotSupportedForSharedFiles": "Нельзя делиться общими файлами",
   "shareStorageWith5Members": "Поделиться хранилищем с 5 участниками",
-  "shareTextConfirmOthersVerificationID": "Привет, можешь подтвердить, что это твой идентификатор подтверждения ente.com: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Скачайте Photovault, чтобы мы могли легко обмениваться файлами оригинального качества\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Скачай Photovault, чтобы я мог добавить тебя в свой семейный тариф\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Скачай Photovault, чтобы мы могли легко делиться фото и видео в оригинальном качестве\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Скачайте Photovault, чтобы мы могли легко обмениваться файлами оригинального качества",
+  "shareTextRecommendUsingEnteForFamily": "Скачай Photovault, чтобы я мог добавить тебя в свой семейный тариф",
+  "shareTextRecommendUsingEnteForPhotos": "Скачай Photovault, чтобы мы могли легко делиться фото и видео в оригинальном качестве",
   "shareTextReferralInvite": "Получите 20 Гб бесплатно с помощью Photovault! Скачайте приложение по ссылке https://ente.com/invite and use code {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -3980,8 +3968,6 @@
   "subject": "Тема",
   "submit": "Отправить",
   "subscribe": "Подписаться",
-  "subscribeToChangeLinkSetting": "Вам нужна платная подписка, чтобы изменить эту ссылку.",
-  "subscribeToEnableSharing": "Вам нужна активная платная подписка, чтобы включить общий доступ.",
   "subscription": "Подписка",
   "subscriptionRequiredForSharing": "Для публикации ссылок требуется платная подписка",
   "subWillBeCancelledOn": "Ваша подписка будет отменена {endDate}",
@@ -4039,7 +4025,6 @@
     }
   },
   "tellUsWhatYouThink": "Расскажите нам, что вы думаете",
-  "tempErrorContactSupportIfPersists": "Похоже, что-то пошло не так. Пожалуйста, повторите попытку через некоторое время. Если ошибка повторится, обратитесь в нашу службу поддержки.",
   "terminate": "Завершить",
   "@terminate": {
     "description": "Terminate button label"
@@ -4572,7 +4557,6 @@
   },
   "yourMap": "Ваша карта",
   "yourPhotosLookUnique": "Ваши фотографии выглядят уникальными",
-  "yourPlanSupportsFamily": "Ваш план уже поддерживает семью",
   "yourPlanWasSuccessfullyDowngraded": "Ваш тариф успешно понижен",
   "yourPlanWasSuccessfullyUpgraded": "Ваш тариф успешно повышен",
   "yourPurchaseWasSuccessful": "Ваша покупка прошла успешно",
@@ -4705,6 +4689,5 @@
   "noEnteAccountWithThisEmail": "Нет аккаунта Photovault с таким адресом электронной почты.",
   "shareALinkInline": "Поделиться ссылкой.",
   "personAlreadyHasAccess": "У этого человека уже есть доступ.",
-  "notEnoughStorageTitle": "Недостаточно места для хранения",
-  "notEnoughStorageBody": "У вас недостаточно свободного места на Photovault для добавления новых фотографий. Освободите место или обновите тариф, чтобы продолжать добавлять фотографии."
+  "notEnoughStorageTitle": "Недостаточно места для хранения"
 }

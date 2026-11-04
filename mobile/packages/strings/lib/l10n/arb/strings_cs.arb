@@ -1453,7 +1453,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Položky zobrazují počet dní zbývajících do trvalého smazání",
   "itemsStored": "Uložené položky",
   "itemsWillBeRemovedFromAlbum": "Vybrané položky budou odstraněny z tohoto alba",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Zdá se, že došlo k chybě. Zkuste to prosím znovu později. Pokud chyba přetrvává, kontaktujte prosím náš tým podpory.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1587,7 +1586,6 @@
   "localBackupSidebarTitle": "Místní záloha",
   "localGallery": "Místní galerie",
   "localIndexing": "Lokální zpracování",
-  "localSyncErrorMessage": "Zdá se, že došlo k nějaké chybě, protože synchronizace místních fotografií trvá déle, než se očekávalo. Obraťte se prosím na náš tým podpory",
   "location": "Poloha",
   "locationName": "Název místa",
   "locationPickerTip": "Můžete také přidat polohu zaměřenou na fotografii z informační obrazovky fotografie",
@@ -1623,7 +1621,6 @@
   "loginWithAuthAccount": "Přihlásit se pomocí účtu Auth",
   "logout": "Odhlásit se",
   "logs": "Protokoly",
-  "logsDialogBody": "Tímto se odešlou záznamy, které nám pomohou vyřešit Váš problém. Upozorňujeme, že budou zahrnuty názvy souborů, aby bylo možné sledovat problémy s konkrétními soubory.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1771,11 +1768,9 @@
   "moveToHiddenAlbum": "Přesunout do skrytého alba",
   "movingFilesToAlbum": "Přesouvání souborů do alba...",
   "name": "Název",
-  "networkConnectionRefusedErr": "Nelze se připojit k Photovault, zkuste to prosím znovu později. Pokud chyba přetrvává, kontaktujte prosím podporu.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nelze se připojit k Photovault. Zkontrolujte prosím nastavení sítě a pokud chyba přetrvává, kontaktujte podporu.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2100,7 +2095,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Kontaktujte nás na adrese support@ente.com a rádi Vám pomůžeme!",
-  "pleaseContactSupportIfTheProblemPersists": "Pokud problém přetrvává, kontaktujte prosím podporu",
   "pleaseEmailUsAt": "Prosím, pošlete nám e-mail na adresu {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2821,8 +2815,8 @@
   "shareLink": "Sdílet odkaz",
   "shareNotSupportedForSharedFiles": "Sdílení není u sdílených souborů podporováno",
   "shareStorageWith5Members": "Sdílejte úložiště s 5 členy",
-  "shareTextRecommendUsingEnteForFamily": "Stáhněte si Photovault, abych Vás mohl přidat do svého rodinného plánu\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Stáhněte si aplikaci Photovault, abychom mohli snadno sdílet fotografie a videa v originální kvalitě\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Stáhněte si Photovault, abych Vás mohl přidat do svého rodinného plánu",
+  "shareTextRecommendUsingEnteForPhotos": "Stáhněte si aplikaci Photovault, abychom mohli snadno sdílet fotografie a videa v originální kvalitě",
   "shareThisLink": "Tento odkaz umožňuje každému, kdo jej obdrží, přístup k vašemu obsahu. Přístup můžete kdykoli zrušit smazáním odkazu.",
   "shareWithNonenteUsers": "Sdílet s jinými uživateli",
   "shareYourSubscription": "Sdílejte své předplatné se svými blízkými",
@@ -2966,8 +2960,6 @@
   "subject": "Předmět",
   "submit": "Odeslat",
   "subscribe": "Odebírat",
-  "subscribeToChangeLinkSetting": "Pro změnu nastavení odkazu potřebujete placené předplatné.",
-  "subscribeToEnableSharing": "K povolení sdílení potřebujete aktivní placené předplatné.",
   "subscription": "Předplatné",
   "subscriptionRequiredForSharing": "Pro sdílení odkazu potřebujete placené předplatné",
   "subWillBeCancelledOn": "Vaše předplatné bude zrušeno dne {endDate}",
@@ -3020,7 +3012,6 @@
     }
   },
   "tellUsWhatYouThink": "Sdělte nám svůj názor",
-  "tempErrorContactSupportIfPersists": "Zdá se, že došlo k chybě. Zkuste to prosím znovu později. Pokud chyba přetrvává, kontaktujte prosím náš tým podpory.",
   "terminate": "Ukončit",
   "@terminate": {
     "description": "Terminate button label"
@@ -3478,7 +3469,6 @@
   },
   "yourMap": "Vaše mapa",
   "yourPhotosLookUnique": "Vaše fotografie vypadají jedinečně",
-  "yourPlanSupportsFamily": "Váš plán již podporuje rodinu",
   "yourPlanWasSuccessfullyDowngraded": "Váš plán byl úspěšně změněn na nižší",
   "yourPlanWasSuccessfullyUpgraded": "Váš plán byl úspěšně změněn na vyšší",
   "yourPurchaseWasSuccessful": "Váš nákup byl úspěšný",

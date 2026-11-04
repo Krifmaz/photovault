@@ -1451,7 +1451,6 @@
   "localBackupDailyManualCopy": "Per dieną, kai atveriate programą, sukuriama viena vietinė atsarginė kopija. Naudokite Kurti atsarginę kopiją dabar, kad paleistumėte rankinį atsarginės kopijos kūrimą. Atsarginės kopijos saugomos iki 5 failų.",
   "localBackupSidebarTitle": "Vietinė atsarginė kopija",
   "localGallery": "Vietinė galerija",
-  "localSyncErrorMessage": "Atrodo, kad kažkas nutiko ne taip, nes vietinių nuotraukų sinchronizavimas trunka ilgiau nei tikėtasi. Susisiekite su mūsų palaikymo komanda.",
   "location": "Vietovė",
   "locationName": "Vietovės pavadinimas",
   "locationPickerTip": "Taip pat galite pridėti vietą, centruotą ant nuotraukos, iš nuotraukos informacijos ekrano.",
@@ -1490,7 +1489,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Atsijungti",
-  "logsDialogBody": "Tai nusiųs žurnalus, kurie padės mums išspręsti jūsų problemą. Atkreipkite dėmesį, kad failų pavadinimai bus įtraukti, kad būtų lengviau atsekti problemas su konkrečiais failais.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1583,7 +1581,6 @@
     }
   },
   "mlIndexingDescription": "Atkreipkite dėmesį, kad mašininis mokymasis padidins pralaidumą ir akumuliatoriaus naudojimą, kol bus apdoroti visi elementai. Apsvarstykite galimybę naudoti darbalaukio programą spartesniam apdorojimui – visi rezultatai bus sinchronizuojami automatiškai.",
-  "mlItemsCouldNotBeProcessed": "{count, plural, one {{count} elementas negalėjo būti apdorotas mašininiam mokymui. Susisiekite su mumis, kad galėtume padėti.} few {{count} elementai negalėjo būti apdoroti mašininiam mokymui. Susisiekite su mumis, kad galėtume padėti.} many {{count} elemento negalėjo būti apdorota mašininiam mokymui. Susisiekite su mumis, kad galėtume padėti.} other {{count} elementų negalėjo būti apdorota mašininiam mokymui. Susisiekite su mumis, kad galėtume padėti.}}",
   "@mlItemsCouldNotBeProcessed": {
     "description": "Description shown when machine learning could not process one or more items",
     "placeholders": {
@@ -1592,7 +1589,6 @@
       }
     }
   },
-  "mlProcessingIssueReachOut": "Susisiekite su mumis, kad galėtume padėti.",
   "@mlProcessingIssueReachOut": {
     "description": "Support prompt shown when machine learning could not process one or more items"
   },
@@ -1651,11 +1647,9 @@
   "moveToHiddenAlbum": "Perkelti į paslėptą albumą",
   "movingFilesToAlbum": "Perkeliami failai į albumą...",
   "name": "Pavadinimą",
-  "networkConnectionRefusedErr": "Nepavyksta prisijungti prie „Photovault“. Bandykite dar kartą po kurio laiko. Jei klaida tęsiasi, susisiekite su palaikymo komanda.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nepavyksta prisijungti prie „Photovault“. Patikrinkite tinklo nustatymus ir susisiekite su palaikymo komanda, jei klaida tęsiasi.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1782,7 +1776,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Turite vieną paskyrą tarp „Photovault“ nuotraukų, „Ente Auth“ ir „Photovault“ spintelės.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -1967,7 +1960,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Susisiekite adresu support@ente.com ir mes mielai padėsime!",
-  "pleaseContactSupportIfTheProblemPersists": "Jei problema išlieka, susisiekite su pagalbos komanda.",
   "pleaseEmailUsAt": "Siųskite el. laišką mums adresu {toEmail}.",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2598,20 +2590,18 @@
   "sharedPhotoNotifications": "Naujos bendrintos nuotraukos ir albumai",
   "shareKey": "Bendrinti raktą",
   "shareLink": "Bendrinti nuorodą",
-  "shareMyVerificationID": "Štai mano patvirtinimo ID: {verificationID}, skirta ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextConfirmOthersVerificationID": "Ei, ar galite patvirtinti, kad tai yra jūsų ente.com patvirtinimo ID: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Atsisiųsk „Photovault“, kad galėčiau tave įtraukti į savo šeimos planą\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Atsisiųsk „Photovault“, kad galėtume lengvai bendrinti originalios kokybės nuotraukas ir vaizdo įrašus.\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Atsisiųsk „Photovault“, kad galėčiau tave įtraukti į savo šeimos planą",
+  "shareTextRecommendUsingEnteForPhotos": "Atsisiųsk „Photovault“, kad galėtume lengvai bendrinti originalios kokybės nuotraukas ir vaizdo įrašus.",
   "shareTextReferralInvite": "Gaukite 20 GB nemokamai su „Photovault“ nuotraukomis! Atsisiųskite programą adresu https://ente.com/invite ir naudokite kodą {referralCode}.",
   "@shareTextReferralInvite": {
     "placeholders": {
@@ -2728,7 +2718,6 @@
   },
   "submit": "Pateikti",
   "subscribe": "Prenumeruoti",
-  "subscribeToEnableSharing": "Kad įjungtumėte bendrinimą, reikia aktyvios mokamos prenumeratos.",
   "subscription": "Prenumerata",
   "subWillBeCancelledOn": "Jūsų prenumerata bus atsisakyta {endDate}",
   "@subWillBeCancelledOn": {
@@ -2784,7 +2773,6 @@
     }
   },
   "tellUsWhatYouThink": "Pasakykite mums, ką manote",
-  "tempErrorContactSupportIfPersists": "Atrodo, kad kažkas nutiko ne taip. Bandykite dar kartą po kurio laiko. Jei klaida tęsiasi, susisiekite su mūsų palaikymo komanda.",
   "terminate": "Baigti",
   "@terminate": {
     "description": "Terminate button label"
@@ -3185,7 +3173,6 @@
   },
   "yourMap": "Jūsų žemėlapis",
   "yourPhotosLookUnique": "Jūsų nuotraukos atrodo ypatingos",
-  "yourPlanSupportsFamily": "Jūsų planas jau palaiko šeimą.",
   "yourPlanWasSuccessfullyDowngraded": "Jūsų planas sėkmingai pakeistas į žemesnį",
   "yourPlanWasSuccessfullyUpgraded": "Jūsų planas sėkmingai pakeistas",
   "yourPurchaseWasSuccessful": "Jūsų pirkimas buvo sėkmingas",

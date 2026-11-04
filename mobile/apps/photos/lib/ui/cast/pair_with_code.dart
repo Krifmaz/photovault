@@ -6,6 +6,7 @@ import "package:photos/core/network/network.dart";
 import "package:photos/gateways/cast/cast_gateway.dart";
 import "package:photos/models/collection/collection.dart";
 import "package:photos/service_locator.dart";
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
 import "package:photos/theme/ente_theme.dart";
 import "package:photos/ui/notification/toast.dart";
 import "package:photos/utils/dialog_util.dart";
@@ -74,7 +75,9 @@ class _PairWithCodeSheetState extends State<_PairWithCodeSheet> {
     return BottomSheetComponent(
       title: l10n.castAlbum,
       content: Text(
-        l10n.castInstruction(castUrl: flagService.castUrl),
+        // PHOTOVAULT: the cast web app is the server's announced castUrl,
+        // else <publicUrl>/cast, and only then <endpoint>/cast.
+        l10n.castInstruction(castUrl: _photovaultCastUrl()),
         style: textStyles.smallMuted,
       ),
       isKeyboardAware: true,
@@ -126,4 +129,18 @@ class _PairWithCodeSheetState extends State<_PairWithCodeSheet> {
       ],
     );
   }
+}
+
+// PHOTOVAULT: server connection. Order: remote flag, the server's castUrl
+// from /photovault/info, <publicUrl>/cast, <endpoint>/cast. The endpoint can
+// be the LAN home address, which a TV outside that network cannot open.
+String _photovaultCastUrl() {
+  if (flagService.castUrl.isNotEmpty) return flagService.castUrl;
+  final server = PhotovaultServerService.instance.activeServer.value;
+  final announced = server?.castUrl;
+  if (announced != null && announced.isNotEmpty) return announced;
+  if (server != null && server.publicUrl.isNotEmpty) {
+    return "${server.publicUrl}/cast";
+  }
+  return "${endpointConfig.endpoint}/cast";
 }

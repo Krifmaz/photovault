@@ -45,22 +45,16 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
 
-            <intent-filter android:autoVerify="true">
+            <!-- PHOTOVAULT: server connection. photovault://connect?url=...
+                 links from the server's QR code (contracts/apps.json). -->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="albums.ente.io"/>
+                <data android:scheme="photovault" android:host="connect" />
             </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="albums.ente.com"/>
-            </intent-filter>
+            <!-- PHOTOVAULT: removed the albums.ente.io / albums.ente.com
+                 app-link intent filters (Ente's public album domains). -->
 
             <intent-filter android:label="@string/backup">
                 <action android:name="android.intent.action.SEND" />
@@ -199,29 +193,14 @@
                 <category android:name="android.intent.category.APP_GALLERY"/>
             </intent-filter>
         </activity-alias>
-        <activity-alias
-            android:name="${applicationId}.IconDuckyHuggingE"
-            android:icon="@mipmap/icon_ducky_hugging_e"
-            android:enabled="false"
-            android:exported="true"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-                <category android:name="android.intent.category.APP_GALLERY"/>
-            </intent-filter>
-        </activity-alias>
+        <!-- PHOTOVAULT: removed the IconDuckyHuggingE (mascot) launcher alias. -->
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
         <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
-        <meta-data android:name="asset_statements"
-            android:resource="@string/asset_statements" />
-        <meta-data android:name="io.sentry.dsn"
-            android:value="https://2235e5c99219488ea93da34b9ac1cb68@sentry.ente.io/4" />
-        <meta-data android:name="firebase_analytics_collection_deactivated"
-            android:value="true" />
+        <!-- PHOTOVAULT: removed asset_statements (Ente domain asset links),
+             the Sentry DSN and the Firebase analytics flag. -->
         <receiver android:name="EnteMemoryWidgetProvider" android:label="Memories" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -268,7 +247,7 @@
         tools:replace="android:maxSdkVersion"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="com.android.vending.BILLING" />
+    <!-- PHOTOVAULT: removed com.android.vending.BILLING (no payments). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>

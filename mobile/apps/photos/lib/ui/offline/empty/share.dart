@@ -18,7 +18,8 @@ class EmptySharedSection extends StatelessWidget {
     final countText = total == 0
         ? "No shared albums available offline."
         : "You have $total shared album"
-              "${total == 1 ? "" : "s"} on Ente.";
+              // PHOTOVAULT: branding
+              "${total == 1 ? "" : "s"} on Photovault.";
 
     return Container(
       width: double.infinity,

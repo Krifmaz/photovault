@@ -653,7 +653,6 @@
       }
     }
   },
-  "confirmDeleteAccountAcrossApps": "Аз осъзнзвам, че това ще изтрие моите данни в Photovault, Ente Auth и Ente Locker. ",
   "@confirmDeleteAccountAcrossApps": {
     "description": "Checkbox label for final account deletion confirmation"
   },
@@ -1924,7 +1923,6 @@
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Items show the number of days remaining before permanent deletion",
   "itemsStored": "Items stored",
   "itemsWillBeRemovedFromAlbum": "Selected items will be removed from this album",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Изглежда нещо се обърка. Моля, опитайте отново след известно време. Ако грешката продължава, моля, свържете се с нашия екип за поддръжка.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -2110,7 +2108,6 @@
   "localBackupSidebarTitle": "Локално резервно копие",
   "localGallery": "Local gallery",
   "localIndexing": "Local processing",
-  "localSyncErrorMessage": "Looks like something went wrong since local photos sync is taking more time than expected. Please reach out to our support team",
   "location": "Location",
   "locationName": "Location name",
   "locationPickerTip": "You can also add a location centered on a photo from the photo's info screen",
@@ -2162,7 +2159,6 @@
   },
   "logout": "Изход",
   "logs": "Logs",
-  "logsDialogBody": "This will send across logs to help us debug your issue. Please note that file names will be included to help track issues with specific files.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -2347,11 +2343,9 @@
       }
     }
   },
-  "networkConnectionRefusedErr": "Не може да се свърже с Photovault, моля, опитайте отново след известно време. Ако проблемът продължава, моля, свържете се с поддръжката.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Не може да се свърже с Photovault, моля, проверете мрежовите си настройки и се свържете с поддръжката, ако проблемът продължава.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2516,7 +2510,6 @@
     "description": "The text displayed above folders/albums stored on device",
     "type": "text"
   },
-  "oneAccountAcrossEnteApps": "Имате един общ профил за Photovault, Ente Auth и Ente Locker.",
   "@oneAccountAcrossEnteApps": {
     "description": "Explains that account deletion affects all Ente apps"
   },
@@ -2762,7 +2755,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "Please contact support@ente.com and we will be happy to help!",
-  "pleaseContactSupportIfTheProblemPersists": "Please contact support if the problem persists",
   "pleaseEmailUsAt": "Please email us at {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -3591,7 +3583,6 @@
   "shareLegacyDescription": "Send each card to the person it's for. No single card works alone.",
   "shareLink": "Share link",
   "shareMemory": "Share memory",
-  "shareMyVerificationID": "Here's my verification ID: {verificationID} for ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
@@ -3599,15 +3590,14 @@
   },
   "shareNotSupportedForSharedFiles": "Share is not supported for shared files",
   "shareStorageWith5Members": "Share storage with 5 members",
-  "shareTextConfirmOthersVerificationID": "Hey, can you confirm that this is your ente.com verification ID: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnte": "Download Photovault so we can easily share original quality files",
+  "shareTextRecommendUsingEnteForFamily": "Download Photovault so I can add you to my family plan",
+  "shareTextRecommendUsingEnteForPhotos": "Download Photovault so we can easily share original quality photos and videos",
   "shareThisLink": "This link allows anyone who receives it to access your item. You can remove access at any time by deleting the link.",
   "shareWithNonenteUsers": "Share with non-Photovault users",
   "shareYourFeedbackHere": "Споделете вашата обратната връзка тук",
@@ -3803,8 +3793,6 @@
   "subject": "Subject",
   "submit": "Потвърди",
   "subscribe": "Subscribe",
-  "subscribeToChangeLinkSetting": "You need a paid subscription to change this link setting.",
-  "subscribeToEnableSharing": "You need an active paid subscription to enable sharing.",
   "subscription": "Subscription",
   "subscriptionRequiredForSharing": "You need a paid subscription to share links",
   "subWillBeCancelledOn": "Your subscription will be cancelled on {endDate}",
@@ -3862,7 +3850,6 @@
     }
   },
   "tellUsWhatYouThink": "Кажете ни какво мислите",
-  "tempErrorContactSupportIfPersists": "Изглежда нещо се обърка. Моля, опитайте отново след известно време. Ако грешката продължава, моля, свържете се с нашия екип за поддръжка.",
   "terminate": "Прекратяване",
   "@terminate": {
     "description": "Terminate button label"
@@ -4391,7 +4378,6 @@
   },
   "yourMap": "Your map",
   "yourPhotosLookUnique": "Your photos look unique",
-  "yourPlanSupportsFamily": "Your plan already supports a family",
   "yourPlanWasSuccessfullyDowngraded": "Your plan was successfully downgraded",
   "yourPlanWasSuccessfullyUpgraded": "Your plan was successfully upgraded",
   "yourPurchaseWasSuccessful": "Your purchase was successful",

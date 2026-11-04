@@ -51,6 +51,18 @@
 					<string>ente</string>
 				</array>
 			</dict>
+			<!-- PHOTOVAULT: server connection. photovault://connect links from the
+			     server's QR code (contracts/apps.json deepLinkScheme). -->
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>CFBundleURLName</key>
+				<string>app.photovault.connect</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>photovault</string>
+				</array>
+			</dict>
 			<dict>
 				<key>CFBundleURLName</key>
 				<string>public-albums</string>
@@ -62,8 +74,7 @@
 		</array>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
-		<key>FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED</key>
-		<true/>
+		<!-- PHOTOVAULT: removed FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED (no Firebase). -->
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSAppTransportSecurity</key>
@@ -151,8 +162,11 @@
 		<array>
 			<string>_googlecast._tcp</string>
 			<string>_F5BCEC64._googlecast._tcp</string>
+			<!-- PHOTOVAULT: server connection (LAN discovery of the server). -->
+			<string>_photovault._tcp</string>
 		</array>
 		<key>NSLocalNetworkUsageDescription</key>
-		<string>${PRODUCT_NAME} uses the local network to discover Cast-enabled devices on your WiFi network.</string>
+		<!-- PHOTOVAULT: also covers finding your Photovault server. -->
+		<string>${PRODUCT_NAME} uses the local network to find your Photovault server and Cast-enabled devices on your Wi-Fi network.</string>
 	</dict>
 </plist>

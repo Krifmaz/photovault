@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:ente_components/ente_components.dart';
 import 'package:ente_contacts/contacts.dart' as contacts;
 import 'package:ente_pure_utils/ente_pure_utils.dart';
@@ -13,8 +12,6 @@ import 'package:photos/core/event_bus.dart';
 import 'package:photos/events/collection_updated_event.dart';
 import 'package:photos/events/contacts_changed_event.dart';
 import 'package:photos/events/people_changed_event.dart';
-import 'package:photos/gateways/billing/models/billing_plan.dart';
-import 'package:photos/gateways/billing/models/subscription.dart';
 import 'package:photos/models/library_sharing/library_sharing_recipient.dart';
 import 'package:photos/models/user_details.dart';
 import 'package:photos/service_locator.dart';
@@ -30,7 +27,6 @@ import 'package:photos/ui/family/family_dashboard.dart';
 import 'package:photos/ui/family/family_ui.dart';
 import 'package:photos/ui/family/invite_members_page.dart';
 import 'package:photos/ui/notification/toast.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/ui/sharing/library_sharing/library_sharing_page.dart';
 import 'package:photos/ui/viewer/search/result/edit_contact_page.dart';
 import 'package:photos/utils/dialog_util.dart';
@@ -64,17 +60,11 @@ class _FamilyPlanPageState extends State<FamilyPlanPage> {
   final Map<int, contacts.ContactRecord?> _contactsByUserId = {};
   final Map<int, Uint8List?> _profilePictureBytesByUserId = {};
   Map<int, int> _sharedAlbumCountsByUserId = const {};
-  String? _startingPrice;
   bool _isRefreshing = false;
   int _memberContactsLoadGeneration = 0;
   StreamSubscription<CollectionUpdatedEvent>? _collectionUpdatedSubscription;
   StreamSubscription<ContactsChangedEvent>? _contactsChangedSubscription;
   StreamSubscription<PeopleChangedEvent>? _peopleChangedSubscription;
-
-  bool get _isFreeUser =>
-      endpointConfig.isProduction &&
-      _userDetails.subscription.productID == freeProductID &&
-      !_userDetails.hasPaidAddon();
 
   bool get _isFamilyAdmin =>
       _userDetails.currentFamilyMember()?.isAdmin ?? false;
@@ -124,9 +114,6 @@ class _FamilyPlanPageState extends State<FamilyPlanPage> {
         setState(() {});
       }
     });
-    if (_isFreeUser && !_userDetails.isPartOfFamily()) {
-      unawaited(_loadStartingPrice());
-    }
   }
 
   @override
@@ -160,8 +147,8 @@ class _FamilyPlanPageState extends State<FamilyPlanPage> {
         ? _buildDashboard(context, isAdminView: true)
         : _showsMemberDashboard
         ? _buildDashboard(context, isAdminView: false)
-        : _isFreeUser
-        ? _buildFreeAdvert(context)
+        // PHOTOVAULT: payments removed. Ente's free-plan advert ("View
+        // plans" upsell) is gone; everyone gets the invite advert.
         : _buildPaidAdvert(context);
 
     return FamilyPageScaffold(
@@ -169,41 +156,6 @@ class _FamilyPlanPageState extends State<FamilyPlanPage> {
       actions: _showsDashboard ? [_buildDashboardOverflow(context)] : const [],
       scrollable: _showsDashboard,
       child: content,
-    );
-  }
-
-  Widget _buildFreeAdvert(BuildContext context) {
-    final l10n = context.strings;
-    return _buildAdvert(
-      context,
-      illustrationAsset: _advertIllustrationAsset,
-      title: l10n.designedForFamilies,
-      body: l10n.shareYourSubscription,
-      benefits: [
-        _BenefitItem(
-          icon: Icons.group_outlined,
-          text: l10n.shareStorageWith5Members,
-        ),
-        _BenefitItem(
-          icon: Icons.lock_outline,
-          text: l10n.privateSpaceForEveryMember,
-        ),
-        _BenefitItem(
-          icon: Icons.forum_outlined,
-          text: l10n.feedToEngageWithFamily,
-        ),
-      ],
-      footerText: _startingPrice == null
-          ? null
-          : l10n.plansStartAt(price: _startingPrice!),
-      buttonLabel: l10n.viewPlans,
-      onButtonTap: () async {
-        if (widget.popOnFreeAdvertViewPlans && Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-          return;
-        }
-        await routeToPage(context, getSubscriptionPage());
-      },
     );
   }
 
@@ -446,21 +398,6 @@ class _FamilyPlanPageState extends State<FamilyPlanPage> {
         }
       },
     );
-  }
-
-  Future<void> _loadStartingPrice() async {
-    try {
-      final billingPlans = await billingService.getBillingPlans();
-      final cheapestPlan = billingPlans.plans
-          .where((plan) => plan.id != freeProductID && plan.price.isNotEmpty)
-          .map(_monthlyPriceForPlan)
-          .whereType<_MonthlyPrice>()
-          .sorted((a, b) => a.value.compareTo(b.value))
-          .firstOrNull;
-      if (mounted && cheapestPlan != null) {
-        setState(() => _startingPrice = cheapestPlan.displayPrice);
-      }
-    } catch (_) {}
   }
 
   Future<void> _refreshUserDetails({bool showError = false}) async {
@@ -911,29 +848,6 @@ class _FamilyPlanPageState extends State<FamilyPlanPage> {
       }
     }
   }
-
-  _MonthlyPrice? _monthlyPriceForPlan(BillingPlan plan) {
-    if (plan.price.isEmpty) {
-      return null;
-    }
-    if (plan.price.length < 2) {
-      return _MonthlyPrice(plan.price, double.infinity);
-    }
-
-    final currencySymbol = plan.price[0];
-    final rawPrice = plan.price.substring(1).replaceAll(",", "");
-    final parsedPrice = double.tryParse(rawPrice);
-    if (parsedPrice == null) {
-      return null;
-    }
-
-    final monthlyValue = plan.period == "year" ? parsedPrice / 12 : parsedPrice;
-    var displayValue = monthlyValue.toStringAsFixed(2);
-    if (displayValue.endsWith(".00")) {
-      displayValue = displayValue.substring(0, displayValue.length - 3);
-    }
-    return _MonthlyPrice("$currencySymbol$displayValue", monthlyValue);
-  }
 }
 
 class _AdvertTitle extends StatelessWidget {
@@ -1008,11 +922,4 @@ class _ResolvedMemberContact {
   final int userID;
   final contacts.ContactRecord? contact;
   final Uint8List? profilePictureBytes;
-}
-
-class _MonthlyPrice {
-  const _MonthlyPrice(this.displayPrice, this.value);
-
-  final String displayPrice;
-  final double value;
 }

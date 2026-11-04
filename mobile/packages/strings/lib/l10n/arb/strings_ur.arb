@@ -959,7 +959,7 @@
   "@endpointUpdatedMessage": {
     "description": "Success message when endpoint is updated"
   },
-  "ente": "اینٹی",
+  "ente": "Photovault",
   "enterAlbumName": "البم کا نام درج کریں",
   "enterAnEmailAddress": "ایک ای میل ایڈریس درج کریں",
   "enterAValidEmailAddress": "درست ای میل ایڈریس درج کریں",
@@ -1509,7 +1509,6 @@
   "localBackupSidebarTitle": "لوکل بیک اپ",
   "localGallery": "مقامی گیلری",
   "localIndexing": "مقامی پراسیسنگ",
-  "localSyncErrorMessage": "لگتا ہے کچھ غلط ہو گیا ہے کیونکہ مقامی تصاویر کی sync توقع سے زیادہ وقت لے رہی ہے. براہ کرم ہماری سپورٹ ٹیم سے رابطہ کریں",
   "location": "مقام",
   "locationName": "مقام کا نام",
   "locationPickerTip": "آپ تصویر کی معلوماتی اسکرین سے تصویر پر مرکوز مقام بھی شامل کر سکتے ہیں",
@@ -1533,7 +1532,6 @@
   },
   "logout": "لاگ آؤٹ",
   "logs": "لاگس",
-  "logsDialogBody": "یہ آپ کے مسئلے کو ڈیبگ کرنے میں ہماری مدد کے لیے لاگز بھیجے گا. براہ کرم نوٹ کریں کہ مخصوص فائلوں کے مسائل کو ٹریک کرنے میں مدد کے لیے فائلوں کے نام شامل کیے جائیں گے.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1624,7 +1622,7 @@
   "mixedGrouping": "ملی جلی گروپنگ؟",
   "mlConsent": "مشین لرننگ کو فعال کریں",
   "mlConsentConfirmation": "میں سمجھتا ہوں، اور مشین لرننگ کو فعال کرنا چاہتا ہوں",
-  "mlConsentDescription": "اگر آپ مشین لرننگ کو فعال کرتے ہیں، تو اینٹی Photovault فائلوں سے چہرے کی ساخت جیسی معلومات اخذ کرے گا، بشمول وہ فائلیں جو آپ کے ساتھ شیئر کی گئی ہیں.\n\nیہ عمل آپ کے اپنے آلے پر ہوگا، اور تیار کردہ تمام بائیومیٹرک معلومات مکمل طور پر اینڈ ٹو اینڈ انکرپٹڈ ہوں گی.",
+  "mlConsentDescription": "اگر آپ مشین لرننگ کو فعال کرتے ہیں، تو Photovault فائلوں سے چہرے کی ساخت جیسی معلومات اخذ کرے گا، بشمول وہ فائلیں جو آپ کے ساتھ شیئر کی گئی ہیں.\n\nیہ عمل آپ کے اپنے آلے پر ہوگا، اور تیار کردہ تمام بائیومیٹرک معلومات مکمل طور پر اینڈ ٹو اینڈ انکرپٹڈ ہوں گی.",
   "mlIndexingDescription": "نوٹ کریں کہ مشین لرننگ تمام آئٹمز پراسیس ہونے تک زیادہ انٹرنیٹ اور بیٹری استعمال کرے گی۔ تیز پراسیسنگ کے لیے ڈیسک ٹاپ ایپ استعمال کریں، تمام نتائج خود بخود سنک ہو جائیں گے.",
   "mlProgressBannerDescription": "آپ کی تصاویر پر چہروں، اشیاء اور مزید کا پتہ لگانے کے لیے ڈیوائس پر کارروائی کی جا رہی ہے.",
   "mlProgressBannerStatus": "{total} میں سے {indexed} تصاویر پر کارروائی کی گئی",
@@ -2005,7 +2003,6 @@
     "description": "Message asking user to check internet connection"
   },
   "pleaseContactSupportAndWeWillBeHappyToHelp": "از کرم support@ente.com پر رابطہ کریں اور ہمیں خوشی ہوگی مدد کر کے!",
-  "pleaseContactSupportIfTheProblemPersists": "اگر مسئلہ برقرار رہے تو براہ کرم سپورٹ سے رابطہ کریں",
   "pleaseEmailUsAt": "براہ کرم ہمیں {toEmail} پر ای میل کریں",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2656,21 +2653,19 @@
   "sharedPhotoNotificationsExplanation": "نئی تصاویر اور البمز جن میں آپ شامل ہیں یا آپ کے ساتھ شیئر کیے گئے",
   "shareKey": "کی شیئر کریں",
   "shareLink": "لنک شیئر کریں",
-  "shareMyVerificationID": "یہ میرا تصدیقی ID ہے: {verificationID} ente.com کے لیے.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "۵ اراکین کے ساتھ اسٹوریج شیئر کریں",
-  "shareTextConfirmOthersVerificationID": "ارے، کیا آپ تصدیق کر سکتے ہیں کہ یہ آپ کا ente.com تصدیقی ID ہے: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Photovault ڈاؤن لوڈ کریں تاکہ میں آپ کو اپنے فیملی پلان میں شامل کر سکوں۔\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Photovault ڈاؤن لوڈ کریں تاکہ ہم اصل معیار کی تصاویر اور ویڈیوز آسانی سے شیئر کر سکیں۔\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Photovault ڈاؤن لوڈ کریں تاکہ میں آپ کو اپنے فیملی پلان میں شامل کر سکوں۔",
+  "shareTextRecommendUsingEnteForPhotos": "Photovault ڈاؤن لوڈ کریں تاکہ ہم اصل معیار کی تصاویر اور ویڈیوز آسانی سے شیئر کر سکیں۔",
   "shareWithNonenteUsers": "غیر Photovault صارفین کے ساتھ شیئر کریں",
   "shareYourSubscription": "اپنی سبسکرپشن اپنے پیاروں کے ساتھ شیئر کریں",
   "sharing": "شیئر کیا جا رہا ہے...",
@@ -2810,8 +2805,6 @@
   "subject": "موضوع",
   "submit": "جمع کرائیں",
   "subscribe": "سبسکرائب کریں",
-  "subscribeToChangeLinkSetting": "اس لنک کی ترتیب کو تبدیل کرنے کے لیے آپ کو معاوضہ سبسکرپشن کی ضرورت ہے.",
-  "subscribeToEnableSharing": "شیئرنگ کو فعال کرنے کے لیے آپ کو فعال معاوضہ سبسکرپشن کی ضرورت ہے.",
   "subscription": "سبسکرپشن",
   "subWillBeCancelledOn": "آپ کی سبسکرپشن {endDate} کو منسوخ کر دی جائے گی",
   "@subWillBeCancelledOn": {
@@ -3267,7 +3260,6 @@
   },
   "yourMap": "آپ کا نقشہ",
   "yourPhotosLookUnique": "آپ کی تصاویر منفرد لگتی ہیں",
-  "yourPlanSupportsFamily": "آپ کا پلان پہلے ہی فیملی کو سپورٹ کرتا ہے",
   "yourPlanWasSuccessfullyDowngraded": "آپ کا پلان کامیابی سے ڈاؤن گریڈ ہو گیا",
   "yourPlanWasSuccessfullyUpgraded": "آپ کا پلان کامیابی سے اپ گریڈ ہو گیا",
   "yourPurchaseWasSuccessful": "آپ کی خریداری کامیاب رہی",

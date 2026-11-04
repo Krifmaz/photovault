@@ -1536,7 +1536,6 @@
   "localBackupSidebarTitle": "Copia de seguridad local",
   "localGallery": "Galería local",
   "localIndexing": "Procesamiento local",
-  "localSyncErrorMessage": "Parece que algo salió mal ya que la sincronización de fotos locales está tomando más tiempo del esperado. Por favor contacta con nuestro equipo de soporte",
   "location": "Ubicación",
   "locationName": "Nombre de la ubicación",
   "locationPickerTip": "También puedes añadir una ubicación centrada en una foto desde la pantalla de información de la foto",
@@ -1572,7 +1571,6 @@
   "loginWithAuthAccount": "Inicia sesión con tu cuenta de Auth",
   "logout": "Cerrar sesión",
   "logs": "Registros",
-  "logsDialogBody": "Esto enviará registros para ayudarnos a depurar su problema. Ten en cuenta que los nombres de los archivos se incluirán para ayudar a rastrear problemas con archivos específicos.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1718,11 +1716,9 @@
   "moveToHiddenAlbum": "Mover al álbum oculto",
   "movingFilesToAlbum": "Moviendo archivos al álbum...",
   "name": "Nombre",
-  "networkConnectionRefusedErr": "No se puede conectar a Photovault. Por favor, vuelve a intentarlo pasado un tiempo. Si el error persiste, ponte en contacto con el soporte técnico.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "No se puede conectar a Photovault. Por favor, comprueba tu configuración de red y ponte en contacto con el soporte técnico si el error persiste.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -2005,7 +2001,6 @@
   "playstoreSubscription": "Suscripción en la PlayStore",
   "playStream": "Reproducir transmisión",
   "pleaseCheckPasswordAndTryAgain": "Por favor, compruebe su contraseña e inténtelo de nuevo.",
-  "pleaseContactSupportIfTheProblemPersists": "Por favor, contacta a soporte técnico si el problema persiste",
   "pleaseEmailUsAt": "Por favor, envíanos un correo electrónico a {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2798,8 +2793,6 @@
   },
   "submit": "Enviar",
   "subscribe": "Suscribirse",
-  "subscribeToChangeLinkSetting": "Necesitas una suscripción de pago para cambiar la configuración de este enlace.",
-  "subscribeToEnableSharing": "Necesitas una suscripción activa de pago para habilitar el compartir.",
   "subscription": "Suscripción",
   "subscriptionRequiredForSharing": "Necesitas una suscripcion de pago para compartir enlaces",
   "subWillBeCancelledOn": "Tu suscripción se cancelará el {endDate}",

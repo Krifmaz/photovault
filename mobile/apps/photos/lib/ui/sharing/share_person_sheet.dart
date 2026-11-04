@@ -15,7 +15,6 @@ import 'package:photos/models/selected_files.dart';
 import 'package:photos/service_locator.dart' as services;
 import 'package:photos/services/collections_service.dart';
 import 'package:photos/ui/actions/collection/collection_sharing_actions.dart';
-import 'package:photos/ui/payment/subscription.dart';
 import 'package:photos/ui/viewer/gallery/gallery.dart';
 import 'package:photos/ui/viewer/gallery/state/boundary_reporter_mixin.dart';
 import 'package:photos/ui/viewer/gallery/state/gallery_boundaries_provider.dart';
@@ -335,23 +334,15 @@ class _SharePersonSheetState extends State<_SharePersonSheet> {
       await dialog.hide();
       if (!mounted) return;
       if (error is SharingNotPermittedForFreeAccountsError) {
-        final upgrade = await showBottomSheetComponent<bool>(
+        // PHOTOVAULT: payments removed (was a "Subscribe"/"Upgrade" sheet).
+        await showBottomSheetComponent<bool>(
           context: context,
           builder: (context) => BottomSheetComponent(
-            title: context.strings.subscribe,
+            title: context.strings.sorry,
             message: context.strings.subscribeToEnableSharing,
             closeTooltip: context.strings.close,
-            actions: [
-              ButtonComponent(
-                label: context.strings.upgrade,
-                onTap: () => Navigator.of(context).pop(true),
-              ),
-            ],
           ),
         );
-        if (upgrade == true && mounted) {
-          await routeToPage(context, getSubscriptionPage());
-        }
       } else {
         _logger.severe('Could not share person', error, stack);
         await showErrorDialog(

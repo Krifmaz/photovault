@@ -1187,7 +1187,6 @@
   },
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Elementy pokazują liczbę dni pozostałych przed trwałym usunięciem",
   "itemsWillBeRemovedFromAlbum": "Wybrane elementy zostaną usunięte z tego albumu",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Wygląda na to, że coś poszło nie tak. Spróbuj ponownie po pewnym czasie. Jeśli błąd będzie się powtarzał, skontaktuj się z naszym zespołem pomocy technicznej.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -1275,7 +1274,6 @@
   "localBackupDailyManualCopy": "Tworzy jedną lokalną kopię zapasową dziennie po uruchomieniu aplikacji. Użyj opcji „Utwórz kopię zapasową”, aby uruchomić ręczną kopię zapasową. Kopie zapasowe są przechowywane do 5 plików.",
   "localBackupSidebarTitle": "Lokalna kopia zapasowa",
   "localGallery": "Galeria lokalna",
-  "localSyncErrorMessage": "Wygląda na to, że coś poszło nie tak, ponieważ lokalna synchronizacja zdjęć zajmuje więcej czasu, niż oczekiwano. Skontaktuj się z naszym zespołem pomocy technicznej",
   "location": "Lokalizacja",
   "locationName": "Nazwa lokalizacji",
   "locationPickerTip": "Możesz również dodać lokalizację wyśrodkowaną na zdjęciu z ekranu informacji o zdjęciu",
@@ -1314,7 +1312,6 @@
     "description": "Login with TOTP button label"
   },
   "logs": "Dziennik logów",
-  "logsDialogBody": "Spowoduje to wysyłanie logów, aby pomóc nam w debugowaniu twojego problemu. Pamiętaj, że nazwy plików zostaną dołączone, aby pomóc w śledzeniu problemów z określonymi plikami.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1447,11 +1444,9 @@
   "moveToHiddenAlbum": "Przenieś do ukrytego albumu",
   "movingFilesToAlbum": "Przenoszenie plików do albumów...",
   "name": "Nazwa",
-  "networkConnectionRefusedErr": "Nie można połączyć się z Photovault, spróbuj ponownie po pewnym czasie. Jeśli błąd będzie się powtarzał, skontaktuj się z pomocą techniczną.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Nie można połączyć się z Photovault, sprawdź ustawienia sieci i skontaktuj się z pomocą techniczną, jeśli błąd będzie się powtarzał.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -1734,7 +1729,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Skontaktuj się z pomocą techniczną, jeśli problem będzie się powtarzał",
   "pleaseEmailUsAt": "Prosimy o kontakt mailowy pod adresem {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -2241,21 +2235,19 @@
   "sharedWith": "Udostępniono",
   "shareKey": "Udostępnij klucz",
   "shareLink": "Udostępnij link",
-  "shareMyVerificationID": "Oto mój identyfikator weryfikacyjny: {verificationID} dla ente.com.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "Udostępnij przestrzeń 5 użytkownikom",
-  "shareTextConfirmOthersVerificationID": "Hej, czy możesz potwierdzić, że to jest Twój identyfikator weryfikacyjny ente.com: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Pobierz Photovault, abym mógł dodać cię do mojego planu rodzinnego\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Pobierz Photovault, abyśmy mogli łatwo udostępniać zdjęcia i wideo w oryginalnej jakości\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Pobierz Photovault, abym mógł dodać cię do mojego planu rodzinnego",
+  "shareTextRecommendUsingEnteForPhotos": "Pobierz Photovault, abyśmy mogli łatwo udostępniać zdjęcia i wideo w oryginalnej jakości",
   "shareThisLink": "Ten link pozwala każdemu, kto go otrzyma, uzyskać dostęp do Twojego elementu. Możesz w każdej chwili usunąć dostęp, usuwając link.",
   "shareWithNonenteUsers": "Udostępnij użytkownikom bez konta Photovault",
   "shareYourSubscription": "Podziel się swoją subskrypcją z bliskimi",
@@ -2377,8 +2369,6 @@
   "subject": "Temat",
   "submit": "Zatwierdź",
   "subscribe": "Subskrybuj",
-  "subscribeToChangeLinkSetting": "Potrzebujesz płatnej subskrypcji, aby zmienić to ustawienie linku.",
-  "subscribeToEnableSharing": "Potrzebujesz aktywnej płatnej subskrypcji, aby włączyć udostępnianie.",
   "subscription": "Subskrypcja",
   "subscriptionRequiredForSharing": "Potrzebujesz płatnej subskrypcji, aby udostępniać linki",
   "subWillBeCancelledOn": "Twoja subskrypcja zostanie anulowana dnia {endDate}",
@@ -2433,7 +2423,6 @@
     }
   },
   "tellUsWhatYouThink": "Wyraź swoją opinię",
-  "tempErrorContactSupportIfPersists": "Wygląda na to, że coś poszło nie tak. Spróbuj ponownie po pewnym czasie. Jeśli błąd będzie się powtarzał, skontaktuj się z naszym zespołem pomocy technicznej.",
   "terminate": "Zakończ",
   "@terminate": {
     "description": "Terminate button label"
@@ -2821,7 +2810,6 @@
   },
   "yourMap": "Twoja mapa",
   "yourPhotosLookUnique": "Twoje zdjęcia wyglądają na unikalne",
-  "yourPlanSupportsFamily": "Twój plan już obsługuje rodzinę",
   "yourPlanWasSuccessfullyDowngraded": "Twój plan został pomyślnie obniżony",
   "yourPlanWasSuccessfullyUpgraded": "Twój plan został pomyślnie ulepszony",
   "yourPurchaseWasSuccessful": "Twój zakup zakończył się pomyślnie",

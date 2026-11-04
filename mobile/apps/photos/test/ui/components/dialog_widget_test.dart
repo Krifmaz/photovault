@@ -51,9 +51,10 @@ void main() {
       await _openLauncher(tester);
 
       expect(find.text("Download failed"), findsOneWidget);
+      // PHOTOVAULT: server-neutral text (no vendor support team).
       expect(
         find.text(
-          "This item could not be downloaded. Please reach out to us so we can help.",
+          "This item could not be downloaded. Please export the logs and share them with your server administrator.",
         ),
         findsOneWidget,
       );

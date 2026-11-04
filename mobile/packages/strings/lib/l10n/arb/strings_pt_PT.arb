@@ -1064,7 +1064,6 @@
   "localBackupDailyManualCopy": "A aplicação cria uma cópia de segurança local por dia ao ser aberta. Utilize \"Fazer cópia de segurança agora\" para executar uma cópia de segurança manual. As cópias de segurança armazenam até 5 ficheiros.",
   "localBackupSidebarTitle": "Cópia de segurança local",
   "localGallery": "Galeria local",
-  "localSyncErrorMessage": "Parece que algo correu mal, uma vez que a sincronização de fotografias locais está a demorar mais tempo do que o esperado. Contacte a nossa equipa de apoio",
   "location": "Localização",
   "locationName": "Nome da localização",
   "locationPickerTip": "Pode também adicionar uma localização centrada numa foto, pelo ecrã de info da foto.",
@@ -1084,7 +1083,6 @@
   "@loginWithTOTP": {
     "description": "Login with TOTP button label"
   },
-  "logsDialogBody": "Isto enviará os registos para nos ajudar a resolver o problema. Tenha em atenção que os nomes dos ficheiros serão incluídos para ajudar a localizar problemas com ficheiros específicos.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -1394,7 +1392,6 @@
   "playstoreSubscription": "Subscrição da PlayStore",
   "playStream": "Ver em direto",
   "pleaseCheckPasswordAndTryAgain": "Por favor, verifique a sua palavra-passe e tente novamente.",
-  "pleaseContactSupportIfTheProblemPersists": "Por favor, contate o suporte se o problema persistir",
   "pleaseEmailUsAt": "Por favor, envie-nos um e-mail para {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -1819,15 +1816,14 @@
   "sharedWith": "Compartilhado com",
   "shareKey": "Partilhar chave",
   "shareLink": "Partilhar link",
-  "shareMyVerificationID": "Aqui está o meu ID de verificação: {verificationID} para ente.com",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "Partilhe armazenamento com 5 membros",
-  "shareTextRecommendUsingEnteForFamily": "Transfira Photovault para poder adicioná-lo ao meu plano de família\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Transfira Photovault para podermos partilhar facilmente fotos e vídeos com qualidade original\n\nhttps://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Transfira Photovault para poder adicioná-lo ao meu plano de família",
+  "shareTextRecommendUsingEnteForPhotos": "Transfira Photovault para podermos partilhar facilmente fotos e vídeos com qualidade original",
   "shareThisLink": "Este link permite que qualquer pessoa que o receba acesse seu item. Você pode remover o acesso a qualquer momento excluindo o link.",
   "shareWithNonenteUsers": "Compartilhar com usuários que não usam Photovault",
   "shareYourSubscription": "Partilhe a sua subscrição para entes queridos",
@@ -1901,8 +1897,6 @@
   },
   "submit": "Submeter",
   "subscribe": "Subscrever",
-  "subscribeToChangeLinkSetting": "É necessária uma subscrição paga para alterar esta definição.",
-  "subscribeToEnableSharing": "Você precisa de uma assinatura paga ativa para ativar o compartilhamento.",
   "subscription": "Subscrição",
   "subscriptionRequiredForSharing": "Você precisa de uma assinatura paga para compartilhar links",
   "subWillBeCancelledOn": "A sua subscrição será cancelada em {endDate}",
@@ -2287,7 +2281,6 @@
     }
   },
   "yourMap": "Seu mapa",
-  "yourPlanSupportsFamily": "O seu plano já permite uma família",
   "yourPlanWasSuccessfullyDowngraded": "O seu plano foi rebaixado com sucesso",
   "yourPlanWasSuccessfullyUpgraded": "O seu plano foi atualizado com sucesso",
   "yourPurchaseWasSuccessful": "Sua compra foi realizada com sucesso",

@@ -44,7 +44,7 @@
   "addTag": "Címke hozzáadása",
   "addToAlbum": "Hozzáadás albumhoz",
   "addToCollection": "Hozzadas gyujtemennyhez",
-  "addToEnte": "Hozzáadás az Entéhez",
+  "addToEnte": "Hozzáadás a Photovaulthoz",
   "addUpTo5MembersFree": "Legfeljebb 5 tagot adhatsz hozzá ingyen",
   "admin": "Adminisztrátor",
   "after1Day": "1 nap múlva",
@@ -81,7 +81,7 @@
   "@androidSignInTitle": {
     "description": "Message showed as a title in a dialog which indicates the user that they need to scan biometric to continue. It is used on Android side. Maximum 60 characters."
   },
-  "aNewVersionOfEnteIsAvailable": "Megjelent az Photovault új verziója.",
+  "aNewVersionOfEnteIsAvailable": "Megjelent a Photovault új verziója.",
   "appearance": "Megjelenés",
   "appIcon": "Alkalmazásikon",
   "appleId": "Apple ID",
@@ -164,7 +164,7 @@
   "backupSettings": "Biztonsági mentés beállításai",
   "backupStatus": "Biztonsági mentés állapota",
   "backupStatusDescription": "Azok az elemek jelennek meg itt, amelyekről biztonsági másolat készült",
-  "backupToEnte": "Mentés az Entébe",
+  "backupToEnte": "Mentés a Photovaultba",
   "backupVideos": "Tartalék videók",
   "bothIssuerAndAccountCanNotBeEmpty": "A kibocsátó és a fiók mezője nem lehet üres",
   "bringYourFamilyAlong": "Hozd magaddal a családodat",
@@ -369,7 +369,7 @@
   "deleteFromBoth": "Törlés mindkettőből",
   "deleteFromDevice": "Törlés az eszközről",
   "deleteFromDeviceQuestion": "Törlöd az eszközről?",
-  "deleteFromEnte": "Törlés az Photovault-ből",
+  "deleteFromEnte": "Törlés a Photovault-ből",
   "deleteItemCount": "{count, plural, one{Törölsz {count} elemet} other{Törölsz {count} elemet}}",
   "@deleteItemCount": {
     "placeholders": {
@@ -740,7 +740,7 @@
   "importBitwardenGuide": "Használd a Bitwarden eszközök \"Export Vault\" opcióját és importáld a titkosítatlan JSON fájlt.",
   "importCodeDelimiterInfo": "A kódokat vesszővel vagy új sorral lehet elválasztani",
   "importCodes": "Kódok importálása",
-  "importEnteEncGuide": "Válassza ki az Photovault-ből exportált titkosított JSON fájlt",
+  "importEnteEncGuide": "Válassza ki a Photovault-ből exportált titkosított JSON fájlt",
   "importEnterSetupKey": "Adj meg egy beállítási kulcsot",
   "importFailureDesc": "Nem sikerült elemezni a kiválasztott fájlt.",
   "importFromGallery": "Importálás galériából",
@@ -826,7 +826,7 @@
       }
     }
   },
-  "inviteToEnte": "Meghívás az Photovault-re",
+  "inviteToEnte": "Meghívás a Photovault-re",
   "ok": "OK",
   "@ok": {
     "description": "Generic OK button label"
@@ -961,7 +961,7 @@
   "minimizeToTrayOnClose": "Bezárásra minimalizálás a tálcára",
   "mlConsent": "Gépi tanulás engedélyezése",
   "mlConsentConfirmation": "Értem, és szeretném engedélyezni a gépi tanulást",
-  "mlConsentDescription": "Ha engedélyezi a gépi tanulást, az Photovault olyan információkat fog kinyerni, mint az arc geometriája, a fájlokból, beleértve azokat is, amelyeket Önnel megosztott.\n\nEz az Ön eszközén fog megtörténni, és minden generált biometrikus információ végponttól végpontig titkosítva lesz.",
+  "mlConsentDescription": "Ha engedélyezi a gépi tanulást, a Photovault olyan információkat fog kinyerni, mint az arc geometriája, a fájlokból, beleértve azokat is, amelyeket Önnel megosztott.\n\nEz az Ön eszközén fog megtörténni, és minden generált biometrikus információ végponttól végpontig titkosítva lesz.",
   "mlIndexingDescription": "Fontos: a gépi tanulás a feldolgozás végéig megnövelt adatforgalmat és akkumulátorhasználatot eredményez. Gyorsabb feldolgozáshoz érdemes az asztali alkalmazást használni; az eredmények automatikusan szinkronizálódnak.",
   "moderateStrength": "Közepes",
   "@moderateStrength": {
@@ -1305,7 +1305,7 @@
   "secretCanNotBeEmpty": "A titkos kulcs nem lehet üres",
   "security": "Biztonság",
   "seeAllCollections": "Osszes gyujtemeny megtekintese",
-  "selectAlbumsToBackUpToEnte": "Válaszd ki azokat az albumokat, amelyeket az Entébe szeretnél menteni",
+  "selectAlbumsToBackUpToEnte": "Válaszd ki azokat az albumokat, amelyeket a Photovaultba szeretnél menteni",
   "selectAll": "Összes kijelölése",
   "selectBackupFolder": "Biztonsági mentés mappájának kiválasztása",
   "selectDate": "Datum kivalasztasa",
@@ -1413,21 +1413,19 @@
   "sharedWith": "Megosztva",
   "shareKey": "Kulcs megosztása",
   "shareLink": "Link megosztása",
-  "shareMyVerificationID": "Az ente.com-hoz tartozó ellenőrzési azonosítóm: {verificationID}.",
   "@shareMyVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
   "shareStorageWith5Members": "Oszd meg a tárhelyed 5 taggal",
-  "shareTextConfirmOthersVerificationID": "Szia, meg tudod erősíteni, hogy ez a te ente.com-hoz tartozó ellenőrzési azonosítód: {verificationID}",
   "@shareTextConfirmOthersVerificationID": {
     "placeholders": {
       "verificationID": {}
     }
   },
-  "shareTextRecommendUsingEnteForFamily": "Töltsd le az Entét, hogy hozzáadhassalak a családi csomagomhoz\n\nhttps://ente.com",
-  "shareTextRecommendUsingEnteForPhotos": "Töltsd le az Photovault alkalmazást, hogy könnyen megoszthassuk az eredeti minőségű fotókat és videókat https://ente.com",
+  "shareTextRecommendUsingEnteForFamily": "Töltsd le a Photovaultot, hogy hozzáadhassalak a családi csomagomhoz",
+  "shareTextRecommendUsingEnteForPhotos": "Töltsd le a Photovault alkalmazást, hogy könnyen megoszthassuk az eredeti minőségű fotókat és videókat",
   "shareThisLink": "Ez a link lehetove teszi barkinek, aki megkapja, hogy hozzaferjen az elemehez. Barmikor eltavolithatja a hozzaferest a link torlesevel.",
   "shareWithNonenteUsers": "Megosztás nem Photovault felhasználókkal",
   "shareYourSubscription": "Oszd meg az előfizetésedet a szeretteiddel",
@@ -1454,14 +1452,14 @@
   "@singleFileDeleteFromDevice": {
     "description": "Delete confirmation message for a single item that exists only on the device."
   },
-  "singleFileInBothLocalAndRemote": "Ez az elem az eszközön és az Photovault-ben is elérhető.",
+  "singleFileInBothLocalAndRemote": "Ez az elem az eszközön és a Photovault-ben is elérhető.",
   "@singleFileInBothLocalAndRemote": {
     "description": "Delete confirmation message for a single item that exists both on the device and in Ente."
   },
   "skip": "Kihagyás",
   "socialNotifications": "Tetszések és hozzászólások",
   "someoneSharingAlbumsWithYouShouldSeeTheSameId": "Valaki, aki megoszt Önnel albumokat, ugyanazt az azonosítót fogja látni az eszközén.",
-  "someSelectedFilesBackedUpToEnte": "Ezek az elemek az eszközön és az Photovault-n is elérhetőek.",
+  "someSelectedFilesBackedUpToEnte": "Ezek az elemek az eszközön és a Photovault-n is elérhetőek.",
   "@someSelectedFilesBackedUpToEnte": {
     "description": "Delete confirmation message for selected items that exist both on the device and in Ente."
   },
@@ -1511,8 +1509,6 @@
   },
   "submit": "Küldés",
   "subscribe": "Előfizetés",
-  "subscribeToChangeLinkSetting": "A linkbeállítás módosításához fizetős előfizetés szükséges.",
-  "subscribeToEnableSharing": "A megosztás engedélyezéséhez aktív fizetős előfizetésre van szükség.",
   "subscriptionRequiredForSharing": "Fizetett elofizeteset igenel a linkek megosztasa",
   "success": "Sikeres",
   "suggestFeatures": "Funkció ajánlása",
@@ -1522,7 +1518,6 @@
   "tags": "Címkék",
   "tapToCopy": "érintse meg a másoláshoz",
   "tellUsWhatYouThink": "Mondd el, mit gondolsz",
-  "tempErrorContactSupportIfPersists": "Úgy tűnik, valami hiba történt. Kérjük, próbáld újra egy idő után. Ha a hiba továbbra is fennáll, fordulj ügyfélszolgálatunkhoz.",
   "termsOfServicesTitle": "Használati feltételek",
   "@termsOfServicesTitle": {
     "description": "Terms of service title"
@@ -1750,7 +1745,6 @@
       }
     }
   },
-  "yourPlanSupportsFamily": "A csomagod már támogatja a családi megosztást",
   "yourPlanWasSuccessfullyDowngraded": "A csomagodat sikeresen visszaváltottuk",
   "yourPlanWasSuccessfullyUpgraded": "A csomagod sikeresen frissítve lett",
   "yourPurchaseWasSuccessful": "A vásárlás sikeres volt",

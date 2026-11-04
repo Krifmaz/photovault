@@ -669,7 +669,6 @@
   },
   "itemsShowTheNumberOfDaysRemainingBeforePermanentDeletion": "Elementer viser gjenværende dager før de slettes for godt",
   "itemsWillBeRemovedFromAlbum": "Valgte elementer vil bli fjernet fra dette albumet",
-  "itLooksLikeSomethingWentWrongPleaseRetryAfterSome": "Det ser ut til at noe gikk galt. Prøv på nytt etter en stund. Hvis feilen vedvarer, kan du kontakte kundestøtte.",
   "@itLooksLikeSomethingWentWrongPleaseRetryAfterSome": {
     "description": "Generic error message for temporary issues"
   },
@@ -738,7 +737,6 @@
   },
   "loadMessage9": "Vi bruker Xcha20Poly1305 for å trygt kryptere dataene dine",
   "localGallery": "Lokalt galleri",
-  "localSyncErrorMessage": "Ser ut som noe gikk galt siden lokal synkronisering av bilder tar lengre tid enn forventet. Vennligst kontakt vårt supportteam",
   "location": "Plassering",
   "locationName": "Stedsnavn",
   "locations": "Plasseringer",
@@ -769,7 +767,6 @@
     "description": "Login with TOTP button label"
   },
   "logout": "Logg ut",
-  "logsDialogBody": "Dette vil sende over logger for å hjelpe oss med å feilsøke problemet. Vær oppmerksom på at filnavn vil bli inkludert for å hjelpe å spore problemer med spesifikke filer.",
   "@logsDialogBody": {
     "description": "Body text for the logs dialog explaining what will be sent"
   },
@@ -837,11 +834,9 @@
   "moveToHiddenAlbum": "Flytt til skjult album",
   "movingFilesToAlbum": "Flytter filer til album...",
   "name": "Navn",
-  "networkConnectionRefusedErr": "Kan ikke koble til Photovault, prøv igjen etter en stund. Hvis feilen vedvarer, vennligst kontakt kundestøtte.",
   "@networkConnectionRefusedErr": {
     "description": "Error message shown when the app cannot connect to Ente due to connection refused"
   },
-  "networkHostLookUpErr": "Kan ikke koble til Photovault, kontroller nettverksinnstillingene og kontakt kundestøtte hvis feilen vedvarer.",
   "@networkHostLookUpErr": {
     "description": "Error message shown when the app cannot connect to Ente due to network host lookup failure"
   },
@@ -870,7 +865,7 @@
     "description": "No internet connection error message"
   },
   "noPhotosFoundHere": "Ingen bilder funnet her",
-  "noRecoveryKeyNoDecryption": "Grunnet vår type ente-til-ende-krypteringsprotokoll kan ikke dine data dekrypteres uten passordet ditt eller gjenopprettingsnøkkelen din",
+  "noRecoveryKeyNoDecryption": "Grunnet vår type ende-til-ende-krypteringsprotokoll kan ikke dine data dekrypteres uten passordet ditt eller gjenopprettingsnøkkelen din",
   "@noRecoveryKeyNoDecryption": {
     "description": "Explanation that data cannot be decrypted without password or recovery key"
   },
@@ -1012,7 +1007,6 @@
   "@pleaseCheckYourInternetConnectionAndTryAgain": {
     "description": "Message asking user to check internet connection"
   },
-  "pleaseContactSupportIfTheProblemPersists": "Vennligst kontakt kundestøtte hvis problemet vedvarer",
   "pleaseEmailUsAt": "Vennligst send oss en e-post på {toEmail}",
   "@pleaseEmailUsAt": {
     "placeholders": {
@@ -1435,7 +1429,6 @@
     "description": "Strong password strength label"
   },
   "subscribe": "Abonner",
-  "subscribeToEnableSharing": "Du trenger et aktivt betalt abonnement for å aktivere deling.",
   "subscription": "Abonnement",
   "subWillBeCancelledOn": "Abonnementet ditt blir avsluttet den {endDate}",
   "@subWillBeCancelledOn": {
@@ -1480,7 +1473,6 @@
       }
     }
   },
-  "tempErrorContactSupportIfPersists": "Det ser ut som noe gikk galt. Prøv på nytt etter en stund. Hvis feilen vedvarer, kontakt kundestøtte.",
   "terminate": "Avslutte",
   "@terminate": {
     "description": "Terminate button label"

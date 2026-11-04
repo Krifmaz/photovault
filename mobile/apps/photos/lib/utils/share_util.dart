@@ -195,7 +195,8 @@ Future<List<EnteFile>> convertIncomingSharedMediaToFile(
               "/" +
               sharedLocalId,
         );
-        if (media.path.contains("io.ente.photos")) {
+        // PHOTOVAULT: package id is app.photovault (was io.ente.photos).
+        if (media.path.contains("app.photovault")) {
           _logger.info("delete original file in path ${ioFile.path}");
           ioFile.deleteSync();
         }

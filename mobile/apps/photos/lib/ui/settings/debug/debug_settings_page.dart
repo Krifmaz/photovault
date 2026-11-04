@@ -9,7 +9,6 @@ import "package:photos/ui/components/settings/settings_grouped_card.dart";
 import "package:photos/ui/components/toggle_switch_widget.dart";
 import "package:photos/ui/home/christmas/christmas_utils.dart";
 import "package:photos/ui/notification/toast.dart";
-import "package:photos/ui/notification/update/change_log_page.dart";
 import "package:photos/ui/settings/debug/social_debug_screen.dart";
 import "package:photos/utils/background_tasks.dart";
 
@@ -187,18 +186,7 @@ class _DebugSettingsPageState extends State<DebugSettingsPage> {
                       const SizedBox(height: 8),
                       SettingsGroupedCard(
                         children: [
-                          MenuItemWidgetNew(
-                            title: "Show change log",
-                            leadingIconWidget: _buildIconWidget(
-                              context,
-                              HugeIcons.strokeRoundedInformationCircle,
-                            ),
-                            trailingIcon: Icons.chevron_right_outlined,
-                            trailingIconIsMuted: true,
-                            onTap: () async {
-                              await showChangeLogSheet(context);
-                            },
-                          ),
+                          // PHOTOVAULT: removed "Show change log".
                           MenuItemWidgetNew(
                             title: "Social settings",
                             leadingIconWidget: _buildIconWidget(

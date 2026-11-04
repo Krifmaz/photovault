@@ -17,7 +17,6 @@ import 'package:photos/core/cache/image_cache.dart';
 import 'package:photos/core/cache/thumbnail_in_memory_cache.dart';
 import 'package:photos/core/cache/video_cache_manager.dart';
 import 'package:photos/core/constants.dart';
-import 'package:photos/core/error-reporting/super_logging.dart';
 import 'package:photos/core/event_bus.dart';
 import 'package:photos/db/collections_db.dart';
 import 'package:photos/db/files_db.dart';
@@ -48,13 +47,13 @@ import "package:photos/services/memory_share_service.dart";
 import 'package:photos/services/notification_key_service.dart';
 import "package:photos/services/notification_service.dart";
 import 'package:photos/services/photos_contacts_service.dart';
+import 'package:photos/services/photovault/photovault_server_service.dart'; // PHOTOVAULT
 import 'package:photos/services/search_service.dart';
 import 'package:photos/services/sync/sync_service.dart';
 import 'package:photos/services/video_preview_service.dart';
 import 'package:photos/src/rust/third_party/ente_frb_lib/account_deletion.dart'
     as account_deletion;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 class Configuration implements LockScreenHost, AccountDeletionHost {
   Configuration._privateConstructor();
@@ -158,7 +157,7 @@ class Configuration implements LockScreenHost, AccountDeletionHost {
         }
         await _migrateSecurityStorageToFirstUnlock();
       }
-      SuperLogging.setUserID(await _getOrCreateAnonymousUserID()).ignore();
+      // PHOTOVAULT: telemetry removed (no anonymous Sentry user ID).
       _logger.info('User ID: ${getUserID()}');
     } catch (e, s) {
       _logger.severe("Configuration init failed", e, s);
@@ -244,7 +243,16 @@ class Configuration implements LockScreenHost, AccountDeletionHost {
     await _clearTempFolderOnLogout();
 
     _cachedToken = null;
+    // PHOTOVAULT: server connection. Saved servers and the endpoint survive
+    // logout (upstream clears every preference here).
+    final keptServerPrefs = PhotovaultServerService.preserveOnLogout(
+      _preferences,
+    );
     await _preferences.clear();
+    await PhotovaultServerService.restoreAfterLogout(
+      _preferences,
+      keptServerPrefs,
+    );
     await _secureStorage.deleteAll();
     _key = null;
     _secretKey = null;
@@ -548,13 +556,5 @@ class Configuration implements LockScreenHost, AccountDeletionHost {
       await _preferences.setBool(hasMigratedSecureStorageKey, true);
     }
     _logger.info("(for debugging) Migration check complete");
-  }
-
-  Future<String> _getOrCreateAnonymousUserID() async {
-    if (!_preferences.containsKey(anonymousUserIDKey)) {
-      //ignore: prefer_const_constructors
-      await _preferences.setString(anonymousUserIDKey, Uuid().v4());
-    }
-    return _preferences.getString(anonymousUserIDKey)!;
   }
 }

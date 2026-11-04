@@ -119,32 +119,9 @@ class _SummaryRows extends StatelessWidget {
                 ),
           subtitle: summary == null ? null : context.strings.entePhotos,
         ),
-        const SizedBox(height: Spacing.sm),
-        _row(
-          app: ComponentApp.auth,
-          title: summary == null
-              ? context.strings.enteAuth
-              : context.strings.authenticatorCodesCount(
-                  count: summary.authenticatorCodesCount,
-                  formattedCount: numberFormat.format(
-                    summary.authenticatorCodesCount,
-                  ),
-                ),
-          subtitle: summary == null ? null : context.strings.enteAuth,
-        ),
-        const SizedBox(height: Spacing.sm),
-        _row(
-          app: ComponentApp.locker,
-          title: summary == null
-              ? context.strings.enteLocker
-              : context.strings.lockerRecordsCount(
-                  count: summary.lockerRecordsCount,
-                  formattedCount: numberFormat.format(
-                    summary.lockerRecordsCount,
-                  ),
-                ),
-          subtitle: summary == null ? null : context.strings.enteLocker,
-        ),
+        // PHOTOVAULT: branding. Ente's Auth and Locker rows (other Ente
+        // apps) are not shown; the confirmation text covers all data on the
+        // account.
       ],
     );
   }
