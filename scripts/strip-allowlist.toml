@@ -77,6 +77,12 @@ reason = "tests, not shipped"
 path = "*/integration_test/*"
 reason = "tests, not shipped"
 [[exclude]]
+path = "rust/*/tests.rs"
+reason = "Rust test modules, not shipped"
+[[exclude]]
+path = "rust/*/test_*.rs"
+reason = "Rust test modules, not shipped"
+[[exclude]]
 path = "*.test.ts"
 reason = "tests, not shipped"
 [[exclude]]
@@ -105,7 +111,7 @@ path = "*/package-lock.json"
 reason = "dependency lockfile, not shipped"
 [[exclude]]
 path = "web/packages/wasm/*/pkg/*"
-reason = "generated wasm-bindgen output; its Rust source is not in scope"
+reason = "generated wasm-bindgen output; its Rust source (rust/bindings/wasm/*) is scanned"
 
 # ---------------------------------------------------------------------------
 # About credit
@@ -535,6 +541,59 @@ term = "ente"
 line = "^Locker is available only to Ente photos paid users"
 category = "upstream-only-app-not-built"
 reason = "Passkey error shown only when the flow was started by Ente Locker (apps/accounts passkeys/verify.tsx)."
+
+# ---------------------------------------------------------------------------
+# Rust crates built into the apps (frb photos for mobile, wasm photos/cast/
+# prelogin for web, napi photos for desktop, and their path dependencies).
+
+[[allow]]
+path = ["rust/crates/ml/src/assets.rs", "rust/crates/ml/src/ocr/assets.rs", "rust/crates/ml/src/scan/mod.rs"]
+term = "ente.com"
+line = "https://models\\.ente\\.com/"
+category = "pending-user-decision"
+reason = "ML model downloads from models.ente.com; where the models come from is left to the owner."
+[[allow]]
+path = "rust/crates/photos/src/location.rs"
+term = "ente.com"
+line = "^const ASSET_URL: &str = \"https://assets\\.ente\\.com/location/v2\";$"
+category = "upstream-only-app-not-built"
+reason = "LocationIndex::open default, used only by Ente's CLI; the apps call open_from with <server>/static-assets/location/v2."
+[[allow]]
+path = "rust/crates/core/src/urls.rs"
+term = "ente.com"
+line = "^pub const PRODUCTION_API_ORIGIN: &str = \"https://api\\.ente\\.com\";$"
+category = "upstream-only-app-not-built"
+reason = "ente_core default API origin for Ente's CLI; the apps always pass their configured endpoint."
+[[allow]]
+path = "rust/crates/accounts/src/auth/payload.rs"
+term = "ente.com"
+line = "^Some\\(\"api\\.ente\\.com\" \\| \"api\\.ente\\.in\" \\| \"localhost\"\\)$"
+category = "upstream-security-logic"
+reason = "enforce_auth_payloads: stricter login-token checks only for Ente's API hosts; makes no request, left as is."
+[[allow]]
+path = "rust/crates/accounts/src/admin.rs"
+term = ["subscription", "ente"]
+line = "^/admin/user/subscription$|Test mail from Ente"
+category = "upstream-only-app-not-built"
+reason = "Admin client calls used only by Ente's CLI; no binding the apps build exposes them."
+[[allow]]
+path = "rust/crates/photos/src/files.rs"
+term = "ente"
+line = "Update your Ente server"
+category = "upstream-only-app-not-built"
+reason = "Error of files::download, used only by Ente's CLI and photos-export; the apps do not call it."
+[[allow]]
+path = "rust/crates/legacy/src/error.rs"
+term = "ente"
+line = "^legacy contact is not on Ente$"
+category = "internal-identifier"
+reason = "Display text of ContactNotOnEnte; Photos matches the variant (LegacyError_ContactNotOnEnte, web: contact_not_on_ente) and shows its own invite dialog, never this text."
+[[allow]]
+path = "rust/crates/ml/src/onnx/coreml_cache.rs"
+term = "ente"
+line = "^ente$"
+category = "internal-identifier"
+reason = "Directory name of the Core ML compile cache (Library/Caches/ente/ml/coreml); never shown."
 
 # ---------------------------------------------------------------------------
 # Built APK (--apk). Written from the sources above; the APK is built only in

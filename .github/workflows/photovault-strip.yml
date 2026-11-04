@@ -13,6 +13,9 @@ on:
       - "mobile/**"
       - "web/**"
       - "desktop/**"
+      - "rust/crates/**"
+      - "rust/bindings/**"
+      - "rust/Cargo.toml"
       - "scripts/strip-*"
       - ".github/workflows/photovault-strip.yml"
   pull_request:
@@ -20,6 +23,9 @@ on:
       - "mobile/**"
       - "web/**"
       - "desktop/**"
+      - "rust/crates/**"
+      - "rust/bindings/**"
+      - "rust/Cargo.toml"
       - "scripts/strip-*"
       - ".github/workflows/photovault-strip.yml"
   workflow_dispatch:

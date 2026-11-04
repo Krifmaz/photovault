@@ -23,6 +23,9 @@
 #   * web/apps/{photos,albums,accounts,cast,embed,memories,share}, web/packages,
 #   * desktop/src, desktop/build (metadata), desktop/package.json and
 #     desktop/electron-builder.yml,
+#   * src/ of the Rust crates built into the apps (RUST_BINDINGS and their
+#     path dependencies, followed through Cargo.toml; inline
+#     `#[cfg(test)] mod` blocks are skipped),
 #   * .arb and locale translation.json files (string values only).
 #
 # Contexts. Comments are not scanned (they are neither compiled into the
@@ -155,8 +158,61 @@ def mobile_roots() -> list[str]:
     return roots
 
 
+# Rust crates compiled into the shipped apps: the Flutter bridge of the
+# mobile app (mobile/apps/photos/flutter_rust_bridge.yaml), the wasm packages
+# the web apps import (ente-photos-wasm, ente-cast-wasm, ente-prelogin-wasm)
+# and the desktop app's napi addon, plus their path dependencies.
+RUST_BINDINGS = ["bindings/frb/photos", "bindings/wasm/photos",
+                 "bindings/wasm/cast", "bindings/wasm/prelogin",
+                 "bindings/napi/photos"]
+
+
+def _cargo_path_deps(crate: str, workspace: dict[str, str]) -> list[str]:
+    """Path dependencies (normal, build and target-specific; not dev) of a crate."""
+    try:
+        with open(os.path.join(crate, "Cargo.toml"), "rb") as f:
+            manifest = tomllib.load(f)
+    except (OSError, tomllib.TOMLDecodeError):
+        return []
+    tables = [manifest.get("dependencies", {}), manifest.get("build-dependencies", {})]
+    for t in manifest.get("target", {}).values():
+        tables += [t.get("dependencies", {}), t.get("build-dependencies", {})]
+    out = []
+    for table in tables:
+        for name, spec in table.items():
+            if not isinstance(spec, dict):
+                continue
+            if spec.get("workspace") and name in workspace:
+                out.append(workspace[name])
+            elif "path" in spec:
+                out.append(os.path.normpath(os.path.join(crate, spec["path"])))
+    return out
+
+
+def rust_roots() -> list[str]:
+    """src/ of the Rust binding crates the apps build, and their path deps."""
+    rust = os.path.join(REPO, "rust")
+    try:
+        with open(os.path.join(rust, "Cargo.toml"), "rb") as f:
+            ws_deps = tomllib.load(f).get("workspace", {}).get("dependencies", {})
+    except (OSError, tomllib.TOMLDecodeError):
+        return []
+    workspace = {n: os.path.normpath(os.path.join(rust, d["path"]))
+                 for n, d in ws_deps.items() if isinstance(d, dict) and "path" in d}
+    seen: list[str] = []
+    todo = [os.path.join(rust, b) for b in RUST_BINDINGS]
+    while todo:
+        d = todo.pop()
+        if d in seen:
+            continue
+        seen.append(d)
+        todo.extend(_cargo_path_deps(d, workspace))
+    return [os.path.join(d, "src") for d in sorted(seen)]
+
+
 def source_roots() -> list[str]:
     roots = mobile_roots()
+    roots += rust_roots()
     roots += [os.path.join(REPO, "web", "apps", a) for a in WEB_APPS]
     roots.append(os.path.join(REPO, "web", "packages"))
     roots += [os.path.join(REPO, "desktop", p) for p in
@@ -406,10 +462,41 @@ def scan_lines(rel: str, lines: list[Line], hits: list[Hit], only: set[str] | No
                 hits.append(Hit(term, rel, ln.no, snippet[:200], ln.key))
 
 
+_RS_CFG_TEST = re.compile(r"^\s*#\[cfg\(test\)\]\s*$")
+_RS_MOD_OPEN = re.compile(r"^\s*(?:pub(?:\([\w:]+\))?\s+)?mod\s+\w+\s*\{")
+_RS_STR = re.compile(r'"(?:\\.|[^"\\])*"')
+
+
+def drop_rust_test_modules(lines: list[Line]) -> list[Line]:
+    """Drop `#[cfg(test)] mod x { ... }` blocks (inline unit tests, not shipped)."""
+    out: list[Line] = []
+    k = 0
+    while k < len(lines):
+        if _RS_CFG_TEST.match(lines[k].code):
+            j = k + 1
+            while j < len(lines) and not lines[j].code.strip():
+                j += 1
+            if j < len(lines) and _RS_MOD_OPEN.match(lines[j].code):
+                depth = 0
+                while j < len(lines):
+                    c = _RS_STR.sub("", lines[j].code)
+                    depth += c.count("{") - c.count("}")
+                    j += 1
+                    if depth <= 0:
+                        break
+                k = j
+                continue
+        out.append(lines[k])
+        k += 1
+    return out
+
+
 def lex_file(rel: str, text: str) -> list[Line]:
     ext = os.path.splitext(rel)[1].lower()
     if is_translation(rel):
         return lex_translations(text, rel.endswith(".arb"))
+    if ext == ".rs":
+        return drop_rust_test_modules(lex_clike(text, ext))
     if ext in CLIKE:
         return lex_clike(text, ext)
     if ext in MARKUP:
