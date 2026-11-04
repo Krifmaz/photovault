@@ -102,8 +102,19 @@ impl CoreError {
             message: m.to_string(),
         }
     }
+    /// A transport failure (connection reset, timeout, TLS). Only for
+    /// problems a retry can fix: malformed answers are [`CoreError::protocol`].
     pub(crate) fn network(m: impl std::fmt::Display) -> Self {
         Self::Network {
+            message: m.to_string(),
+        }
+    }
+    /// The server answered, but with something unusable (unparseable JSON,
+    /// missing fields). Reported as `Server { status: 0 }`: retrying the
+    /// same request will not help.
+    pub(crate) fn protocol(m: impl std::fmt::Display) -> Self {
+        Self::Server {
+            status: 0,
             message: m.to_string(),
         }
     }
@@ -122,9 +133,12 @@ impl From<crypto::CryptoError> for CoreError {
         Self::crypto(e.to_string())
     }
 }
+/// Local (de)serialisation (the store, request bodies). Server answers are
+/// mapped to [`CoreError::protocol`] and decrypted payloads to
+/// [`CoreError::Crypto`] where they are parsed.
 impl From<serde_json::Error> for CoreError {
     fn from(e: serde_json::Error) -> Self {
-        Self::crypto(format!("bad JSON: {e}"))
+        Self::storage(format!("bad JSON: {e}"))
     }
 }
 impl From<rusqlite::Error> for CoreError {
@@ -195,7 +209,7 @@ pub enum LoginStep {
         /// Second-factor session.
         session_id: String,
     },
-    /// A passkey is needed; open `url` in a browser.
+    /// A passkey is needed; open `url` in a browser, then call `verify_passkey`.
     Passkey {
         /// Passkey session.
         session_id: String,
@@ -305,6 +319,20 @@ pub fn runtime() -> &'static tokio::runtime::Runtime {
     })
 }
 
+/// Run CPU-heavy synchronous work (index rebuilds, SRP modpows, cache
+/// walks) without stalling the async worker it is called from: on the
+/// core's multi-threaded runtime the worker hands its other tasks to the
+/// rest of the pool for the duration (`block_in_place`). Elsewhere (unit
+/// tests on a current-thread runtime, plain threads) `f` just runs.
+pub(crate) fn offload<T>(f: impl FnOnce() -> T) -> T {
+    match tokio::runtime::Handle::try_current() {
+        Ok(h) if h.runtime_flavor() == tokio::runtime::RuntimeFlavor::MultiThread => {
+            tokio::task::block_in_place(f)
+        }
+        _ => f(),
+    }
+}
+
 /// Aborts the spawned task when the caller's future is dropped (a cancelled
 /// Kotlin coroutine).
 struct AbortOnDrop<T>(tokio::task::JoinHandle<T>);
@@ -366,8 +394,27 @@ impl Core {
     /// Open (or create) the local store in `data_dir` (app-private) and the
     /// encrypted cache in `cache_dir`.
     #[uniffi::constructor]
+    ///
+    /// The store is sealed under a `device.key` file in `data_dir`; apps
+    /// should use [`Core::with_device_key`] instead.
     pub fn new(data_dir: String, cache_dir: String) -> Result<Arc<Self>, CoreError> {
-        let inner = client::Inner::open(data_dir.into(), cache_dir.into())?;
+        let inner = client::Inner::open(data_dir.into(), cache_dir.into(), None)?;
+        Ok(Arc::new(Self { inner }))
+    }
+
+    /// Like [`Core::new`], but the store is sealed under `device_key`
+    /// (32 bytes), which the app keeps wrapped by the platform keystore and
+    /// never writes in the clear. A store left by [`Core::new`] is re-sealed
+    /// under it and its `device.key` deleted. If the store was sealed under
+    /// a different key (keystore reset), its account data is dropped and
+    /// the user signs in again; saved servers are kept.
+    #[uniffi::constructor]
+    pub fn with_device_key(
+        data_dir: String,
+        cache_dir: String,
+        device_key: Vec<u8>,
+    ) -> Result<Arc<Self>, CoreError> {
+        let inner = client::Inner::open(data_dir.into(), cache_dir.into(), Some(device_key))?;
         Ok(Arc::new(Self { inner }))
     }
 
@@ -398,6 +445,20 @@ impl Core {
     /// The base URL requests go to now (home or public URL of the active server).
     pub fn active_base_url(&self) -> Option<String> {
         self.inner.active_base_url()
+    }
+
+    /// Whether the user allowed the plain-http home URL of this saved server.
+    /// An `https://` home URL needs no approval (its certificate is checked).
+    pub fn home_url_allowed(&self, public_url: String) -> bool {
+        self.inner.home_url_allowed(&public_url)
+    }
+
+    /// Allow (or stop allowing) requests, including sign-in and the session
+    /// token, to go to this server's plain-http home URL when it answers.
+    /// Off by default: on another network the same private address can be a
+    /// different machine.
+    pub fn set_home_url_allowed(&self, public_url: String, allowed: bool) -> Result<(), CoreError> {
+        self.inner.set_home_url_allowed(&public_url, allowed)
     }
 
     /// Re-run the home/public choice (call on network change). Returns the new base URL.
@@ -445,6 +506,19 @@ impl Core {
     ) -> Result<LoginStep, CoreError> {
         let inner = self.inner.clone();
         run(async move { inner.verify_totp(&session_id, &code, &password).await }).await
+    }
+
+    /// After `Passkey`: once the passkey ceremony in the browser finished
+    /// (the `photovault://passkey` redirect, or the user says so), fetch the
+    /// verified session. Returns the same `Passkey` step while it is not
+    /// verified yet. With an empty `password`, see `verify_email_ott`.
+    pub async fn verify_passkey(
+        &self,
+        session_id: String,
+        password: String,
+    ) -> Result<LoginStep, CoreError> {
+        let inner = self.inner.clone();
+        run(async move { inner.verify_passkey(&session_id, &password).await }).await
     }
 
     /// After `NeedsRecoveryKey`: unlock with the recovery key (24 words or

@@ -514,7 +514,16 @@ async fn home_public_switching_and_usage() {
 
     let a = TestCore::new();
     a.core.add_server(public.clone()).await.unwrap();
-    assert_eq!(a.core.active_base_url().as_deref(), Some(home.as_str()));
+    // A plain-http home URL is not trusted until the user allows it: anyone
+    // on another network with the same address could answer /photovault/info.
+    assert_eq!(a.core.active_base_url().as_deref(), Some(public.as_str()));
+    assert!(!a.core.home_url_allowed(public.clone()));
+    a.core.set_home_url_allowed(public.clone(), true).unwrap();
+    assert!(a.core.home_url_allowed(public.clone()));
+    assert_eq!(
+        a.core.refresh_network().await.as_deref(),
+        Some(home.as_str())
+    );
     let account = done(a.core.login(EMAIL.into(), PASSWORD.into()).await.unwrap());
     // The account belongs to the public URL, wherever requests go.
     assert_eq!(account.server_url, public);
@@ -562,4 +571,15 @@ async fn home_public_switching_and_usage() {
     a.core.remove_server(srv.url.clone()).unwrap();
     assert_eq!(a.core.saved_servers().len(), 1);
     assert_eq!(a.core.active_base_url(), None);
+    // The session still talks to its own server (never to whichever is active).
+    a.core.sync(None).await.unwrap();
+
+    // Revoking the approval stops using the home URL at once.
+    a.core.select_server(public.clone()).unwrap();
+    a.core.set_home_url_allowed(public.clone(), false).unwrap();
+    assert_eq!(a.core.active_base_url().as_deref(), Some(public.as_str()));
+    assert_eq!(
+        a.core.refresh_network().await.as_deref(),
+        Some(public.as_str())
+    );
 }

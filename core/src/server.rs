@@ -119,8 +119,20 @@ pub async fn fetch_server_info(address: &str) -> Result<ServerInfo> {
 /// The base URL to use for `info`: the home URL if it answers
 /// `/photovault/info` within [`HOME_PROBE_TIMEOUT`] with the same public URL,
 /// otherwise the public URL.
-pub async fn choose_base(info: &ServerInfo) -> String {
-    if let Some(home) = info.home_url.as_deref().filter(|h| !h.is_empty()) {
+///
+/// The home URL carries the session token and the SRP login, and anyone on
+/// a network that reuses the same private address can answer
+/// `/photovault/info` with the (public) `publicUrl`. So a home URL is only
+/// considered when its identity is checked (`https://`, verified against the
+/// web PKI like the public URL) or when the user explicitly allowed this
+/// server's plain-http home address (`allow_http`).
+pub async fn choose_base(info: &ServerInfo, allow_http: bool) -> String {
+    if let Some(home) = info
+        .home_url
+        .as_deref()
+        .filter(|h| !h.is_empty())
+        .filter(|h| allow_http || h.to_ascii_lowercase().starts_with("https://"))
+    {
         let client = probe_client(HOME_PROBE_TIMEOUT);
         let fut = client
             .get(format!("{}/photovault/info", trim_url(home)))

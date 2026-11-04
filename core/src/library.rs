@@ -35,8 +35,15 @@ const THUMB_CACHE_MAX: u64 = 512 * 1024 * 1024;
 /// Original-file cache cap.
 const FILE_CACHE_MAX: u64 = 2 * 1024 * 1024 * 1024;
 
+/// How many syncs in a row may stop at the same entry that fails to
+/// decrypt before the cursor moves past it (a damaged entry must not make
+/// every sync re-read the rest of the collection forever).
+const MAX_DECRYPT_RETRIES: u32 = 3;
+/// kv key prefix of the retry state of a cursor held back by such an entry.
+const KV_RETRY: &str = "retry:";
+
 /// A decrypted collection, as sealed in the store.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct CollectionRec {
     pub id: i64,
     pub key: Vec<u8>,
@@ -49,6 +56,21 @@ pub(crate) struct CollectionRec {
     pub updation_time: i64,
 }
 
+impl std::fmt::Debug for CollectionRec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CollectionRec")
+            .field("id", &self.id)
+            .field("kind", &self.kind)
+            .finish_non_exhaustive()
+    }
+}
+
+impl Drop for CollectionRec {
+    fn drop(&mut self) {
+        crypto::wipe(&mut self.key);
+    }
+}
+
 impl CollectionRec {
     fn hidden(&self) -> bool {
         self.sub_type == Some(SUB_TYPE_DEFAULT_HIDDEN) || self.visibility == Some(VISIBILITY_HIDDEN)
@@ -59,7 +81,7 @@ impl CollectionRec {
 }
 
 /// A decrypted file, as sealed in the store.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct FileRec {
     pub id: i64,
     pub owner_id: i64,
@@ -73,6 +95,20 @@ pub(crate) struct FileRec {
     pub pub_magic: Map<String, Value>,
     /// Decrypted private magic metadata.
     pub magic: Map<String, Value>,
+}
+
+impl std::fmt::Debug for FileRec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FileRec")
+            .field("id", &self.id)
+            .finish_non_exhaustive()
+    }
+}
+
+impl Drop for FileRec {
+    fn drop(&mut self) {
+        crypto::wipe(&mut self.key);
+    }
 }
 
 impl FileRec {
@@ -316,15 +352,17 @@ impl Inner {
     }
 
     pub(crate) fn all_collections(&self) -> Result<Vec<CollectionRec>> {
-        let st = self.store();
-        let mut q = st
-            .conn()
-            .prepare("SELECT sealed FROM collections ORDER BY id")?;
-        let blobs: Vec<Vec<u8>> = q
-            .query_map([], |r| r.get(0))?
-            .collect::<rusqlite::Result<_>>()?;
-        drop(q);
-        blobs.iter().map(|b| st.open_sealed(b)).collect()
+        let (blobs, opener) = {
+            let st = self.store();
+            let mut q = st
+                .conn()
+                .prepare("SELECT sealed FROM collections ORDER BY id")?;
+            let blobs: Vec<Vec<u8>> = q
+                .query_map([], |r| r.get(0))?
+                .collect::<rusqlite::Result<_>>()?;
+            (blobs, st.opener())
+        };
+        blobs.iter().map(|b| opener.open_sealed(b)).collect()
     }
 
     pub(crate) fn save_collection(&self, c: &CollectionRec) -> Result<()> {
@@ -437,6 +475,7 @@ impl Inner {
             .get_json("/collections/v2", &[("sinceTime", since.to_string())])
             .await?;
         let mut max_since = since;
+        let mut first_failed: Option<i64> = None;
         for c in &res.collections {
             max_since = max_since.max(c.updation_time);
             if c.is_deleted {
@@ -445,12 +484,17 @@ impl Inner {
             }
             match decrypt_collection(c, &s) {
                 Ok(rec) => self.save_collection(&rec)?,
-                // A collection we cannot open (e.g. a share whose key we lack) is skipped.
-                Err(_) => continue,
+                // A collection we cannot open (e.g. a share whose key we lack
+                // yet): keep the cursor before it so the next sync retries.
+                Err(_) => {
+                    first_failed =
+                        Some(first_failed.map_or(c.updation_time, |f| f.min(c.updation_time)));
+                }
             }
         }
+        let cursor = self.cursor_after_failures("collections", since, max_since, first_failed)?;
         self.store()
-            .put_plain(KV_COLLECTIONS_SINCE, &max_since.to_string())?;
+            .put_plain(KV_COLLECTIONS_SINCE, &cursor.to_string())?;
 
         let todo: Vec<(i64, i64, i64)> = {
             let st = self.store();
@@ -463,7 +507,7 @@ impl Inner {
         let mut done_collections = 0u32;
         for (cid, updated, synced) in todo {
             if synced == 0 || updated > synced {
-                self.sync_collection(&api, cid, synced).await?;
+                self.sync_collection(&api, cid, synced, updated).await?;
             }
             done_collections += 1;
             if let Some(l) = &listener {
@@ -475,7 +519,7 @@ impl Inner {
             }
         }
         self.rebuild_index()?;
-        trim_dir(&self.cache_dir.join("thumbs"), THUMB_CACHE_MAX);
+        crate::offload(|| trim_dir(&self.cache_dir.join("thumbs"), THUMB_CACHE_MAX));
         let p = SyncProgress {
             collections: done_collections,
             files: self.file_count()?,
@@ -495,10 +539,56 @@ impl Inner {
         Ok(n as u64)
     }
 
-    async fn sync_collection(&self, api: &crate::api::Api, cid: i64, mut since: i64) -> Result<()> {
+    /// Where a cursor may move after a pass from `from` that reached
+    /// `advanced`: not past the first entry that failed to decrypt, unless
+    /// that entry has already held it back [`MAX_DECRYPT_RETRIES`] times.
+    fn cursor_after_failures(
+        &self,
+        name: &str,
+        from: i64,
+        advanced: i64,
+        first_failed: Option<i64>,
+    ) -> Result<i64> {
+        let key = format!("{KV_RETRY}{name}");
+        let st = self.store();
+        let Some(failed) = first_failed else {
+            st.delete(&key)?;
+            return Ok(advanced);
+        };
+        // `sinceTime` is exclusive: stop just before the failed entry.
+        let stuck = (failed - 1).max(from);
+        let tries = st
+            .get_plain(&key)?
+            .and_then(|v| {
+                let (at, n) = v.split_once(':')?;
+                (at.parse::<i64>().ok()? == stuck).then(|| n.parse::<u32>().ok())?
+            })
+            .unwrap_or(0)
+            + 1;
+        if tries > MAX_DECRYPT_RETRIES {
+            st.delete(&key)?;
+            return Ok(advanced);
+        }
+        st.put_plain(&key, &format!("{stuck}:{tries}"))?;
+        Ok(advanced.min(stuck))
+    }
+
+    /// Pull the diff of collection `cid` from `since`. `updated` is the
+    /// collection's `updationTime` when this sync started: once the diff is
+    /// drained the collection counts as synced up to it, so a rename or an
+    /// empty collection (no file changes) does not trigger a diff every sync.
+    async fn sync_collection(
+        &self,
+        api: &crate::api::Api,
+        cid: i64,
+        mut since: i64,
+        updated: i64,
+    ) -> Result<()> {
         let Some(c) = self.collection_rec(cid)? else {
             return Ok(());
         };
+        let from = since;
+        let mut first_failed: Option<i64> = None;
         loop {
             let page: DiffResponse = api
                 .get_json(
@@ -519,16 +609,27 @@ impl Inner {
                     Ok(rec) => {
                         self.save_file(&rec, cid)?;
                     }
-                    Err(_) => continue,
+                    // Keep the stored cursor before it: retried next sync.
+                    Err(_) => {
+                        first_failed =
+                            Some(first_failed.map_or(f.updation_time, |x| x.min(f.updation_time)));
+                    }
                 }
             }
+            let finished = !page.has_more || page.diff.is_empty();
+            let reached = if finished { since.max(updated) } else { since };
+            let mark = if first_failed.is_some() || finished {
+                self.cursor_after_failures(&format!("c{cid}"), from, reached, first_failed)?
+            } else {
+                reached
+            };
             // Never store 0: it means "never synced".
-            let mark = since.max(1);
+            let mark = mark.max(1);
             self.store().conn().execute(
                 "UPDATE collections SET synced_until = ?1 WHERE id = ?2",
                 params![mark, cid],
             )?;
-            if !page.has_more || page.diff.is_empty() {
+            if finished {
                 break;
             }
         }
@@ -537,10 +638,12 @@ impl Inner {
 
     // ---- index ----
 
-    /// Rebuild the in-memory index from the store.
+    /// Rebuild the in-memory index from the store. Opening every sealed
+    /// record is CPU work: it runs off the async worker, and the store lock
+    /// is held only while the blobs are read.
     pub(crate) fn rebuild_index(&self) -> Result<()> {
         let idx = if self.session().is_ok() {
-            self.build_index()?
+            crate::offload(|| self.build_index())?
         } else {
             Index::default()
         };
@@ -555,7 +658,7 @@ impl Inner {
             .into_iter()
             .map(|c| (c.id, c))
             .collect();
-        let (members, files) = {
+        let (members, blobs) = {
             let st = self.store();
             let mut members: HashMap<i64, Vec<i64>> = HashMap::new();
             {
@@ -567,15 +670,18 @@ impl Inner {
                     members.entry(f).or_default().push(c);
                 }
             }
-            let mut files = Vec::new();
             let mut q = st.conn().prepare("SELECT sealed FROM files")?;
-            for b in q.query_map([], |r| r.get::<_, Vec<u8>>(0))? {
-                if let Ok(f) = st.open_sealed::<FileRec>(&b?) {
-                    files.push(f);
-                }
-            }
-            (members, files)
+            let blobs: Vec<Vec<u8>> = q
+                .query_map([], |r| r.get::<_, Vec<u8>>(0))?
+                .collect::<rusqlite::Result<_>>()?;
+            (members, blobs)
         };
+        let opener = self.store().opener();
+        let files: Vec<FileRec> = blobs
+            .iter()
+            .filter_map(|b| opener.open_sealed::<FileRec>(b).ok())
+            .collect();
+        drop(opener);
         let mut entries: Vec<(TimelineItem, Vec<i64>, bool)> = Vec::with_capacity(files.len());
         let mut hashes = HashMap::new();
         for f in files {
@@ -739,7 +845,7 @@ impl Inner {
         match result {
             Ok(()) => {
                 tokio::fs::rename(&tmp_dest, &dest).await?;
-                trim_dir(&self.cache_dir.join("files"), FILE_CACHE_MAX);
+                crate::offload(|| trim_dir(&self.cache_dir.join("files"), FILE_CACHE_MAX));
                 Ok(dest.to_string_lossy().into_owned())
             }
             Err(e) => {
@@ -838,4 +944,35 @@ async fn decrypt_file_to(src: &Path, dest: &Path, header: &[u8], key: &[u8]) -> 
     }
     out.flush().await?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::client::Inner;
+
+    #[test]
+    fn a_failed_entry_holds_the_cursor_back_a_few_times_only() {
+        let data = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let inner = Inner::open(data.path().into(), cache.path().into(), None).unwrap();
+        // No failure: the cursor moves to where the pass got.
+        assert_eq!(inner.cursor_after_failures("c1", 10, 50, None).unwrap(), 50);
+        // An entry at 30 failed: stop just before it, for a few passes.
+        for _ in 0..super::MAX_DECRYPT_RETRIES {
+            assert_eq!(
+                inner.cursor_after_failures("c1", 10, 50, Some(30)).unwrap(),
+                29
+            );
+        }
+        // Then give up on it rather than re-reading the collection forever.
+        assert_eq!(
+            inner.cursor_after_failures("c1", 10, 50, Some(30)).unwrap(),
+            50
+        );
+        // Never behind where the pass started.
+        assert_eq!(
+            inner.cursor_after_failures("c2", 40, 50, Some(30)).unwrap(),
+            40
+        );
+    }
 }

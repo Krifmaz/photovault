@@ -6,7 +6,8 @@
 //!    `create-session`/`verify-session`; otherwise an email code is sent
 //!    (`/users/ott`, `/users/verify-email`).
 //! 2. Second factor: TOTP via `/users/two-factor/verify`; passkeys are
-//!    handed to the app as a URL.
+//!    handed to the app as a URL, then `verify_passkey` fetches the verified
+//!    session from `/users/two-factor/passkeys/get-token`.
 //! 3. The master key is opened with the KEK (or the recovery key), the
 //!    secret key with the master key, the sealed auth token with the key pair.
 //! 4. Recovery (`recover_with_key`) then sets a new password as the apps'
@@ -36,6 +37,8 @@ pub(crate) struct Pending {
     kek: Option<Vec<u8>>,
     /// The last authorization answer (for `NeedsRecoveryKey`).
     auth: Option<AuthorizationResponse>,
+    /// The passkey ceremony URL while a passkey is pending.
+    passkey_url: Option<String>,
 }
 
 impl Pending {
@@ -44,6 +47,7 @@ impl Pending {
             email,
             kek: None,
             auth: None,
+            passkey_url: None,
         }
     }
 }
@@ -58,16 +62,30 @@ impl Drop for Pending {
 
 /// Argon2id off the async threads.
 async fn derive_kek(password: &str, salt_b64: &str, ops: u64, mem: u64) -> Result<Vec<u8>> {
-    let pw = password.as_bytes().to_vec();
+    let mut pw = password.as_bytes().to_vec();
     let salt = crypto::unb64(salt_b64)?;
-    tokio::task::spawn_blocking(move || crypto::derive_argon_key(&pw, &salt, ops, mem))
-        .await
-        .map_err(|e| CoreError::crypto(e.to_string()))?
-        .map_err(Into::into)
+    tokio::task::spawn_blocking(move || {
+        let k = crypto::derive_argon_key(&pw, &salt, ops, mem);
+        crypto::wipe(&mut pw);
+        k
+    })
+    .await
+    .map_err(|e| CoreError::crypto(e.to_string()))?
+    .map_err(Into::into)
 }
 
 fn non_empty(s: &Option<String>) -> Option<&str> {
     s.as_deref().filter(|s| !s.is_empty())
+}
+
+/// Check the server's SRP proof `M2`, as Ente's clients (`checkM2`) do. A
+/// missing proof is an error: without it the server never showed that it
+/// knows the verifier (an impostor would just leave it out).
+fn require_m2(client: &SrpClient, m2: &Option<String>, what: &str) -> Result<()> {
+    let m2 = non_empty(m2).ok_or_else(|| CoreError::crypto("server sent no SRP proof"))?;
+    client
+        .verify_m2(&crypto::unb64(m2)?)
+        .map_err(|_| CoreError::crypto(format!("the server failed to prove {what}")))
 }
 
 /// A v4 UUID from libsodium randomness (SRP identities).
@@ -92,20 +110,41 @@ type Unlocked = (Vec<u8>, Vec<u8>, Vec<u8>, String);
 /// Open the account keys and the token. `Err(IncorrectPassword)` if `kek`
 /// does not open the master key.
 fn unlock_with_master(
-    master_key: Vec<u8>,
+    mut master_key: Vec<u8>,
     ka: &KeyAttributes,
     auth: &AuthorizationResponse,
 ) -> Result<Unlocked> {
-    let secret_key = crypto::secretbox_open(
+    let mut secret_key = match crypto::secretbox_open(
         &crypto::unb64(&ka.encrypted_secret_key)?,
         &crypto::unb64(&ka.secret_key_decryption_nonce)?,
         &master_key,
-    )
-    .map_err(|_| CoreError::crypto("the secret key does not decrypt"))?;
+    ) {
+        Ok(k) => k,
+        Err(_) => {
+            crypto::wipe(&mut master_key);
+            return Err(CoreError::crypto("the secret key does not decrypt"));
+        }
+    };
+    match open_token(&secret_key, ka, auth) {
+        Ok((public_key, token)) => Ok((master_key, secret_key, public_key, token)),
+        Err(e) => {
+            crypto::wipe(&mut master_key);
+            crypto::wipe(&mut secret_key);
+            Err(e)
+        }
+    }
+}
+
+/// The public key and the auth token (sealed to the key pair, or plain).
+fn open_token(
+    secret_key: &[u8],
+    ka: &KeyAttributes,
+    auth: &AuthorizationResponse,
+) -> Result<(Vec<u8>, String)> {
     let public_key = crypto::unb64(&ka.public_key)?;
     let token = match (non_empty(&auth.encrypted_token), non_empty(&auth.token)) {
         (Some(et), _) => {
-            let mut raw = crypto::box_seal_open(&crypto::unb64(et)?, &public_key, &secret_key)
+            let mut raw = crypto::box_seal_open(&crypto::unb64(et)?, &public_key, secret_key)
                 .map_err(|_| CoreError::crypto("the auth token does not decrypt"))?;
             // Museum encodes the token URL-safe with padding (Go's URLEncoding).
             let t = base64::engine::general_purpose::URL_SAFE.encode(&raw);
@@ -115,7 +154,7 @@ fn unlock_with_master(
         (None, Some(t)) => t.to_string(),
         _ => return Err(CoreError::crypto("the server sent no auth token")),
     };
-    Ok((master_key, secret_key, public_key, token))
+    Ok((public_key, token))
 }
 
 /// Decrypt the master key with the KEK.
@@ -158,10 +197,19 @@ impl Inner {
             self.set_pending(Pending::new(email));
             return Ok(LoginStep::EmailOtt);
         };
-        let kek = derive_kek(password, &a.kek_salt, a.ops_limit, a.mem_limit).await?;
-        let login_key = crypto::derive_login_key(&kek)?;
+        let mut kek = derive_kek(password, &a.kek_salt, a.ops_limit, a.mem_limit).await?;
+        let mut login_key = match crypto::derive_login_key(&kek) {
+            Ok(k) => k,
+            Err(e) => {
+                crypto::wipe(&mut kek);
+                return Err(e.into());
+            }
+        };
         let salt = crypto::unb64(&a.srp_salt)?;
-        let mut client = SrpClient::new(a.srp_user_id.as_bytes(), &salt, &login_key);
+        // 4096-bit modpows: off the async worker.
+        let mut client =
+            crate::offload(|| SrpClient::new(a.srp_user_id.as_bytes(), &salt, &login_key));
+        crypto::wipe(&mut login_key);
         let session: CreateSrpSessionResponse = api
             .json(
                 Method::POST,
@@ -172,7 +220,8 @@ impl Inner {
                 },
             )
             .await?;
-        let m1 = client.compute_m1(&crypto::unb64(&session.srp_b)?)?;
+        let srp_b = crypto::unb64(&session.srp_b)?;
+        let m1 = crate::offload(|| client.compute_m1(&srp_b))?;
         let auth: AuthorizationResponse = match api
             .json(
                 Method::POST,
@@ -191,16 +240,13 @@ impl Inner {
             }
             Err(e) => return Err(e),
         };
-        if let Some(m2) = non_empty(&auth.srp_m2) {
-            client.verify_m2(&crypto::unb64(m2)?).map_err(|_| {
-                CoreError::crypto("the server failed to prove it knows the SRP verifier")
-            })?;
-        }
+        require_m2(&client, &auth.srp_m2, "it knows the SRP verifier")?;
         self.after_first_factor(
             Pending {
                 email,
                 kek: Some(kek),
                 auth: None,
+                passkey_url: None,
             },
             auth,
             password,
@@ -296,6 +342,44 @@ impl Inner {
         self.after_first_factor(pending, auth, password).await
     }
 
+    /// After `LoginStep::Passkey`, once the user finished the ceremony in the
+    /// browser (or the `photovault://passkey` redirect arrived): fetch the
+    /// verified session's answer from `/users/two-factor/passkeys/get-token`,
+    /// as Ente's apps poll it. While the ceremony is not done yet this
+    /// returns the same `Passkey` step again.
+    pub async fn verify_passkey(&self, session_id: &str, password: &str) -> Result<LoginStep> {
+        let api = self.anon_api()?;
+        let auth: AuthorizationResponse = match api
+            .get_json(
+                "/users/two-factor/passkeys/get-token",
+                &[("sessionID", session_id.to_string())],
+            )
+            .await
+        {
+            Ok(r) => r,
+            Err(e) if e.status() == Some(400) => {
+                let url = self
+                    .pending
+                    .lock()
+                    .unwrap_or_else(|e| e.into_inner())
+                    .as_ref()
+                    .and_then(|p| p.passkey_url.clone())
+                    .unwrap_or_default();
+                return Ok(LoginStep::Passkey {
+                    session_id: session_id.to_string(),
+                    url,
+                });
+            }
+            Err(e) if matches!(e.status(), Some(401 | 403 | 404 | 410)) => {
+                return Err(CoreError::IncorrectCode);
+            }
+            Err(e) => return Err(e),
+        };
+        let mut pending = self.take_pending().unwrap_or_default();
+        pending.passkey_url = None;
+        self.after_first_factor(pending, auth, password).await
+    }
+
     /// Second factor, then key decryption.
     async fn after_first_factor(
         &self,
@@ -312,6 +396,7 @@ impl Inner {
                 "{accounts}/passkeys/verify?passkeySessionID={sid}&redirect=photovault://passkey&clientPackage={}",
                 crate::api::CLIENT_PACKAGE
             );
+            p.passkey_url = Some(url.clone());
             let step = LoginStep::Passkey {
                 session_id: sid.to_string(),
                 url,
@@ -527,13 +612,21 @@ pub(crate) async fn set_password(
         tokio::task::spawn_blocking(move || crypto::derive_sensitive_key(&pw, &s2))
             .await
             .map_err(|e| CoreError::crypto(e.to_string()))??;
-    let (enc_key, nonce) = crypto::secretbox_seal(master_key, &kek)?;
-    let login_key = crypto::derive_login_key(&kek)?;
+    let sealed = crypto::secretbox_seal(master_key, &kek);
+    let login_key = crypto::derive_login_key(&kek);
     crypto::wipe(&mut kek);
+    let (enc_key, nonce) = sealed?;
+    let mut login_key = login_key?;
     let srp_user_id = uuid_v4();
     let srp_salt = crypto::random_bytes(16);
-    let verifier = crate::srp::verifier(srp_user_id.as_bytes(), &srp_salt, &login_key);
-    let mut client = SrpClient::new(srp_user_id.as_bytes(), &srp_salt, &login_key);
+    // 4096-bit modpows: off the async worker.
+    let (verifier, mut client) = crate::offload(|| {
+        (
+            crate::srp::verifier(srp_user_id.as_bytes(), &srp_salt, &login_key),
+            SrpClient::new(srp_user_id.as_bytes(), &srp_salt, &login_key),
+        )
+    });
+    crypto::wipe(&mut login_key);
     let setup: SetupSrpResponse = api
         .json(
             Method::POST,
@@ -546,7 +639,8 @@ pub(crate) async fn set_password(
             },
         )
         .await?;
-    let m1 = client.compute_m1(&crypto::unb64(&setup.srp_b)?)?;
+    let srp_b = crypto::unb64(&setup.srp_b)?;
+    let m1 = crate::offload(|| client.compute_m1(&srp_b))?;
     let updated = UpdatedKeyAttributes {
         kek_salt: crypto::b64(&salt),
         encrypted_key: crypto::b64(&enc_key),
@@ -566,11 +660,7 @@ pub(crate) async fn set_password(
             },
         )
         .await?;
-    if let Some(m2) = non_empty(&res.srp_m2) {
-        client.verify_m2(&crypto::unb64(m2)?).map_err(|_| {
-            CoreError::crypto("the server failed to prove it stored the new verifier")
-        })?;
-    }
+    require_m2(&client, &res.srp_m2, "it stored the new verifier")?;
     let mut out = ka.clone();
     out.kek_salt = updated.kek_salt;
     out.encrypted_key = updated.encrypted_key;

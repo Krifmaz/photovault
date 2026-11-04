@@ -13,6 +13,9 @@ use std::sync::{Arc, Mutex, MutexGuard, RwLock};
 
 /// kv key of the active server's public URL (plain).
 pub(crate) const KV_ACTIVE_SERVER: &str = "active_server";
+/// kv key prefix of "the user allows this server's plain-http home URL"
+/// (`home_allowed:<public url>` = `1`, plain).
+pub(crate) const KV_HOME_ALLOWED: &str = "home_allowed:";
 /// kv key of the sealed [`Session`].
 pub(crate) const KV_SESSION: &str = "session";
 
@@ -50,13 +53,31 @@ pub(crate) struct LiveUpload {
     pub bytes_done: u64,
 }
 
+/// Where requests go now: the active server's public URL and the base URL
+/// chosen for it (home or public). Kept together so a request for one
+/// server can never pick up another server's base.
+#[derive(Debug, Clone)]
+pub(crate) struct Base {
+    pub public: String,
+    pub url: String,
+}
+
+impl Base {
+    fn public(public: &str) -> Self {
+        Self {
+            public: public.to_string(),
+            url: public.to_string(),
+        }
+    }
+}
+
 /// Everything behind [`crate::Core`].
 pub struct Inner {
     pub(crate) cache_dir: PathBuf,
     store: Mutex<Store>,
     pub(crate) session: RwLock<Option<Arc<Session>>>,
     pub(crate) pending: Mutex<Option<crate::auth::Pending>>,
-    base: RwLock<Option<String>>,
+    base: RwLock<Option<Base>>,
     pub(crate) index: RwLock<Arc<Index>>,
     pub(crate) sync_lock: tokio::sync::Mutex<()>,
     pub(crate) upload_lock: tokio::sync::Mutex<()>,
@@ -65,10 +86,24 @@ pub struct Inner {
 
 impl Inner {
     /// Open the store and restore the session and index.
-    pub fn open(data_dir: PathBuf, cache_dir: PathBuf) -> Result<Arc<Self>> {
+    /// `device_key`: the 32-byte key that seals the store, supplied (and
+    /// kept wrapped) by the platform; `None` uses the legacy `device.key`
+    /// file (tests, desktop tools).
+    pub fn open(
+        data_dir: PathBuf,
+        cache_dir: PathBuf,
+        device_key: Option<Vec<u8>>,
+    ) -> Result<Arc<Self>> {
         crate::crypto::init();
         std::fs::create_dir_all(&cache_dir)?;
-        let store = Store::open(&data_dir)?;
+        let (store, reset) = Store::open_with(&data_dir, device_key)?;
+        if reset {
+            // The store was sealed under a key we no longer have: its account
+            // data is unreadable. Drop the encrypted object cache with it.
+            for d in ["thumbs", "files"] {
+                let _ = std::fs::remove_dir_all(cache_dir.join(d));
+            }
+        }
         let session: Option<Session> = store.get_sealed(KV_SESSION)?;
         let active = store.get_plain(KV_ACTIVE_SERVER)?;
         let inner = Arc::new(Self {
@@ -76,7 +111,7 @@ impl Inner {
             store: Mutex::new(store),
             session: RwLock::new(session.map(Arc::new)),
             pending: Mutex::new(None),
-            base: RwLock::new(active.clone()),
+            base: RwLock::new(active.as_deref().map(Base::public)),
             index: RwLock::new(Arc::new(Index::default())),
             sync_lock: tokio::sync::Mutex::new(()),
             upload_lock: tokio::sync::Mutex::new(()),
@@ -114,13 +149,57 @@ impl Inner {
         Ok(Api::new(&base))
     }
 
-    /// A client for the active base URL with the session token.
+    /// A client for the signed-in account's server, with the session token.
+    /// The token only ever goes to that server: its home URL when that is
+    /// the current choice for it, otherwise its public URL, never another
+    /// server the user selected meanwhile.
     pub(crate) fn api(&self) -> Result<Api> {
         let s = self.session()?;
+        let own = &s.account.server_url;
         let base = self
-            .active_base_url()
-            .unwrap_or_else(|| s.account.server_url.clone());
+            .base
+            .read()
+            .unwrap_or_else(|e| e.into_inner())
+            .as_ref()
+            .filter(|b| &b.public == own || &b.url == own)
+            .map(|b| b.url.clone())
+            .unwrap_or_else(|| own.clone());
         Ok(Api::new(&base).with_token(s.token.clone()))
+    }
+
+    fn set_base(&self, b: Option<Base>) {
+        *self.base.write().unwrap_or_else(|e| e.into_inner()) = b;
+    }
+
+    /// Whether the user allowed the plain-http home URL of `public_url`.
+    pub fn home_url_allowed(&self, public_url: &str) -> bool {
+        self.store()
+            .get_plain(&format!("{KV_HOME_ALLOWED}{public_url}"))
+            .ok()
+            .flatten()
+            .is_some_and(|v| v == "1")
+    }
+
+    /// Allow (or stop allowing) a plain-http home URL for `public_url`.
+    pub fn set_home_url_allowed(self: &Arc<Self>, public_url: &str, allowed: bool) -> Result<()> {
+        let k = format!("{KV_HOME_ALLOWED}{public_url}");
+        {
+            let st = self.store();
+            if allowed {
+                st.put_plain(&k, "1")?;
+            } else {
+                st.delete(&k)?;
+            }
+        }
+        if !allowed && self.active_public_url().as_deref() == Some(public_url) {
+            // Stop using the home URL right away, before the re-probe finishes.
+            self.set_base(Some(Base::public(public_url)));
+        }
+        let me = self.clone();
+        crate::runtime().spawn(async move {
+            me.refresh_network().await;
+        });
+        Ok(())
     }
 
     /// The public URL of the active server.
@@ -143,9 +222,8 @@ impl Inner {
         };
         if make_active {
             self.store().put_plain(KV_ACTIVE_SERVER, &info.public_url)?;
-            *self.base.write().unwrap_or_else(|e| e.into_inner()) = Some(info.public_url.clone());
-            let base = server::choose_base(&info).await;
-            *self.base.write().unwrap_or_else(|e| e.into_inner()) = Some(base);
+            self.set_base(Some(Base::public(&info.public_url)));
+            self.refresh_network().await;
         }
         Ok(info)
     }
@@ -155,7 +233,10 @@ impl Inner {
         st.remove_server(public_url)?;
         if st.get_plain(KV_ACTIVE_SERVER)?.as_deref() == Some(public_url) {
             st.delete(KV_ACTIVE_SERVER)?;
-            *self.base.write().unwrap_or_else(|e| e.into_inner()) = None;
+            st.delete(&format!("{KV_HOME_ALLOWED}{public_url}"))?;
+            self.set_base(None);
+        } else {
+            st.delete(&format!("{KV_HOME_ALLOWED}{public_url}"))?;
         }
         Ok(())
     }
@@ -168,7 +249,7 @@ impl Inner {
             }
             st.put_plain(KV_ACTIVE_SERVER, public_url)?;
         }
-        *self.base.write().unwrap_or_else(|e| e.into_inner()) = Some(public_url.to_string());
+        self.set_base(Some(Base::public(public_url)));
         let me = self.clone();
         crate::runtime().spawn(async move {
             me.refresh_network().await;
@@ -177,7 +258,11 @@ impl Inner {
     }
 
     pub fn active_base_url(&self) -> Option<String> {
-        self.base.read().unwrap_or_else(|e| e.into_inner()).clone()
+        self.base
+            .read()
+            .unwrap_or_else(|e| e.into_inner())
+            .as_ref()
+            .map(|b| b.url.clone())
     }
 
     pub async fn refresh_network(&self) -> Option<String> {
@@ -188,10 +273,14 @@ impl Inner {
             .ok()?
             .into_iter()
             .find(|s| s.public_url == active)?;
-        let base = server::choose_base(&info).await;
+        let allow_http = self.home_url_allowed(&active);
+        let base = server::choose_base(&info, allow_http).await;
         // The user may have switched servers while we probed.
         if self.active_public_url().as_deref() == Some(active.as_str()) {
-            *self.base.write().unwrap_or_else(|e| e.into_inner()) = Some(base.clone());
+            self.set_base(Some(Base {
+                public: active,
+                url: base.clone(),
+            }));
             Some(base)
         } else {
             self.active_base_url()

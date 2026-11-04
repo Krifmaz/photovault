@@ -245,7 +245,7 @@ impl<'a> ObjectUploader<'a> {
         res.urls
             .into_iter()
             .next()
-            .ok_or_else(|| CoreError::network("server returned no upload URL"))
+            .ok_or_else(|| CoreError::protocol("server returned no upload URL"))
     }
 
     async fn multipart_urls(
@@ -294,7 +294,7 @@ impl<'a> ObjectUploader<'a> {
             total.min(MULTIPART_CHUNKS_PER_PART * (ENCRYPTION_CHUNK_SIZE + STREAM_ABYTES) as u64);
         let urls = self.multipart_urls(total, part_length, parts).await?;
         if urls.part_urls.len() as u64 != parts {
-            return Err(CoreError::network(format!(
+            return Err(CoreError::protocol(format!(
                 "server returned {} part URLs for {parts} parts",
                 urls.part_urls.len()
             )));
@@ -323,7 +323,7 @@ impl<'a> ObjectUploader<'a> {
                 .get(reqwest::header::ETAG)
                 .and_then(|v| v.to_str().ok())
                 .map(str::to_string)
-                .ok_or_else(|| CoreError::network("no ETag in part upload response"))?;
+                .ok_or_else(|| CoreError::protocol("no ETag in part upload response"))?;
             etags.push(etag);
             (self.progress)(data.len() as u64);
         }
@@ -363,7 +363,7 @@ pub fn complete_multipart_body(etags: &[String]) -> String {
 }
 
 /// The sealed state of a queued upload.
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize)]
 struct UpState {
     path: String,
     /// Per-file key (fresh random), set once the file has been prepared.
@@ -372,6 +372,22 @@ struct UpState {
     file_obj: Option<UploadedObject>,
     thumb_obj: Option<UploadedObject>,
     file_id: Option<i64>,
+}
+
+impl std::fmt::Debug for UpState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("UpState")
+            .field("file_id", &self.file_id)
+            .finish_non_exhaustive()
+    }
+}
+
+impl Drop for UpState {
+    fn drop(&mut self) {
+        if let Some(k) = self.file_key.as_mut() {
+            crypto::wipe(k);
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -457,10 +473,9 @@ impl Inner {
             return Err(CoreError::storage(format!("{path} is not a file")));
         }
         let st = self.store();
-        let sealed = st.seal(&UpState {
-            path: path.to_string(),
-            ..Default::default()
-        })?;
+        let mut state = UpState::default();
+        state.path = path.to_string();
+        let sealed = st.seal(&state)?;
         st.conn().execute(
             "INSERT INTO uploads (state, collection_id, bytes_total, sealed, created_at) VALUES (?1, ?2, ?3, ?4, ?5)",
             params![UP_PENDING, collection_id, meta.len() as i64, sealed, now_us()],

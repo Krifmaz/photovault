@@ -1,5 +1,6 @@
 //! HTTP client for Ente's API: the headers the apps send, JSON helpers,
-//! retries with backoff on 429 / 5xx / network errors, redirects followed
+//! retries with backoff on 429 / 5xx / network errors (idempotent requests
+//! only; POSTs just on connect failures and 429), redirects followed
 //! without the auth token, and TLS via rustls + ring with Mozilla's roots.
 //!
 //! Adapted from `importers/src/ente/api.rs` (branch `claude/project-thread-cp9x81`)
@@ -165,8 +166,13 @@ impl Api {
             .header("X-Client-Package", CLIENT_PACKAGE)
     }
 
-    /// Send what `make` builds, retrying on 429, 5xx and network errors.
-    /// Non-2xx answers (other than 3xx) become [`CoreError`]s.
+    /// Send what `make` builds. Idempotent requests (GET, HEAD, PUT, DELETE,
+    /// OPTIONS) are retried on 429, 5xx and network errors. Others (POST,
+    /// PATCH: create a file or collection, SRP steps) are retried only when
+    /// nothing reached the server: a failed connect, or a 429 refusal. A lost
+    /// answer to a POST that the server did process must not be replayed
+    /// (duplicate file, used SRP session). Non-2xx answers (other than 3xx)
+    /// become [`CoreError`]s.
     pub async fn send(&self, make: impl Fn() -> RequestBuilder) -> Result<Response> {
         let mut retry = 0u32;
         loop {
@@ -176,22 +182,25 @@ impl Api {
                 .base_delay
                 .saturating_mul(2u32.saturating_pow(retry))
                 .min(self.retry.max_delay);
-            match make().send().await {
+            let (client, req) = make().build_split();
+            let req = req.map_err(|e| net_error(&e, &self.base))?;
+            let idempotent = is_idempotent(req.method());
+            match client.execute(req).await {
                 Ok(res) if res.status().is_success() || res.status().is_redirection() => {
                     return Ok(res);
                 }
                 Ok(res) => {
                     let status = res.status();
-                    if (status == StatusCode::TOO_MANY_REQUESTS || status.is_server_error())
-                        && !last
-                    {
+                    let retryable = status == StatusCode::TOO_MANY_REQUESTS
+                        || (idempotent && status.is_server_error());
+                    if retryable && !last {
                         tokio::time::sleep(delay).await;
                         retry += 1;
                         continue;
                     }
                     return Err(error_from(res).await);
                 }
-                Err(e) if !last && !e.is_builder() => {
+                Err(e) if !last && !e.is_builder() && (idempotent || e.is_connect()) => {
                     tokio::time::sleep(delay).await;
                     retry += 1;
                 }
@@ -259,13 +268,21 @@ impl Api {
             .headers()
             .get(reqwest::header::LOCATION)
             .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| CoreError::network("redirect without Location"))?;
+            .ok_or_else(|| CoreError::protocol("redirect without Location"))?;
         let target = url::Url::parse(&format!("{}{}", self.base, path))
             .and_then(|u| u.join(location))
-            .map_err(CoreError::network)?;
+            .map_err(CoreError::protocol)?;
         self.send(|| self.storage_request(Method::GET, target.as_str()))
             .await
     }
+}
+
+/// Whether replaying `m` after a lost answer is harmless.
+fn is_idempotent(m: &Method) -> bool {
+    matches!(
+        *m,
+        Method::GET | Method::HEAD | Method::PUT | Method::DELETE | Method::OPTIONS
+    )
 }
 
 async fn error_from(res: Response) -> CoreError {
@@ -291,7 +308,7 @@ async fn error_from(res: Response) -> CoreError {
 
 async fn parse<T: DeserializeOwned>(res: Response) -> Result<T> {
     let bytes = res.bytes().await.map_err(CoreError::network)?;
-    serde_json::from_slice(&bytes).map_err(|e| CoreError::network(format!("bad answer: {e}")))
+    serde_json::from_slice(&bytes).map_err(|e| CoreError::protocol(format!("bad answer: {e}")))
 }
 
 #[cfg(test)]
@@ -306,6 +323,14 @@ mod tests {
             "photos.example.com"
         );
         assert_eq!(display_address("nonsense"), "nonsense");
+    }
+
+    #[test]
+    fn only_idempotent_methods_are_replayed() {
+        assert!(is_idempotent(&Method::GET));
+        assert!(is_idempotent(&Method::PUT));
+        assert!(!is_idempotent(&Method::POST));
+        assert!(!is_idempotent(&Method::PATCH));
     }
 
     #[test]

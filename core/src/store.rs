@@ -2,9 +2,13 @@
 //!
 //! No plaintext key or decrypted metadata is ever written: every sensitive
 //! value is sealed with [`crypto::seal_local`] (secretbox, fresh nonce) under
-//! the 32-byte device key in `device.key` next to the database (contract v1;
-//! later wrapped by the Android Keystore). Only ids, server timestamps and
-//! upload states, which the server knows anyway, are stored in the clear.
+//! a 32-byte device key. The apps supply that key themselves and keep it
+//! wrapped by the platform keystore (Android: a non-exportable AES key in
+//! the Android Keystore), so the data directory alone does not open the
+//! store. Without a supplied key (tests, tools) the legacy `device.key` file
+//! next to the database is used; a store found with such a file is re-sealed
+//! under the supplied key and the file deleted. Only ids, server timestamps
+//! and upload states, which the server knows anyway, are stored in the clear.
 
 use crate::crypto;
 use crate::{CoreError, Result, ServerInfo};
@@ -42,15 +46,38 @@ pub const UP_FAILED: &str = "failed";
 /// Finished; removed when the queue drains.
 pub const UP_DONE: &str = "done";
 
+/// kv key of a sealed constant: tells whether a supplied key is the one the
+/// store was sealed with.
+const KV_KEY_CHECK: &str = "key_check";
+const KEY_CHECK: &str = "photovault-store-v1";
+/// The legacy device key file.
+const LEGACY_KEY_FILE: &str = "device.key";
+
 /// The store.
 pub struct Store {
     conn: Connection,
     key: Vec<u8>,
 }
 
-/// Load or create the device key.
+impl Drop for Store {
+    fn drop(&mut self) {
+        crypto::wipe(&mut self.key);
+    }
+}
+
+/// Load the legacy device key file, if there is one.
+fn legacy_key(dir: &Path) -> Result<Option<Vec<u8>>> {
+    match std::fs::read(dir.join(LEGACY_KEY_FILE)) {
+        Ok(k) if k.len() == 32 => Ok(Some(k)),
+        Ok(_) => Err(CoreError::storage("device.key is corrupt")),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(e.into()),
+    }
+}
+
+/// Load or create the legacy device key file.
 fn device_key(dir: &Path) -> Result<Vec<u8>> {
-    let path = dir.join("device.key");
+    let path = dir.join(LEGACY_KEY_FILE);
     match std::fs::read(&path) {
         Ok(k) if k.len() == 32 => return Ok(k),
         Ok(_) => return Err(CoreError::storage("device.key is corrupt")),
@@ -77,16 +104,93 @@ fn device_key(dir: &Path) -> Result<Vec<u8>> {
 }
 
 impl Store {
-    /// Open the store in `dir`.
+    /// Open the store in `dir` with the legacy `device.key` file.
+    #[cfg(test)]
     pub fn open(dir: &Path) -> Result<Self> {
+        Self::open_with(dir, None).map(|(s, _)| s)
+    }
+
+    /// Open the store in `dir`, sealed under `key` (the platform-supplied
+    /// device key) or, without one, the legacy `device.key` file. Returns
+    /// whether the account data had to be dropped because it was sealed
+    /// under a key that is gone (keystore reset): the user signs in again.
+    pub fn open_with(dir: &Path, key: Option<Vec<u8>>) -> Result<(Self, bool)> {
         std::fs::create_dir_all(dir)?;
-        let key = device_key(dir)?;
+        let supplied = key.is_some();
+        let key = match key {
+            Some(k) if k.len() == 32 => k,
+            Some(mut k) => {
+                crypto::wipe(&mut k);
+                return Err(CoreError::storage("the device key must be 32 bytes"));
+            }
+            None => device_key(dir)?,
+        };
         let conn = Connection::open(dir.join("photovault-core.sqlite"))?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
         conn.pragma_update(None, "synchronous", "NORMAL")?;
         conn.busy_timeout(std::time::Duration::from_secs(5))?;
         conn.execute_batch(SCHEMA)?;
-        Ok(Self { conn, key })
+        let mut store = Self { conn, key };
+        let reset = if supplied {
+            store.adopt_key(dir)?
+        } else {
+            false
+        };
+        Ok((store, reset))
+    }
+
+    /// Make sure everything is sealed under the supplied key: re-seal a
+    /// legacy store, or drop account data sealed under a lost key.
+    fn adopt_key(&mut self, dir: &Path) -> Result<bool> {
+        // `Some("")`: a check value that does not open under this key.
+        let check: Option<String> = self
+            .get_sealed(KV_KEY_CHECK)
+            .unwrap_or_else(|_| Some(String::new()));
+        if check.as_deref() == Some(KEY_CHECK) {
+            if legacy_key(dir)?.is_some() {
+                std::fs::remove_file(dir.join(LEGACY_KEY_FILE))?;
+            }
+            return Ok(false);
+        }
+        let mut reset = false;
+        match legacy_key(dir)? {
+            Some(mut old) if check.is_none() => {
+                let r = self.reseal_from(&old);
+                crypto::wipe(&mut old);
+                r?;
+            }
+            _ if check.is_some() || self.has_account_data()? => {
+                // Sealed under a key we do not have any more.
+                self.wipe_account()?;
+                reset = true;
+            }
+            _ => {}
+        }
+        self.put_sealed(KV_KEY_CHECK, &KEY_CHECK)?;
+        let legacy = dir.join(LEGACY_KEY_FILE);
+        if legacy.exists() {
+            std::fs::remove_file(legacy)?;
+        }
+        Ok(reset)
+    }
+
+    fn has_account_data(&self) -> Result<bool> {
+        let n: i64 = self.conn.query_row(
+            "SELECT (SELECT COUNT(*) FROM kv WHERE k = 'session')              + (SELECT COUNT(*) FROM files) + (SELECT COUNT(*) FROM collections)              + (SELECT COUNT(*) FROM uploads)",
+            [],
+            |r| r.get(0),
+        )?;
+        Ok(n > 0)
+    }
+
+    /// Re-seal every sealed value from `old` to the current key. kv values
+    /// that do not open under `old` are plain and kept; damaged rows of the
+    /// sealed tables are dropped (the next sync fetches them again).
+    fn reseal_from(&mut self, old: &[u8]) -> Result<()> {
+        let mut key = self.key.clone();
+        let r = reseal_tx(&mut self.conn, old, &key);
+        crypto::wipe(&mut key);
+        r
     }
 
     /// The raw connection.
@@ -109,11 +213,15 @@ impl Store {
 
     /// Open a sealed value.
     pub fn open_sealed<T: DeserializeOwned>(&self, blob: &[u8]) -> Result<T> {
-        let mut json = crypto::open_local(blob, &self.key)
-            .map_err(|_| CoreError::storage("local data does not decrypt (device key changed?)"))?;
-        let v = serde_json::from_slice(&json);
-        crypto::wipe(&mut json);
-        Ok(v?)
+        open_sealed_with(blob, &self.key)
+    }
+
+    /// Something that opens sealed values without holding the store (and
+    /// its lock): read blobs under the lock, decrypt after releasing it.
+    pub fn opener(&self) -> Opener {
+        Opener {
+            key: self.key.clone(),
+        }
     }
 
     // ---- key/value ----
@@ -203,11 +311,77 @@ impl Store {
         let tx = self.conn.transaction()?;
         tx.execute_batch(
             "DELETE FROM collections; DELETE FROM files; DELETE FROM collection_files; \
-             DELETE FROM uploads; DELETE FROM kv WHERE k NOT IN ('active_server');",
+             DELETE FROM uploads; \
+             DELETE FROM kv WHERE k NOT IN ('active_server', 'key_check') \
+             AND k NOT LIKE 'home_allowed:%';",
         )?;
         tx.commit()?;
         Ok(())
     }
+}
+
+fn reseal_tx(conn: &mut Connection, old: &[u8], key: &[u8]) -> Result<()> {
+    let tx = conn.transaction()?;
+    let reseal = |blob: &[u8]| -> Option<Vec<u8>> {
+        let mut plain = crypto::open_local(blob, old).ok()?;
+        let out = crypto::seal_local(&plain, key).ok();
+        crypto::wipe(&mut plain);
+        out
+    };
+    let kv: Vec<(String, Vec<u8>)> = {
+        let mut q = tx.prepare("SELECT k, v FROM kv")?;
+        q.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+            .collect::<rusqlite::Result<_>>()?
+    };
+    for (k, v) in kv {
+        if let Some(n) = reseal(&v) {
+            tx.execute("UPDATE kv SET v = ?1 WHERE k = ?2", params![n, k])?;
+        }
+    }
+    for table in ["collections", "files", "uploads"] {
+        let rows: Vec<(i64, Vec<u8>)> = {
+            let mut q = tx.prepare(&format!("SELECT id, sealed FROM {table}"))?;
+            q.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+                .collect::<rusqlite::Result<_>>()?
+        };
+        for (id, v) in rows {
+            match reseal(&v) {
+                Some(n) => tx.execute(
+                    &format!("UPDATE {table} SET sealed = ?1 WHERE id = ?2"),
+                    params![n, id],
+                )?,
+                None => tx.execute(&format!("DELETE FROM {table} WHERE id = ?1"), params![id])?,
+            };
+        }
+    }
+    tx.commit()?;
+    Ok(())
+}
+
+/// Opens sealed values; see [`Store::opener`].
+pub struct Opener {
+    key: Vec<u8>,
+}
+
+impl Opener {
+    /// Open a sealed value.
+    pub fn open_sealed<T: DeserializeOwned>(&self, blob: &[u8]) -> Result<T> {
+        open_sealed_with(blob, &self.key)
+    }
+}
+
+impl Drop for Opener {
+    fn drop(&mut self) {
+        crypto::wipe(&mut self.key);
+    }
+}
+
+fn open_sealed_with<T: DeserializeOwned>(blob: &[u8], key: &[u8]) -> Result<T> {
+    let mut json = crypto::open_local(blob, key)
+        .map_err(|_| CoreError::storage("local data does not decrypt (device key changed?)"))?;
+    let v = serde_json::from_slice(&json);
+    crypto::wipe(&mut json);
+    Ok(v?)
 }
 
 /// Now, µs since the epoch.
@@ -221,6 +395,48 @@ pub fn now_us() -> i64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn supplied_key_reseals_a_legacy_store_and_detects_a_lost_key() {
+        let dir = tempfile::tempdir().unwrap();
+        {
+            let s = Store::open(dir.path()).unwrap();
+            s.put_sealed("session", &"kept across the migration")
+                .unwrap();
+            s.put_plain("active_server", "https://a").unwrap();
+        }
+        assert!(dir.path().join(LEGACY_KEY_FILE).exists());
+        let k1 = crypto::generate_key();
+        {
+            let (s, reset) = Store::open_with(dir.path(), Some(k1.clone())).unwrap();
+            assert!(!reset);
+            assert_eq!(
+                s.get_sealed::<String>("session").unwrap().as_deref(),
+                Some("kept across the migration")
+            );
+            assert_eq!(
+                s.get_plain("active_server").unwrap().as_deref(),
+                Some("https://a")
+            );
+        }
+        // The key file is gone: the data directory alone no longer opens the store.
+        assert!(!dir.path().join(LEGACY_KEY_FILE).exists());
+        {
+            let (s, reset) = Store::open_with(dir.path(), Some(k1.clone())).unwrap();
+            assert!(!reset);
+            assert!(s.get_sealed::<String>("session").unwrap().is_some());
+        }
+        // A different key (keystore reset): account data is dropped, servers kept.
+        let (s, reset) = Store::open_with(dir.path(), Some(crypto::generate_key())).unwrap();
+        assert!(reset);
+        assert!(s.get_sealed::<String>("session").unwrap().is_none());
+        assert_eq!(
+            s.get_plain("active_server").unwrap().as_deref(),
+            Some("https://a")
+        );
+        drop(s);
+        assert!(Store::open_with(dir.path(), Some(vec![1; 5])).is_err());
+    }
 
     #[test]
     fn sealed_values_roundtrip_and_are_not_plaintext() {

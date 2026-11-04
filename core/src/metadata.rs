@@ -104,7 +104,9 @@ pub fn decrypt_magic(remote: &RemoteMagicMetadata, key: &[u8]) -> crate::Result<
         &crypto::unb64(&remote.header)?,
         key,
     )?;
-    let data = match serde_json::from_slice::<Value>(&json)? {
+    let parsed = serde_json::from_slice::<Value>(&json)
+        .map_err(|e| crate::CoreError::protocol(format!("magic metadata is not JSON: {e}")))?;
+    let data = match parsed {
         Value::Object(m) => m,
         _ => Map::new(),
     };
@@ -128,7 +130,8 @@ pub fn decrypt_json(encrypted_data: &str, header: &str, key: &[u8]) -> crate::Re
         &crypto::unb64(header)?,
         key,
     )?;
-    Ok(serde_json::from_slice(&plain)?)
+    serde_json::from_slice(&plain)
+        .map_err(|e| crate::CoreError::protocol(format!("metadata is not JSON: {e}")))
 }
 
 /// The content hash of decrypted file metadata, as `metadataHash` in the
