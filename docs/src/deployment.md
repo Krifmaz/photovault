@@ -184,3 +184,22 @@ Back up:
 * [HTTPS behind a reverse proxy](deployment/reverse-proxy.md)
 * [Optional mTLS device certificates](deployment/mtls.md)
 * [LAN discovery](discovery.md)
+
+## Building the image yourself
+
+```sh
+docker build -t photovault .
+```
+
+builds the server and the web apps (Photos at `/`, plus `/albums`, `/cast`,
+`/accounts` and `/embed`) in one go, with the same script the web CI uses
+(`web/scripts/photovault-build.sh`). It needs network access for npm, crates
+and the Rust toolchains, and takes about 15 minutes the first time.
+Build options:
+
+| Option | Effect |
+|---|---|
+| `--build-arg WEB=prebuilt --build-context webout=./photovault-web` | Use a web build made earlier (e.g. the `photovault-web` CI artifact) instead of building it. |
+| `--build-arg WEB=none` | Server only; the API works, no web apps. |
+| `--secret id=ca,src=/path/ca.crt` | Trust an extra CA while building (TLS-intercepting proxy). |
+| `--build-arg PHOTOVAULT_COMMIT=$(git rev-parse --short HEAD)` | Commit shown in `/photovault/info`. |
