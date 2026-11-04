@@ -246,7 +246,10 @@ jobs:
                       exit 1
                   fi
                   badging=$("$bt/aapt2" dump badging "$apk")
-                  grep -E "^package: name='app.photovault' versionCode='$VERSION_CODE' versionName='$VERSION_NAME'" <<<"$badging" \
+                  # --split-per-abi: Flutter adds 1000 * ABI index (arm64-v8a = 2)
+                  # to each split's versionCode, so arm64 is build_number + 2000.
+                  apk_code=$((VERSION_CODE + 2000))
+                  grep -E "^package: name='app.photovault' versionCode='$apk_code' versionName='$VERSION_NAME'" <<<"$badging" \
                       || { echo "::error::unexpected package line: $(head -1 <<<"$badging")"; exit 1; }
                   # arm64 only.
                   if unzip -l "$apk" | grep -E ' lib/' | grep -v ' lib/arm64-v8a/'; then

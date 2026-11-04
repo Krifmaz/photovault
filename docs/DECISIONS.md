@@ -10,6 +10,9 @@ Calls that are not obvious from the code, newest first.
   stored counter and is above Ente's last code (2158), so it never looks like a
   downgrade. Limits: minor < 100, patch < 10000; the version job fails loudly
   past them. `pubspec.yaml` carries the same scheme for local builds only.
+  With `--split-per-abi` Flutter adds 2000 to the arm64 APK's versionCode
+  (1000 × ABI index), so v0.1.5 ships as 12005; still a constant offset, so it
+  still rises every release.
 - **Release key is mandatory for releases.** A release build without the
   `PHOTOVAULT_KEYSTORE_*` secrets fails instead of shipping a debug-signed APK,
   and the certificate is checked against the Photovault key's SHA-256. PR and

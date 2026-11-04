@@ -3,7 +3,8 @@ description: ente photos application
 
 # PHOTOVAULT: version. The release workflow overrides both parts with
 # --build-name (the tag without the v) and --build-number
-# (major*1000000 + minor*10000 + patch); this value is only for local builds.
+# (major*1000000 + minor*10000 + patch; the arm64 split APK adds 2000);
+# this value is only for local builds.
 version: 0.1.4+10004
 publish_to: none
 
