@@ -14,7 +14,9 @@ import "package:photos/models/backup/backup_item.dart";
 import "package:photos/models/backup/backup_item_status.dart";
 import "package:photos/models/file/extensions/file_props.dart";
 import "package:photos/module/upload/service/file_uploader.dart";
+import "package:photos/services/photovault/backup_progress/backup_progress_service.dart";
 import "package:photos/services/search_service.dart";
+import "package:photos/ui/photovault/backup_progress_banner.dart";
 import "package:photos/ui/settings/backup/backup_item_card.dart";
 
 class BackupStatusScreen extends StatefulWidget {
@@ -110,6 +112,15 @@ class _BackupStatusScreenState extends State<BackupStatusScreen> {
       body: AppBarComponent(
         title: context.strings.backupStatus,
         slivers: [
+          // PHOTOVAULT: progress, Pause/Resume, Wi-Fi only, error details.
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
+            sliver: SliverToBoxAdapter(
+              child: BackupProgressPanel(
+                service: BackupProgressService.instance,
+              ),
+            ),
+          ),
           if (allItems.isEmpty)
             const SliverFillRemaining(
               hasScrollBody: false,

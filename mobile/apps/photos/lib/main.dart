@@ -52,6 +52,7 @@ import 'package:photos/services/memory_lane/memory_lane_service.dart';
 import 'package:photos/services/memory_share_service.dart';
 import "package:photos/services/notification_service.dart";
 import "package:photos/services/photos_contacts_service.dart";
+import "package:photos/services/photovault/backup_progress/backup_progress_service.dart";
 import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT
 import "package:photos/services/process_activity.dart";
 import 'package:photos/services/push_service.dart';
@@ -580,6 +581,10 @@ Future<void> _init(
     PersonService.init(entityService, MLDataDB.instance, preferences);
     _logger.info("SyncService init $tlog");
     await SyncService.instance.init(preferences);
+    if (!isBackground) {
+      // PHOTOVAULT: backup progress notification + Photos banner.
+      await BackupProgressService.instance.init(preferences);
+    }
     _isSyncInitialized = true;
     _logger.info("SyncService init done $tlog");
     if (!isBackground && flagService.librarySharing) {

@@ -81,6 +81,10 @@ class FileUploader {
   bool _hasStartedBackgroundUploadPolling = false;
 
   late MultiPartUploader _multiPartUploader;
+
+  /// PHOTOVAULT: bytes sent since the last call, for the backup speed.
+  void Function(int bytes)? onBytesSent;
+  final _bytesSentByLocalID = <String, int>{};
   UploadTransport? _uploadTransport;
   StreamSubscription<LocalPhotosUpdatedEvent>? _localPhotosUpdatedSubscription;
 
@@ -249,8 +253,10 @@ class FileUploader {
         file,
         collectionID,
         forcedUpload,
-        onSendProgress: (sent, total) =>
-            _queue.updateBackupProgress(item, file.localID!, sent, total),
+        onSendProgress: (sent, total) {
+          _reportBytesSent(file.localID!, sent);
+          _queue.updateBackupProgress(item, file.localID!, sent, total);
+        },
       );
       stopwatch.stop();
       if (stopwatch.elapsed >= _longRunningUploadThreshold) {
@@ -276,9 +282,20 @@ class FileUploader {
       _queue.fail(item, e);
       return null;
     } finally {
+      _bytesSentByLocalID.remove(file.localID);
       _queue.finishAttempt(item);
       _pollQueue();
     }
+  }
+
+  void _reportBytesSent(String localID, int sent) {
+    final listener = onBytesSent;
+    if (listener == null) return;
+    final previous = _bytesSentByLocalID[localID] ?? 0;
+    // A retried request starts again from zero.
+    final delta = sent >= previous ? sent - previous : sent;
+    _bytesSentByLocalID[localID] = sent;
+    if (delta > 0) listener(delta);
   }
 
   Future<void> removeStaleFiles() =>
@@ -287,6 +304,10 @@ class FileUploader {
   Future<void> checkNetworkForUpload({bool isForceUpload = false}) async {
     if (isForceUpload) {
       return;
+    }
+    // PHOTOVAULT: Pause from the backup notification.
+    if (backupSettings.isBackupPausedByUser()) {
+      throw BackupPausedByUserError();
     }
     final canUploadUnderCurrentNetworkConditions = await canUseHighBandwidth();
 

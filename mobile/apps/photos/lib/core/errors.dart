@@ -46,6 +46,9 @@ class WiFiUnavailableError extends Error implements LocallyHandledError {
 
 class SyncStopRequestedError extends Error {}
 
+/// PHOTOVAULT: the user paused backup from the notification or the app.
+class BackupPausedByUserError extends Error implements LocallyHandledError {}
+
 class NoActiveSubscriptionError extends Error implements LocallyHandledError {}
 
 class StorageLimitExceededError extends Error implements LocallyHandledError {}

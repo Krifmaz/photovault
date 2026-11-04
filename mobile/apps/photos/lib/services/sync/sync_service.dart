@@ -141,7 +141,20 @@ class SyncService {
     } on WiFiUnavailableError {
       _logger.warning("Not uploading over mobile data");
       Bus.instance.fire(
-        SyncStatusUpdate(SyncStatus.paused, reason: "Waiting for WiFi..."),
+        SyncStatusUpdate(
+          SyncStatus.paused,
+          reason: "Waiting for WiFi...",
+          pauseCause: SyncPauseCause.wifi,
+        ),
+      );
+    } on BackupPausedByUserError {
+      _logger.info("Backup paused by the user");
+      Bus.instance.fire(
+        SyncStatusUpdate(
+          SyncStatus.paused,
+          reason: "Backup paused",
+          pauseCause: SyncPauseCause.user,
+        ),
       );
     } on SyncStopRequestedError {
       _syncStopRequested = false;
@@ -178,6 +191,8 @@ class SyncService {
             SyncStatusUpdate(
               SyncStatus.paused,
               reason: "Waiting for network...",
+              pauseCause: SyncPauseCause.network,
+              details: _describeDioError(e),
             ),
           );
           _logger.severe("unable to connect", e, StackTrace.current);
@@ -185,7 +200,12 @@ class SyncService {
         }
       }
       _logger.severe("backup failed", e, StackTrace.current);
-      Bus.instance.fire(SyncStatusUpdate(SyncStatus.error));
+      Bus.instance.fire(
+        SyncStatusUpdate(
+          SyncStatus.error,
+          details: e is DioException ? _describeDioError(e) : e.toString(),
+        ),
+      );
       rethrow;
     } finally {
       _existingSync?.complete(successful);
@@ -199,6 +219,44 @@ class SyncService {
   void stopSync() {
     _logger.info("Sync stop requested");
     _syncStopRequested = true;
+  }
+
+  /// PHOTOVAULT: Pause from the backup notification or the app. Files that
+  /// are already uploading finish; nothing new starts until [resumeBackup].
+  Future<void> pauseBackup() async {
+    _logger.info("Backup pause requested");
+    await backupSettings.setBackupPausedByUser(true);
+    _uploader.clearQueue(BackupPausedByUserError());
+    Bus.instance.fire(
+      SyncStatusUpdate(
+        SyncStatus.paused,
+        reason: "Backup paused",
+        pauseCause: SyncPauseCause.user,
+      ),
+    );
+  }
+
+  /// PHOTOVAULT: Resume (or Retry) from the backup notification or the app.
+  Future<void> resumeBackup() async {
+    _logger.info("Backup resume requested");
+    await backupSettings.setBackupPausedByUser(false);
+    final running = _existingSync?.future;
+    if (running != null) {
+      await running;
+    }
+    unawaited(sync());
+  }
+
+  static String _describeDioError(DioException e) {
+    final parts = <String>[
+      "type: ${e.type.name}",
+      if (e.requestOptions.uri.host.isNotEmpty)
+        "host: ${e.requestOptions.uri.host}",
+      if (e.response?.statusCode != null) "status: ${e.response!.statusCode}",
+      if (e.message != null && e.message!.isNotEmpty) "message: ${e.message}",
+      if (e.error != null) "cause: ${e.error}",
+    ];
+    return parts.join("\n");
   }
 
   bool shouldStopSync() {

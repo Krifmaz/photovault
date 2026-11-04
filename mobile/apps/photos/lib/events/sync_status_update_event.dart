@@ -11,6 +11,12 @@ class SyncStatusUpdate extends Event {
   @override
   final String reason;
   final Error? error;
+
+  /// PHOTOVAULT: why a [SyncStatus.paused] backup paused.
+  final SyncPauseCause? pauseCause;
+
+  /// PHOTOVAULT: full error text for the Backup status screen.
+  final String? details;
   late int timestamp;
 
   SyncStatusUpdate(
@@ -20,6 +26,8 @@ class SyncStatusUpdate extends Event {
     this.wasStopped = false,
     this.reason = "",
     this.error,
+    this.pauseCause,
+    this.details,
   }) {
     _logger.info("Creating sync status: " + status.toString());
     timestamp = DateTime.now().microsecondsSinceEpoch;
@@ -36,3 +44,6 @@ enum SyncStatus {
   completedBackup,
   error,
 }
+
+/// PHOTOVAULT: backup progress notification.
+enum SyncPauseCause { user, wifi, network }

@@ -222,6 +222,15 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/people_widget" />
         </receiver>
+        <!-- PHOTOVAULT: backup progress notification. dataSync foreground
+             service while a backup uploads (BackupProgressService.kt). -->
+        <service
+            android:name=".BackupProgressService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+        <receiver
+            android:name=".BackupProgressActionReceiver"
+            android:exported="false" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>
@@ -249,6 +258,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- PHOTOVAULT: removed com.android.vending.BILLING (no payments). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- PHOTOVAULT: backup progress foreground service. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 </manifest>

@@ -226,6 +226,7 @@ class RemoteSyncService {
             DeviceStorageFullError,
             SyncStopRequestedError,
             NoMediaLocationAccessError,
+            BackupPausedByUserError,
           }.contains(e.runtimeType)) {
         rethrow;
       }
