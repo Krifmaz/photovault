@@ -1,4 +1,12 @@
+import { buildEnvCustomAPIEndpoint } from "ente-base/env";
 import log from "ente-base/log";
+// PHOTOVAULT: connect
+import {
+    companionAppURL,
+    pageOrigin,
+    resolveServerOrigin,
+    savedServerStorageKey,
+} from "ente-base/photovault/server";
 import {
     updateChecksumProtectedUploadsEnabled,
     updateShouldDisableCFUploadProxy,
@@ -26,10 +34,21 @@ export interface Settings {
 // PHOTOVAULT: strip - defaults point at this server (cast and embed pages are
 // served under the public URL, see contracts/server-info.md) instead of Ente's
 // hosts. The server can still override them through its feature flags.
-const pvServerOrigin = () =>
-    "location" in globalThis && /^https?:\/\//.test(globalThis.location.origin)
-        ? globalThis.location.origin
-        : "http://localhost:8080";
+// PHOTOVAULT: connect - "this server" is the API server (saved choice, build
+// env, then page origin), resolved synchronously.
+const pvServerOrigin = () => {
+    let saved: string | null = null;
+    try {
+        saved = globalThis.localStorage.getItem(savedServerStorageKey) ?? null;
+    } catch {
+        // Not available (worker / SSR).
+    }
+    return resolveServerOrigin({
+        saved,
+        buildEnv: buildEnvCustomAPIEndpoint,
+        page: pageOrigin(),
+    });
+};
 
 const createDefaultSettings = (): Settings => ({
     isInternalUser: false,
@@ -37,8 +56,8 @@ const createDefaultSettings = (): Settings => ({
     previewUploadV2Enabled: false,
     mapEnabled: false,
     cfUploadProxyDisabled: false,
-    castURL: `${pvServerOrigin()}/cast`,
-    embedURL: `${pvServerOrigin()}/embed`,
+    castURL: companionAppURL(pvServerOrigin(), "cast"),
+    embedURL: companionAppURL(pvServerOrigin(), "embed"),
     customDomainCNAME: new URL(pvServerOrigin()).host,
 });
 

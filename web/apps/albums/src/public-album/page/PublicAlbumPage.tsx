@@ -48,7 +48,7 @@ import { FocusVisibleButton } from "ente-base/components/mui/FocusVisibleButton"
 import { NavbarBase } from "ente-base/components/Navbar";
 import { useModalVisibility } from "ente-base/components/utils/modal";
 import { useBaseContext } from "ente-base/context";
-import { isDevBuild } from "ente-base/env";
+import { buildEnvBasePath, isDevBuild } from "ente-base/env"; // PHOTOVAULT: connect
 import { isNamedError } from "ente-base/error";
 import {
     isHTTP401Error,
@@ -136,8 +136,18 @@ const loadJoinPublicAlbumRedirect = () =>
 
 const publicAlbumAllFilesCollectionID = 0;
 
+// PHOTOVAULT: connect - ignore the /albums base path when the token is in
+// the path (see next.config.js).
 const accessTokenFromURL = (url: URL) =>
-    url.searchParams.get("t") || url.pathname.split("/").find(Boolean);
+    url.searchParams.get("t") ||
+    url.pathname
+        .slice(
+            buildEnvBasePath && url.pathname.startsWith(buildEnvBasePath)
+                ? buildEnvBasePath.length
+                : 0,
+        )
+        .split("/")
+        .find(Boolean);
 
 export default function PublicAlbumPage() {
     const { showMiniDialog, onGenericError } = useBaseContext();

@@ -1,5 +1,5 @@
-import { DevSettingsDialog } from "@/components/auth/DevSettingsDialog";
 import { PhotosAuthShell } from "@/components/PhotosAuthShell";
+import { ServerField } from "@/components/photovault/ServerField"; // PHOTOVAULT: connect
 import { LoginContents } from "ente-accounts/components/LoginContents";
 import { SignUpContents } from "ente-accounts/components/SignUpContents";
 import { savedPartialLocalUser } from "ente-accounts/services/accounts-db";
@@ -11,11 +11,9 @@ import {
     type JoinAlbumContext,
 } from "ente-base/join-album";
 import log from "ente-base/log";
-import { customAPIHost } from "ente-base/origins";
 import { haveMasterKeyInSession } from "ente-base/session-storage";
 import { savedAuthToken } from "ente-base/token";
 import { canAccessIndexedDB } from "ente-gallery/services/files-db";
-import { DevSettings } from "ente-new/photos/components/DevSettings";
 import { updateSessionFromElectronSafeStorageIfNeeded } from "ente-new/photos/services/account-keys";
 import { t } from "i18next";
 import { useRouter } from "next/router";
@@ -26,21 +24,21 @@ const Page: React.FC = () => {
 
     const [loading, setLoading] = useState(true);
     const [showLogin, setShowLogin] = useState(true);
-    const [host, setHost] = useState<string | undefined>(undefined);
+    // PHOTOVAULT: connect - the server is shown (and changed) by ServerField
+    // below the form, so the forms' own host line stays empty.
+    const host = undefined;
+    // Remount the forms when the server changes (Ente did this by reloading
+    // the host after its developer settings dialog closed).
+    const [serverKey, setServerKey] = useState(0);
+    const refreshHost = useCallback(() => setServerKey((k) => k + 1), []);
 
     const router = useRouter();
-
-    const refreshHost = useCallback(
-        () => void customAPIHost().then(setHost),
-        [],
-    );
 
     const handleShowLogin = useCallback(() => setShowLogin(true), []);
     const handleShowSignUp = useCallback(() => setShowLogin(false), []);
 
     useEffect(() => {
         void (async () => {
-            refreshHost();
             const currentURL = new URL(window.location.href);
 
             // Persist join data before authentication redirects discard this URL.
@@ -106,25 +104,29 @@ const Page: React.FC = () => {
             }
             setLoading(false);
         })();
-    }, [showMiniDialog, router, refreshHost]);
+    }, [showMiniDialog, router]);
 
     return (
-        <TappableContainer onMaybeChangeHost={refreshHost}>
+        <TappableContainer>
             {loading ? (
                 <ActivityIndicator />
             ) : (
                 <PhotosAuthShell>
                     {showLogin ? (
                         <LoginContents
+                            key={serverKey}
                             {...{ host }}
                             onSignUp={handleShowSignUp}
                         />
                     ) : (
                         <SignUpContents
+                            key={serverKey}
                             {...{ router, host }}
                             onLogin={handleShowLogin}
                         />
                     )}
+                    {/* PHOTOVAULT: connect */}
+                    <ServerField onChange={refreshHost} />
                 </PhotosAuthShell>
             )}
         </TappableContainer>
@@ -133,65 +135,20 @@ const Page: React.FC = () => {
 
 export default Page;
 
-interface TappableContainerProps {
-    onMaybeChangeHost: () => void;
-}
-
-const TappableContainer: React.FC<
-    React.PropsWithChildren<TappableContainerProps>
-> = ({ onMaybeChangeHost, children }) => {
-    // Seven background taps open self-hosting settings outside Ente production.
-    const [tapCount, setTapCount] = useState(0);
-    const [showDevSettings, setShowDevSettings] = useState(false);
-
-    const handleClick: React.MouseEventHandler = (event) => {
-        if (!shouldAllowChangingAPIOrigin()) return;
-
-        if (event.target instanceof HTMLButtonElement) return;
-
-        if (showDevSettings) return;
-
-        setTapCount(tapCount + 1);
-        if (tapCount + 1 == 7) {
-            setTapCount(0);
-            setShowDevSettings(true);
-        }
-    };
-
-    const handleClose = () => {
-        setShowDevSettings(false);
-        onMaybeChangeHost();
-    };
-
-    return (
-        <CenteredFill
-            sx={[
-                {
-                    bgcolor: "background.paper2",
-                    "@media (width <= 1024px)": { flexDirection: "column" },
-                },
-                (theme) =>
-                    theme.applyStyles("dark", {
-                        bgcolor: "background.default",
-                    }),
-            ]}
-            onClick={handleClick}
-        >
-            <DevSettings
-                open={showDevSettings}
-                onClose={handleClose}
-                presentation={DevSettingsDialog}
-            />
-            {children}
-        </CenteredFill>
-    );
-};
-
-const shouldAllowChangingAPIOrigin = () => {
-    const hostname = new URL(window.location.origin).hostname;
-    return !(
-        hostname.endsWith(".ente.com") ||
-        hostname.endsWith(".ente.io") ||
-        hostname.endsWith(".ente.sh")
-    );
-};
+// PHOTOVAULT: connect - Ente's hidden "tap seven times" developer endpoint
+// dialog is removed; the visible ServerField replaces it. The container keeps
+// its upstream name and styling.
+const TappableContainer: React.FC<React.PropsWithChildren> = ({ children }) => (
+    <CenteredFill
+        sx={[
+            {
+                bgcolor: "background.paper2",
+                "@media (width <= 1024px)": { flexDirection: "column" },
+            },
+            (theme) =>
+                theme.applyStyles("dark", { bgcolor: "background.default" }),
+        ]}
+    >
+        {children}
+    </CenteredFill>
+);

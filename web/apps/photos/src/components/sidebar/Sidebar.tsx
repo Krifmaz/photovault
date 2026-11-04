@@ -55,6 +55,7 @@ import { SubscriptionCard } from "./account/SubscriptionCard";
 import { Account, type AccountAction } from "./accounts/Account";
 import { ManageMemberSubscription } from "./accounts/ManageMemberSubscription";
 import { openManageSubscription } from "./accounts/subscription";
+import { ServerSettings } from "./photovault/ServerSettings"; // PHOTOVAULT: connect
 import { Preferences, type PreferencesAction } from "./preferences/Preferences";
 import { sidebarTheme } from "./theme";
 
@@ -89,6 +90,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const onShowPlanSelector = showFamilyManagement;
     const { onClose: closeFamilyManagement } = familyManagementVisibilityProps;
     const { show: showHelp, props: helpVisibilityProps } = useModalVisibility();
+    // PHOTOVAULT: connect - Settings → Server.
+    const { show: showServer, props: serverVisibilityProps } =
+        useModalVisibility();
     const { show: showAccount, props: accountVisibilityProps } =
         useModalVisibility();
     // PHOTOVAULT: strip - referrals removed.
@@ -141,6 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         accountVisibilityProps.onClose();
         preferencesVisibilityProps.onClose();
         helpVisibilityProps.onClose();
+        serverVisibilityProps.onClose(); // PHOTOVAULT: connect
         freeUpSpaceVisibilityProps.onClose();
         closeExport();
         closeMemberSubscription();
@@ -151,6 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         accountVisibilityProps,
         preferencesVisibilityProps,
         helpVisibilityProps,
+        serverVisibilityProps, // PHOTOVAULT: connect
         freeUpSpaceVisibilityProps,
         closeExport,
         closeMemberSubscription,
@@ -285,6 +291,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         accountVisibilityProps.open ||
         preferencesVisibilityProps.open ||
         helpVisibilityProps.open ||
+        serverVisibilityProps.open || // PHOTOVAULT: connect
         freeUpSpaceVisibilityProps.open ||
         exportVisibilityProps.open ||
         watchFolderView ||
@@ -327,6 +334,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 showAccount: selectSection(showAccount),
                                 showPreferences: selectSection(showPreferences),
                                 showHelp: selectSection(showHelp),
+                                showServer: selectSection(showServer), // PHOTOVAULT: connect
                                 showFreeUpSpace: selectSection(showFreeUpSpace),
                                 onShowWatchFolder: selectSection(
                                     handleOpenWatchFolder,
@@ -357,6 +365,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onRootClose={onClose}
                     pendingAction={pendingHelpAction}
                     onActionHandled={setPendingHelpAction}
+                />
+            )}
+            {/* PHOTOVAULT: connect */}
+            {serverVisibilityProps.open && (
+                <ServerSettings
+                    {...serverVisibilityProps}
+                    onRootClose={onClose}
                 />
             )}
             {isDesktop && watchFolderView && (
@@ -662,6 +677,7 @@ interface UtilitySectionProps {
     showAccount: () => void;
     showPreferences: () => void;
     showHelp: () => void;
+    showServer: () => void; // PHOTOVAULT: connect
     showFreeUpSpace: () => void;
     onShowWatchFolder: () => void;
 }
@@ -671,6 +687,7 @@ const UtilitySection: React.FC<UtilitySectionProps> = ({
     showAccount,
     showPreferences,
     showHelp,
+    showServer,
     showFreeUpSpace,
     onShowWatchFolder,
 }) => {
@@ -698,6 +715,12 @@ const UtilitySection: React.FC<UtilitySectionProps> = ({
                 variant="parent"
                 title={t("preferences")}
                 onClick={showPreferences}
+            />
+            {/* PHOTOVAULT: connect - Settings → Server. */}
+            <RowCard
+                variant="parent"
+                title={t("pv_server")}
+                onClick={showServer}
             />
             <RowCard variant="parent" title={t("help")} onClick={showHelp} />
             <RowCard
