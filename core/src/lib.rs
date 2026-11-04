@@ -24,6 +24,7 @@ pub mod media;
 pub mod metadata;
 pub mod model;
 mod server;
+mod signup;
 pub mod srp;
 mod store;
 mod upload;
