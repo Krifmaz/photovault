@@ -124,8 +124,90 @@ async fn usage_reports_disk_and_quota() {
 }
 
 #[tokio::test]
+async fn usage_reports_the_whole_disk_like_df() {
+    const GB: i64 = 1_000_000_000;
+    // A 100 GB disk with 93 GB used by anything (other apps, the OS, our photos).
+    let srv = TestServer::start_with(|c| {
+        c.disk_override = Some(capacity::Disk {
+            total: 100 * GB,
+            used: 93 * GB,
+            available: 7 * GB,
+            source: capacity::DiskSource::Disk,
+        });
+        c.hardcoded_ott.insert("d@example.org".into(), OTT.into());
+    })
+    .await
+    .unwrap();
+    let c = Client::new(&srv);
+    let acc = signup(&c, "d@example.org").await;
+    let u = c.with_token(&acc.token);
+    let (s, v) = u.get("/photovault/usage").await;
+    assert_eq!(s, 200, "{v}");
+    // The disk itself, not "used + free".
+    assert_eq!(v["disk"]["totalBytes"], 100 * GB);
+    assert_eq!(v["disk"]["usedBytes"], 93 * GB);
+    assert_eq!(v["disk"]["availableBytes"], 7 * GB);
+    assert_eq!(v["disk"]["usedPercent"], 93.0);
+    assert_eq!(v["disk"]["nearlyFull"], true);
+    assert_eq!(v["disk"]["source"], "disk");
+    assert_eq!(v["nearlyFullPercent"], 90.0);
+    // The account's own photos are reported separately.
+    assert_eq!(v["userBytes"], 0);
+    assert_eq!(v["usedBytes"], 0);
+    // No quota: the limit is the disk's size, what is left is the disk's rest.
+    assert_eq!(v["limitBytes"], 100 * GB);
+    assert_eq!(v["freeBytes"], 7 * GB);
+    assert_eq!(v["limitSource"], "disk");
+    assert!(v["quotaBytes"].is_null());
+    // Ente's endpoints carry the disk's size: no plan, no placeholder.
+    let (_, d) = u.get("/users/details/v2").await;
+    assert_eq!(d["subscription"]["storage"], 100 * GB);
+    let (_, b) = u.get("/billing/subscription").await;
+    assert_eq!(b["subscription"]["storage"], 100 * GB);
+
+    // An admin quota is the limit; the rest is capped by the disk.
+    run(
+        &srv.state,
+        AdminCmd::SetQuota {
+            user: "d@example.org".into(),
+            size: "50GB".into(),
+        },
+    )
+    .await
+    .unwrap();
+    let (_, v) = u.get("/photovault/usage").await;
+    assert_eq!(v["limitSource"], "quota");
+    assert_eq!(v["limitBytes"], v["quotaBytes"]);
+    assert_eq!(v["freeBytes"], 7 * GB);
+    // The disk is still reported, so the app can warn.
+    assert_eq!(v["disk"]["nearlyFull"], true);
+    let (_, d) = u.get("/users/details/v2").await;
+    assert_eq!(d["subscription"]["storage"], v["quotaBytes"]);
+}
+
+#[tokio::test]
+async fn usage_is_not_nearly_full_on_a_roomy_disk() {
+    let srv = TestServer::start_with(|c| {
+        c.disk_override = Some(capacity::Disk {
+            total: 1000,
+            used: 500,
+            available: 500,
+            source: capacity::DiskSource::Disk,
+        });
+        c.hardcoded_ott.insert("r@example.org".into(), OTT.into());
+    })
+    .await
+    .unwrap();
+    let c = Client::new(&srv);
+    let acc = signup(&c, "r@example.org").await;
+    let (_, v) = c.with_token(&acc.token).get("/photovault/usage").await;
+    assert_eq!(v["disk"]["usedPercent"], 50.0);
+    assert_eq!(v["disk"]["nearlyFull"], false);
+}
+
+#[tokio::test]
 async fn storage_limit_and_unlimited_rules() {
-    assert_eq!(capacity::combine(0, 5, None), capacity::UNLIMITED);
+    assert_eq!(capacity::combine(0, None), capacity::UNLIMITED);
     let srv = server(&["s@example.org"]).await;
     let c = Client::new(&srv);
     let acc = signup(&c, "s@example.org").await;
@@ -144,6 +226,9 @@ async fn storage_limit_and_unlimited_rules() {
         (v["limitBytes"].as_i64(), v["limitSource"].as_str()),
         (Some(10 << 20), Some("storage-limit"))
     );
+    // The budget stands in for the disk.
+    assert_eq!(v["disk"]["totalBytes"], 10 << 20);
+    assert_eq!(v["disk"]["source"], "storage-limit");
     let (_, d) = u.get("/users/details/v2").await;
     assert_ne!(d["subscription"]["storage"], capacity::UNLIMITED);
 }

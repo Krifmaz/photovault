@@ -55,6 +55,19 @@ class UsersGateway {
     return UserDetails.fromMap(response.data);
   }
 
+  /// PHOTOVAULT: `GET /photovault/usage` (contracts/storage-usage.md), or
+  /// null when the server does not have it (stock museum: 404).
+  Future<Map<String, dynamic>?> getPhotovaultUsage() async {
+    try {
+      final response = await _enteDio.get("/photovault/usage");
+      final data = response.data;
+      return data is Map<String, dynamic> ? data : null;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
+      rethrow;
+    }
+  }
+
   Future<Sessions> getActiveSessions() async {
     final response = await _enteDio.get("/users/sessions");
     return Sessions.fromMap(response.data);

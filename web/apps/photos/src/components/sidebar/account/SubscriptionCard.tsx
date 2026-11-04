@@ -1,4 +1,5 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import {
     Box,
     Skeleton,
@@ -18,8 +19,20 @@ import {
 } from "ente-new/photos/services/user-details";
 import { t } from "i18next";
 import type React from "react";
+import { useEffect, useState } from "react";
 // PHOTOVAULT: theme - Encore colours instead of Ente green.
-import { pvGold } from "ente-base/components/utils/photovault/encore-tokens";
+import {
+    pvDark,
+    pvGold,
+} from "ente-base/components/utils/photovault/encore-tokens";
+// PHOTOVAULT: real disk - the storage card shows the disk holding the photos.
+import log from "ente-base/log";
+import {
+    fetchStorageUsage,
+    storageCardView,
+    type StorageCardView,
+    type StorageUsage,
+} from "ente-base/photovault/storage-usage";
 
 interface SubscriptionCardProps {
     userDetails: UserDetails | undefined;
@@ -105,10 +118,16 @@ const SubscriptionCardContentOverlay: React.FC<
     const storageLimit = inFamily
         ? familyMemberStorageLimit(userDetails)
         : undefined;
+    const usage = useStorageUsage(userDetails);
 
     return (
         <Stack sx={{ gap: "16px", padding: "20px 16px 16px" }}>
-            {inFamily ? (
+            {usage ? (
+                <DiskCardContents
+                    view={storageCardView(usage)}
+                    fileCount={userDetails.fileCount}
+                />
+            ) : inFamily ? (
                 storageLimit !== undefined ? (
                     <UserSubscriptionCardContents
                         userDetails={userDetails}
@@ -129,6 +148,105 @@ const SubscriptionCardContentOverlay: React.FC<
         </Stack>
     );
 };
+
+/**
+ * PHOTOVAULT: real disk - `/photovault/usage`, refetched whenever the user
+ * details are (the sidebar refreshes those when it opens). Undefined on a
+ * stock Ente server, which keeps Ente's card.
+ */
+const useStorageUsage = (userDetails: UserDetails) => {
+    const [usage, setUsage] = useState<StorageUsage | undefined>(undefined);
+    useEffect(() => {
+        let live = true;
+        fetchStorageUsage()
+            .then((u) => live && setUsage(u))
+            .catch((e: unknown) =>
+                log.warn("Cannot load /photovault/usage", e),
+            );
+        return () => {
+            live = false;
+        };
+    }, [userDetails]);
+    return usage;
+};
+
+interface DiskCardContentsProps {
+    view: StorageCardView;
+    fileCount: number;
+}
+
+/**
+ * PHOTOVAULT: real disk - "438 GB of 500 GB used" for the disk holding the
+ * photos, the account's own photos as a second line, and a warning from 90%
+ * full (contracts/storage-usage.md).
+ */
+const DiskCardContents: React.FC<DiskCardContentsProps> = ({
+    view,
+    fileCount,
+}) => (
+    <>
+        <Box>
+            <Typography variant="tiny" sx={{ opacity: 0.7, mb: "2px" }}>
+                {t("storage")}
+            </Typography>
+            <Typography
+                variant="h3"
+                noWrap
+                sx={{
+                    fontSize: "24px",
+                    lineHeight: "32px",
+                    fontWeight: 700,
+                    letterSpacing: "-1px",
+                    paddingInlineEnd: "24px",
+                }}
+            >
+                {view.headline}
+            </Typography>
+        </Box>
+        <Stack sx={{ gap: 1.5 }}>
+            <UsageBar>
+                <UsageBarSegment
+                    usage={view.diskFraction}
+                    storage={1}
+                    fillColor={
+                        view.warning ? pvWarn : "rgba(193, 193, 193, 0.45)"
+                    }
+                />
+                <UsageBarSegment
+                    usage={view.userFraction}
+                    storage={1}
+                    fillColor={pvGold}
+                />
+            </UsageBar>
+            <Stack
+                direction="row"
+                sx={{ justifyContent: "space-between", gap: 1 }}
+            >
+                <Legend label={view.detail} color={pvGold} />
+                <Typography
+                    variant="tiny"
+                    sx={{ fontWeight: 600, color: "rgba(165, 165, 165, 0.79)" }}
+                >
+                    {t("photos_count", { count: fileCount })}
+                </Typography>
+            </Stack>
+            {view.warning && (
+                <Stack
+                    direction="row"
+                    sx={{ alignItems: "center", gap: 0.75, color: pvWarn }}
+                >
+                    <WarningAmberRoundedIcon sx={{ fontSize: 16 }} />
+                    <Typography variant="tiny" sx={{ fontWeight: 600 }}>
+                        {view.warning}
+                    </Typography>
+                </Stack>
+            )}
+        </Stack>
+    </>
+);
+
+/** Encore `warn` (amber); the card is dark in both themes. */
+const pvWarn = pvDark.warn;
 
 type UserSubscriptionCardContentsProps = SubscriptionCardContentOverlayProps & {
     totalStorage: number;

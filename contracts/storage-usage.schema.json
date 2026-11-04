@@ -3,14 +3,101 @@
   "$id": "photovault/contracts/storage-usage.schema.json",
   "title": "GET /photovault/usage",
   "type": "object",
-  "required": ["usedBytes", "limitBytes", "unlimited", "limitSource"],
+  "required": [
+    "usedBytes",
+    "limitBytes",
+    "unlimited",
+    "limitSource"
+  ],
   "properties": {
-    "usedBytes": { "type": "integer", "minimum": 0 },
-    "limitBytes": { "type": ["integer", "null"], "minimum": 0 },
-    "freeBytes": { "type": ["integer", "null"], "minimum": 0 },
-    "unlimited": { "type": "boolean" },
-    "limitSource": { "enum": ["quota", "default-quota", "disk", "storage-limit", "unlimited"] },
-    "quotaBytes": { "type": ["integer", "null"], "minimum": 0 }
+    "usedBytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "limitBytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "freeBytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "unlimited": {
+      "type": "boolean"
+    },
+    "limitSource": {
+      "enum": [
+        "quota",
+        "default-quota",
+        "disk",
+        "storage-limit",
+        "unlimited"
+      ]
+    },
+    "quotaBytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "userBytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "This account's own stored bytes (\"Your photos\")."
+    },
+    "disk": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The filesystem holding the photos (statvfs of the storage path), or the PHOTOVAULT_STORAGE_LIMIT budget. null: S3 without a limit.",
+      "required": [
+        "totalBytes",
+        "usedBytes",
+        "availableBytes",
+        "usedPercent",
+        "nearlyFull",
+        "source"
+      ],
+      "properties": {
+        "totalBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "usedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "availableBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "usedPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "nearlyFull": {
+          "type": "boolean"
+        },
+        "source": {
+          "enum": [
+            "disk",
+            "storage-limit"
+          ]
+        }
+      }
+    },
+    "nearlyFullPercent": {
+      "type": "number"
+    }
   },
   "additionalProperties": true
 }

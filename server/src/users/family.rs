@@ -345,8 +345,7 @@ pub async fn fetch_members_for_admin(
         }
         if m.is_admin {
             let sub = subscription(&state.db, m.member_user_id).await?;
-            admin_storage =
-                crate::capacity::effective_limit(state, m.member_user_id, sub.storage).await?;
+            admin_storage = crate::capacity::effective_limit(state, sub.storage).await?;
             admin_expiry = sub.expiry_time;
         }
     }
@@ -636,7 +635,7 @@ pub async fn accept_invite(state: &AppState, token: &str) -> ApiResult<AcceptInv
     }
     let bonus = active_bonus(&state.db, admin.id).await?;
     let mut sub = subscription(&state.db, admin.id).await?;
-    sub.storage = crate::capacity::effective_limit(state, admin.id, sub.storage).await?;
+    sub.storage = crate::capacity::effective_limit(state, sub.storage).await?;
     let usable = if sub.expiry_time < now_micros() {
         bonus.usable_bonus(0)
     } else {

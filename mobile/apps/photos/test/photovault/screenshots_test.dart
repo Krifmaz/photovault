@@ -287,11 +287,71 @@ void main() {
           "period": "",
         },
       });
+      StorageCardWidget.resetForTesting();
       await tester.pumpWidget(_app(brightness, _SettingsExcerpt(details)));
       await _pumpFrames(tester);
       expect(find.text(PhotovaultStrings.server), findsOneWidget);
       await _shoot(tester, "settings-$mode");
     });
+
+    // The real disk from `/photovault/usage` (contracts/storage-usage.md):
+    // whole-disk usage, the account's photos as a second line, and the
+    // warning from 90% full.
+    for (final (name, used, warn) in [
+      ("settings-disk", 300, false),
+      ("settings-disk-nearly-full", 465, true),
+    ]) {
+      testWidgets("settings: storage card shows the disk, $name ($mode)", (
+        tester,
+      ) async {
+        await setUpView(tester);
+        const gib = 1024 * 1024 * 1024;
+        final details = UserDetails.fromMap({
+          "email": "alex@example.com",
+          "usage": 412 * gib ~/ 10,
+          "fileCount": 48213,
+          "storageBonus": 0,
+          "subscription": {
+            "productID": "free",
+            "originalTransactionID": "",
+            "paymentProvider": "",
+            "storage": 500 * gib,
+            "expiryTime": 0,
+            "price": "",
+            "period": "",
+          },
+        });
+        StorageCardWidget.resetForTesting();
+        StorageCardWidget.usageLoaderForTesting = () async => {
+          "usedBytes": 412 * gib ~/ 10,
+          "userBytes": 412 * gib ~/ 10,
+          "limitBytes": 500 * gib,
+          "freeBytes": (500 - used) * gib,
+          "unlimited": false,
+          "limitSource": "disk",
+          "quotaBytes": null,
+          "disk": {
+            "totalBytes": 500 * gib,
+            "usedBytes": used * gib,
+            "availableBytes": (500 - used) * gib,
+            "usedPercent": used / 5,
+            "nearlyFull": warn,
+            "source": "disk",
+          },
+          "nearlyFullPercent": 90,
+        };
+        addTearDown(StorageCardWidget.resetForTesting);
+        await tester.pumpWidget(_app(brightness, _SettingsExcerpt(details)));
+        await _pumpFrames(tester);
+        expect(find.text("$used GB of 500 GB used"), findsOneWidget);
+        expect(find.text("Your photos: 41.2 GB"), findsOneWidget);
+        expect(
+          find.text("Server disk is ${(used / 5).floor()}% full"),
+          warn ? findsOneWidget : findsNothing,
+        );
+        await _shoot(tester, "$name-$mode");
+      });
+    }
 
     testWidgets("settings > Server ($mode)", (tester) async {
       await setUpView(tester);

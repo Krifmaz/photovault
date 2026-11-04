@@ -53,27 +53,33 @@ limits. See [HTTPS behind a reverse proxy](deployment/reverse-proxy.md).
 
 ## Storage numbers
 
-The apps show "X of Y used". Photovault fills in real numbers instead of a
-plan size:
+The apps show the real disk that holds the photos, like Immich: "438 GB of
+500 GB used" for the whole disk, then "Your photos: 7.4 GB" for the account.
+There are no plans or made-up limits; a limit exists only when an admin sets a
+quota.
 
-* **used**: the bytes the account stores. In a family it is the family's
-  total, as in Ente.
-* **free**: what the backend can still take.
-  * Local: free space on the disk behind `PHOTOVAULT_STORAGE_PATH`, read with
-    `statvfs` (space available to normal users) and cached for a few seconds.
-  * S3: there is no such call, so it is `PHOTOVAULT_STORAGE_LIMIT` minus
-    everything stored on the server. Without `PHOTOVAULT_STORAGE_LIMIT` it is
-    unlimited.
-  * `PHOTOVAULT_STORAGE_LIMIT` also caps a local disk, for example to keep
-    part of a shared pool free.
+* **disk**: the filesystem behind `PHOTOVAULT_STORAGE_PATH`, read with
+  `statvfs` and cached for a few seconds. Total size, used (by anything on
+  it, as `df` counts it) and available space. The fill level is `df`'s
+  `Use%`, so space reserved for root counts as full.
+  * `PHOTOVAULT_STORAGE_LIMIT` replaces the disk with that budget (total =
+    the limit, used = everything Photovault stores, or more if the real disk
+    has less left). Use it on S3, where there is no `statvfs`, or to keep part
+    of a shared pool free. S3 without it has no disk to show.
+* **Your photos**: the bytes the account stores. In a family, quota checks use
+  the family's total, as in Ente.
 * **quota**: the account's quota (`photovault admin quota`), or
   `PHOTOVAULT_DEFAULT_QUOTA` for new accounts. None by default.
-* **limit** = `min(quota, used + free)`. A side that is "none" or unlimited
-  is left out.
+* **limit** = the quota when one is set (capped by the disk's size), else the
+  disk's size.
+* Uploads are refused when they do not fit in the disk's available space or
+  go beyond the quota.
+* From **90%** full the apps' storage card shows "Server disk is N% full".
 
 When there is no limit at all (S3 without `PHOTOVAULT_STORAGE_LIMIT` and no
-quota), Ente's endpoints report **100 TiB** (`109951162777600` bytes), so
-the stock apps still show a number.
+quota), Ente's endpoints report **100 TiB** (`109951162777600` bytes) only
+because the stock apps need a number; Photovault's apps show "Your photos"
+alone.
 
 The values go into Ente's existing fields (`/users/details/v2`:
 `usage` and `subscription.storage`; `/billing/subscription`), so the stock

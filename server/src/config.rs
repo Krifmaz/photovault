@@ -62,6 +62,9 @@ pub struct Config {
     /// Tests only: report this many free bytes instead of asking the storage backend.
     #[serde(skip)]
     pub free_space_override: Option<i64>,
+    /// Tests only: report this disk instead of `statvfs` of the storage path.
+    #[serde(skip)]
+    pub disk_override: Option<crate::capacity::Disk>,
     /// User IDs allowed to call `/admin/*` endpoints.
     pub admins: Vec<i64>,
     /// When false, only the admin CLI can create accounts (OTT is only sent to existing emails).
@@ -232,6 +235,7 @@ impl Default for Config {
             models_upstream: "https://models.ente.com".into(),
             music_upstream: "https://music.ente.com".into(),
             free_space_override: None,
+            disk_override: None,
             admins: vec![],
             allow_signups: false,
             hardcoded_ott: Default::default(),
