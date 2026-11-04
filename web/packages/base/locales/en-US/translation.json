@@ -1249,5 +1249,7 @@
     "pv_server_not_set": "Not set",
     "pv_server_qr_title": "Connect a phone",
     "pv_server_qr_hint": "Scan this code with the Photovault app to connect it to this server.",
-    "pv_server_retry": "Try again"
+    "pv_server_retry": "Try again",
+    "pv_auth_own_server": "Stored on your own server",
+    "pv_auth_your_keys": "Only you hold the keys"
 }

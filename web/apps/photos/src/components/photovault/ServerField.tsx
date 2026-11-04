@@ -200,7 +200,7 @@ const rootStyle = {
     textAlign: "center",
 } as const;
 
-const Root = styled("div")(rootStyle);
+const Root = styled("div")({ ...rootStyle, alignItems: "center" });
 const FormRoot = styled("form")(rootStyle);
 
 const SummaryRow = styled("div")({
@@ -223,5 +223,6 @@ const Address = styled("span")({
 const ButtonRow = styled("div")({
     ...authBodyTypography,
     display: "flex",
+    alignItems: "center",
     gap: "8px",
 });
