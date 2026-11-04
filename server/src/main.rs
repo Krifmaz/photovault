@@ -201,9 +201,9 @@ async fn serve(mut config: Config) -> anyhow::Result<()> {
         }
     };
     let c = &state.config;
-    let email = match (&c.smtp, c.skip_email_verification) {
-        (Some(s), _) => format!("smtp {}:{}", s.host, s.port),
-        (None, true) => "verification skipped".into(),
+    let email = match (&c.smtp, c.skips_email_verification()) {
+        (_, true) => "verification skipped".into(),
+        (Some(s), false) => format!("smtp {}:{}", s.host, s.port),
         (None, false) => "codes written to this log".into(),
     };
     let free = capacity::free_bytes(&state).await.ok().flatten();

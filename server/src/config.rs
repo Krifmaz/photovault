@@ -28,8 +28,10 @@ pub struct Config {
     /// Outgoing mail. When unset, OTP codes are printed to the log.
     pub smtp: Option<SmtpConfig>,
     /// Accept any code at the email verification step and send no email
-    /// (`PHOTOVAULT_SKIP_EMAIL_VERIFICATION`). For single-user local installs.
-    pub skip_email_verification: bool,
+    /// (`PHOTOVAULT_SKIP_EMAIL_VERIFICATION`). Unset = skip exactly when no SMTP
+    /// server is configured (there is no way to deliver a code then); see
+    /// [`Config::skips_email_verification`].
+    pub skip_email_verification: Option<bool>,
     /// Default storage quota (bytes) for new users (`PHOTOVAULT_DEFAULT_QUOTA`).
     /// `0` (default) = no quota: the storage backend's free space is the limit.
     pub default_storage_bytes: i64,
@@ -216,7 +218,7 @@ impl Default for Config {
             },
             secrets: Secrets::default(),
             smtp: None,
-            skip_email_verification: false,
+            skip_email_verification: None,
             default_storage_bytes: 0,
             storage_limit: None,
             server_name: "Photovault".into(),
@@ -237,6 +239,13 @@ impl Default for Config {
 }
 
 impl Config {
+    /// Whether sign-up / log-in accept any email code: `PHOTOVAULT_SKIP_EMAIL_VERIFICATION`
+    /// when set, otherwise on exactly when no SMTP server is configured. Codes for
+    /// accounts with email two-factor are always checked (`users::login::skip_applies`).
+    pub fn skips_email_verification(&self) -> bool {
+        self.skip_email_verification.unwrap_or(self.smtp.is_none())
+    }
+
     /// Load from an optional file then apply environment overrides.
     pub fn load(path: Option<&std::path::Path>) -> anyhow::Result<Self> {
         let mut cfg: Config = match path {
@@ -340,7 +349,12 @@ impl Config {
             self.admins = v.split(',').filter_map(|s| s.trim().parse().ok()).collect();
         }
         if let Some(v) = env("PHOTOVAULT_SKIP_EMAIL_VERIFICATION") {
-            self.skip_email_verification = flag(&v);
+            let v = v.trim();
+            self.skip_email_verification = if v.is_empty() || v.eq_ignore_ascii_case("auto") {
+                None
+            } else {
+                Some(flag(v))
+            };
         }
         if let Some(v) = env("PHOTOVAULT_DEFAULT_QUOTA") {
             self.default_storage_bytes =

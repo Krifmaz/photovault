@@ -51,7 +51,7 @@ limit. Flags accept `true`, `1`, `yes` or `on`; anything else is false.
 | `PHOTOVAULT_ALLOW_SIGNUPS` | `false` | Let anyone create an account. `photovault admin signups on\|off` overrides it at run time. |
 | `PHOTOVAULT_ADMINS` | unset | User ids allowed to call the `/admin/*` API, comma-separated. |
 | `PHOTOVAULT_DEFAULT_QUOTA` | unset | Quota for new accounts (size). Unset: no quota, the free space is the limit. |
-| `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` | `false` | Accept any code at the email step and send no email. For single-user installs. |
+| `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` | `auto` | Accept any code at the email step and send no email. `auto` (unset): on when no SMTP server is set, since no code could be delivered; off with SMTP. Set `false` to require the code from the log, `true` to skip even with SMTP. Accounts with email two-factor always need their code. The Photovault apps skip the code screen when this is on; Ente's stock apps show it, and any 6 digits work. |
 
 ### Storage
 

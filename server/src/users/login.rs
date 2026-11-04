@@ -126,6 +126,9 @@ pub async fn send_email_ott(
             && st == SignUpState::NoAccount
             && !crate::settings::signups_allowed(state).await
         {
+            tracing::warn!(
+                "Sign-up refused for {email}: sign-ups are off. Turn them on with `photovault admin signups on`, or create the account with `photovault admin create-user {email}`"
+            );
             return Err(permission_denied());
         }
         if purpose == purpose::SIGNUP && st == SignUpState::Complete {
@@ -189,7 +192,7 @@ pub async fn send_email_ott(
 /// `PHOTOVAULT_SKIP_EMAIL_VERIFICATION` applies to `email`: on, and the account (if any)
 /// has not turned on email two-factor (that code is always required).
 pub async fn skip_applies(state: &AppState, email: &str) -> ApiResult<bool> {
-    if !state.config.skip_email_verification {
+    if !state.config.skips_email_verification() {
         return Ok(false);
     }
     let Some(id) = user_id_for_email(state, email).await? else {

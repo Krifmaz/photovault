@@ -42,9 +42,9 @@ pub async fn info_value(state: &AppState) -> Value {
             v.to_string()
         }
     };
-    let email = match (&c.smtp, c.skip_email_verification) {
-        (Some(_), _) => "smtp",
-        (None, true) => "skip",
+    let email = match (&c.smtp, c.skips_email_verification()) {
+        (_, true) => "skip",
+        (Some(_), false) => "smtp",
         (None, false) => "log",
     };
     let storage = match c.storage {
