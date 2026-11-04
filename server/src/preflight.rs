@@ -172,8 +172,6 @@ pub async fn check_database(config: &Config) -> Result<(), Failure> {
                 "fix: the password in PHOTOVAULT_DATABASE_URL must match POSTGRES_PASSWORD (Postgres only reads POSTGRES_PASSWORD when its data folder is empty)"
             } else if msg.contains("role") && msg.contains("does not exist") {
                 "fix: the user name in PHOTOVAULT_DATABASE_URL must match POSTGRES_USER"
-            } else if msg.contains("password authentication failed") {
-                "fix: the password in PHOTOVAULT_DATABASE_URL must match POSTGRES_PASSWORD (Postgres only reads POSTGRES_PASSWORD when its data folder is empty)"
             } else if msg.contains("does not exist") {
                 "fix: create the database or correct its name in PHOTOVAULT_DATABASE_URL"
             } else if msg.contains("unable to open database file") {

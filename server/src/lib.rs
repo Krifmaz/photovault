@@ -7,6 +7,7 @@
 #![warn(missing_docs)]
 
 pub mod admin_cli;
+pub mod asset_mirror;
 pub mod auth;
 pub mod capacity;
 pub mod config;

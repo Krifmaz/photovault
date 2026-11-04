@@ -61,6 +61,9 @@ pub async fn info_value(state: &AppState) -> Value {
     if c.mdns {
         features.push("mdns");
     }
+    if c.asset_mirror {
+        features.extend(["models", "music"]);
+    }
     json!({
         "product": "photovault",
         "name": c.server_name,
@@ -72,6 +75,9 @@ pub async fn info_value(state: &AppState) -> Value {
         // Same base the share links use (`public_albums_url`; `<public>/albums` by default).
         "albumsUrl": or_default(&c.accounts.public_albums_url, "/albums"),
         "castUrl": or_default(&c.accounts.cast_url, "/cast"),
+        // Present when the asset mirror is on (`crate::asset_mirror`).
+        "modelsUrl": c.asset_mirror.then(|| format!("{public}/photovault/models")),
+        "musicManifestUrl": c.asset_mirror.then(|| format!("{public}/photovault/music/tracks.json")),
         "signupsAllowed": crate::settings::signups_allowed(state).await,
         "emailVerification": email,
         "storage": storage,

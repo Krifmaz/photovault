@@ -38,6 +38,9 @@ limit. Flags accept `true`, `1`, `yes` or `on`; anything else is false.
 | `PHOTOVAULT_WEB_DIR` | `/app/web` | Built web app, served on the API port. Unset or missing folder: API only. |
 | `PHOTOVAULT_WEB_ORIGINS` | unset | Origins allowed by CORS, comma-separated. Unset: any origin. `/photovault/info` always allows any origin. |
 | `PHOTOVAULT_MDNS` | `true` | Announce `_photovault._tcp` on the LAN. See [LAN discovery](discovery.md). |
+| `PHOTOVAULT_ASSET_MIRROR` | `true` | Serve the ML models and memories music to the apps, so they never contact Ente. Each file is downloaded once into `/config/assets` (about 330 MB for all models). See [Models and music](asset-mirror.md). |
+| `PHOTOVAULT_MODELS_UPSTREAM` | `https://models.ente.com` | Where the mirror downloads models from. |
+| `PHOTOVAULT_MUSIC_UPSTREAM` | `https://music.ente.com` | Where the mirror downloads the memories music from. |
 | `PHOTOVAULT_LOG_FORMAT` | `pretty` | `pretty` (plain text) or `json`. One line per event. |
 | `RUST_LOG` | `info` | Log filter, e.g. `info,sqlx=warn`. |
 

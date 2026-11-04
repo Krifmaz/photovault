@@ -44,6 +44,8 @@ pub struct Inner {
     pub metrics: Metrics,
     /// Cached free space of the storage backend.
     pub capacity: crate::capacity::Cache,
+    /// Model / music mirror (download locks, HTTP client).
+    pub asset_mirror: crate::asset_mirror::Mirror,
 }
 
 impl std::ops::Deref for AppState {
@@ -93,5 +95,6 @@ pub async fn build_state(config: Config) -> anyhow::Result<AppState> {
         keys,
         metrics: Default::default(),
         capacity: Default::default(),
+        asset_mirror: Default::default(),
     })))
 }
