@@ -18,9 +18,9 @@ import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
 import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
-import "package:hugeicons/hugeicons.dart";
 import "package:http/http.dart" as http;
 import "package:http/testing.dart";
+import "package:hugeicons/hugeicons.dart";
 import "package:photos/core/network/endpoint_config.dart";
 import "package:photos/ente_theme_data.dart";
 import "package:photos/models/user_details.dart";
@@ -31,14 +31,16 @@ import "package:photos/services/photovault/server_discovery.dart";
 import "package:photos/services/photovault/server_info_client.dart";
 import "package:photos/states/user_details_state.dart";
 import "package:photos/ui/photovault/connect_server_page.dart";
+import "package:photos/ui/photovault/server_qr_scan_page.dart";
 import "package:photos/ui/photovault/server_settings_page.dart";
 import "package:photos/ui/settings/about/about_us_page.dart";
 import "package:photos/ui/settings/storage_card_widget.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 const _outEnv = "PHOTOVAULT_SCREENSHOT_DIR";
-const _phone = Size(390, 844);
-const _pixelRatio = 2.0;
+// 1080x2400 pixels at 2.625 (411x914 dp), as before_after/ uses.
+const _physical = Size(1080, 2400);
+const _pixelRatio = 2.625;
 
 const _family = PhotovaultServerInfo(
   name: "Family photos",
@@ -198,8 +200,9 @@ void main() {
     final mode = brightness.name;
 
     Future<void> setUpView(WidgetTester tester) async {
-      tester.view.physicalSize = _phone * _pixelRatio;
+      tester.view.physicalSize = _physical;
       tester.view.devicePixelRatio = _pixelRatio;
+      tester.view.padding = const FakeViewPadding(top: 24 * _pixelRatio);
       addTearDown(tester.view.reset);
     }
 
@@ -299,6 +302,16 @@ void main() {
       await _pumpFrames(tester);
       expect(find.text(PhotovaultStrings.switchServer), findsOneWidget);
       await _shoot(tester, "settings-server-$mode");
+    });
+
+    // Off-device the camera view is a black box (no platform view and no
+    // scan frame); the page chrome around it is what this shows.
+    testWidgets("QR scan page chrome ($mode)", (tester) async {
+      await setUpView(tester);
+      await tester.pumpWidget(_app(brightness, const ServerQrScanPage()));
+      await _pumpFrames(tester);
+      expect(find.text(PhotovaultStrings.scanQr), findsOneWidget);
+      await _shoot(tester, "qr-scan-$mode");
     });
 
     testWidgets("about: Based on Ente ($mode)", (tester) async {

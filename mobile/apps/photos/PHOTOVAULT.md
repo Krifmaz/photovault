@@ -163,6 +163,23 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   (`_handleConnectLink`, which opens the connect screen with the address filled
   in and looks it up. When an account is signed in, or a sign-up is half done,
   it only shows a toast that points to Settings > Server).
+- Email verification skip: when the active server's `/photovault/info` says
+  `"emailVerification": "skip"` (no SMTP; any 6-digit code is accepted after
+  `POST /users/ott`), sign-up and email-code login send the code `000000`
+  themselves instead of showing "Check your inbox", then continue exactly as
+  if it had been typed. If that code is refused (email 2FA accounts, stock
+  Ente server) the usual code screen is shown with no error. Absent field,
+  `smtp`, `log`, change of email, password reset and resends are unchanged.
+  The field is read from the cached active server (refreshed on start), so
+  there is no extra request. Files: `server_contract.dart`
+  (`emailVerification`, `skipsEmailVerification`, stored with the server),
+  new pure `lib/services/photovault/email_verification.dart`
+  (`shouldAutoSubmitEmailCode`, `kSkippedEmailCode`), and
+  `lib/services/account/user_service.dart` (`sendOtt` tries the code first;
+  `verifyEmail` returns whether it succeeded and takes `silentFailure`).
+  Photos' own `UserService` only; `packages/accounts` (Auth/Locker) is
+  untouched. Tests: `test/photovault/email_verification_test.dart`,
+  `test/photovault/email_verification_flow_test.dart`.
 - `ios/Runner/Info.plist`: `_photovault._tcp` in `NSBonjourServices`, the
   local-network prompt mentions the server, stale
   `FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED` key removed.
@@ -175,6 +192,10 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - `lib/ui/cast/pair_with_code.dart`: the cast URL shown for pairing is the
   remote flag, else the server's `castUrl` from `/photovault/info`, else
   `<publicUrl>/cast`, and only then `<endpoint>/cast`.
+- `lib/ui/cast/cast.dart`: no Chromecast "Auto pair" button (`showAutoPair`
+  is `false`): it launches Ente's registered receiver app, whose hosted cast
+  page talks to Ente and cannot pair with this server. The cast sheet offers
+  pair-by-code only, as the web app does.
 - `lib/core/configuration.dart`: `logout()` keeps the `photovault.*` keys and
   Ente's `endpoint` key across its `SharedPreferences.clear()`, so servers
   survive logout.
@@ -190,13 +211,14 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - Public album links shared into the app: `lib/ui/tabs/home_widget.dart`
   (`_isServerAlbumLink`, `isServerPublicAlbumLink` in `server_contract.dart`)
   also accepts links on the host of the active server's `albumsUrl`,
-  `publicUrl` or `homeUrl` that carry a `t=` token, next to Ente's
-  albums.ente.* check. No https app-link filter is added, because the host
+  `publicUrl` or `homeUrl` that carry a `t=` token; links on Ente's
+  albums.ente.* hosts are no longer recognised. No https app-link filter is added, because the host
   is not known at build time.
 - Public album links: `lib/services/collections_service.dart` remembers the
   origin a shared link was opened from (`getSharedPublicAlbumOrigin`) and
   `lib/ui/viewer/gallery/gallery_app_bar_widget.dart` "Open in browser" uses it
-  (falling back to the endpoint) instead of albums.ente.com.
+  (falling back to the server's albums URL, see `serverAlbumsBaseUrl`)
+  instead of albums.ente.com.
 - The 7-tap developer-settings dialog that used to set the endpoint is deleted.
 
 ### Telemetry, Firebase, Play services, billing
@@ -313,6 +335,82 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   transliterations in ja, ko, hu, he, sr, et, gu, ur replaced. Translations whose meaning changed were deleted so
   they fall back to English.
 
+### Ente hosts the app contacted directly (second strip pass)
+
+- `lib/core/constants.dart`: `supportEmail` is empty (no support address; the
+  `/photovault/info` contract has no admin contact). The "Contact support"
+  buttons that passed Ente's address now pass `supportEmail`, and `sendLogs`
+  only offers View logs / Export logs for the server's administrator:
+  `lib/ui/account/login_pwd_verification_page.dart`,
+  `lib/ui/account/password_reentry_page.dart`,
+  `lib/ui/settings/ml/machine_learning_settings_page.dart`,
+  `lib/ui/settings/backup/backup_item_card.dart`,
+  `lib/ui/home/header_error_widget.dart`, `lib/ui/home/loading_photos_widget.dart`,
+  `lib/utils/dialog_util.dart`.
+- `lib/core/constants.dart`, `lib/core/network/endpoint_config.dart`: Ente's
+  production/legacy API constants are gone (no api.ente.io -> api.ente.com
+  rewrite). `kUploadProxyEndpoint` (Ente's Cloudflare upload worker) is empty;
+  it is only used when `isProduction`, which is always false.
+- `lib/module/download/file_url.dart`: downloads and thumbnails always use the
+  configured server's own paths (`/files/download`, `/files/preview`,
+  `/public-collection/files/...`); Ente's files/thumbnails/public-albums
+  worker hosts are removed.
+- `lib/services/memories/memory_music_service.dart`: the memories/Rewind music
+  track list is no longer fetched from Ente's music host; the manifest is
+  always empty, so memories play without music (tracks cached by an older
+  build are cleaned up).
+- `lib/services/location_service.dart` and Rust
+  (`../../../rust/crates/photos/src/location.rs` `LocationIndex::open_from`,
+  `../../../rust/bindings/frb/photos/src/api/location_api.rs`
+  `open_location_index(assetRoot, assetBaseUrl)`): the location data files
+  (cities, urban centres, countries, disputes; pinned sizes and SHA-256s are
+  unchanged) are downloaded from `<endpoint>/static-assets/location/v2`, the
+  server's web app, instead of Ente's assets CDN (the server must run with
+  `PHOTOVAULT_WEB_DIR` pointing at a web build made with
+  `web/scripts/photovault-vendor-assets.mjs`, which vendors all four files;
+  otherwise places and city search are unavailable). `LocationIndex::open` keeps
+  the upstream CDN default for the CLI only. Regenerate the bindings with
+  `cargo codegen frb photos` (output is git-ignored).
+- `lib/ui/tabs/home_widget.dart`: links on Ente's albums hosts are no longer
+  treated as public album links (only the active server's links are).
+- `lib/services/library_sharing_service.dart`: the missing-public-key error no
+  longer says "Ente" (it can reach the generic error dialog).
+- `lib/ui/viewer/gallery/gallery_app_bar_widget.dart`: "Open in browser" for a
+  collect link falls back to `serverAlbumsBaseUrl` (new in
+  `lib/services/photovault/server_contract.dart`: the server's `albumsUrl`,
+  else `<publicUrl>/albums`, else `<endpoint>/albums`), tested in
+  `test/photovault/server_contract_test.dart`.
+
+Shared packages (also compiled into Ente Auth/Locker, which Photovault does
+not ship):
+- `../../packages/utils/lib/email_util.dart`: `sendLogs` hides its e-mail
+  button when the address is empty; the unused `openSupportPage` (Ente's
+  GitHub discussions) is removed.
+- `../../packages/ui/lib/utils/dialog_util.dart`: error dialogs open the logs
+  sheet with no address; the Windows "Update Certificates" help link is gone.
+- `../../packages/ui/lib/components/settings/about_settings_section.dart`
+  (GitHub, blog, privacy, terms), `app_engagement_section.dart` (Merchandise),
+  `social_icons_row.dart` (all Ente social links), `more_from_ente_footer.dart`
+  ("More from Ente" and socials): the Ente links are removed.
+- `../../packages/accounts/lib/pages/`: `email_entry_page.dart` (terms
+  checkbox), `login_page.dart` (terms line), `password_entry_page.dart`
+  ("How it works"), `recovery_page.dart` ("Contact support" e-mail),
+  `two_factor_recovery_page.dart` (shows `askServerAdminToReset2fa` instead of
+  an e-mail), `login_pwd_verification_page.dart`, `password_reentry_page.dart`
+  (logs sheet without an address).
+- `../../packages/lock_screen/lib/ui/local_authentication_unavailable_dialog.dart`:
+  the Linux setup sheet has no Ente help-page button and does not name Ente Auth.
+- `../../packages/ente_components/example/lib/main.dart`: sample link uses
+  example.com.
+
+### Ente logos in shared packages
+
+- `packages/ente_components/assets/ente_wordmark.svg` and the Ente Auth and
+  Locker logos in `assets/apps/` are deleted and dropped from its
+  `pubspec.yaml`, so they are not bundled in the APK. `assets/apps/photos.png`
+  (the account-deletion summary row) is the Photovault icon at 1x/2x/3x.
+  The More-from-Ente section that drew the wordmark is not used by Photos.
+
 ### Mascot
 
 - `assets/photovault_glyph.svg` and `lib/ui/photovault/photovault_glyph.dart`
@@ -357,17 +455,42 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - `test/photovault/screenshots_test.dart` (new): renders the connect screen
   (empty, saved and found servers, server answered, unreachable), the top of
   Settings (storage card and Server entry), Settings > Server and About, in light
-  and dark with the real themes and bundled fonts. With
-  `PHOTOVAULT_SCREENSHOT_DIR=<dir>` it writes `<screen>-<light|dark>.png` there.
+  and dark with the real themes and bundled fonts, plus the QR scan page
+  chrome (the camera view is black off-device). With
+  `PHOTOVAULT_SCREENSHOT_DIR=<dir>` it writes `<screen>-<light|dark>.png` there
+  (1080x2400 at 2.625).
+- `test/photovault/before_after/` (new): the Ente screens Photovault changes
+  (landing, sign-in, sign-up, email code, passwords, recovery key, Settings,
+  About, Account, Family, Free up space, Security, Streaming, ML, backup
+  banners, permissions, loading, empty states, Rewind banner, invite dialog),
+  written so the same test also runs on the pristine Ente import
+  (`tree_env.dart` here, `tree_env_upstream.dart` there).
+  `scripts/photovault/render_before_after.sh <dir>` renders both and writes
+  `<screen>-<mode>-before.png` / `-after.png`.
+- `../../../.github/workflows/photovault-mobile.yml` job
+  `photos-emulator-screens` (non-blocking): x86_64 debug APK in an API 34
+  `aosp_atd` emulator, a server built from the repo's Dockerfile
+  (`WEB=none`, `PHOTOVAULT_SKIP_EMAIL_VERIFICATION`), driven by
+  `scripts/photovault/emulator_screens.py` (adb + uiautomator); uploads the
+  `photovault-emulator-screens` artifact.
 - `lib/main.dart`, `lib/ui/account/onboarding_page_scaffold.dart`: analyzer
   fixes (unused imports left by the telemetry removal, a missing `const`).
 
 ## Known gaps
 
-- Still contacting Ente-run hosts for features we keep: ML model downloads
-  (models.ente.com, set in `rust/crates/ml/src/assets.rs`), memories/rewind music
-  (music.ente.com, `lib/services/memories/memory_music_service.dart`). The map uses
-  OpenStreetMap tiles. Self-hosting these needs a later change.
+- Still contacting an Ente-run host for a feature we keep, pending the
+  owner's decision: ML model downloads (models.ente.com, set in
+  `rust/crates/ml/src/assets.rs`, `ml/src/ocr/assets.rs`, `ml/src/scan/mod.rs`).
+  Memories/Rewind music is no longer fetched (no music). The map uses
+  OpenStreetMap tiles.
+- Shared code Photos does not use still names Ente defaults:
+  `../../packages/configuration` (`api.ente.com` default for Auth/Locker's
+  `BaseConfiguration`), `../../packages/legacy` (legacy kit PDF: Ente support
+  e-mail, `legacy.ente.com` fallback, Ente logo; not in Photos' dependency
+  graph), podspec author/homepage metadata, and
+  Rust `ente_core::urls::PRODUCTION_API_ORIGIN` (CLI default only; the app
+  passes its endpoint) and `ente_accounts` `enforce_auth_payloads`
+  (stricter checks only for Ente's hosts; left as is).
 - Passkey 2FA still returns through `ente://passkey`, as upstream. With Ente
   Photos or Ente Auth installed on the same phone, Android may offer a
   chooser or open the other app. A `photovault://passkey` redirect is not
@@ -381,14 +504,19 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   already in `NSBonjourServices`). The connect/settings text is English only.
 - Unused ARB keys still mention Ente Auth/Locker, referrals and support e-mail;
   they are never displayed by Photos (see `PHOTOVAULT-GREP.md`).
-- Shared `ente_ui`/`ente_utils` helpers still name support@ente.com; Photos
-  does not call those paths.
 - Chromecast uses Ente's registered receiver app id (`F5BCEC64` in
   `plugins/ente_cast/lib/src/service.dart`), which loads Ente's hosted cast
-  page. Pairing by code goes through the server and `<server>/cast` instead
-  (not tested here). Replacing
-  it needs a Photovault receiver registered with Google.
+  page. The id is kept (pending the owner's decision), but its only UI path,
+  "Auto pair", is hidden (`lib/ui/cast/cast.dart`). Pairing by code goes
+  through the server and `<server>/cast` instead (not tested here). Bringing
+  Auto pair back needs a Photovault receiver registered with Google.
 - Some non-mascot illustrations keep Ente's green (e.g. `assets/on_ente.png`,
   `lock_screen_icon.png`, `recovery_key.png`, rewind badge backdrops).
 - The alternate app icons (Settings > App icon) all show the Photovault icon.
 - `PHOTOVAULT-GREP.md` (generated by a final grep) lists every remaining "ente"/telemetry/store hit and why it is acceptable.
+- `../../../scripts/strip-report.py` (repo root) checks the same in CI against
+  `scripts/strip-allowlist.toml`, over the sources and the built APK
+  (`photovault-mobile.yml`, report artifact `strip-report-apk`); the source
+  report is `docs/src/strip-report.md`.
+
+- `lib/ui/home/landing_page_widget.dart`: when the server refuses sign-ups, the landing page shows PhotovaultStrings.signupsClosed in place of "Create account".

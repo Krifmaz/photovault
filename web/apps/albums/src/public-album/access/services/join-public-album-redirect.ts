@@ -36,47 +36,6 @@ const handleWebFallback = (
     window.location.href = redirectURL;
 };
 
-// PHOTOVAULT: strip
-const isPhotovaultBuild = true as boolean;
-
-const tryDeepLinkWithFallback = (
-    deepLinkURL: string,
-    fallbackFn: () => void | Promise<void>,
-    timeoutMs = 2500,
-): (() => void) => {
-    let appOpened = false;
-
-    const onVisibilityChange = () => {
-        if (document.visibilityState === "hidden") {
-            appOpened = true;
-        }
-    };
-
-    const onPageHide = () => {
-        appOpened = true;
-    };
-
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pagehide", onPageHide);
-
-    window.location.assign(deepLinkURL);
-
-    const timeoutId = setTimeout(() => {
-        if (!appOpened) {
-            void fallbackFn();
-        }
-        cleanup();
-    }, timeoutMs);
-
-    const cleanup = () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener("visibilitychange", onVisibilityChange);
-        window.removeEventListener("pagehide", onPageHide);
-    };
-
-    return cleanup;
-};
-
 export const joinPublicAlbumViaRedirect = ({
     publicCollection,
     accessToken,
@@ -91,19 +50,8 @@ export const joinPublicAlbumViaRedirect = ({
     const jwtToken = credentials?.current?.accessTokenJWT;
     const collectionId = publicCollection.id;
 
-    const fallbackToWeb = () => {
-        handleWebFallback(accessToken, collectionId, currentHash, jwtToken);
-    };
-
-    // PHOTOVAULT: strip - no ente:// deep link: Ente's own app also handles
-    // it and would send the token to Ente's servers. Join on the web instead.
-    if (navigator.userAgent.includes("Android") && !isPhotovaultBuild) {
-        // Older Android clients only recognize albums.ente.io in ente://
-        // public-album join links. Newer ones also support albums.ente.com.
-        const deepLinkURL = `ente://albums.ente.io/?action=join&t=${encodeURIComponent(accessToken)}#${currentHash}`;
-
-        tryDeepLinkWithFallback(deepLinkURL, fallbackToWeb);
-    } else {
-        handleWebFallback(accessToken, collectionId, currentHash, jwtToken);
-    }
+    // PHOTOVAULT: strip - no ente:// deep link (ente://albums.ente.io on
+    // Android): Ente's own app also handles it and would send the token to
+    // Ente's servers. Join on the web, in Photos on this server.
+    handleWebFallback(accessToken, collectionId, currentHash, jwtToken);
 };

@@ -1,7 +1,9 @@
 # PHOTOVAULT: web CI. Type-checks, lints and tests the web apps the Photovault
 # server serves (photos, albums, cast, accounts and the shared packages), then
 # builds their static export with web/scripts/photovault-build.sh and uploads
-# it as an artifact (layout as served, see web/PHOTOVAULT.md).
+# it as an artifact (layout as served, see web/PHOTOVAULT.md). Then runs
+# scripts/strip-report.py --check over the source and the export and uploads
+# the report.
 name: photovault-web
 
 on:
@@ -9,11 +11,13 @@ on:
     paths:
       - "web/**"
       - "rust/**"
+      - "scripts/strip-*"
       - ".github/workflows/photovault-web.yml"
   pull_request:
     paths:
       - "web/**"
       - "rust/**"
+      - "scripts/strip-*"
       - ".github/workflows/photovault-web.yml"
   workflow_dispatch:
 
@@ -108,3 +112,16 @@ jobs:
           path: photovault-web
           if-no-files-found: error
           retention-days: 14
+
+      - name: Strip report (source + static export)
+        working-directory: .
+        run: |
+          python3 -I scripts/strip-report.py --check --web-out photovault-web \
+              --output "$RUNNER_TEMP/strip-report/strip-report-web.md"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: strip-report-web
+          path: ${{ runner.temp }}/strip-report/
+          if-no-files-found: warn

@@ -197,7 +197,8 @@ class _LoginPasswordVerificationPageState
       ],
     );
     if (result == true && context.mounted) {
-      await sendLogs(context, "support@ente.com", postShare: () {});
+      // PHOTOVAULT: strip - no support e-mail (Ente's was hard-coded).
+      await sendLogs(context, '', postShare: () {});
     }
   }
 

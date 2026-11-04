@@ -6,6 +6,10 @@ import {
     stashReferralSource,
     stashSRPSetupAttributes,
 } from "ente-accounts/services/accounts-db";
+import {
+    serverEmailVerificationMode,
+    stashSkipEmailCode,
+} from "ente-accounts/services/photovault/email-code"; // PHOTOVAULT: email-skip
 import { saveMasterKeyInSessionAndSafeStore } from "ente-accounts/services/prelogin-session";
 import {
     generateAndSaveInteractiveKeyAttributes,
@@ -21,6 +25,11 @@ import { isPhotovaultApp } from "ente-base/components/utils/photovault/encore-to
 import { isNamedError } from "ente-base/error";
 import { JOIN_ALBUM_CONTEXT_KEY } from "ente-base/join-album";
 import log from "ente-base/log";
+import { apiOrigin } from "ente-base/origins"; // PHOTOVAULT: connect
+import {
+    checkServer,
+    shouldAutoSubmitEmailCode, // PHOTOVAULT: email-skip
+} from "ente-base/photovault/server"; // PHOTOVAULT: connect
 import { useFormik } from "formik";
 import { t } from "i18next";
 import type { NextRouter } from "next/router";
@@ -118,6 +127,9 @@ export const SignUpContents: React.FC<SignUpContentsProps> = ({
                 const cleanedReferral = referral.trim();
                 if (cleanedReferral) stashReferralSource(cleanedReferral);
 
+                // PHOTOVAULT: email-skip - ask the server (in parallel) whether
+                // it emails codes at all.
+                const emailVerification = serverEmailVerificationMode();
                 await sendOTT(email, "signup");
                 replaceSavedLocalUser({ email });
                 const { masterKey, keyAttributes, srp } =
@@ -132,6 +144,9 @@ export const SignUpContents: React.FC<SignUpContentsProps> = ({
                 await saveMasterKeyInSessionAndSafeStore(masterKey);
 
                 saveJustSignedUp();
+                // PHOTOVAULT: email-skip - /verify submits the code itself.
+                if (shouldAutoSubmitEmailCode(await emailVerification))
+                    stashSkipEmailCode(email);
                 void router.push("/verify");
             } catch (e) {
                 if (isNamedError(e, "already_registered")) {
@@ -141,6 +156,10 @@ export const SignUpContents: React.FC<SignUpContentsProps> = ({
                         "confirmPassword",
                         t("password_generation_failed"),
                     );
+                } else if (await serverRefusesSignups()) {
+                    // PHOTOVAULT: connect - the server refuses sign-ups (its
+                    // 403 reaches us as an unnamed error), so say so.
+                    setFieldError("confirmPassword", t("pv_signups_closed"));
                 } else {
                     log.error("Signup failed", e);
                     setFieldError("confirmPassword", t("generic_error"));
@@ -189,4 +208,17 @@ export const SignUpContents: React.FC<SignUpContentsProps> = ({
             onLogin={onLogin}
         />
     );
+};
+
+/**
+ * PHOTOVAULT: connect - true when the configured server says (via
+ * /photovault/info) that it takes no sign-ups.
+ */
+const serverRefusesSignups = async () => {
+    try {
+        const check = await checkServer(await apiOrigin());
+        return check.kind == "photovault" && !check.info.signupsAllowed;
+    } catch {
+        return false;
+    }
 };

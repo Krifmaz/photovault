@@ -2,10 +2,26 @@
 //
 // The Photovault wordmark: the vault/aperture glyph from `branding/glyph.svg`
 // followed by the name. The name uses `currentColor` (like Ente's wordmark
-// did) so it follows the surrounding text colour; the glyph keeps Encore's
-// cream-to-gold gradient.
+// did) so it follows the surrounding text colour; the glyph uses Encore's
+// accent gradient of the active scheme (see `pvGlyphDarkVars`).
 
 import { pvDark } from "../utils/photovault/encore-tokens";
+
+/**
+ * The glyph's gradient colours. The Encore theme sets these variables to the
+ * active scheme's accent (light: gold to charcoal, dark: gold to cream) so the
+ * glyph stays visible on light backgrounds; surfaces that are always dark (the
+ * sign-in brand panel, the photo viewer) pin them with
+ * {@link pvGlyphDarkVars}. Elsewhere it keeps the dark colours.
+ */
+const glyphFrom = `var(--pv-glyph-from, ${pvDark.accent2})`;
+const glyphTo = `var(--pv-glyph-to, ${pvDark.accent})`;
+
+/** CSS custom properties that pin the glyph to its dark-scheme colours. */
+export const pvGlyphDarkVars = {
+    "--pv-glyph-from": pvDark.accent2,
+    "--pv-glyph-to": pvDark.accent,
+};
 
 /** viewBox of {@link pvWordmarkSVGHTML}, the same height as Ente's (264). */
 export const pvWordmarkViewBox = "0 0 1500 264";
@@ -30,8 +46,8 @@ const bolts = [
 const pvGlyphSVGHTML = (id: string) => `
 <defs>
   <linearGradient id="${id}-g" x1="160" y1="864" x2="864" y2="160" gradientUnits="userSpaceOnUse">
-    <stop offset="0" stop-color="${pvDark.accent2}"/>
-    <stop offset="1" stop-color="${pvDark.accent}"/>
+    <stop offset="0" style="stop-color:${glyphFrom}"/>
+    <stop offset="1" style="stop-color:${glyphTo}"/>
   </linearGradient>
   <mask id="${id}-m"><rect width="1024" height="1024" fill="#fff"/>${bolts}</mask>
   <clipPath id="${id}-c"><circle cx="512" cy="512" r="200"/></clipPath>

@@ -23,7 +23,8 @@ export interface AuthPresentationConfig {
      * PHOTOVAULT: theme - extra `--auth-ui-*` variables (without the prefix)
      * that override the defaults below, per scheme. Also accepts the
      * Photovault-only variables `page`, `card`, `brand`, `brand-text`,
-     * `brand-text-muted`, `on-primary` and `primary-gradient`.
+     * `brand-text-muted`, `on-primary`, `primary-gradient`, `curves` and
+     * `brand-curves` (CSS images) and `sparkle-display`.
      */
     photovault?: {
         light: Record<string, string>;

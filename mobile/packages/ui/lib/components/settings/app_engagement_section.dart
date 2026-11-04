@@ -9,22 +9,13 @@ class AppEngagementSection extends StatelessWidget {
 
   final String reviewUrl;
 
-  static Future<void> _launchMerchandise() {
-    return _openExternalUrl('https://shop.ente.com');
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = context.strings;
 
     return MenuGroupComponent(
       items: [
-        SettingsItem(
-          title: strings.merchandise,
-          icon: HugeIcons.strokeRoundedTShirt,
-          showOnlyLoadingState: true,
-          onTap: _launchMerchandise,
-        ),
+        // PHOTOVAULT: strip - removed Merchandise (Ente's shop host).
         SettingsItem(
           title: strings.rateUs,
           icon: HugeIcons.strokeRoundedStar,

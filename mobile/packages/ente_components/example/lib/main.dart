@@ -4123,7 +4123,8 @@ class _CustomBottomSheetContent extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Text(
-                  'https://ente.io/share/example-link',
+                  // PHOTOVAULT: strip - was a sample link on Ente's website.
+                  'https://photos.example.com/albums/example-link',
                   style: TextStyles.body.copyWith(color: colors.textBase),
                 ),
                 Positioned(

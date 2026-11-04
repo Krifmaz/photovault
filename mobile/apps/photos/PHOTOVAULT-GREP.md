@@ -8,6 +8,33 @@ Scope: `apps/photos/{lib,assets,android,ios,pubspec.yaml}` and `mobile/packages/
 
 Rule used: internal identifiers, class/package names, API paths and fields, comments, log messages and the About credit are acceptable; anything a user can see is not. Hits that were user-visible have been fixed in this branch; what is listed below is what remains, each with why it is acceptable or where it is a known gap.
 
+## Update: second strip pass
+
+The totals and per-file lines below are from the first pass. Since then (see
+"Ente hosts the app contacted directly" in `PHOTOVAULT.md`) these hits are
+gone, so their entries below are superseded:
+
+- every `"support@ente.com"` argument in `apps/photos/lib` (now `supportEmail`,
+  which is empty) and in `packages/{accounts,ui}` (now `''`, which hides the
+  e-mail button in `ente_utils`' `sendLogs`);
+- `apps/photos/lib/core/constants.dart` production/legacy/uploader endpoint
+  values, `apps/photos/lib/module/download/file_url.dart` CDN worker URLs,
+  `apps/photos/lib/services/memories/memory_music_service.dart` (music is no
+  longer fetched), `apps/photos/lib/ui/tabs/home_widget.dart` albums.ente.*
+  host check;
+- `packages/ui/lib/components/settings/{about_settings_section,app_engagement_section,more_from_ente_footer,social_icons_row}.dart`,
+  `packages/ui/lib/utils/dialog_util.dart`, `packages/utils/lib/email_util.dart`
+  (`openSupportPage`), `packages/accounts/lib/pages/*` terms/privacy/
+  architecture links, `packages/lock_screen/lib/ui/local_authentication_unavailable_dialog.dart`
+  help link, `packages/ente_components/example/lib/main.dart` sample link;
+- Rust: the Photos app downloads location data from its server
+  (`<endpoint>/static-assets/location/v2`), not from Ente's assets CDN.
+
+Still remaining on purpose: ML models from models.ente.com (pending the
+owner's decision), the Chromecast receiver app id, `packages/configuration`
+(Auth/Locker default endpoint), `packages/legacy` (not compiled into Photos),
+podspec metadata, PHOTOVAULT comments and upstream comments.
+
 ## Totals (remaining hits)
 
 | pattern | hits | files |
@@ -31,7 +58,7 @@ Rule used: internal identifiers, class/package names, API paths and fields, comm
 ## Known user-visible gaps (not fixed, by design or needing other work)
 
 - Chromecast receiver app id `F5BCEC64` (`apps/photos/plugins/ente_cast/lib/src/service.dart`, outside the grep scope) loads Ente's hosted cast receiver; needs a Photovault receiver registered with Google. Pair-by-code uses `<server>/cast`.
-- Network phone-home kept for features that must stay: ML models (models.ente.com, set in `rust/crates/ml/src/assets.rs`), memories/Rewind music (music.ente.com), OpenStreetMap tiles for the map.
+- Network phone-home kept for a feature that must stay, pending the owner's decision: ML models (models.ente.com, set in `rust/crates/ml/src/assets.rs`). OpenStreetMap tiles for the map. (Memories/Rewind music is no longer fetched.)
 - iOS `Podfile.lock` / `project.pbxproj` embed phases still name Firebase and Sentry frameworks until `pod install` is re-run on macOS (the Dart dependencies are gone). iOS share-extension `NSHumanReadableCopyright` still reads "Ente Technologies" (Ente's copyright on the code; not normally displayed).
 - The "Contact support" / "Raise ticket" buttons in a few error dialogs remain; they now only export logs for the user to share (no Ente address). The error texts next to them no longer speak as a vendor ("contact our support team", "reach out to us", "Your plan already supports a family"): see the strings list in `PHOTOVAULT.md`.
 

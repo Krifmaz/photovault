@@ -1,5 +1,4 @@
 import "package:dio/dio.dart";
-import "package:photos/core/constants.dart";
 import "package:photos/service_locator.dart";
 
 const _v3RetryDelay = Duration(hours: 1);
@@ -21,11 +20,10 @@ class FileUrl {
     required Map<String, dynamic> headers,
     CancelToken? cancelToken,
   }) async {
-    final usesWorker =
-        type != FileUrlType.directDownload &&
-        endpointConfig.endpoint == kDefaultProductionEndpoint &&
-        !flagService.disableCFWorker;
-    if (usesWorker || (_v3RetryAfter?.isAfter(DateTime.now()) ?? false)) {
+    // PHOTOVAULT: strip - upstream skipped v3 URLs when Ente's own CDN
+    // workers were used (endpoint == Ente's api host); a configured server never
+    // uses them.
+    if (_v3RetryAfter?.isAfter(DateTime.now()) ?? false) {
       return null;
     }
 
@@ -46,33 +44,25 @@ class FileUrl {
     return (response.data as Map<String, dynamic>)["url"] as String;
   }
 
+  // PHOTOVAULT: strip - always the configured server's own paths (what
+  // upstream uses for self-hosted servers); the files/thumbnails/
+  // public-albums worker URLs on Ente's hosts are removed.
   static String getLegacyUrl(int fileID, FileUrlType type) {
     final endpoint = endpointConfig.endpoint;
-    final disableWorker =
-        endpoint != kDefaultProductionEndpoint || flagService.disableCFWorker;
 
     switch (type) {
       case FileUrlType.directDownload:
-        return "$endpoint/files/download/$fileID";
       case FileUrlType.download:
-        return disableWorker
-            ? "$endpoint/files/download/$fileID"
-            : "https://files.ente.com/?fileID=$fileID";
+        return "$endpoint/files/download/$fileID";
 
       case FileUrlType.publicDownload:
-        return disableWorker
-            ? "$endpoint/public-collection/files/download/$fileID"
-            : "https://public-albums.ente.com/download/?fileID=$fileID";
+        return "$endpoint/public-collection/files/download/$fileID";
 
       case FileUrlType.thumbnail:
-        return disableWorker
-            ? "$endpoint/files/preview/$fileID"
-            : "https://thumbnails.ente.com/?fileID=$fileID";
+        return "$endpoint/files/preview/$fileID";
 
       case FileUrlType.publicThumbnail:
-        return disableWorker
-            ? "$endpoint/public-collection/files/preview/$fileID"
-            : "https://public-albums.ente.com/preview/?fileID=$fileID";
+        return "$endpoint/public-collection/files/preview/$fileID";
     }
   }
 

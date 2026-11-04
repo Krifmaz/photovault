@@ -1,0 +1,59 @@
+# PHOTOVAULT: strip report, source only (new file). A quick check, without
+# building anything, that every Ente host, Ente branding and stripped company
+# service (billing, referrals, crash reporting, store links) still in the app
+# sources is explained in scripts/strip-allowlist.toml. The mobile and web
+# workflows run the same check over the built APK and the static export.
+# The report (docs/src/strip-report.md layout) is uploaded as an artifact;
+# regenerate the committed copy with `python3 -I scripts/strip-report.py`.
+name: photovault-strip
+
+on:
+  push:
+    paths:
+      - "mobile/**"
+      - "web/**"
+      - "desktop/**"
+      - "rust/crates/**"
+      - "rust/bindings/**"
+      - "rust/Cargo.toml"
+      - "scripts/strip-*"
+      - ".github/workflows/photovault-strip.yml"
+  pull_request:
+    paths:
+      - "mobile/**"
+      - "web/**"
+      - "desktop/**"
+      - "rust/crates/**"
+      - "rust/bindings/**"
+      - "rust/Cargo.toml"
+      - "scripts/strip-*"
+      - ".github/workflows/photovault-strip.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: photovault-strip-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Strip report (source)
+        run: |
+          python3 -I scripts/strip-report.py --check \
+              --output "$RUNNER_TEMP/strip-report/strip-report.md"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: strip-report
+          path: ${{ runner.temp }}/strip-report/
+          if-no-files-found: warn

@@ -21,10 +21,12 @@ import {
 } from "@mui/material";
 import { EnteLogo } from "ente-base/components/EnteLogo";
 import { ActivityIndicator } from "ente-base/components/mui/ActivityIndicator";
+import { pvGlyphDarkVars } from "ente-base/components/photovault/wordmark"; // PHOTOVAULT: branding
 import { useBaseContext } from "ente-base/context";
 import { isNamedError } from "ente-base/error";
 import type { PublicAlbumsCredentials } from "ente-base/http";
 import log from "ente-base/log";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import type { AddSaveGroup } from "ente-gallery/components/utils/save-groups";
 import { createPSRegisterElementIconHTML } from "ente-gallery/components/viewer/icons";
 import type { EnteFile } from "ente-media/file";
@@ -436,7 +438,10 @@ export const PublicAlbumSingleFileViewer: React.FC<
         }
 
         try {
-            await navigator.clipboard.writeText(shareUrl);
+            await copyTextToClipboard(
+                // PHOTOVAULT: clipboard
+                shareUrl,
+            );
             setShowCopiedMessage(true);
             window.setTimeout(() => setShowCopiedMessage(false), 2000);
         } catch (error) {
@@ -612,6 +617,7 @@ export const PublicAlbumSingleFileViewer: React.FC<
                                     component="span"
                                     sx={{
                                         color: "white",
+                                        ...pvGlyphDarkVars, // PHOTOVAULT: branding - dark viewer
                                         opacity: 0.85,
                                         lineHeight: 0,
                                         flexShrink: 0,

@@ -26,8 +26,7 @@ import { LOGOUT_MODAL_WIDTH, subtitleTextSx, titleTextSx } from "./styles";
 // PHOTOVAULT: theme - Encore colours instead of Ente green.
 import {
     pvGold,
-    pvGoldHover,
-    pvOnGold,
+    pvVar,
 } from "ente-base/components/utils/photovault/encore-tokens";
 
 type AppLockSnapshot = ReturnType<typeof useAppLockSnapshot>;
@@ -53,7 +52,6 @@ interface AppLockFormHeaderProps {
 type UnlockInputError = string | null | undefined;
 
 const ENTE_GREEN = pvGold; // PHOTOVAULT: theme
-const ENTE_GREEN_HOVER = pvGoldHover;
 const appLockModalContentSx = { width: 408 - 32, maxWidth: "100%" } as const;
 
 const useCooldownState = (
@@ -113,14 +111,14 @@ const primaryActionButtonSx = (theme: Parameters<typeof titleTextSx>[0]) => ({
     alignItems: "center",
     gap: 1,
     borderRadius: "20px",
-    backgroundColor: ENTE_GREEN,
+    backgroundColor: pvVar.accent, // PHOTOVAULT: theme - primary button from the tokens (scheme-aware)
     fontSize: 16,
     fontWeight: 500,
     lineHeight: "20px",
     textTransform: "none" as const,
-    color: pvOnGold, // PHOTOVAULT: theme
+    color: pvVar.onAccent, // PHOTOVAULT: theme
     boxShadow: "none",
-    "&:hover": { backgroundColor: ENTE_GREEN_HOVER, boxShadow: "none" },
+    "&:hover": { backgroundColor: pvVar.accent2, boxShadow: "none" }, // PHOTOVAULT: theme
     "&.Mui-disabled": {
         backgroundColor: "rgba(0, 0, 0, 0.04)",
         color: "#999",
@@ -706,9 +704,9 @@ const DeviceLockUnlockContent = ({
                         }}
                         sx={(theme) => ({
                             ...primaryActionButtonSx(theme),
-                            backgroundColor: ENTE_GREEN,
-                            color: pvOnGold, // PHOTOVAULT: theme
-                            "&:hover": { backgroundColor: ENTE_GREEN_HOVER },
+                            backgroundColor: pvVar.accent, // PHOTOVAULT: theme
+                            color: pvVar.onAccent, // PHOTOVAULT: theme
+                            "&:hover": { backgroundColor: pvVar.accent2 }, // PHOTOVAULT: theme
                             fontWeight: 600,
                             mt: 2,
                         })}

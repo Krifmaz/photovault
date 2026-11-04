@@ -8,6 +8,7 @@ import {
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 import { Box, IconButton, styled } from "@mui/material";
 import { EnteLogo } from "ente-base/components/EnteLogo";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import { useState } from "react";
 
 interface MobileNavBarProps {
@@ -43,7 +44,10 @@ export const MobileNavBar: React.FC<MobileNavBarProps> = ({
                     !error ||
                     (error instanceof Error && error.name !== "AbortError")
                 ) {
-                    void navigator.clipboard.writeText(shareText);
+                    void copyTextToClipboard(
+                        // PHOTOVAULT: clipboard
+                        shareText,
+                    );
                     setShowCopiedMessage(true);
                     setTimeout(() => setShowCopiedMessage(false), 2000);
                 }

@@ -203,7 +203,7 @@ Future<ButtonResult?> showGenericErrorDialog({
           await sendLogs(
             context,
             context.strings.contactSupport,
-            "support@ente.com",
+            supportEmail, // PHOTOVAULT: strip - was Ente's support address
             postShare: () {},
           );
         },
@@ -264,7 +264,7 @@ Future<void> showGenericErrorBottomSheet({
           await sendLogs(
             context,
             context.strings.contactSupport,
-            "support@ente.com",
+            supportEmail, // PHOTOVAULT: strip - was Ente's support address
             postShare: () {},
           );
         },

@@ -20,4 +20,5 @@
 - [Architecture](architecture.md)
 - [API compatibility matrix](api-compatibility.md)
 - [Mobile app API audit](mobile-api-audit.md)
+- [Strip report (Ente mentions left and why)](strip-report.md)
 - [Keeping the app forks up to date](upstream.md)

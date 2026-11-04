@@ -6,12 +6,10 @@ import {
 import { blobCache, type BlobCache } from "ente-base/blob-cache";
 import { fetchPublicCollectionFile } from "ente-base/file-download";
 import {
-    authenticatedPublicAlbumsRequestHeaders,
     retryEnsuringHTTPOk,
     type PublicAlbumsCredentials,
 } from "ente-base/http";
 import log from "ente-base/log";
-import { customAPIOrigin } from "ente-base/origins";
 import type { EnteFile } from "ente-media/file";
 import { decryptThumbnailBlobBytes } from "./thumbnail-crypto";
 
@@ -130,26 +128,14 @@ const wrapErrors = <T>(op: () => Promise<T>) =>
         throw new NetworkThumbnailError(e);
     });
 
+// PHOTOVAULT: strip - always fetch from the configured server (Ente's
+// self-hosted path), never Ente's public-albums.ente.com CDN.
 const publicAlbums_downloadThumbnail = async (
     file: EnteFile,
     credentials: PublicAlbumsCredentials,
 ) => {
-    const customOrigin = await customAPIOrigin();
-
-    const getThumbnail = () => {
-        if (customOrigin) {
-            return fetchPublicCollectionFile(file.id, "thumbnail", credentials);
-        } else {
-            return fetch(
-                `https://public-albums.ente.com/preview/?fileID=${file.id}`,
-                {
-                    headers:
-                        authenticatedPublicAlbumsRequestHeaders(credentials),
-                },
-            );
-        }
-    };
-
-    const res = await retryEnsuringHTTPOk(getThumbnail);
+    const res = await retryEnsuringHTTPOk(() =>
+        fetchPublicCollectionFile(file.id, "thumbnail", credentials),
+    );
     return new Uint8Array(await res.arrayBuffer());
 };

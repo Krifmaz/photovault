@@ -183,7 +183,8 @@ class _PasswordReentryPageState extends State<PasswordReentryPage> {
         ],
       );
       if (result == true && mounted) {
-        await sendLogs(context, "support@ente.com", postShare: () {});
+        // PHOTOVAULT: strip - no support e-mail (Ente's was hard-coded).
+        await sendLogs(context, '', postShare: () {});
       }
       return;
     }

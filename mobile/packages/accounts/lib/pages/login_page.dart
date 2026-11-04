@@ -5,11 +5,8 @@ import 'package:ente_configuration/base_configuration.dart';
 import "package:ente_strings/ente_strings.dart";
 import 'package:ente_ui/components/buttons/dynamic_fab.dart';
 import 'package:ente_ui/theme/ente_theme.dart';
-import 'package:ente_utils/platform_util.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import "package:styled_text/tags/styled_text_tag_action.dart";
-import "package:styled_text/widgets/styled_text.dart";
 
 class LoginPage extends StatefulWidget {
   final BaseConfiguration config;
@@ -184,39 +181,9 @@ class _LoginPageState extends State<LoginPage> {
                         keyboardType: TextInputType.emailAddress,
                         autofocus: true,
                       ),
-                      const SizedBox(height: 24),
-                      StyledText(
-                        text: context.strings.loginTerms,
-                        style: textTheme.small.copyWith(
-                          color: colorScheme.textMuted,
-                        ),
-                        tags: {
-                          'u-terms': StyledTextActionTag(
-                            (String? text, Map<String?, String?> attrs) =>
-                                PlatformUtil.openWebView(
-                                  context,
-                                  context.strings.termsOfServicesTitle,
-                                  "https://ente.com/terms",
-                                ),
-                            style: TextStyle(
-                              decoration: TextDecoration.underline,
-                              color: colorScheme.textMuted,
-                            ),
-                          ),
-                          'u-policy': StyledTextActionTag(
-                            (String? text, Map<String?, String?> attrs) =>
-                                PlatformUtil.openWebView(
-                                  context,
-                                  context.strings.privacyPolicyTitle,
-                                  "https://ente.com/privacy",
-                                ),
-                            style: TextStyle(
-                              decoration: TextDecoration.underline,
-                              color: colorScheme.textMuted,
-                            ),
-                          ),
-                        },
-                      ),
+                      // PHOTOVAULT: strip - removed the "By clicking log
+                      // in, I agree to the terms of service and privacy
+                      // policy" line (Ente's /terms page, Ente's /privacy page).
                     ],
                   ),
                 ),

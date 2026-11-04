@@ -77,8 +77,9 @@ export const downloadPublicCollectionFile = async (
     downloadOrigin?: string,
 ) => {
     const customOrigin = await customAPIOrigin();
-    const origin =
-        downloadOrigin ?? customOrigin ?? "https://public-albums.ente.com";
+    // PHOTOVAULT: strip - no Ente CDN (public-albums.ente.com) fallback; the
+    // configured server is always set (see ente-base/origins).
+    const origin = downloadOrigin ?? customOrigin;
     const path = thumbnail ? "preview" : "download";
     const res =
         customOrigin && origin === customOrigin

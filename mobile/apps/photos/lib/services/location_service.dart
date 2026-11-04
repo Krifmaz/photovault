@@ -185,7 +185,13 @@ class LocationService {
     final startTime = DateTime.now();
     try {
       final root = (await getApplicationSupportDirectory()).path;
-      _index = await rust.openLocationIndex(assetRoot: root);
+      // PHOTOVAULT: strip - the location data files come from the server's
+      // web app (`/static-assets/`, which mirrors Ente's assets host
+      // layout), not from Ente; files are checked against pinned SHA-256s.
+      _index = await rust.openLocationIndex(
+        assetRoot: root,
+        assetBaseUrl: "${endpointConfig.endpoint}/static-assets/location/v2",
+      );
       _logger.info(
         "Loaded location index in ${DateTime.now().difference(startTime).inMilliseconds}ms, reloadingDiscovery: $reloadLocationDiscoverySection",
       );

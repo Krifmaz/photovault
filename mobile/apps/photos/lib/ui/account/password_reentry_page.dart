@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import "package:flutter/services.dart" show TextInput;
 import 'package:logging/logging.dart';
 import 'package:photos/core/configuration.dart';
+import "package:photos/core/constants.dart"; // PHOTOVAULT: strip
 import 'package:photos/core/event_bus.dart';
 import 'package:photos/events/subscription_purchased_event.dart';
 import "package:photos/service_locator.dart";
@@ -177,7 +178,7 @@ class _PasswordReentryPageState extends State<PasswordReentryPage> {
       await sendLogs(
         context,
         context.strings.contactSupport,
-        "support@ente.com",
+        supportEmail, // PHOTOVAULT: strip - was Ente's support address
         postShare: () {},
       );
     }

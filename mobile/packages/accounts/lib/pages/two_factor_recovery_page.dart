@@ -1,9 +1,9 @@
 import 'package:ente_accounts/ente_accounts.dart';
 import 'package:ente_accounts/widgets/account_app_bar_logo.dart';
 import 'package:ente_strings/ente_strings.dart';
+import 'package:ente_ui/components/alert_bottom_sheet.dart'; // PHOTOVAULT: strip
 import 'package:ente_ui/components/buttons/dynamic_fab.dart';
 import 'package:ente_ui/theme/ente_theme.dart';
-import 'package:ente_utils/email_util.dart';
 import 'package:flutter/material.dart';
 
 class TwoFactorRecoveryPage extends StatefulWidget {
@@ -138,8 +138,15 @@ class _TwoFactorRecoveryPageState extends State<TwoFactorRecoveryPage> {
                       children: [
                         GestureDetector(
                           behavior: HitTestBehavior.translucent,
+                          // PHOTOVAULT: strip - was an e-mail to
+                          // Ente's support address; the server's admin resets 2FA.
                           onTap: () async {
-                            await sendEmail(context, to: "support@ente.com");
+                            await showAlertBottomSheet(
+                              context,
+                              title: context.strings.noRecoveryKeyTitle,
+                              message: context.strings.askServerAdminToReset2fa,
+                              assetPath: 'assets/warning-grey.png',
+                            );
                           },
                           child: Text(
                             context.strings.noRecoveryKeyTitle,

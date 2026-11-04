@@ -11,7 +11,6 @@ import 'package:ente_ui/pages/base_home_page.dart';
 import 'package:ente_ui/theme/ente_theme.dart';
 import 'package:ente_ui/utils/dialog_util.dart';
 import 'package:ente_ui/utils/toast_util.dart';
-import 'package:ente_utils/platform_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
@@ -383,28 +382,8 @@ class _PasswordEntryPageState extends State<PasswordEntryPage> {
                             });
                           },
                         ),
-                        const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              PlatformUtil.openWebView(
-                                context,
-                                "${context.strings.howItWorks}?",
-                                "https://ente.com/architecture",
-                              );
-                            },
-                            child: Text(
-                              "${context.strings.howItWorks}?",
-                              style: textTheme.body.copyWith(
-                                color: colorScheme.primary700,
-                                decoration: TextDecoration.underline,
-                                decorationColor: colorScheme.primary700,
-                              ),
-                            ),
-                          ),
-                        ),
+                        // PHOTOVAULT: strip - removed "How it works?" (a
+                        // link to Ente's /architecture page).
                         const SizedBox(height: 20),
                       ],
                     ),

@@ -57,7 +57,8 @@ import {
     type PublicAlbumsCredentials,
 } from "ente-base/http";
 import log from "ente-base/log";
-import { apiOrigin, isCustomAPIOrigin } from "ente-base/origins";
+import { apiOrigin } from "ente-base/origins";
+import { copyTextToClipboard } from "ente-base/photovault/clipboard"; // PHOTOVAULT: clipboard
 import type { FullScreenDropZoneProps } from "ente-gallery/components/FullScreenDropZone";
 import {
     useSaveGroupsActions,
@@ -84,7 +85,6 @@ import {
 import { thumbnailGap } from "ente-new/photos/components/utils/thumbnail-grid-layout";
 import { t } from "i18next";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
 import {
     useCallback,
     useEffect,
@@ -228,8 +228,6 @@ export default function PublicAlbumPage() {
         });
     };
 
-    const router = useRouter();
-
     const showPublicLinkExpiredMessage = () =>
         showMiniDialog({
             title: t("link_expired"),
@@ -237,46 +235,24 @@ export default function PublicAlbumPage() {
             nonClosable: true,
             continue: {
                 text: t("login"),
-                action: async () => {
-                    if (isCustomAPIOrigin) {
-                        await router.push("/");
-                    } else {
-                        window.location.href = "https://photos.ente.com";
-                    }
+                // PHOTOVAULT: strip - sign in at Photos on this server (the
+                // root of this origin, outside the /albums base path), not
+                // photos.ente.com.
+                action: () => {
+                    window.location.assign(`${window.location.origin}/`);
                 },
             },
             cancel: false,
         });
 
-    // Ente-hosted trip albums are only fully supported on albums.ente.com.
-    const checkAndRedirectForTripAlbum = (collection: Collection): boolean => {
-        if (
-            isCustomAPIOrigin ||
-            collection.pubMagicMetadata?.data.layout !== "trip"
-        ) {
-            return false;
-        }
-
-        const currentURL = new URL(window.location.href);
-        const albumsURL = new URL("https://albums.ente.com");
-
-        if (currentURL.host === albumsURL.host) {
-            return false;
-        }
-
-        isRedirectingToAlbumsAppRef.current = true;
-
-        albumsURL.pathname = currentURL.pathname;
-        albumsURL.search = currentURL.search;
-        albumsURL.hash = currentURL.hash;
-
-        window.location.href = albumsURL.href;
-        return true;
-    };
+    // PHOTOVAULT: strip - Ente-hosted builds sent trip albums to
+    // albums.ente.com; here every layout renders on this server.
+    const checkAndRedirectForTripAlbum: (
+        collection: Collection,
+    ) => boolean = () => false;
 
     useEffect(() => {
         const main = async () => {
-            let redirectingToWebsite = false;
             try {
                 const currentURL = new URL(window.location.href);
                 const accessToken = accessTokenFromURL(currentURL);
@@ -293,12 +269,7 @@ export default function PublicAlbumPage() {
                     loadPublicAlbumsFDB(),
                 ]);
                 const ck = await extractCollectionKeyFromShareURL(currentURL);
-                if (!accessToken && !ck) {
-                    if (!isCustomAPIOrigin) {
-                        window.location.href = "https://ente.com";
-                        redirectingToWebsite = true;
-                    }
-                }
+                // PHOTOVAULT: strip - no redirect to ente.com without a token.
                 if (!accessToken || !ck) {
                     return;
                 }
@@ -333,10 +304,7 @@ export default function PublicAlbumPage() {
                 setPublicAlbumsCredentials(credentials.current);
                 await publicAlbumsRemotePull();
             } finally {
-                if (
-                    !redirectingToWebsite &&
-                    !isRedirectingToAlbumsAppRef.current
-                ) {
+                if (!isRedirectingToAlbumsAppRef.current) {
                     setLoading(false);
                 }
             }
@@ -1183,7 +1151,10 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
             }
         }
 
-        void navigator.clipboard.writeText(isMobile ? shareText : shareUrl);
+        void copyTextToClipboard(
+            // PHOTOVAULT: clipboard
+            isMobile ? shareText : shareUrl,
+        );
         setShowCopiedMessage(true);
         setTimeout(() => setShowCopiedMessage(false), 2000);
     };
