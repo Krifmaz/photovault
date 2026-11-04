@@ -192,7 +192,10 @@ fun AppNav(graph: AppGraph, start: Any) {
                 composable<ViewerRoute> { entry ->
                     val route = entry.toRoute<ViewerRoute>()
                     val vm = viewModel {
-                        ViewerViewModel(graph.core, graph.timeline, graph.viewerCache, cleanupScope = graph.appScope, startIndex = route.index)
+                        ViewerViewModel(
+                            graph.core, graph.timeline, graph.viewerCache, cleanupScope = graph.appScope, startIndex = route.index,
+                            videos = graph.videos, engineFactory = graph::newPlaybackEngine,
+                        )
                     }
                     CompositionLocalProvider(LocalNavAnimatedScope provides this) {
                         ViewerScreen(
@@ -272,6 +275,8 @@ private fun NavGraphBuilder.albumDestinations(nav: NavHostController, graph: App
                 graph.viewerCache,
                 cleanupScope = graph.appScope,
                 startIndex = route.index,
+                videos = graph.videos,
+                engineFactory = graph::newPlaybackEngine,
             )
         }
         CompositionLocalProvider(LocalNavAnimatedScope provides this) {

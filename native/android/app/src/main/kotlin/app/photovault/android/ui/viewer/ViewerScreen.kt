@@ -1,6 +1,5 @@
 package app.photovault.android.ui.viewer
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -18,21 +17,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -43,7 +38,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -55,13 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
-import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import app.photovault.android.R
 import app.photovault.android.data.CoreError
 import app.photovault.android.data.FileKind
@@ -69,7 +57,7 @@ import app.photovault.android.data.TimelineItem
 import app.photovault.android.ui.image.Thumb
 import app.photovault.android.ui.nav.sharedPhoto
 import app.photovault.android.ui.theme.Spacing
-import app.photovault.android.ui.theme.palette
+import app.photovault.android.ui.viewer.video.VideoPage
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -103,7 +91,6 @@ fun ViewerScreen(vm: ViewerViewModel, startIndex: Int, onClose: (Int) -> Unit) {
     val dismiss = remember { Animatable(0f) }
     var chrome by remember { mutableStateOf(true) }
     var zoomed by remember { mutableStateOf(false) }
-    val player = rememberViewerPlayer()
     val close = { onClose(pager.currentPage) }
 
     BackHandler(onBack = close)
@@ -158,8 +145,10 @@ fun ViewerScreen(vm: ViewerViewModel, startIndex: Int, onClose: (Int) -> Unit) {
                 vm = vm,
                 pager = pager,
                 page = page,
-                player = player,
-                onTap = { chrome = !chrome },
+                onTap = {
+                    chrome = !chrome
+                    if (item.kind == FileKind.Video) vm.playback.onSurfaceTap()
+                },
                 onZoomed = { if (page == pager.currentPage) zoomed = it },
             )
         }
@@ -175,7 +164,6 @@ private fun ViewerPage(
     vm: ViewerViewModel,
     pager: PagerState,
     page: Int,
-    player: ViewerPlayer,
     onTap: () -> Unit,
     onZoomed: (Boolean) -> Unit,
 ) {
@@ -207,7 +195,7 @@ private fun ViewerPage(
                     modifier = Modifier.fillMaxSize(),
                 )
                 when (item.kind) {
-                    FileKind.Video -> VideoContent(item, vm, player, active = isCurrent)
+                    FileKind.Video -> VideoPage(item, vm.playback, active = isCurrent)
                     else -> OriginalImage(item, vm, maxW, maxH)
                 }
             }
@@ -241,78 +229,6 @@ private fun OriginalImage(item: TimelineItem, vm: ViewerViewModel, maxW: Int, ma
 }
 
 @Composable
-private fun VideoContent(item: TimelineItem, vm: ViewerViewModel, player: ViewerPlayer, active: Boolean) {
-    if (!active) {
-        PlayBadge()
-        return
-    }
-    val source by produceState<Result<VideoSource>?>(null, item.id) {
-        value = try {
-            Result.success(vm.video(item))
-        } catch (e: CoreError) {
-            Result.failure(e)
-        } catch (e: IOException) {
-            Result.failure(e)
-        }
-    }
-    val result = source
-    when {
-        result == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = MaterialTheme.palette.accent2)
-        }
-        result.isFailure -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(
-                stringResource(R.string.viewer_video_error, result.exceptionOrNull()?.message.orEmpty()),
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .background(Color.Black.copy(alpha = 0.6f))
-                    .padding(Spacing.lg),
-            )
-        }
-        else -> {
-            val src = result.getOrThrow()
-            val exo = player.get()
-            DisposableEffect(src) {
-                val media = MediaItem.Builder().setUri(src.uri).apply {
-                    if (src.isHls) setMimeType(MimeTypes.APPLICATION_M3U8)
-                }.build()
-                exo.setMediaItem(media)
-                exo.repeatMode = Player.REPEAT_MODE_OFF
-                exo.prepare()
-                exo.playWhenReady = true
-                onDispose {
-                    exo.stop()
-                    exo.clearMediaItems()
-                }
-            }
-            AndroidView(
-                factory = { ctx -> PlayerView(ctx).apply { useController = true } },
-                update = { view -> view.player = exo },
-                onRelease = { view -> view.player = null },
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PlayBadge() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Box(
-            Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(Color.Black.copy(alpha = 0.5f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(painterResource(R.drawable.ic_play), contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
-        }
-    }
-}
-
-@Composable
 private fun TopChrome(item: TimelineItem?, onClose: () -> Unit) {
     val formatter = remember { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT) }
     Row(
@@ -343,27 +259,4 @@ private fun TopChrome(item: TimelineItem?, onClose: () -> Unit) {
             }
         }
     }
-}
-
-/** One ExoPlayer for the viewer, created on the first video and released with the screen. */
-@Stable
-class ViewerPlayer(private val context: Context) {
-    private var player: ExoPlayer? = null
-
-    fun get(): ExoPlayer = player ?: ExoPlayer.Builder(context).build().also { player = it }
-
-    fun release() {
-        player?.release()
-        player = null
-    }
-}
-
-@Composable
-private fun rememberViewerPlayer(): ViewerPlayer {
-    val context = LocalContext.current
-    val holder = remember { ViewerPlayer(context.applicationContext) }
-    DisposableEffect(holder) {
-        onDispose { holder.release() }
-    }
-    return holder
 }

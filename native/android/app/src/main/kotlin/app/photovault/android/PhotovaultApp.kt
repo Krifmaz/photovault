@@ -12,6 +12,10 @@ import app.photovault.android.data.SignupRepository
 import app.photovault.android.data.TimelineStore
 import app.photovault.android.data.albums.AlbumsProvider
 import app.photovault.android.data.albums.AlbumsRepository
+import app.photovault.android.data.VideoRepository
+import app.photovault.android.data.VideoRepositoryProvider
+import app.photovault.android.ui.viewer.video.ExoPlaybackEngine
+import app.photovault.android.ui.viewer.video.PlaybackEngine
 import app.photovault.android.ui.image.buildImageLoader
 import app.photovault.android.ui.timeline.TimelineLabels
 import app.photovault.android.widget.WidgetRefresh
@@ -62,6 +66,12 @@ class AppGraph(private val context: Context) {
                 pageOf = { offset, limit -> albums.albumPage(collectionId, offset, limit) },
             ).also { albumStore = collectionId to it }
     }
+
+    /** Streamable videos (contract v1.2): core's loopback streams, or v1's `streamPlaylist` without them. */
+    val videos: VideoRepository by lazy { VideoRepositoryProvider.create(core) }
+
+    /** The viewer's player (one per open viewer, created on its first video, released when it closes). */
+    fun newPlaybackEngine(): PlaybackEngine = ExoPlaybackEngine(context)
 
     /** App-lifetime work that must not block the UI or die with a screen (file cleanup, network re-checks). */
     val appScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

@@ -221,6 +221,12 @@ impl Api {
         parse(res).await
     }
 
+    /// `GET path?query`, the raw answer (for 204-aware callers).
+    pub async fn get(&self, path: &str, query: &[(&str, String)]) -> Result<Response> {
+        self.send(|| self.request(Method::GET, path).query(query))
+            .await
+    }
+
     /// `method path` with a JSON body, parse the JSON answer.
     pub async fn json<B: Serialize, T: DeserializeOwned>(
         &self,

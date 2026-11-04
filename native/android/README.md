@@ -71,3 +71,10 @@ an email containing `taken` is already registered.
   24-word recovery key is shown; only after "I saved my recovery key" are the keys uploaded and the account
   signed in, straight to the timeline. Sign-in hides "Create account" and says so when the server's
   `signupsAllowed` is false.
+- Videos (contract v1.2 "video"): `data/VideoRepository` asks core for a stream of every video (`video_stream`);
+  core answers with an HLS playlist on its loopback server (127.0.0.1, random port, secret token), decrypting
+  Ente's streamable segments in memory, and the viewer plays it with Media3's HLS module. Without a stream the
+  original is downloaded and played by the same player. One ExoPlayer (`ui/viewer/video`) serves all pages: only
+  the settled page attaches a Compose `PlayerSurface` (TextureView, so it follows the pager and dismiss
+  transforms); controls fade after 3 s, mute sticks across videos, audio focus is handled by ExoPlayer, and the
+  player is released (and core's streams ended with `stop_streams`) when the viewer closes.
