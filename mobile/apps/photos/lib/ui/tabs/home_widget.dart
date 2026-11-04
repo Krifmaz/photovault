@@ -852,9 +852,10 @@ class _HomeWidgetState extends State<HomeWidget> {
     PhotovaultServerService.instance.activeServer.value,
   );
 
-  bool _isPublicAlbumHost(String host) {
-    return host == "albums.ente.io" || host == "albums.ente.com";
-  }
+  // PHOTOVAULT: strip - links on Ente's albums hosts are not
+  // recognised: they belong to Ente's service, whose tokens this server does
+  // not know. Only the active server's links count (_isServerAlbumLink).
+  bool _isPublicAlbumHost(String host) => false;
 
   @override
   Widget build(BuildContext context) {

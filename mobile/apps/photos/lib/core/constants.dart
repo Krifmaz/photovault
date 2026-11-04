@@ -29,15 +29,22 @@ const mediaManagementHintDeleteAttemptThreshold = 3;
 
 const dragSensitivity = 8;
 
-// PHOTOVAULT: no Ente support. Kept (unused in the UI) for upstream call
-// sites; see utils/email_util.dart sendLogs, which ignores the address.
-const supportEmail = 'support@ente.com';
+// PHOTOVAULT: strip - no support address (Ente's was hard-coded); the
+// server contract (`/photovault/info`) has no admin contact, so there is
+// none. Upstream "Contact support" buttons pass this to `sendLogs`
+// (utils/email_util.dart), which ignores it and lets the person view or
+// export the logs for their server's administrator.
+const supportEmail = '';
 
 const multipartPartSize = 20 * 1024 * 1024;
 
-const kDefaultProductionEndpoint = 'https://api.ente.com';
-const kLegacyProductionEndpoint = 'https://api.ente.io';
-const kUploadProxyEndpoint = 'https://uploader.ente.com';
+// PHOTOVAULT: strip - removed kDefaultProductionEndpoint (Ente's api host) and
+// kLegacyProductionEndpoint (Ente's old api host): the endpoint is always the
+// configured server (core/network/endpoint_config.dart).
+// Ente's Cloudflare upload worker (was Ente's uploader host). Only used when
+// `EndpointConfig.isProduction`, which is always false, so it is never
+// contacted; it points at nothing instead of an Ente host.
+const kUploadProxyEndpoint = '';
 // PHOTOVAULT: removed kPhotosWebDomain (photos.ente.com) and kFamilyUrl.
 
 const int intMaxValue = 9223372036854775807;

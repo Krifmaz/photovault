@@ -2,14 +2,12 @@ import "dart:async";
 import "dart:convert";
 
 import "package:crypto/crypto.dart";
-import "package:dio/dio.dart";
 import "package:logging/logging.dart";
 import "package:photos/models/memories/memory_music_track.dart";
 import "package:photos/service_locator.dart";
 import "package:photos/services/remote_assets_service.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
-const _manifestURL = "https://music.ente.com/tracks.json";
 const _manifestPreferenceKey = "memory_music_manifest";
 
 String memoryMusicCacheFileName(String url) =>
@@ -19,13 +17,11 @@ class MemoryMusicService {
   static final _logger = Logger("MemoryMusicService");
   static final instance = MemoryMusicService(
     preferences: ServiceLocator.instance.prefs,
-    fetchManifest: () async {
-      final response = await ServiceLocator.instance.nonEnteDio.get<Object?>(
-        _manifestURL,
-        options: Options(receiveTimeout: const Duration(seconds: 15)),
-      );
-      return response.data;
-    },
+    // PHOTOVAULT: strip - upstream fetched its track list from
+    // Ente's music host (tracks.json, Ente-hosted MP3s). Nothing is fetched: the
+    // manifest is always empty, so memories and Rewind play without music,
+    // and tracks cached by an earlier build are cleaned up.
+    fetchManifest: () async => <String, dynamic>{"tracks": <dynamic>[]},
     hasAsset: (url) => RemoteAssetsService.instance.hasAsset(
       url,
       cacheFileName: memoryMusicCacheFileName(url),

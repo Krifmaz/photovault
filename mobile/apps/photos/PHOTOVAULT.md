@@ -190,13 +190,14 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 - Public album links shared into the app: `lib/ui/tabs/home_widget.dart`
   (`_isServerAlbumLink`, `isServerPublicAlbumLink` in `server_contract.dart`)
   also accepts links on the host of the active server's `albumsUrl`,
-  `publicUrl` or `homeUrl` that carry a `t=` token, next to Ente's
-  albums.ente.* check. No https app-link filter is added, because the host
+  `publicUrl` or `homeUrl` that carry a `t=` token; links on Ente's
+  albums.ente.* hosts are no longer recognised. No https app-link filter is added, because the host
   is not known at build time.
 - Public album links: `lib/services/collections_service.dart` remembers the
   origin a shared link was opened from (`getSharedPublicAlbumOrigin`) and
   `lib/ui/viewer/gallery/gallery_app_bar_widget.dart` "Open in browser" uses it
-  (falling back to the endpoint) instead of albums.ente.com.
+  (falling back to the server's albums URL, see `serverAlbumsBaseUrl`)
+  instead of albums.ente.com.
 - The 7-tap developer-settings dialog that used to set the endpoint is deleted.
 
 ### Telemetry, Firebase, Play services, billing
@@ -313,6 +314,69 @@ API paths are Ente's, unchanged: only the base URL in Ente's
   transliterations in ja, ko, hu, he, sr, et, gu, ur replaced. Translations whose meaning changed were deleted so
   they fall back to English.
 
+### Ente hosts the app contacted directly (second strip pass)
+
+- `lib/core/constants.dart`: `supportEmail` is empty (no support address; the
+  `/photovault/info` contract has no admin contact). The "Contact support"
+  buttons that passed Ente's address now pass `supportEmail`, and `sendLogs`
+  only offers View logs / Export logs for the server's administrator:
+  `lib/ui/account/login_pwd_verification_page.dart`,
+  `lib/ui/account/password_reentry_page.dart`,
+  `lib/ui/settings/ml/machine_learning_settings_page.dart`,
+  `lib/ui/settings/backup/backup_item_card.dart`,
+  `lib/ui/home/header_error_widget.dart`, `lib/ui/home/loading_photos_widget.dart`,
+  `lib/utils/dialog_util.dart`.
+- `lib/core/constants.dart`, `lib/core/network/endpoint_config.dart`: Ente's
+  production/legacy API constants are gone (no api.ente.io -> api.ente.com
+  rewrite). `kUploadProxyEndpoint` (Ente's Cloudflare upload worker) is empty;
+  it is only used when `isProduction`, which is always false.
+- `lib/module/download/file_url.dart`: downloads and thumbnails always use the
+  configured server's own paths (`/files/download`, `/files/preview`,
+  `/public-collection/files/...`); Ente's files/thumbnails/public-albums
+  worker hosts are removed.
+- `lib/services/memories/memory_music_service.dart`: the memories/Rewind music
+  track list is no longer fetched from Ente's music host; the manifest is
+  always empty, so memories play without music (tracks cached by an older
+  build are cleaned up).
+- `lib/services/location_service.dart` and Rust
+  (`../../../rust/crates/photos/src/location.rs` `LocationIndex::open_from`,
+  `../../../rust/bindings/frb/photos/src/api/location_api.rs`
+  `open_location_index(assetRoot, assetBaseUrl)`): the location data files
+  (cities, urban centres, countries, disputes; pinned sizes and SHA-256s are
+  unchanged) are downloaded from `<endpoint>/static-assets/location/v2`, the
+  server's web app, instead of Ente's assets CDN. `LocationIndex::open` keeps
+  the upstream CDN default for the CLI only. Regenerate the bindings with
+  `cargo codegen frb photos` (output is git-ignored).
+- `lib/ui/tabs/home_widget.dart`: links on Ente's albums hosts are no longer
+  treated as public album links (only the active server's links are).
+- `lib/ui/viewer/gallery/gallery_app_bar_widget.dart`: "Open in browser" for a
+  collect link falls back to `serverAlbumsBaseUrl` (new in
+  `lib/services/photovault/server_contract.dart`: the server's `albumsUrl`,
+  else `<publicUrl>/albums`, else `<endpoint>/albums`), tested in
+  `test/photovault/server_contract_test.dart`.
+
+Shared packages (also compiled into Ente Auth/Locker, which Photovault does
+not ship):
+- `../../packages/utils/lib/email_util.dart`: `sendLogs` hides its e-mail
+  button when the address is empty; the unused `openSupportPage` (Ente's
+  GitHub discussions) is removed.
+- `../../packages/ui/lib/utils/dialog_util.dart`: error dialogs open the logs
+  sheet with no address; the Windows "Update Certificates" help link is gone.
+- `../../packages/ui/lib/components/settings/about_settings_section.dart`
+  (GitHub, blog, privacy, terms), `app_engagement_section.dart` (Merchandise),
+  `social_icons_row.dart` (all Ente social links), `more_from_ente_footer.dart`
+  ("More from Ente" and socials): the Ente links are removed.
+- `../../packages/accounts/lib/pages/`: `email_entry_page.dart` (terms
+  checkbox), `login_page.dart` (terms line), `password_entry_page.dart`
+  ("How it works"), `recovery_page.dart` ("Contact support" e-mail),
+  `two_factor_recovery_page.dart` (shows `askServerAdminToReset2fa` instead of
+  an e-mail), `login_pwd_verification_page.dart`, `password_reentry_page.dart`
+  (logs sheet without an address).
+- `../../packages/lock_screen/lib/ui/local_authentication_unavailable_dialog.dart`:
+  the Linux setup sheet has no Ente help-page button and does not name Ente Auth.
+- `../../packages/ente_components/example/lib/main.dart`: sample link uses
+  example.com.
+
 ### Mascot
 
 - `assets/photovault_glyph.svg` and `lib/ui/photovault/photovault_glyph.dart`
@@ -364,10 +428,25 @@ API paths are Ente's, unchanged: only the base URL in Ente's
 
 ## Known gaps
 
-- Still contacting Ente-run hosts for features we keep: ML model downloads
-  (models.ente.com, set in `rust/crates/ml/src/assets.rs`), memories/rewind music
-  (music.ente.com, `lib/services/memories/memory_music_service.dart`). The map uses
-  OpenStreetMap tiles. Self-hosting these needs a later change.
+- Still contacting an Ente-run host for a feature we keep, pending the
+  owner's decision: ML model downloads (models.ente.com, set in
+  `rust/crates/ml/src/assets.rs`, `ml/src/ocr/assets.rs`, `ml/src/scan/mod.rs`).
+  Memories/Rewind music is no longer fetched (no music). The map uses
+  OpenStreetMap tiles.
+- Location data (places, city search) needs the server's web build to
+  include `static-assets/location/v2/{cities,urban-centres,countries,disputes}.bin`.
+  `web/scripts/photovault-vendor-assets.mjs` vendors only the first two today;
+  until it also copies `countries.bin` and `disputes.bin`, the app's location
+  index fails to load (logged, places and city search are then unavailable).
+  Files already downloaded by an earlier build keep working.
+- Shared code Photos does not use still names Ente defaults:
+  `../../packages/configuration` (`api.ente.com` default for Auth/Locker's
+  `BaseConfiguration`), `../../packages/legacy` (legacy kit PDF: Ente support
+  e-mail, `legacy.ente.com` fallback, Ente logo; not in Photos' dependency
+  graph), podspec author/homepage metadata, and
+  Rust `ente_core::urls::PRODUCTION_API_ORIGIN` (CLI default only; the app
+  passes its endpoint) and `ente_accounts` `enforce_auth_payloads`
+  (stricter checks only for Ente's hosts; left as is).
 - Passkey 2FA still returns through `ente://passkey`, as upstream. With Ente
   Photos or Ente Auth installed on the same phone, Android may offer a
   chooser or open the other app. A `photovault://passkey` redirect is not

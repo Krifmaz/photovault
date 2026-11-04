@@ -305,3 +305,20 @@ bool isServerPublicAlbumLink(Uri? uri, PhotovaultServerInfo? server) {
   }
   return false;
 }
+
+/// Base URL of the server's public-album web app (`contracts/apps.json`
+/// shareLink: `<albumsUrl>/?t=<token>#<key>`): the announced `albumsUrl`,
+/// else `<publicUrl>/albums`, else `<endpoint>/albums` for a server that does
+/// not describe itself. Never an Ente host (upstream used Ente's albums host).
+String serverAlbumsBaseUrl(PhotovaultServerInfo? server, String endpoint) {
+  final announced = server?.albumsUrl;
+  if (announced != null && announced.isNotEmpty) return announced;
+  if (server != null && server.isPhotovault && server.publicUrl.isNotEmpty) {
+    return "${server.publicUrl}/albums";
+  }
+  var base = endpoint;
+  while (base.endsWith("/")) {
+    base = base.substring(0, base.length - 1);
+  }
+  return "$base/albums";
+}

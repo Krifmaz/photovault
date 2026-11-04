@@ -6,6 +6,7 @@ import "package:ente_ui/components/loading_widget.dart";
 import "package:flutter/material.dart";
 import "package:hugeicons/hugeicons.dart";
 import "package:logging/logging.dart";
+import "package:photos/core/constants.dart"; // PHOTOVAULT: strip
 import "package:photos/core/event_bus.dart";
 import "package:photos/db/files_db.dart";
 import "package:photos/db/ml/db.dart";
@@ -619,7 +620,7 @@ class _MLProcessingIssuesBlurb extends StatelessWidget {
                       sendLogs(
                         context,
                         context.strings.contactUs,
-                        "support@ente.com",
+                        supportEmail, // PHOTOVAULT: strip - was Ente's support address
                         postShare: () {},
                         subject: "Machine learning processing issue",
                         body: context.strings.mlItemsCouldNotBeProcessed(

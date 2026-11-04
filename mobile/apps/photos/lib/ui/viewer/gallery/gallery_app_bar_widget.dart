@@ -28,6 +28,8 @@ import 'package:photos/module/download/gallery.dart';
 import 'package:photos/service_locator.dart';
 import 'package:photos/services/collections_service.dart';
 import "package:photos/services/files_service.dart";
+import "package:photos/services/photovault/photovault_server_service.dart"; // PHOTOVAULT: strip
+import "package:photos/services/photovault/server_contract.dart"; // PHOTOVAULT: strip
 import "package:photos/states/location_screen_state.dart";
 import "package:photos/theme/ente_theme.dart";
 import 'package:photos/ui/actions/collection/collection_sharing_actions.dart';
@@ -1488,12 +1490,16 @@ class _GalleryAppBarWidgetState extends State<GalleryAppBarWidget> {
           collection.id,
         );
         // PHOTOVAULT: open the album on the server its link came from (Ente
-        // hard-coded albums.ente.com).
+        // hard-coded Ente's albums host), else the active server's albums web
+        // app (albumsUrl from /photovault/info, else <publicUrl>/albums).
         final albumOrigin =
             CollectionsService.instance.getSharedPublicAlbumOrigin(
               collection.id,
             ) ??
-            endpointConfig.endpoint;
+            serverAlbumsBaseUrl(
+              PhotovaultServerService.instance.activeServer.value,
+              endpointConfig.endpoint,
+            );
 
         final res = await showChoiceDialog(
           context,
