@@ -10,7 +10,7 @@ PhotovaultServerInfo _info(Map<String, Object?> extra) =>
       "name": "Home",
       "version": "0.2.0",
       "publicUrl": "https://photos.example.com",
-      "homeUrl": "http://10.0.1.7:8095",
+      "homeUrl": "http://192.168.1.10:8080",
       ...extra,
     })!;
 
@@ -44,16 +44,16 @@ void main() {
     expect(
       PhotovaultServerAssets.modelsMirrorUrl(
         server: mirrored,
-        currentAddress: "http://10.0.1.7:8095",
+        currentAddress: "http://192.168.1.10:8080",
       ),
-      "http://10.0.1.7:8095/photovault/models",
+      "http://192.168.1.10:8080/photovault/models",
     );
     expect(
       PhotovaultServerAssets.musicManifestUrl(
         server: mirrored,
-        currentAddress: "http://10.0.1.7:8095",
+        currentAddress: "http://192.168.1.10:8080",
       ),
-      "http://10.0.1.7:8095/photovault/music/tracks.json",
+      "http://192.168.1.10:8080/photovault/music/tracks.json",
     );
   });
 
@@ -79,7 +79,7 @@ void main() {
       PhotovaultServerAssets.rebase(
         "https://photos.example.community/a.mp3",
         mirrored,
-        "http://10.0.1.7:8095",
+        "http://192.168.1.10:8080",
       ),
       "https://photos.example.community/a.mp3",
     );
@@ -88,7 +88,7 @@ void main() {
   test("tracks on the server's own addresses may be plain http", () {
     expect(
       PhotovaultServerAssets.isOnServer(
-        "http://10.0.1.7:8095/photovault/music/a.mp3",
+        "http://192.168.1.10:8080/photovault/music/a.mp3",
         server: mirrored,
       ),
       isTrue,

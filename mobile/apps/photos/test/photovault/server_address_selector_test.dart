@@ -1,12 +1,10 @@
 // PHOTOVAULT: server connection tests (pure Dart).
-import "dart:async";
-
 import "package:flutter_test/flutter_test.dart";
 import "package:photos/services/photovault/server_address_selector.dart";
 import "package:photos/services/photovault/server_contract.dart";
 
 const _public = "https://photos.example.com";
-const _home = "http://10.0.1.7:8095";
+const _home = "http://192.168.1.10:8080";
 
 PhotovaultServerInfo _info({String? home = _home, String public = _public}) {
   return PhotovaultServerInfo(
@@ -91,7 +89,7 @@ void main() {
   });
 
   group("reachedAt (address the person connected through)", () {
-    const lan = "http://192.168.1.20:8095";
+    const lan = "http://192.168.1.20:8080";
 
     test("used when the public URL does not answer", () async {
       final asked = <String>[];
@@ -140,6 +138,86 @@ void main() {
         _public,
       );
       expect(probes, 0);
+    });
+  });
+
+  group("Tailscale up: last address tried directly", () {
+    const tailnet = "http://100.101.102.103:8080";
+
+    test("after home, before public", () async {
+      final asked = <String>[];
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async {
+          asked.add(url);
+          return url == tailnet ? _info() : null;
+        },
+      );
+      expect(
+        await selector.select(
+          _info(),
+          lastAddress: tailnet,
+          reachedAt: tailnet,
+          vpnActive: true,
+        ),
+        tailnet,
+      );
+      expect(asked, [_home, tailnet]);
+    });
+
+    test("home still wins", () async {
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async => _info(),
+      );
+      expect(
+        await selector.select(_info(), lastAddress: tailnet, vpnActive: true),
+        _home,
+      );
+    });
+
+    test("public when the last address does not answer", () async {
+      final asked = <String>[];
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async {
+          asked.add(url);
+          return url == _public ? _info() : null;
+        },
+      );
+      expect(
+        await selector.select(_info(), lastAddress: tailnet, vpnActive: true),
+        _public,
+      );
+      expect(asked, [_home, tailnet, _public]);
+    });
+
+    test("not tried while the VPN is down", () async {
+      final asked = <String>[];
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async {
+          asked.add(url);
+          return url == tailnet ? _info() : null;
+        },
+      );
+      expect(await selector.select(_info(), lastAddress: tailnet), _public);
+      expect(asked, [_home]);
+    });
+
+    test("no extra probe when the last address is public or home", () async {
+      final asked = <String>[];
+      final selector = ServerAddressSelector(
+        probe: (url, timeout) async {
+          asked.add(url);
+          return null;
+        },
+      );
+      expect(
+        await selector.select(_info(), lastAddress: _public, vpnActive: true),
+        _public,
+      );
+      expect(
+        await selector.select(_info(), lastAddress: _home, vpnActive: true),
+        _public,
+      );
+      expect(asked, [_home, _home]);
     });
   });
 }

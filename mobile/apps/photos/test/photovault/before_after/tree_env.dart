@@ -45,7 +45,7 @@ Future<void> prepareTree(SharedPreferences prefs) async {
       name: "Family photos",
       version: "0.4.0",
       publicUrl: "https://photos.example.com",
-      homeUrl: "http://10.0.1.7:8095",
+      homeUrl: "http://192.168.1.10:8080",
     ),
   );
 }

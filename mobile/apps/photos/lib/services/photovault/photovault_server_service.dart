@@ -1,6 +1,8 @@
 // PHOTOVAULT: server connection (new file).
 //
-// Saved servers, the active server and its current address. The address
+// Saved servers ("Recent servers": when each last connected and the last
+// address that answered, see recent_servers.dart), the active server and its
+// current address. The address
 // goes into Ente's own endpoint setting (`EndpointConfig.setEndpoint`), so
 // every API call keeps Ente's paths and only the base URL changes.
 //
@@ -15,11 +17,13 @@ import "package:connectivity_plus/connectivity_plus.dart";
 import "package:flutter/foundation.dart";
 import "package:logging/logging.dart";
 import "package:photos/core/network/endpoint_config.dart";
+import "package:photos/services/photovault/recent_servers.dart";
 import "package:photos/services/photovault/server_address.dart";
 import "package:photos/services/photovault/server_address_selector.dart";
 import "package:photos/services/photovault/server_contract.dart";
 import "package:photos/services/photovault/server_discovery.dart";
 import "package:photos/services/photovault/server_info_client.dart";
+import "package:photos/services/photovault/tailscale.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 class PhotovaultServerService {
@@ -35,6 +39,10 @@ class PhotovaultServerService {
   /// neither the public nor the home URL (see [ServerAddressSelector.select]).
   static const _reachedAtKey = "${_keyPrefix}reachedAt";
 
+  /// publicUrl -> when it last connected and the address that answered
+  /// ([RecentServerEntry]).
+  static const _recentKey = "${_keyPrefix}recent";
+
   /// Optional label for the built-in server (`contracts/apps.json`).
   static const builtInServerName = String.fromEnvironment(
     "PHOTOVAULT_SERVER_NAME",
@@ -47,15 +55,31 @@ class PhotovaultServerService {
   );
   PhotovaultServerDiscovery _discovery = const PhotovaultServerDiscovery();
   PhotovaultServerDiscovery get discovery => _discovery;
+  Future<bool> Function() _tailscaleDetector = detectTailscale;
+  DateTime Function() _now = DateTime.now;
 
-  /// Test seam: a fake HTTP client and/or LAN discovery (screenshot tests).
+  /// Test seam: a fake HTTP client, LAN discovery, Tailscale detection
+  /// and/or clock (screenshot and widget tests).
   @visibleForTesting
   void overrideForTesting({
     PhotovaultServerInfoClient? client,
     PhotovaultServerDiscovery? discovery,
+    Future<bool> Function()? tailscale,
+    DateTime Function()? now,
   }) {
     if (client != null) _client = client;
     if (discovery != null) _discovery = discovery;
+    if (tailscale != null) _tailscaleDetector = tailscale;
+    if (now != null) _now = now;
+  }
+
+  /// True while Tailscale is up on this device (see tailscale.dart).
+  Future<bool> isTailscaleActive() async {
+    try {
+      return await _tailscaleDetector();
+    } catch (_) {
+      return false;
+    }
   }
 
   SharedPreferences? _prefs;
@@ -105,9 +129,29 @@ class PhotovaultServerService {
     }
   }
 
+  /// The saved servers for "Recent servers": most recently connected first.
+  List<RecentServer> get recentServers => orderRecentServers(
+    savedServers,
+    _recentEntries(),
+    reachedAt: _reachedAtMap(),
+    activeUrl: _prefs?.getString(_activeKey),
+  );
+
+  /// Probes the recent servers' last known address, then home and public,
+  /// directly over HTTP (for a VPN, which mDNS does not cross). Short
+  /// timeouts ([kHomeProbeTimeout] per address).
+  Future<List<DirectlyReachedServer>> probeRecentDirectly() =>
+      probeRecentServersDirectly(
+        recentServers,
+        (baseUrl, timeout) => _client.probe(baseUrl, timeout),
+      );
+
   /// Normalises [input] and asks the server what it is.
   /// Throws [ServerConnectException].
-  Future<PhotovaultServerInfo> fetchInfo(String input) async {
+  Future<PhotovaultServerInfo> fetchInfo(
+    String input, {
+    Duration timeout = kConnectTimeout,
+  }) async {
     final String address;
     try {
       address = normalizeServerAddress(input);
@@ -117,7 +161,7 @@ class PhotovaultServerService {
         input.trim(),
       );
     }
-    return _client.fetch(address);
+    return _client.fetch(address, timeout: timeout);
   }
 
   /// Saves [info], makes it the active server and points Ente's endpoint at
@@ -131,9 +175,16 @@ class PhotovaultServerService {
     await _save(info);
     await _prefs!.setString(_activeKey, info.publicUrl);
     await _setReachedAt(info, answeredAddress);
+    final answered = tryNormalizeServerAddress(answeredAddress);
+    await _setRecent(info, answered);
     // Endpoint first, so the landing page that listens to [activeServer]
     // never signs in against the previous address.
-    final address = await _selector.select(info, reachedAt: _reachedAt(info));
+    final address = await _selector.select(
+      info,
+      reachedAt: _reachedAt(info),
+      lastAddress: answered,
+      vpnActive: await _vpnCouldHelp(info, answered),
+    );
     await _setEndpoint(address);
     activeServer.value = info;
   }
@@ -150,6 +201,10 @@ class PhotovaultServerService {
       ..removeWhere((s) => sameServerAddress(s.publicUrl, info.publicUrl));
     await _writeServers(servers);
     await _setReachedAt(info, null);
+    final recent = _recentEntries();
+    if (recent.remove(recentServerKey(info.publicUrl)) != null) {
+      await _prefs!.setString(_recentKey, encodeRecentEntries(recent));
+    }
     if (sameServerAddress(activeServer.value?.publicUrl, info.publicUrl)) {
       await clearActive();
     }
@@ -167,9 +222,12 @@ class PhotovaultServerService {
     final server = activeServer.value;
     if (server == null || _prefs == null) return;
     try {
+      final last = _recentEntries()[recentServerKey(server.publicUrl)]?.address;
       final address = await _selector.select(
         server,
         reachedAt: _reachedAt(server),
+        lastAddress: last,
+        vpnActive: await _vpnCouldHelp(server, last),
       );
       await _setEndpoint(address);
       if (!server.isPhotovault) return;
@@ -178,6 +236,7 @@ class PhotovaultServerService {
           sameServerAddress(fresh.publicUrl, server.publicUrl) &&
           sameServerAddress(activeServer.value?.publicUrl, server.publicUrl)) {
         await _save(fresh);
+        await _setRecent(fresh, address);
         activeServer.value = fresh;
       }
     } catch (e, s) {
@@ -220,6 +279,35 @@ class PhotovaultServerService {
       map[key] = normalized;
     }
     await _prefs!.setString(_reachedAtKey, jsonEncode(map));
+  }
+
+  /// Tailscale is only checked when [lastAddress] is neither the public nor
+  /// the home address, the only case where it changes the choice.
+  Future<bool> _vpnCouldHelp(
+    PhotovaultServerInfo server,
+    String? lastAddress,
+  ) async {
+    if (lastAddress == null ||
+        sameServerAddress(lastAddress, server.publicUrl) ||
+        sameServerAddress(lastAddress, server.homeUrl)) {
+      return false;
+    }
+    return isTailscaleActive();
+  }
+
+  Map<String, RecentServerEntry> _recentEntries() =>
+      parseRecentEntries(_prefs?.getString(_recentKey));
+
+  /// Records that [server] connected now; [address] is the one that
+  /// answered (the previous one is kept when null).
+  Future<void> _setRecent(PhotovaultServerInfo server, String? address) async {
+    final entries = _recentEntries();
+    final key = recentServerKey(server.publicUrl);
+    entries[key] = RecentServerEntry(
+      connectedAt: _now().toUtc(),
+      address: address ?? entries[key]?.address,
+    );
+    await _prefs!.setString(_recentKey, encodeRecentEntries(entries));
   }
 
   Future<void> _setEndpoint(String address) async {

@@ -3,7 +3,8 @@
 // Home/public address switching (contract: `contracts/server-info.md`):
 // if the server has a home (LAN) address and it answers `/photovault/info`
 // within 1.5 s with the same public URL, use it; otherwise use the public
-// address. Re-run on app start and when connectivity changes.
+// address. Re-run on app start and when connectivity changes. While
+// Tailscale is up, the last address that answered is tried directly too.
 // Pure Dart; unit-tested in `test/photovault/server_address_selector_test.dart`.
 
 import "package:photos/services/photovault/server_address.dart";
@@ -30,9 +31,16 @@ class ServerAddressSelector {
   /// URL. It is used only when the public URL does not answer within
   /// [timeout] and [reachedAt] still answers with the same public URL;
   /// without it the public URL is used unchecked, as the contract says.
+  ///
+  /// [vpnActive] (Tailscale is up): after home, [lastAddress] (the last
+  /// address that answered) is tried directly before the public URL, since
+  /// mDNS and the home LAN may be out of reach on cellular while the VPN
+  /// still reaches the server.
   Future<String> select(
     PhotovaultServerInfo server, {
     String? reachedAt,
+    String? lastAddress,
+    bool vpnActive = false,
   }) async {
     final public = server.publicUrl;
     final home = server.homeUrl;
@@ -42,15 +50,30 @@ class ServerAddressSelector {
         home.isNotEmpty &&
         !sameServerAddress(home, public);
     if (hasHome && await _answers(home, server)) return home;
-    if (!server.isPhotovault ||
-        reachedAt == null ||
-        reachedAt.isEmpty ||
-        sameServerAddress(reachedAt, public) ||
-        (hasHome && sameServerAddress(reachedAt, home))) {
-      return public;
+    if (!server.isPhotovault) return public;
+    bool extra(String? a) =>
+        a != null &&
+        a.isNotEmpty &&
+        !sameServerAddress(a, public) &&
+        !(hasHome && sameServerAddress(a, home));
+    final fallbacks = <String>[];
+    void add(String? a) {
+      if (extra(a) && !fallbacks.any((f) => sameServerAddress(f, a))) {
+        fallbacks.add(a!);
+      }
+    }
+
+    if (vpnActive) add(lastAddress);
+    final direct = fallbacks.length;
+    add(reachedAt);
+    if (fallbacks.isEmpty) return public;
+    for (final a in fallbacks.take(direct)) {
+      if (await _answers(a, server)) return a;
     }
     if (await _answers(public, server)) return public;
-    if (await _answers(reachedAt, server)) return reachedAt;
+    for (final a in fallbacks.skip(direct)) {
+      if (await _answers(a, server)) return a;
+    }
     return public;
   }
 

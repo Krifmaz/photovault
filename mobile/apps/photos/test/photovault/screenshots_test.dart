@@ -45,7 +45,7 @@ const _family = PhotovaultServerInfo(
   name: "Family photos",
   version: "0.4.0",
   publicUrl: "https://photos.example.com",
-  homeUrl: "http://10.0.1.7:8095",
+  homeUrl: "http://192.168.1.10:8080",
 );
 
 Future<void> _loadFonts() async {
@@ -192,6 +192,7 @@ void main() {
     service.overrideForTesting(
       client: _refusing,
       discovery: const _FakeDiscovery([]),
+      tailscale: () async => false,
     );
   });
 
@@ -224,12 +225,12 @@ void main() {
         discovery: const _FakeDiscovery([
           DiscoveredServer(
             name: "Living room NAS",
-            address: "http://192.168.1.20:8095",
+            address: "http://192.168.1.20:8080",
             version: "0.4.0",
           ),
           DiscoveredServer(
             name: "Grandma's photos",
-            address: "http://192.168.1.31:8095",
+            address: "http://192.168.1.31:8080",
             version: "0.3.2",
           ),
         ]),
@@ -241,8 +242,27 @@ void main() {
       );
       await _pumpFrames(tester);
       expect(find.text("Living room NAS"), findsOneWidget);
+      expect(find.text(PhotovaultStrings.recentServers), findsOneWidget);
       expect(find.text(_family.name), findsOneWidget);
       await _shoot(tester, "connect-servers-$mode");
+    });
+
+    // On cellular with Tailscale up: mDNS finds nothing, the recent
+    // server answers at its last (tailnet) address.
+    testWidgets("connect screen, over Tailscale ($mode)", (tester) async {
+      await setUpView(tester);
+      service.overrideForTesting(client: _answering);
+      await service.activate(_family, answeredAddress: "100.101.102.103:8080");
+      await service.clearActive();
+      service.overrideForTesting(tailscale: () async => true);
+      await tester.pumpWidget(
+        _app(brightness, ConnectServerPage(onUseWithoutServer: () {})),
+      );
+      await _pumpFrames(tester);
+      expect(find.text(PhotovaultStrings.recentServers), findsOneWidget);
+      expect(find.text(PhotovaultStrings.foundOverTailscale), findsOneWidget);
+      expect(find.text("100.101.102.103:8080 · 0.4.0"), findsOneWidget);
+      await _shoot(tester, "connect-tailscale-$mode");
     });
 
     testWidgets("connect screen, server answered ($mode)", (tester) async {
@@ -250,7 +270,7 @@ void main() {
       service.overrideForTesting(client: _answering);
       await tester.pumpWidget(_app(brightness, const ConnectServerPage()));
       await _pumpFrames(tester);
-      await tester.enterText(find.byType(TextField), "10.0.1.7:8095");
+      await tester.enterText(find.byType(TextField), "192.168.1.10:8080");
       await tester.tap(find.text(PhotovaultStrings.connect));
       await _pumpFrames(tester);
       expect(find.textContaining(_family.name), findsWidgets);
@@ -261,7 +281,7 @@ void main() {
       await setUpView(tester);
       await tester.pumpWidget(_app(brightness, const ConnectServerPage()));
       await _pumpFrames(tester);
-      await tester.enterText(find.byType(TextField), "10.0.1.7:8095");
+      await tester.enterText(find.byType(TextField), "192.168.1.10:8080");
       await tester.tap(find.text(PhotovaultStrings.connect));
       await _pumpFrames(tester);
       expect(find.textContaining("Can't reach"), findsOneWidget);
