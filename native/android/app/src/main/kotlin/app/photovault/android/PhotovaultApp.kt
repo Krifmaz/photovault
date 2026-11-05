@@ -23,6 +23,7 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import app.photovault.android.data.AndroidTailscaleStatus
 import app.photovault.android.data.NetworkWatcher
+import app.photovault.android.data.TailscaleStatus
 import coil3.SingletonImageLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
