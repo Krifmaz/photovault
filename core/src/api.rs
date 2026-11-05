@@ -335,7 +335,10 @@ mod tests {
 
     #[test]
     fn addresses() {
-        assert_eq!(display_address("http://10.0.1.7:8095"), "10.0.1.7:8095");
+        assert_eq!(
+            display_address("http://192.168.1.10:8080"),
+            "192.168.1.10:8080"
+        );
         assert_eq!(
             display_address("https://photos.example.com/"),
             "photos.example.com"

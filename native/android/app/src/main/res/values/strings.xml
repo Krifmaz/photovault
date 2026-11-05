@@ -11,7 +11,7 @@
     <string name="connect_title">Connect to your server</string>
     <string name="connect_subtitle">Enter the address of your Photovault server, pick one found on this network, or scan the QR code from its settings page.</string>
     <string name="connect_address">Server address</string>
-    <string name="connect_address_hint">photos.example.com or 10.0.1.7:8095</string>
+    <string name="connect_address_hint">photos.example.com or 192.168.1.10:8080</string>
     <string name="connect_scan_qr">Scan QR code</string>
     <string name="connect_check">Check address</string>
     <string name="connect_continue">Continue</string>
@@ -25,11 +25,20 @@
     <string name="connect_other">Couldn\'t connect: %1$s</string>
     <string name="connect_on_network">On this network</string>
     <string name="connect_on_network_none">Looking for servers on this Wi-Fi…</string>
-    <string name="connect_saved">Saved servers</string>
+    <string name="connect_recent">Recent servers</string>
+    <string name="connect_recent_last">%1$s · last connected %2$s</string>
     <string name="connect_saved_active">%1$s · current</string>
     <string name="connect_saved_remove">Remove %1$s</string>
     <string name="connect_home_title">Use home address %1$s</string>
     <string name="connect_home_warning">Faster at home. Sign-in and your session go unencrypted to this address, so turn it on only if you trust every network where it answers.</string>
+    <string name="connect_direct_title">Use direct address %1$s</string>
+    <string name="connect_direct_warning">The address this server last answered at, for example over Tailscale. Sign-in and your session go unencrypted to this address, so turn it on only if you trust every network where it answers.</string>
+    <string name="connect_tailscale">Over Tailscale</string>
+    <string name="connect_tailscale_searching">Tailscale is on. Trying your recent servers directly…</string>
+    <string name="connect_tailscale_none">Tailscale is on, but none of your recent servers answered.</string>
+    <string name="connect_tailscale_no_recent">Tailscale is on. Servers on your home network don\'t show up over it: type your server\'s Tailscale address, such as 100.101.102.103:8080.</string>
+    <string name="connect_tailscale_reached">Reached over Tailscale at %1$s</string>
+    <string name="connect_tailscale_reached_public">Reached at its public address %1$s</string>
 
     <!-- QR -->
     <string name="qr_permission">The camera is needed to scan your server\'s QR code.</string>

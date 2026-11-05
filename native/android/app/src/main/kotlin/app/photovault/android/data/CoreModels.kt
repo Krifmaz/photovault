@@ -17,6 +17,16 @@ data class ServerInfo(
     val isPhotovault: Boolean,
 )
 
+/**
+ * [contract v1.3] `RecentServer` record: a saved server, when it last answered ([lastConnectedUs], µs since the
+ * epoch, 0 = not since it was saved by an older version) and the base URL that answered then ([lastAddress]).
+ */
+data class RecentServer(
+    val info: ServerInfo,
+    val lastConnectedUs: Long = 0L,
+    val lastAddress: String? = null,
+)
+
 /** `StorageUsage` record. A null limit means unlimited. */
 data class StorageUsage(val usedBytes: Long, val limitBytes: Long?, val freeBytes: Long?)
 

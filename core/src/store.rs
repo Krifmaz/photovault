@@ -11,7 +11,7 @@
 //! and upload states, which the server knows anyway, are stored in the clear.
 
 use crate::crypto;
-use crate::{CoreError, Result, ServerInfo};
+use crate::{CoreError, RecentServer, Result, ServerInfo};
 use rusqlite::{Connection, OptionalExtension, params};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
@@ -45,6 +45,10 @@ const MIGRATIONS: &[&str] = &[
     "CREATE TABLE IF NOT EXISTS video_streams (
        file_id INTEGER PRIMARY KEY, object_id TEXT, size INTEGER NOT NULL DEFAULT 0,
        updated_at INTEGER NOT NULL);",
+    // 3: recent servers (contract v1.3): when a saved server last answered and at which address.
+    // A table of its own (not new `servers` columns), so stores saved before it read unchanged.
+    "CREATE TABLE IF NOT EXISTS server_seen (
+       public_url TEXT PRIMARY KEY, last_connected_at INTEGER NOT NULL, last_address TEXT);",
 ];
 
 /// Create the schema and run the migrations it has not seen yet.
@@ -326,10 +330,69 @@ impl Store {
         Ok(())
     }
 
+    /// Saved servers, most recently reached first; servers never reached
+    /// since recent servers exist come last, oldest first.
+    pub fn recent_servers(&self) -> Result<Vec<RecentServer>> {
+        let mut st = self.conn.prepare(
+            "SELECT s.info, r.last_connected_at, r.last_address FROM servers s \
+             LEFT JOIN server_seen r ON r.public_url = s.public_url \
+             ORDER BY r.last_connected_at IS NULL, r.last_connected_at DESC, s.added_at, s.public_url",
+        )?;
+        let rows = st.query_map([], |r| {
+            Ok((
+                r.get::<_, String>(0)?,
+                r.get::<_, Option<i64>>(1)?,
+                r.get::<_, Option<String>>(2)?,
+            ))
+        })?;
+        let mut out = Vec::new();
+        for r in rows {
+            let (info, at, address) = r?;
+            if let Ok(info) = serde_json::from_str(&info) {
+                out.push(RecentServer {
+                    info,
+                    last_connected_us: at.unwrap_or(0),
+                    last_address: address.filter(|a| !a.is_empty()),
+                });
+            }
+        }
+        Ok(out)
+    }
+
+    /// Remember that `address` of the saved server `public_url` answered at `at_us`.
+    pub fn record_server_seen(&self, public_url: &str, address: &str, at_us: i64) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO server_seen (public_url, last_connected_at, last_address) \
+             SELECT ?1, ?2, ?3 WHERE EXISTS (SELECT 1 FROM servers WHERE public_url = ?1) \
+             ON CONFLICT(public_url) DO UPDATE SET \
+             last_connected_at = excluded.last_connected_at, last_address = excluded.last_address",
+            params![public_url, at_us, address],
+        )?;
+        Ok(())
+    }
+
+    /// The address of `public_url` that answered last.
+    pub fn last_server_address(&self, public_url: &str) -> Result<Option<String>> {
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT last_address FROM server_seen WHERE public_url = ?1",
+                params![public_url],
+                |r| r.get::<_, Option<String>>(0),
+            )
+            .optional()?
+            .flatten()
+            .filter(|a| !a.is_empty()))
+    }
+
     /// Forget a server.
     pub fn remove_server(&self, public_url: &str) -> Result<()> {
         self.conn.execute(
             "DELETE FROM servers WHERE public_url = ?1",
+            params![public_url],
+        )?;
+        self.conn.execute(
+            "DELETE FROM server_seen WHERE public_url = ?1",
             params![public_url],
         )?;
         Ok(())
@@ -493,5 +556,130 @@ mod tests {
             s.get_plain("active_server").unwrap().as_deref(),
             Some("https://a")
         );
+    }
+
+    fn server(public: &str, home: Option<&str>) -> ServerInfo {
+        ServerInfo {
+            name: "Home vault".into(),
+            version: "0.2.0".into(),
+            public_url: public.into(),
+            home_url: home.map(str::to_string),
+            signups_allowed: false,
+            is_photovault: true,
+        }
+    }
+
+    #[test]
+    fn servers_saved_before_recent_servers_still_load() {
+        let dir = tempfile::tempdir().unwrap();
+        {
+            // A store as an app before contract v1.3 left it: schema step 2, no server_seen table,
+            // a server saved with the v1 JSON.
+            let s = Store::open(dir.path()).unwrap();
+            s.conn
+                .execute_batch("DROP TABLE server_seen; PRAGMA user_version = 2;")
+                .unwrap();
+            s.conn
+                .execute(
+                    "INSERT INTO servers (public_url, info, added_at) VALUES (?1, ?2, 1)",
+                    params![
+                        "https://photos.example.com",
+                        r#"{"name":"Home vault","version":"0.2.0","public_url":"https://photos.example.com","home_url":"http://192.168.1.10:8080","signups_allowed":false,"is_photovault":true}"#
+                    ],
+                )
+                .unwrap();
+        }
+        let s = Store::open(dir.path()).unwrap();
+        let v: i64 = s
+            .conn
+            .query_row("PRAGMA user_version", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(v, 3);
+        assert_eq!(
+            s.servers().unwrap(),
+            vec![server(
+                "https://photos.example.com",
+                Some("http://192.168.1.10:8080")
+            )]
+        );
+        let recent = s.recent_servers().unwrap();
+        assert_eq!(recent.len(), 1);
+        assert_eq!(recent[0].last_connected_us, 0);
+        assert_eq!(recent[0].last_address, None);
+        assert_eq!(
+            s.last_server_address("https://photos.example.com").unwrap(),
+            None
+        );
+    }
+
+    #[test]
+    fn recent_servers_are_most_recent_first() {
+        let dir = tempfile::tempdir().unwrap();
+        let s = Store::open(dir.path()).unwrap();
+        s.save_server(&server("https://a.example.com", None))
+            .unwrap();
+        s.save_server(&server("https://b.example.com", None))
+            .unwrap();
+        s.save_server(&server("https://c.example.com", None))
+            .unwrap();
+        s.record_server_seen("https://a.example.com", "https://a.example.com", 10)
+            .unwrap();
+        s.record_server_seen("https://b.example.com", "http://100.101.102.103:8080", 20)
+            .unwrap();
+        // Not a saved server: not remembered.
+        s.record_server_seen("https://x.example.com", "https://x.example.com", 30)
+            .unwrap();
+        let order = |s: &Store| {
+            s.recent_servers()
+                .unwrap()
+                .into_iter()
+                .map(|r| (r.info.public_url, r.last_connected_us, r.last_address))
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(
+            order(&s),
+            vec![
+                (
+                    "https://b.example.com".to_string(),
+                    20,
+                    Some("http://100.101.102.103:8080".to_string())
+                ),
+                (
+                    "https://a.example.com".to_string(),
+                    10,
+                    Some("https://a.example.com".to_string())
+                ),
+                ("https://c.example.com".to_string(), 0, None),
+            ]
+        );
+        // Seen again at another address; saving the server again keeps what was seen.
+        s.record_server_seen("https://a.example.com", "http://192.168.1.10:8080", 40)
+            .unwrap();
+        s.save_server(&server(
+            "https://a.example.com",
+            Some("http://192.168.1.10:8080"),
+        ))
+        .unwrap();
+        assert_eq!(order(&s)[0].0, "https://a.example.com");
+        assert_eq!(
+            s.last_server_address("https://a.example.com")
+                .unwrap()
+                .as_deref(),
+            Some("http://192.168.1.10:8080")
+        );
+        // Forgetting a server forgets when it was seen; wiping the account does not.
+        s.remove_server("https://b.example.com").unwrap();
+        assert_eq!(
+            s.last_server_address("https://b.example.com").unwrap(),
+            None
+        );
+        let mut s = s;
+        s.wipe_account().unwrap();
+        assert_eq!(s.recent_servers().unwrap().len(), 2);
+        assert_eq!(s.recent_servers().unwrap()[0].last_connected_us, 40);
+        // Saved again after removal: starts unseen.
+        s.save_server(&server("https://b.example.com", None))
+            .unwrap();
+        assert_eq!(order(&s)[2], ("https://b.example.com".to_string(), 0, None));
     }
 }

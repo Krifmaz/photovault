@@ -39,7 +39,8 @@ Android builds run in GitHub Actions (`android-native.yml`, job `apk`):
 Any address connects except hosts containing `unreachable` (shows the "Can't reach … home Wi-Fi?" error),
 `notphotovault`, or `compat` (a compatible server without Photovault info). Any non-empty password signs in
 (`wrong` is rejected); add `+otp`, `+totp`, `+passkey` or `+recovery` to the email to reach those steps.
-The code `123456` is accepted. Videos show an error since there are no real files.
+The code `123456` is accepted. Recent servers remember the address they answered at; `markSeen` (tests) sets another one, such as a
+Tailscale address `http://100.101.102.103:8080`, which then answers as that server. Videos show an error since there are no real files.
 Create account works on servers whose address does not contain `nosignup` (that one has sign-ups closed);
 an email containing `taken` is already registered.
 
@@ -65,6 +66,13 @@ an email containing `taken` is already registered.
   are kept, and they are deleted when the viewer closes.
 - Pinch-to-zoom scales the grid in its graphics layer and only changes the column count (2/3/4 by day,
   6 by month, 10 by year) when a threshold is crossed, so a pinch does not recompose the grid.
+- Recent servers and Tailscale (contract v1.3): the connect screen lists saved servers under "Recent servers", most
+  recently reached first (core's `recent_servers`). Core tries the last address that answered, then home, then
+  public whenever it re-checks the network (`NetworkWatcher` also fires when a VPN comes up). When Tailscale is on
+  (`data/Tailscale.kt`: a VPN network with an address in 100.64.0.0/10 or fd7a:115c:a1e0::/48), the screen tries
+  each recent server's last address, home and public URL directly (`fetch_server_info`, 3 s each; mDNS does not
+  cross the VPN) and lists those that answer under "Over Tailscale". A plain-http last address, like a plain-http
+  home URL, is only used for sign-in and the session after the user turns it on.
 - Create account (`ui/signup`, `data/SignupRepository`, core contract "v1.2: signup") follows the stock apps: email,
   password + confirmation with a strength hint (weak passwords are refused, as there), the emailed code, then core
   makes the keys on the device (Argon2id: 1 GiB / 4 ops, or 256 MiB / 16 ops on a low-memory device) and the
