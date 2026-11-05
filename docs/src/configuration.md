@@ -28,8 +28,8 @@ limit. Flags accept `true`, `1`, `yes` or `on`; anything else is false.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `PHOTOVAULT_PUBLIC_URL` | **required** | Address of the API, web app, public albums and cast, e.g. `https://photos.example.com` or `http://10.0.1.7:8095`. This is what you enter in the apps. |
-| `PHOTOVAULT_HOME_URL` | unset | LAN address, e.g. `http://10.0.1.7:8095`. Advertised in `/photovault/info` and mDNS; the apps use it when it answers. |
+| `PHOTOVAULT_PUBLIC_URL` | **required** | Address of the API, web app, public albums and cast, e.g. `https://photos.example.com` or `http://192.168.1.10:8095`. This is what you enter in the apps. |
+| `PHOTOVAULT_HOME_URL` | unset | LAN address, e.g. `http://192.168.1.10:8095`. Advertised in `/photovault/info` and mDNS; the apps use it when it answers. |
 | `PHOTOVAULT_SERVER_NAME` | `Photovault` | Name shown in the apps, in emails and on the LAN. |
 | `PHOTOVAULT_LISTEN` | `0.0.0.0:8080` | Address and port the server binds to. |
 | `PHOTOVAULT_CONFIG_DIR` | `/config` | Folder for `keys.toml` and the SQLite database `photovault.db`. |

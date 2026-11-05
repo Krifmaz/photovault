@@ -136,7 +136,7 @@ export const normalizeServerURL = (input: string): string | undefined => {
     return url.origin + path;
 };
 
-/** The address without the scheme, as shown to people ("10.0.1.7:8095"). */
+/** The address without the scheme, as shown to people ("192.168.1.10:8080"). */
 export const serverDisplayName = (origin: string) =>
     origin.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
 

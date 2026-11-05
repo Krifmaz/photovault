@@ -40,7 +40,7 @@ services:
     ports:
       - "8095:8080"
     environment:
-      PHOTOVAULT_PUBLIC_URL: http://10.0.1.7:8095
+      PHOTOVAULT_PUBLIC_URL: http://192.168.1.10:8095
     volumes:
       - /drivepool/photovault:/data   # encrypted photos
       - /opt/photovault:/config       # database + keys (local disk)
@@ -54,8 +54,8 @@ docker compose -f deploy/compose.yaml up -d
 docker compose -f deploy/compose.yaml logs -f
 ```
 
-Replace `10.0.1.7` with the address of the Docker host. Open
-`http://10.0.1.7:8095` for the web app, and enter the same address in the
+Replace `192.168.1.10` with the address of the Docker host. Open
+`http://192.168.1.10:8095` for the web app, and enter the same address in the
 phone app. The file also has commented lines for the server name, quotas,
 SMTP and the `photovault-mdns` service that lets the apps find the server
 without typing an address ([LAN discovery](discovery.md)).
@@ -73,7 +73,7 @@ with two hostnames:
 | --- | --- | --- |
 | `PHOTOVAULT_PUBLIC_URL` | `https://photos.example.com` | API and web app; what you enter in the apps. |
 | `PHOTOVAULT_STORAGE_PUBLIC_URL` | `https://storage.photos.example.com` | Signed photo upload and download URLs. |
-| `PHOTOVAULT_HOME_URL` | `http://10.0.1.7:8095` | LAN address. At home the apps use it when it answers as the same server. |
+| `PHOTOVAULT_HOME_URL` | `http://192.168.1.10:8095` | LAN address. At home the apps use it when it answers as the same server. |
 
 See [HTTPS behind a reverse proxy](deployment/reverse-proxy.md) for the
 proxy settings. The storage hostname must not go through Cloudflare's proxy.

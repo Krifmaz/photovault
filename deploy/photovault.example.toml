@@ -6,7 +6,7 @@
 # What the apps connect to (API, web app, albums, cast).
 public_url = "https://photos.example.com"
 # LAN address, advertised in /photovault/info and mDNS.
-# home_url = "http://10.0.1.7:8095"
+# home_url = "http://192.168.1.10:8095"
 # server_name = "Photovault"
 # listen = "0.0.0.0:8080"
 

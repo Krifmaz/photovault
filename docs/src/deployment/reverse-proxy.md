@@ -20,7 +20,7 @@ CDN. With the S3 backend the apps talk to the bucket's endpoint
 used.
 
 Set `PHOTOVAULT_HOME_URL` to the LAN address (for example
-`http://10.0.1.7:8095`) so the apps can skip the proxy at home.
+`http://192.168.1.10:8095`) so the apps can skip the proxy at home.
 
 ## Cloudflare
 

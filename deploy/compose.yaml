@@ -5,7 +5,7 @@
 #   mkdir -p /drivepool/photovault /opt/photovault
 #   chown -R 65532:65532 /drivepool/photovault /opt/photovault
 #
-# Then enter http://10.0.1.7:8095 in the apps ("Connect to your server").
+# Then enter http://192.168.1.10:8095 in the apps ("Connect to your server").
 # Domain behind a reverse proxy: compose.domain.yaml. PostgreSQL: compose.postgres.yaml.
 # Every setting: docs/src/configuration.md.
 name: photovault
@@ -22,12 +22,12 @@ services:
     environment:
       # The address the apps and the web app use. The only required setting.
       # Photo up/downloads use it too unless PHOTOVAULT_STORAGE_PUBLIC_URL is set.
-      PHOTOVAULT_PUBLIC_URL: http://10.0.1.7:8095
+      PHOTOVAULT_PUBLIC_URL: http://192.168.1.10:8095
       # Optional settings (remove the # to use one):
       # Name shown in the apps, in emails and on the LAN.
       # PHOTOVAULT_SERVER_NAME: Photovault
       # LAN address, when PUBLIC_URL is a domain (see compose.domain.yaml).
-      # PHOTOVAULT_HOME_URL: http://10.0.1.7:8095
+      # PHOTOVAULT_HOME_URL: http://192.168.1.10:8095
       # Quota for new accounts; unset = the free disk space is the limit.
       # PHOTOVAULT_DEFAULT_QUOTA: 500GB
       # Email the sign-in codes. Without SMTP they are written to the log:

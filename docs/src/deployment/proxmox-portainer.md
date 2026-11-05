@@ -46,7 +46,7 @@ use a create policy that keeps a new file in its directory's branch, e.g.
 
 *Stacks → Add stack → Web editor*, paste
 [`deploy/compose.yaml`](https://github.com/Krifmaz/photovault/blob/main/deploy/compose.yaml),
-change `10.0.1.7` to the LXC's address, and deploy. No environment
+change `192.168.1.10` to the LXC's address, and deploy. No environment
 variables or secrets are needed: the keys are created in
 `/opt/photovault/keys.toml` on the first start. Back that file up.
 
