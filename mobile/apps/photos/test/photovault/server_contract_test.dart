@@ -15,7 +15,7 @@ void main() {
           "commit": "f145822",
           "apiVersion": 1,
           "publicUrl": "https://photos.example.com/",
-          "homeUrl": "http://10.0.1.7:8095",
+          "homeUrl": "http://192.168.1.10:8080",
           "albumsUrl": "https://photos.example.com/albums",
           "castUrl": "https://photos.example.com/cast",
           "signupsAllowed": false,
@@ -29,7 +29,7 @@ void main() {
       expect(info.name, "Family photos");
       expect(info.version, "0.2.0");
       expect(info.publicUrl, "https://photos.example.com");
-      expect(info.homeUrl, "http://10.0.1.7:8095");
+      expect(info.homeUrl, "http://192.168.1.10:8080");
       expect(info.signupsAllowed, isFalse);
       expect(info.apiVersion, 1);
       expect(info.features, ["web", "mdns"]);
@@ -52,10 +52,10 @@ void main() {
         "product": "photovault",
         "name": "",
         "publicUrl": "",
-      }, fallbackUrl: "http://10.0.1.7:8095")!;
+      }, fallbackUrl: "http://192.168.1.10:8080")!;
       expect(info.name, "Photovault");
       expect(info.version, "");
-      expect(info.publicUrl, "http://10.0.1.7:8095");
+      expect(info.publicUrl, "http://192.168.1.10:8080");
     });
 
     test("rejects other products and non-objects", () {
@@ -74,25 +74,27 @@ void main() {
         "name": "A",
         "version": "1",
         "publicUrl": "https://a.example.com",
-        "homeUrl": "http://10.0.0.2:8095",
+        "homeUrl": "http://192.168.1.11:8080",
         "signupsAllowed": false,
       })!;
       final back = PhotovaultServerInfo.fromStoredJson(
         jsonDecode(jsonEncode(info.toJson())),
       )!;
       expect(back.name, "A");
-      expect(back.homeUrl, "http://10.0.0.2:8095");
+      expect(back.homeUrl, "http://192.168.1.11:8080");
       expect(back.signupsAllowed, isFalse);
 
       final compat = PhotovaultServerInfo.fromStoredJson(
         jsonDecode(
           jsonEncode(
-            PhotovaultServerInfo.compatible("http://10.0.0.3:8080").toJson(),
+            PhotovaultServerInfo.compatible(
+              "http://192.168.1.12:8080",
+            ).toJson(),
           ),
         ),
       )!;
       expect(compat.isPhotovault, isFalse);
-      expect(compat.publicUrl, "http://10.0.0.3:8080");
+      expect(compat.publicUrl, "http://192.168.1.12:8080");
     });
   });
 
@@ -109,10 +111,10 @@ void main() {
     test("photovault:// link", () {
       final p = parseConnectPayload(
         "photovault://connect?url=https%3A%2F%2Fphotos.example.com"
-        "&home=http%3A%2F%2F10.0.1.7%3A8095&name=Family%20photos",
+        "&home=http%3A%2F%2F192.168.1.10%3A8080&name=Family%20photos",
       )!;
       expect(p.url, "https://photos.example.com");
-      expect(p.homeUrl, "http://10.0.1.7:8095");
+      expect(p.homeUrl, "http://192.168.1.10:8080");
       expect(p.name, "Family photos");
     });
     test("bare URL and trailing text", () {
@@ -123,14 +125,14 @@ void main() {
         "https://photos.example.com/photovault/info",
       );
       expect(
-        parseConnectPayload("10.0.1.7:8095 Photovault")!.url,
-        "10.0.1.7:8095",
+        parseConnectPayload("192.168.1.10:8080 Photovault")!.url,
+        "192.168.1.10:8080",
       );
     });
     test("home only, and nothing usable", () {
       expect(
-        parseConnectPayload("PHOTOVAULT://connect?home=10.0.1.7:8095")!.url,
-        "10.0.1.7:8095",
+        parseConnectPayload("PHOTOVAULT://connect?home=192.168.1.10:8080")!.url,
+        "192.168.1.10:8080",
       );
       expect(parseConnectPayload("photovault://connect"), isNull);
       expect(parseConnectPayload("   "), isNull);
@@ -142,10 +144,10 @@ void main() {
       final s = discoveredServerFromMdns(
         instanceName: "Family._photovault._tcp.local",
         txt: {"name": "Family photos", "version": "0.2.0", "home": "x"},
-        ip: "10.0.1.7",
-        port: 8095,
+        ip: "192.168.1.10",
+        port: 8080,
       )!;
-      expect(s.address, "http://10.0.1.7:8095");
+      expect(s.address, "http://192.168.1.10:8080");
       expect(s.name, "Family photos");
       expect(s.version, "0.2.0");
     });
@@ -169,13 +171,13 @@ void main() {
         name: "Family & friends",
         version: "0.2.0",
         publicUrl: "https://photos.example.com",
-        homeUrl: "http://10.0.1.7:8095",
+        homeUrl: "http://192.168.1.10:8080",
       );
       final link = buildConnectLink(info);
       expect(link, startsWith("photovault://connect?"));
       final p = parseConnectPayload(link)!;
       expect(p.url, "https://photos.example.com");
-      expect(p.homeUrl, "http://10.0.1.7:8095");
+      expect(p.homeUrl, "http://192.168.1.10:8080");
       expect(p.name, "Family & friends");
     });
     test("compatible server: address only", () {
@@ -195,14 +197,14 @@ void main() {
       name: "Family",
       version: "0.2.0",
       publicUrl: "https://photos.example.com",
-      homeUrl: "http://10.0.1.7:8095",
+      homeUrl: "http://192.168.1.10:8080",
       albumsUrl: "https://albums.example.com",
     );
     test("accepts links on the albums, public and home hosts", () {
       for (final link in [
         "https://albums.example.com/?t=abc#key",
         "https://photos.example.com/albums/?t=abc#key",
-        "http://10.0.1.7:8095/albums/?t=abc#key",
+        "http://192.168.1.10:8080/albums/?t=abc#key",
       ]) {
         expect(isServerPublicAlbumLink(Uri.parse(link), server), isTrue);
       }
@@ -249,7 +251,7 @@ void main() {
         albumsUrl: "https://share.example.com",
       );
       expect(
-        serverAlbumsBaseUrl(server, "http://10.0.1.7:8095"),
+        serverAlbumsBaseUrl(server, "http://192.168.1.10:8080"),
         "https://share.example.com",
       );
     });
@@ -261,7 +263,7 @@ void main() {
         publicUrl: "https://photos.example.com",
       );
       expect(
-        serverAlbumsBaseUrl(server, "http://10.0.1.7:8095"),
+        serverAlbumsBaseUrl(server, "http://192.168.1.10:8080"),
         "https://photos.example.com/albums",
       );
     });
@@ -275,8 +277,8 @@ void main() {
         "https://museum.example.com/albums",
       );
       expect(
-        serverAlbumsBaseUrl(null, "http://10.0.1.7:8095"),
-        "http://10.0.1.7:8095/albums",
+        serverAlbumsBaseUrl(null, "http://192.168.1.10:8080"),
+        "http://192.168.1.10:8080/albums",
       );
     });
   });

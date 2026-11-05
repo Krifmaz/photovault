@@ -15,7 +15,7 @@ class PhotovaultStrings {
   static const connectSubtitle =
       "Enter the address of your Photovault server, scan its QR code, or pick it from your network.";
   static const addressLabel = "Server address";
-  static const addressHint = "photos.example.com or 10.0.1.7:8095";
+  static const addressHint = "photos.example.com or 192.168.1.10:8080";
   static const connect = "Connect";
   static const connecting = "Connecting…";
   static const continueLabel = "Continue";
@@ -23,7 +23,11 @@ class PhotovaultStrings {
   static const scanQrHint =
       "Point the camera at the QR code in your server's web settings.";
   static const qrNotAServer = "This QR code doesn't contain a server address.";
-  static const savedServers = "Your servers";
+  static const recentServers = "Recent servers";
+  static const foundOverTailscale = "Found over Tailscale";
+  static const checkingRecentServers = "Checking your recent servers…";
+  static const noneAnsweredOverTailscale =
+      "None of your recent servers answered over Tailscale.";
   static const onThisNetwork = "On this network";
   static const searching = "Looking for servers…";
   static const noneFound = "No servers found on this network.";
@@ -70,7 +74,7 @@ class PhotovaultStrings {
     final address = e.address;
     switch (e.kind) {
       case ServerConnectErrorKind.invalidAddress:
-        return "\"$address\" isn't a server address. Try something like photos.example.com or 10.0.1.7:8095.";
+        return "\"$address\" isn't a server address. Try something like photos.example.com or 192.168.1.10:8080.";
       case ServerConnectErrorKind.unreachable:
         // The home Wi-Fi hint only fits a LAN-only address.
         return isHomeNetworkAddress(address)

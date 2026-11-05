@@ -1,8 +1,9 @@
 // PHOTOVAULT: server connection (new file).
 //
 // "Connect to your server": the first onboarding screen. The person types an
-// address (or scans the server's QR code, or taps a server found on the
-// LAN); Connect fetches `/photovault/info` and shows the server's name and
+// address (or scans the server's QR code, taps a recent server, or taps a
+// server found on the LAN or, while Tailscale is up, over the VPN); Connect
+// fetches `/photovault/info` and shows the server's name and
 // version; Continue makes it the active server and hands over to Ente's own
 // sign-in / create-account flow, which is unchanged.
 //
@@ -17,6 +18,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:photos/services/photovault/photovault_server_service.dart";
 import "package:photos/services/photovault/photovault_strings.dart";
+import "package:photos/services/photovault/recent_servers.dart";
 import "package:photos/services/photovault/server_address.dart";
 import "package:photos/services/photovault/server_contract.dart";
 import "package:photos/services/photovault/server_info_client.dart";
@@ -57,6 +59,12 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
   List<DiscoveredServer> _discovered = const [];
   bool _searching = false;
 
+  /// Tailscale is up: recent servers are probed directly (mDNS does not
+  /// cross the VPN) and the ones that answered are listed.
+  bool _tailscale = false;
+  bool _probingDirect = false;
+  List<DirectlyReachedServer> _direct = const [];
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +80,7 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
       });
     }
     if (_service.discovery.isSupported) unawaited(_discover());
+    unawaited(_probeDirect());
   }
 
   @override
@@ -88,6 +97,42 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
     setState(() {
       _searching = false;
       _discovered = found;
+    });
+  }
+
+  /// While Tailscale is up, probes the recent servers' last known address
+  /// (then home and public) directly.
+  Future<void> _probeDirect() async {
+    if (_probingDirect) return;
+    if (_service.recentServers.isEmpty) return;
+    setState(() => _probingDirect = true);
+    final vpn = await _service.isTailscaleActive();
+    if (!mounted) return;
+    if (!vpn) {
+      setState(() {
+        _probingDirect = false;
+        _tailscale = false;
+        _direct = const [];
+      });
+      return;
+    }
+    setState(() => _tailscale = true);
+    final found = await _service.probeRecentDirectly();
+    if (!mounted) return;
+    setState(() {
+      _probingDirect = false;
+      _direct = found;
+    });
+  }
+
+  /// A server that just answered a direct probe: show it, ready to
+  /// continue, without asking it again.
+  void _showReached(DirectlyReachedServer reached) {
+    _controller.text = displayServerAddress(reached.address);
+    setState(() {
+      _error = null;
+      _found = reached.info;
+      _foundAddress = reached.address;
     });
   }
 
@@ -134,9 +179,9 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
     }
   }
 
-  /// A saved server: refresh its description (public, then home address)
-  /// and use it straight away.
-  Future<void> _useSaved(PhotovaultServerInfo server) async {
+  /// A recent server: refresh its description (the last address that
+  /// answered, then public, then home) and use it straight away.
+  Future<void> _useRecent(RecentServer server) async {
     if (_busy) return;
     setState(() {
       _busy = true;
@@ -144,23 +189,31 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
       _found = null;
     });
     ServerConnectException? firstError;
+    ServerConnectException? publicError;
     PhotovaultServerInfo? info;
     String? answered;
-    for (final address in [server.publicUrl, server.homeUrl]) {
-      if (address == null) continue;
+    for (final address in server.connectOrder) {
+      final isPublic = sameServerAddress(address, server.info.publicUrl);
       try {
-        info = await _service.fetchInfo(address);
+        // A last address other than the public one (a tailnet or LAN
+        // address) may be out of reach now: give it a short timeout.
+        info = await _service.fetchInfo(
+          address,
+          timeout: isPublic ? kConnectTimeout : kHomeProbeTimeout * 2,
+        );
         answered = tryNormalizeServerAddress(address);
         break;
       } on ServerConnectException catch (e) {
         firstError ??= e;
+        if (isPublic) publicError = e;
       }
     }
     if (!mounted) return;
     if (info == null) {
       setState(() {
         _busy = false;
-        _error = PhotovaultStrings.connectError(firstError!);
+        // Explain the public address when it was tried.
+        _error = PhotovaultStrings.connectError((publicError ?? firstError)!);
       });
       return;
     }
@@ -196,13 +249,15 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
   @override
   Widget build(BuildContext context) {
     final colors = context.componentColors;
-    final saved = _service.savedServers;
+    final recent = _service.recentServers;
     // The build-time server (PHOTOVAULT_SERVER / PHOTOVAULT_SERVER_NAME),
     // unless it is already saved.
     final builtInAddress = _service.builtInAddress;
     final builtIn =
         builtInAddress != null &&
-            !saved.any((s) => sameServerAddress(s.publicUrl, builtInAddress))
+            !recent.any(
+              (s) => sameServerAddress(s.info.publicUrl, builtInAddress),
+            )
         ? builtInAddress
         : null;
     final canPop = Navigator.of(context).canPop();
@@ -284,38 +339,62 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
                       },
               ),
             ],
-            if (saved.isNotEmpty) ...[
-              const _SectionHeader(PhotovaultStrings.savedServers),
-              for (final server in saved)
+            if (recent.isNotEmpty) ...[
+              const _SectionHeader(PhotovaultStrings.recentServers),
+              for (final server in recent)
                 _ServerRow(
-                  title: server.isPhotovault
-                      ? server.name
+                  title: server.info.isPhotovault
+                      ? server.info.name
                       : PhotovaultStrings.compatibleServer,
                   subtitle: _subtitle(
-                    displayServerAddress(server.publicUrl),
-                    server.version,
+                    displayServerAddress(server.info.publicUrl),
+                    server.info.version,
                   ),
-                  onTap: _busy ? null : () => _useSaved(server),
+                  onTap: _busy ? null : () => _useRecent(server),
                   onRemove: () async {
-                    await _service.forget(server);
-                    if (mounted) setState(() {});
+                    await _service.forget(server.info);
+                    if (!mounted) return;
+                    setState(() {
+                      _direct = _direct
+                          .where(
+                            (d) => !sameServerAddress(
+                              d.info.publicUrl,
+                              server.info.publicUrl,
+                            ),
+                          )
+                          .toList();
+                    });
                   },
+                ),
+            ],
+            if (_tailscale && recent.isNotEmpty) ...[
+              _SectionHeader(
+                PhotovaultStrings.foundOverTailscale,
+                trailing: _refreshTrailing(colors, _probingDirect, () {
+                  unawaited(_probeDirect());
+                }),
+              ),
+              if (_direct.isEmpty)
+                Text(
+                  _probingDirect
+                      ? PhotovaultStrings.checkingRecentServers
+                      : PhotovaultStrings.noneAnsweredOverTailscale,
+                  style: TextStyles.mini.copyWith(color: colors.textLight),
+                ),
+              for (final reached in _direct)
+                _ServerRow(
+                  title: reached.info.name,
+                  subtitle: _subtitle(
+                    displayServerAddress(reached.address),
+                    reached.info.version,
+                  ),
+                  onTap: _busy ? null : () => _showReached(reached),
                 ),
             ],
             if (_service.discovery.isSupported) ...[
               _SectionHeader(
                 PhotovaultStrings.onThisNetwork,
-                trailing: _searching
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : IconButton(
-                        tooltip: PhotovaultStrings.searchAgain,
-                        icon: Icon(Icons.refresh, color: colors.textLight),
-                        onPressed: _discover,
-                      ),
+                trailing: _refreshTrailing(colors, _searching, _discover),
               ),
               if (_discovered.isEmpty)
                 Text(
@@ -404,6 +483,25 @@ class _ConnectServerPageState extends State<ConnectServerPage> {
           onPressed: _busy ? null : _scan,
         ),
       ),
+    );
+  }
+
+  static Widget _refreshTrailing(
+    ColorTokens colors,
+    bool running,
+    VoidCallback onPressed,
+  ) {
+    if (running) {
+      return const SizedBox(
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+    return IconButton(
+      tooltip: PhotovaultStrings.searchAgain,
+      icon: Icon(Icons.refresh, color: colors.textLight),
+      onPressed: onPressed,
     );
   }
 

@@ -84,7 +84,7 @@ String? tryNormalizeServerAddress(String? input) {
   }
 }
 
-/// Short form for messages: `10.0.1.7:8095`, `photos.example.com`.
+/// Short form for messages: `192.168.1.10:8080`, `photos.example.com`.
 String displayServerAddress(String url) {
   final uri = Uri.tryParse(url);
   if (uri == null || uri.host.isEmpty) return url;
