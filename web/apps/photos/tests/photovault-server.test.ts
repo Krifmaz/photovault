@@ -17,8 +17,8 @@ import { describe, expect, it } from "vitest";
 
 describe("normalizeServerURL", () => {
     it.each([
-        ["10.0.1.7:8095", "http://10.0.1.7:8095"],
-        ["  10.0.1.7:8095/  ", "http://10.0.1.7:8095"],
+        ["192.168.1.10:8080", "http://192.168.1.10:8080"],
+        ["  192.168.1.10:8080/  ", "http://192.168.1.10:8080"],
         ["192.168.1.20", "http://192.168.1.20"],
         ["172.20.0.2:8080", "http://172.20.0.2:8080"],
         ["localhost:8080", "http://localhost:8080"],
@@ -38,7 +38,7 @@ describe("normalizeServerURL", () => {
         ["https://example.com/api/ping", "https://example.com/api"],
         ["https://user:pw@example.com/?x=1#y", "https://example.com"],
         [
-            "photovault://connect?url=https%3A%2F%2Fphotos.example.com&home=http%3A%2F%2F10.0.1.7%3A8095&name=Home",
+            "photovault://connect?url=https%3A%2F%2Fphotos.example.com&home=http%3A%2F%2F192.168.1.10%3A8080&name=Home",
             "https://photos.example.com",
         ],
     ])("%s → %s", (input, expected) => {
@@ -66,7 +66,7 @@ describe("isLocalNetworkHost", () => {
         for (const h of [
             "localhost",
             "127.0.0.1",
-            "10.0.1.7",
+            "10.0.0.5",
             "192.168.0.1",
             "172.16.0.1",
             "172.31.255.255",
@@ -97,11 +97,11 @@ describe("resolveServerOrigin", () => {
     it("prefers the server saved on this device", () => {
         expect(
             resolveServerOrigin({
-                saved: "10.0.1.7:8095",
+                saved: "192.168.1.10:8080",
                 buildEnv: "https://build.example.com",
                 page: "https://page.example.com",
             }),
-        ).toBe("http://10.0.1.7:8095");
+        ).toBe("http://192.168.1.10:8080");
     });
 
     it("then the build-time NEXT_PUBLIC_ENTE_ENDPOINT", () => {
@@ -128,9 +128,9 @@ describe("resolveServerOrigin", () => {
         expect(
             resolveServerOrigin({
                 saved: "ftp://x",
-                page: "http://10.0.1.7:8095",
+                page: "http://192.168.1.10:8080",
             }),
-        ).toBe("http://10.0.1.7:8095");
+        ).toBe("http://192.168.1.10:8080");
     });
 
     it("falls back to localhost when nothing applies", () => {
@@ -152,7 +152,7 @@ describe("companion apps and display", () => {
     });
 
     it("shows addresses without the scheme", () => {
-        expect(serverDisplayName("http://10.0.1.7:8095")).toBe("10.0.1.7:8095");
+        expect(serverDisplayName("http://192.168.1.10:8080")).toBe("192.168.1.10:8080");
         expect(serverDisplayName("https://example.com/api")).toBe(
             "example.com/api",
         );
@@ -164,11 +164,11 @@ describe("connectQRPayload", () => {
         expect(
             connectQRPayload({
                 publicUrl: "https://photos.example.com",
-                homeUrl: "http://10.0.1.7:8095",
+                homeUrl: "http://192.168.1.10:8080",
                 name: "Our photos",
             }),
         ).toBe(
-            "photovault://connect?url=https%3A%2F%2Fphotos.example.com&home=http%3A%2F%2F10.0.1.7%3A8095&name=Our%20photos",
+            "photovault://connect?url=https%3A%2F%2Fphotos.example.com&home=http%3A%2F%2F192.168.1.10%3A8080&name=Our%20photos",
         );
     });
 
@@ -198,7 +198,7 @@ describe("checkServer", () => {
         name: "Photovault",
         version: "0.2.0",
         publicUrl: "https://photos.example.com",
-        homeUrl: "http://10.0.1.7:8095",
+        homeUrl: "http://192.168.1.10:8080",
         signupsAllowed: false,
         someFutureField: 1,
     };
@@ -212,8 +212,8 @@ describe("checkServer", () => {
             urls.push(url);
             return Promise.resolve(json(info));
         }) as unknown as typeof fetch;
-        const check = await checkServer("http://10.0.1.7:8095", { fetchFn });
-        expect(urls).toEqual(["http://10.0.1.7:8095/photovault/info"]);
+        const check = await checkServer("http://192.168.1.10:8080", { fetchFn });
+        expect(urls).toEqual(["http://192.168.1.10:8080/photovault/info"]);
         expect(check.kind).toBe("photovault");
         if (check.kind == "photovault") {
             expect(check.info.name).toBe("Photovault");
@@ -237,7 +237,7 @@ describe("checkServer", () => {
         const fetchFn = (() =>
             Promise.reject(new TypeError("Failed to fetch"))) as typeof fetch;
         expect(
-            (await checkServer("http://10.0.1.7:8095", { fetchFn })).kind,
+            (await checkServer("http://192.168.1.10:8080", { fetchFn })).kind,
         ).toBe("unreachable");
     });
 
@@ -248,7 +248,7 @@ describe("checkServer", () => {
                     reject(new DOMException("aborted", "AbortError")),
                 );
             })) as unknown as typeof fetch;
-        const check = await checkServer("http://10.0.1.7:8095", {
+        const check = await checkServer("http://192.168.1.10:8080", {
             fetchFn,
             timeoutMs: 10,
         });
@@ -334,11 +334,11 @@ describe("fetchEmailVerificationMode", () => {
             );
         }) as unknown as typeof fetch;
         expect(
-            await fetchEmailVerificationMode("http://10.0.1.7:8095", {
+            await fetchEmailVerificationMode("http://192.168.1.10:8080", {
                 fetchFn,
             }),
         ).toBe("skip");
-        expect(urls).toEqual(["http://10.0.1.7:8095/photovault/info"]);
+        expect(urls).toEqual(["http://192.168.1.10:8080/photovault/info"]);
     });
 
     it("is undefined when the field is absent", async () => {

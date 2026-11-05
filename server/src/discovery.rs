@@ -199,9 +199,9 @@ mod tests {
         let a = Announcement {
             name: "Test vault".into(),
             version: "9.9.9".into(),
-            home_url: Some("http://10.0.1.7:8095".into()),
+            home_url: Some("http://192.168.1.10:8080".into()),
             public_url: "https://photos.example.com".into(),
-            port: 8095,
+            port: 8080,
         };
         let _ann = announce(&a).expect("announce");
         let browser = ServiceDaemon::new().expect("daemon");
@@ -212,8 +212,11 @@ mod tests {
                 rx.recv_timeout(std::time::Duration::from_millis(500))
                 && s.get_property_val_str("name") == Some("Test vault")
             {
-                assert_eq!(s.get_port(), 8095);
-                assert_eq!(s.get_property_val_str("home"), Some("http://10.0.1.7:8095"));
+                assert_eq!(s.get_port(), 8080);
+                assert_eq!(
+                    s.get_property_val_str("home"),
+                    Some("http://192.168.1.10:8080")
+                );
                 let _ = browser.shutdown();
                 return;
             }
@@ -226,17 +229,17 @@ mod tests {
         let a = Announcement {
             name: "Home photos".into(),
             version: "0.1.0".into(),
-            home_url: Some("http://10.0.1.7:8095".into()),
+            home_url: Some("http://192.168.1.10:8080".into()),
             public_url: "https://photos.example.com".into(),
-            port: 8095,
+            port: 8080,
         };
         let t = a.txt();
         assert_eq!(t["name"], "Home photos");
-        assert_eq!(t["home"], "http://10.0.1.7:8095");
+        assert_eq!(t["home"], "http://192.168.1.10:8080");
         assert_eq!(t["public"], "https://photos.example.com");
         assert_eq!(
-            Announcement::port_from(Some("http://10.0.1.7:8095"), 1),
-            8095
+            Announcement::port_from(Some("http://192.168.1.10:8080"), 1),
+            8080
         );
         assert_eq!(Announcement::port_from(Some("https://x.lan"), 1), 443);
         assert_eq!(Announcement::port_from(None, 8080), 8080);

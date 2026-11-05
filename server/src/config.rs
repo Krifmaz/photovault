@@ -39,7 +39,7 @@ pub struct Config {
     pub storage_limit: Option<i64>,
     /// Server name shown in the apps and announced on the LAN (`PHOTOVAULT_SERVER_NAME`).
     pub server_name: String,
-    /// Address of the server on the home network, e.g. `http://10.0.1.7:8095`
+    /// Address of the server on the home network, e.g. `http://192.168.1.10:8080`
     /// (`PHOTOVAULT_HOME_URL`). Optional.
     pub home_url: Option<String>,
     /// Web app origins allowed by CORS (`PHOTOVAULT_WEB_ORIGINS`, comma-separated).

@@ -14,7 +14,7 @@ A stock Ente museum returns 404 here; clients then fall back to `GET /ping` and 
   "commit": "f145822",
   "apiVersion": 1,
   "publicUrl": "https://photos.example.com",
-  "homeUrl": "http://10.0.1.7:8095",
+  "homeUrl": "http://192.168.1.10:8080",
   "albumsUrl": "https://photos.example.com/albums",
   "castUrl": "https://photos.example.com/cast",
   "castAppId": "1A2B3C4D",

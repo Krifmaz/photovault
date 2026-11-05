@@ -3,7 +3,7 @@
 //! Lets the app send asset downloads to its own server instead of Ente's
 //! hosts: a download URL that starts with a registered upstream prefix (for
 //! example `https://models.ente.com/`) is fetched from the mirror prefix
-//! (for example `http://10.0.1.7:8095/photovault/models/`) instead. The
+//! (for example `http://192.168.1.10:8080/photovault/models/`) instead. The
 //! catalog, sizes and SHA-256 checks are unchanged, so a mirror can only
 //! serve the exact files the app expects. Process-wide, set by the app.
 //!
@@ -75,11 +75,11 @@ mod tests {
     fn rewrites_only_registered_prefixes() {
         set_url_mirror(
             "https://models.ente.com",
-            Some("http://10.0.1.7:8095/photovault/models/"),
+            Some("http://192.168.1.10:8080/photovault/models/"),
         );
         assert_eq!(
             mirrored_url("https://models.ente.com/PP-OCRv5/ppocrv5_dict.txt"),
-            "http://10.0.1.7:8095/photovault/models/PP-OCRv5/ppocrv5_dict.txt"
+            "http://192.168.1.10:8080/photovault/models/PP-OCRv5/ppocrv5_dict.txt"
         );
         assert_eq!(
             mirrored_url("https://models.ente.community/x.onnx"),
@@ -102,13 +102,13 @@ mod tests {
         block_url_prefix_if_unset(upstream);
         assert!(is_blocked("https://blocked.example/a.onnx"));
         assert!(!is_blocked("https://other.example/a.onnx"));
-        set_url_mirror(upstream, Some("http://10.0.1.7:8095/m/"));
+        set_url_mirror(upstream, Some("http://192.168.1.10:8080/m/"));
         assert!(!is_blocked("https://blocked.example/a.onnx"));
         block_url_prefix_if_unset(upstream);
         assert!(!is_blocked("https://blocked.example/a.onnx"));
         assert_eq!(
             mirrored_url("https://blocked.example/a.onnx"),
-            "http://10.0.1.7:8095/m/a.onnx"
+            "http://192.168.1.10:8080/m/a.onnx"
         );
         block_url_prefix(upstream);
         assert!(is_blocked("https://blocked.example/a.onnx"));

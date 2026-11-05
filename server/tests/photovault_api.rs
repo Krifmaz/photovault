@@ -14,7 +14,7 @@ use users_common::*;
 async fn info_is_public_and_complete() {
     let srv = TestServer::start_with(|c| {
         c.server_name = "Home photos".into();
-        c.home_url = Some("http://10.0.1.7:8095".into());
+        c.home_url = Some("http://192.168.1.10:8080".into());
         c.mdns = false;
     })
     .await
@@ -26,7 +26,7 @@ async fn info_is_public_and_complete() {
     assert_eq!(v["name"], "Home photos");
     assert_eq!(v["version"], env!("CARGO_PKG_VERSION"));
     assert_eq!(v["apiVersion"], 1);
-    assert_eq!(v["homeUrl"], "http://10.0.1.7:8095");
+    assert_eq!(v["homeUrl"], "http://192.168.1.10:8080");
     assert_eq!(v["publicUrl"], srv.url.as_str());
     assert_eq!(v["signupsAllowed"], true);
     assert_eq!(v["emailVerification"], "log");

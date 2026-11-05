@@ -27,7 +27,7 @@ services:
     ports:
       - "8095:8080"
     environment:
-      PHOTOVAULT_PUBLIC_URL: http://10.0.1.7:8095
+      PHOTOVAULT_PUBLIC_URL: http://192.168.1.10:8095
       # Use Postgres instead of /config/photovault.db.
       PHOTOVAULT_DATABASE_URL: postgres://photovault:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/photovault
       # Keys are kept in /config/keys.toml (created on first start). An older install

@@ -368,7 +368,7 @@ Changed files:
 - `apps/photos/src/components/photovault/{ServerField.tsx,server-check.ts}`
   (new): the collapsed server field (shows name and address; "Change" expands
   it; checks `GET /photovault/info` and shows name + version, or errors such as
-  "Can't reach 10.0.1.7:8095. Are you on your home Wi-Fi?" for home-network
+  "Can't reach 192.168.1.10:8080. Are you on your home Wi-Fi?" for home-network
   addresses).
 - `apps/photos/src/components/sidebar/photovault/ServerSettings.tsx` (new) and
   `sidebar/Sidebar.tsx`: Settings → Server with name, version, home and public
