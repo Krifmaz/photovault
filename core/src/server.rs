@@ -9,6 +9,9 @@ use std::time::Duration;
 
 /// How long the home URL gets to answer before the public URL is used.
 pub const HOME_PROBE_TIMEOUT: Duration = Duration::from_millis(1500);
+/// How long the public URL gets to answer when only checking that it does
+/// (to remember when the server was last reached); it is used either way.
+pub const PUBLIC_PROBE_TIMEOUT: Duration = Duration::from_secs(3);
 /// Timeout for looking up a server the user typed.
 const INFO_TIMEOUT: Duration = Duration::from_secs(8);
 /// mDNS / DNS-SD service type.
@@ -83,6 +86,11 @@ fn info_from(p: PhotovaultInfo, base: &str) -> ServerInfo {
 
 /// Describe the server at `address`.
 pub async fn fetch_server_info(address: &str) -> Result<ServerInfo> {
+    fetch_server_info_at(address).await.map(|(info, _)| info)
+}
+
+/// [`fetch_server_info`], and the base URL that answered.
+pub async fn fetch_server_info_at(address: &str) -> Result<(ServerInfo, String)> {
     let candidates = normalize_address(address);
     if candidates.is_empty() {
         return Err(CoreError::Unreachable {
@@ -93,16 +101,19 @@ pub async fn fetch_server_info(address: &str) -> Result<ServerInfo> {
     let mut answered = false;
     for base in &candidates {
         match probe(&client, base).await {
-            Probe::Photovault(p) => return Ok(info_from(p, base)),
+            Probe::Photovault(p) => return Ok((info_from(p, base), base.clone())),
             Probe::Stock => {
-                return Ok(ServerInfo {
-                    name: String::new(),
-                    version: String::new(),
-                    public_url: base.clone(),
-                    home_url: None,
-                    signups_allowed: true,
-                    is_photovault: false,
-                });
+                return Ok((
+                    ServerInfo {
+                        name: String::new(),
+                        version: String::new(),
+                        public_url: base.clone(),
+                        home_url: None,
+                        signups_allowed: true,
+                        is_photovault: false,
+                    },
+                    base.clone(),
+                ));
             }
             Probe::Other => answered = true,
             Probe::Unreachable => {}
@@ -116,38 +127,101 @@ pub async fn fetch_server_info(address: &str) -> Result<ServerInfo> {
     })
 }
 
-/// The base URL to use for `info`: the home URL if it answers
-/// `/photovault/info` within [`HOME_PROBE_TIMEOUT`] with the same public URL,
-/// otherwise the public URL.
+/// What [`choose_address`] picked.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Chosen {
+    /// The base URL to use.
+    pub url: String,
+    /// Whether `url` answered (as this server) while choosing.
+    pub answered: bool,
+}
+
+/// The addresses [`choose_address`] probes before falling back to the public
+/// URL, in order: the last address that answered (contract v1.3, e.g. a
+/// Tailscale address; only when it is neither the home nor the public URL),
+/// then the home URL.
 ///
-/// The home URL carries the session token and the SRP login, and anyone on
-/// a network that reuses the same private address can answer
-/// `/photovault/info` with the (public) `publicUrl`. So a home URL is only
-/// considered when its identity is checked (`https://`, verified against the
-/// web PKI like the public URL) or when the user explicitly allowed this
-/// server's plain-http home address (`allow_http`).
-pub async fn choose_base(info: &ServerInfo, allow_http: bool) -> String {
-    if let Some(home) = info
-        .home_url
-        .as_deref()
-        .filter(|h| !h.is_empty())
-        .filter(|h| allow_http || h.to_ascii_lowercase().starts_with("https://"))
+/// These carry the session token and the SRP login, and anyone on a network
+/// that reuses the same private address can answer `/photovault/info` with
+/// the (public) `publicUrl` (a carrier's CGNAT range overlaps Tailscale's).
+/// So one is only considered when its identity is checked (`https://`,
+/// verified against the web PKI like the public URL) or when the user
+/// explicitly allowed this server's plain-http addresses (`allow_http`).
+pub fn direct_candidates(info: &ServerInfo, allow_http: bool, last: Option<&str>) -> Vec<String> {
+    let public = trim_url(&info.public_url);
+    let usable =
+        |u: &str| !u.is_empty() && (allow_http || u.to_ascii_lowercase().starts_with("https://"));
+    let home = info.home_url.as_deref().map(trim_url);
+    let mut out = Vec::new();
+    if let Some(l) = last.map(trim_url)
+        && l != public
+        && Some(&l) != home.as_ref()
+        && usable(&l)
     {
+        out.push(l);
+    }
+    if let Some(h) = home
+        && h != public
+        && usable(&h)
+    {
+        out.push(h);
+    }
+    out
+}
+
+/// Whether `base` answers `/photovault/info` within [`HOME_PROBE_TIMEOUT`]
+/// as the server whose public URL is `public`.
+async fn answers_as(client: &reqwest::Client, base: &str, public: &str) -> bool {
+    let fut = client.get(format!("{base}/photovault/info")).send();
+    if let Ok(Ok(res)) = tokio::time::timeout(HOME_PROBE_TIMEOUT, fut).await
+        && res.status().is_success()
+        && let Ok(Ok(p)) =
+            tokio::time::timeout(HOME_PROBE_TIMEOUT, res.json::<PhotovaultInfo>()).await
+    {
+        return p.product == "photovault" && trim_url(&p.public_url) == trim_url(public);
+    }
+    false
+}
+
+/// The base URL for `info`: the first of [`direct_candidates`] (the last
+/// address that answered, then the home URL) that answers `/photovault/info`
+/// within [`HOME_PROBE_TIMEOUT`] with the same public URL, otherwise the
+/// public URL. With `check_public`, a public URL chosen this way is probed
+/// too (at most [`PUBLIC_PROBE_TIMEOUT`]) so the caller knows whether it
+/// answered; the choice is the same either way.
+pub async fn choose_address(
+    info: &ServerInfo,
+    allow_http: bool,
+    last: Option<&str>,
+    check_public: bool,
+) -> Chosen {
+    let public = trim_url(&info.public_url);
+    let candidates = direct_candidates(info, allow_http, last);
+    if !candidates.is_empty() {
         let client = probe_client(HOME_PROBE_TIMEOUT);
-        let fut = client
-            .get(format!("{}/photovault/info", trim_url(home)))
-            .send();
-        if let Ok(Ok(res)) = tokio::time::timeout(HOME_PROBE_TIMEOUT, fut).await
-            && res.status().is_success()
-            && let Ok(Ok(p)) =
-                tokio::time::timeout(HOME_PROBE_TIMEOUT, res.json::<PhotovaultInfo>()).await
-            && p.product == "photovault"
-            && trim_url(&p.public_url) == trim_url(&info.public_url)
-        {
-            return trim_url(home);
+        for c in candidates {
+            if answers_as(&client, &c, &public).await {
+                return Chosen {
+                    url: c,
+                    answered: true,
+                };
+            }
         }
     }
-    trim_url(&info.public_url)
+    let answered = if check_public {
+        let client = probe_client(PUBLIC_PROBE_TIMEOUT);
+        match tokio::time::timeout(PUBLIC_PROBE_TIMEOUT, probe(&client, &public)).await {
+            Ok(Probe::Photovault(p)) => info_from(p, &public).public_url == public,
+            Ok(Probe::Stock) => !info.is_photovault,
+            _ => false,
+        }
+    } else {
+        false
+    };
+    Chosen {
+        url: public,
+        answered,
+    }
 }
 
 /// The server address in a Connect QR payload.
@@ -227,8 +301,8 @@ mod tests {
             vec!["https://a.example"]
         );
         assert_eq!(
-            normalize_address("10.0.1.7:8095"),
-            vec!["https://10.0.1.7:8095", "http://10.0.1.7:8095"]
+            normalize_address("192.168.1.10:8080"),
+            vec!["https://192.168.1.10:8080", "http://192.168.1.10:8080"]
         );
         assert!(normalize_address("  ").is_empty());
     }
@@ -237,7 +311,7 @@ mod tests {
     fn qr_payloads() {
         assert_eq!(
             parse_connect_qr_url(
-                "photovault://connect?url=https%3A%2F%2Fphotos.example.com%2F&home=http%3A%2F%2F10.0.1.7%3A8095&name=Home"
+                "photovault://connect?url=https%3A%2F%2Fphotos.example.com%2F&home=http%3A%2F%2F192.168.1.10%3A8080&name=Home"
             )
             .as_deref(),
             Some("https://photos.example.com")
@@ -257,5 +331,60 @@ mod tests {
         );
         assert_eq!(parse_connect_qr_url("hello"), None);
         assert_eq!(parse_connect_qr_url("ftp://a.example"), None);
+    }
+
+    fn info(home: Option<&str>) -> ServerInfo {
+        ServerInfo {
+            name: "Home vault".into(),
+            version: "0.2.0".into(),
+            public_url: "https://photos.example.com".into(),
+            home_url: home.map(str::to_string),
+            signups_allowed: false,
+            is_photovault: true,
+        }
+    }
+
+    #[test]
+    fn last_address_is_tried_before_home() {
+        let i = info(Some("http://192.168.1.10:8080"));
+        assert_eq!(
+            direct_candidates(&i, true, Some("http://100.101.102.103:8080/")),
+            vec!["http://100.101.102.103:8080", "http://192.168.1.10:8080"]
+        );
+        // The last address is the home or the public URL: probed once, or not at all.
+        assert_eq!(
+            direct_candidates(&i, true, Some("http://192.168.1.10:8080")),
+            vec!["http://192.168.1.10:8080"]
+        );
+        assert_eq!(
+            direct_candidates(&i, true, Some("https://photos.example.com")),
+            vec!["http://192.168.1.10:8080"]
+        );
+        assert!(direct_candidates(&info(None), true, None).is_empty());
+    }
+
+    #[test]
+    fn plain_http_direct_addresses_need_approval() {
+        let i = info(Some("http://192.168.1.10:8080"));
+        assert!(direct_candidates(&i, false, Some("http://100.101.102.103:8080")).is_empty());
+        // https is checked against the web PKI: no approval needed.
+        assert_eq!(
+            direct_candidates(&i, false, Some("https://vault.tail1234.ts.net")),
+            vec!["https://vault.tail1234.ts.net"]
+        );
+    }
+
+    #[tokio::test]
+    async fn unreachable_direct_addresses_fall_back_to_public() {
+        // Nothing listens on these ports: the public URL is chosen without waiting for long.
+        let i = ServerInfo {
+            public_url: "http://127.0.0.1:9".into(),
+            ..info(Some("http://127.0.0.1:7"))
+        };
+        let started = std::time::Instant::now();
+        let c = choose_address(&i, true, Some("http://127.0.0.1:5"), true).await;
+        assert_eq!(c.url, "http://127.0.0.1:9");
+        assert!(!c.answered);
+        assert!(started.elapsed() < Duration::from_secs(8));
     }
 }

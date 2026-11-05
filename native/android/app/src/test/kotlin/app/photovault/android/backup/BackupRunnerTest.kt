@@ -116,7 +116,7 @@ class BackupRunnerTest {
     fun errorsMapToOutcomes() = runTest {
         signIn()
         media.add(1)
-        core.stopWith = CoreError.Unreachable("10.0.1.7:8095")
+        core.stopWith = CoreError.Unreachable("192.168.1.10:8080")
         assertEquals(BackupOutcome.Retry, runner.run().outcome)
         core.stopWith = CoreError.Server(503, "busy")
         assertEquals(BackupOutcome.Retry, runner.run().outcome)

@@ -216,11 +216,17 @@ impl Inner {
         self.store().servers().unwrap_or_default()
     }
 
+    /// Saved servers, most recently reached first (contract v1.3).
+    pub fn recent_servers(&self) -> Vec<crate::RecentServer> {
+        self.store().recent_servers().unwrap_or_default()
+    }
+
     pub async fn add_server(&self, address: &str) -> Result<ServerInfo> {
-        let info = server::fetch_server_info(address).await?;
+        let (info, answered) = server::fetch_server_info_at(address).await?;
         let make_active = {
             let st = self.store();
             st.save_server(&info)?;
+            st.record_server_seen(&info.public_url, &answered, crate::store::now_us())?;
             st.get_plain(KV_ACTIVE_SERVER)?.is_none()
         };
         if make_active {
@@ -277,7 +283,10 @@ impl Inner {
             .into_iter()
             .find(|s| s.public_url == active)?;
         let allow_http = self.home_url_allowed(&active);
-        let mut base = server::choose_base(&info, allow_http).await;
+        let last = self.store().last_server_address(&active).ok().flatten();
+        let chosen = server::choose_address(&info, allow_http, last.as_deref(), true).await;
+        let answered = chosen.answered.then(|| chosen.url.clone());
+        let mut base = chosen.url;
         // The approval may have been withdrawn while we probed (a probe started
         // earlier must not bring the plain-http home URL back).
         if allow_http
@@ -289,6 +298,11 @@ impl Inner {
         }
         // The user may have switched servers while we probed.
         if self.active_public_url().as_deref() == Some(active.as_str()) {
+            if answered.as_deref() == Some(base.as_str()) {
+                let _ = self
+                    .store()
+                    .record_server_seen(&active, &base, crate::store::now_us());
+            }
             self.set_base(Some(Base {
                 public: active,
                 url: base.clone(),

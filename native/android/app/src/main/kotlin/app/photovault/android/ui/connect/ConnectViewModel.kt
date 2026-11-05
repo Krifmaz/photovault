@@ -6,23 +6,34 @@ import app.photovault.android.data.CoreError
 import app.photovault.android.data.CoreRepository
 import app.photovault.android.data.DiscoveredServer
 import app.photovault.android.data.LanDiscovery
+import app.photovault.android.data.RecentServer
 import app.photovault.android.data.ServerInfo
+import app.photovault.android.data.TailscaleStatus
 import app.photovault.android.data.displayAddress
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 /** Why the address did not work; the screen turns it into a sentence. */
 sealed interface ConnectProblem {
@@ -40,10 +51,27 @@ data class ConnectUiState(
     /** The server [address] answered with, once checked. */
     val info: ServerInfo? = null,
     val problem: ConnectProblem? = null,
-    val saved: List<ServerInfo> = emptyList(),
+    /** Saved servers, most recently reached first ("Recent servers"). */
+    val recent: List<RecentServer> = emptyList(),
     val activeUrl: String? = null,
-    /** Saved servers (public URLs) whose plain-http home address the user allowed. */
+    /** Saved servers (public URLs) whose plain-http home (or last direct) address the user allowed. */
     val homeAllowed: Set<String> = emptySet(),
+) {
+    /** The saved servers, in [recent] order. */
+    val saved: List<ServerInfo> get() = recent.map { it.info }
+}
+
+/** A recent server that answered directly while Tailscale is on, at [address]. */
+data class TailscaleReach(val server: RecentServer, val address: String, val info: ServerInfo) {
+    /** False when only its public URL answered (that may not have gone through Tailscale). */
+    val direct: Boolean get() = address.trimEnd('/') != server.info.publicUrl.trimEnd('/')
+}
+
+/** Recent servers tried directly while Tailscale is on (mDNS does not cross the VPN). */
+data class TailscaleScan(
+    val active: Boolean = false,
+    val searching: Boolean = false,
+    val found: List<TailscaleReach> = emptyList(),
 )
 
 sealed interface ConnectEvent {
@@ -55,6 +83,7 @@ class ConnectViewModel(
     private val core: CoreRepository,
     discovery: LanDiscovery,
     defaultServer: String,
+    tailscaleStatus: TailscaleStatus = TailscaleStatus.Off,
     private val io: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
@@ -70,18 +99,58 @@ class ConnectViewModel(
         .catch { emit(emptyList()) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /**
+     * While Tailscale is on: each recent server's last address that answered, then its home and public URL, tried
+     * directly with [fetchServerInfo][CoreRepository.fetchServerInfo] (a short timeout each); the ones that answer
+     * as that server.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val tailscale: StateFlow<TailscaleScan> = tailscaleStatus.active()
+        .catch { emit(false) }
+        .distinctUntilChanged()
+        .combine(_state.map { s -> s.recent.map { it.probeTargets() } }.distinctUntilChanged()) { on, _ -> on }
+        .transformLatest { on ->
+            if (!on) {
+                emit(TailscaleScan())
+                return@transformLatest
+            }
+            val recent = _state.value.recent
+            emit(TailscaleScan(active = true, searching = recent.isNotEmpty()))
+            val found = coroutineScope { recent.map { async { reach(it) } }.awaitAll().filterNotNull() }
+            emit(TailscaleScan(active = true, searching = false, found = found))
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TailscaleScan())
+
     init {
         reloadSaved()
     }
 
     private fun reloadSaved() {
         viewModelScope.launch {
-            val (saved, active, allowed) = withContext(io) {
-                val saved = core.savedServers()
-                Triple(saved, core.activeBaseUrl(), saved.filter { core.homeUrlAllowed(it.publicUrl) }.map { it.publicUrl }.toSet())
+            val (recent, active, allowed) = withContext(io) {
+                val recent = core.recentServers()
+                Triple(recent, core.activeBaseUrl(), recent.filter { core.homeUrlAllowed(it.info.publicUrl) }.map { it.info.publicUrl }.toSet())
             }
-            _state.update { it.copy(saved = saved, activeUrl = active, homeAllowed = allowed) }
+            _state.update { it.copy(recent = recent, activeUrl = active, homeAllowed = allowed) }
         }
+    }
+
+    private fun RecentServer.probeTargets(): List<String> =
+        listOfNotNull(lastAddress, info.homeUrl, info.publicUrl).map { it.trimEnd('/') }.filter { it.isNotBlank() }.distinct()
+
+    private suspend fun reach(server: RecentServer): TailscaleReach? {
+        val public = server.info.publicUrl.trimEnd('/')
+        for (address in server.probeTargets()) {
+            val info = withTimeoutOrNull(TAILSCALE_PROBE_MS) {
+                try {
+                    core.fetchServerInfo(address)
+                } catch (e: CoreError) {
+                    null
+                }
+            }
+            if (info != null && info.publicUrl.trimEnd('/') == public) return TailscaleReach(server, address, info)
+        }
+        return null
     }
 
     fun onAddressChange(text: String) {
@@ -145,6 +214,10 @@ class ConnectViewModel(
         }
     }
 
+    /**
+     * A recent server tapped: it becomes the active one. Core then tries its last address that answered, then its
+     * home URL, then its public URL (contract v1.3).
+     */
     fun selectSaved(server: ServerInfo) {
         viewModelScope.launch {
             try {
@@ -184,6 +257,9 @@ class ConnectViewModel(
         }
     }
 
+    /** A server found over Tailscale tapped: the same as tapping it under "Recent servers". */
+    fun useTailscale(reach: TailscaleReach) = selectSaved(reach.server.info)
+
     private suspend fun nextStep(publicUrl: String): ConnectEvent {
         val account = withContext(io) { core.currentAccount() }
         return if (account != null && account.serverUrl.trimEnd('/') == publicUrl.trimEnd('/')) ConnectEvent.Timeline
@@ -194,5 +270,10 @@ class ConnectViewModel(
         is CoreError.Unreachable -> ConnectProblem.Unreachable(this.address.ifBlank { displayAddress(address) })
         is CoreError.NotPhotovault -> ConnectProblem.NotPhotovault(this.address.ifBlank { displayAddress(address) })
         else -> ConnectProblem.Other(message ?: javaClass.simpleName)
+    }
+
+    companion object {
+        /** How long one address gets to answer over Tailscale. */
+        const val TAILSCALE_PROBE_MS = 3_000L
     }
 }

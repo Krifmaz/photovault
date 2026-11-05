@@ -181,6 +181,20 @@ pub struct ServerInfo {
     pub is_photovault: bool,
 }
 
+/// [contract v1.3] A saved server with when the app last reached it and the
+/// address that answered then (recent servers).
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct RecentServer {
+    /// The saved server.
+    pub info: ServerInfo,
+    /// When an address of this server last answered (µs since the epoch);
+    /// 0 if not since it was saved by an app version without recent servers.
+    pub last_connected_us: i64,
+    /// The base URL that answered then (public, home or a typed address such
+    /// as a Tailscale one), no trailing slash.
+    pub last_address: Option<String>,
+}
+
 /// Storage numbers (contracts/storage-usage.md).
 #[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
 pub struct StorageUsage {
@@ -447,6 +461,12 @@ impl Core {
         self.inner.saved_servers()
     }
 
+    /// [contract v1.3] Saved servers, most recently reached first (servers
+    /// never reached since recent servers exist come last, oldest first).
+    pub fn recent_servers(&self) -> Vec<RecentServer> {
+        self.inner.recent_servers()
+    }
+
     /// Look up and save the server at `address`; it becomes the active
     /// server if none is selected.
     pub async fn add_server(&self, address: String) -> Result<ServerInfo, CoreError> {
@@ -476,14 +496,17 @@ impl Core {
     }
 
     /// Allow (or stop allowing) requests, including sign-in and the session
-    /// token, to go to this server's plain-http home URL when it answers.
+    /// token, to go to this server's plain-http home URL when it answers
+    /// (contract v1.3: also its plain-http last address, such as a Tailscale one).
     /// Off by default: on another network the same private address can be a
     /// different machine.
     pub fn set_home_url_allowed(&self, public_url: String, allowed: bool) -> Result<(), CoreError> {
         self.inner.set_home_url_allowed(&public_url, allowed)
     }
 
-    /// Re-run the home/public choice (call on network change). Returns the new base URL.
+    /// Re-run the address choice (call on network change): the last address
+    /// that answered (contract v1.3), then the home URL, then the public URL.
+    /// Returns the new base URL.
     pub async fn refresh_network(&self) -> Option<String> {
         let inner = self.inner.clone();
         run(async move { Ok(inner.refresh_network().await) })

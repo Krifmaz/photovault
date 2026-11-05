@@ -8,6 +8,7 @@ import app.photovault.android.data.FileKind
 import app.photovault.android.data.LoginStep
 import app.photovault.android.data.MapPoint
 import app.photovault.android.data.PhotoCollection
+import app.photovault.android.data.RecentServer
 import app.photovault.android.data.ServerInfo
 import app.photovault.android.data.StorageUsage
 import app.photovault.android.data.SyncProgress
@@ -53,6 +54,9 @@ class FakeCore(
     private var account: Account? = null
     private var pendingUploads = 0
     private val homeAllowed = HashSet<String>()
+    /** publicUrl -> (when it last answered, the address that answered), as core's `server_seen` table. */
+    private val seen = HashMap<String, Pair<Long, String>>()
+    private var lastSeenUs = 0L
     private var passkeyChecks = 0
 
     private val collections: List<PhotoCollection>
@@ -118,6 +122,11 @@ class FakeCore(
         if ("unreachable" in host || host.endsWith(".invalid")) throw CoreError.Unreachable(displayAddress(address))
         if ("notphotovault" in host) throw CoreError.NotPhotovault(displayAddress(address))
         if ("compat" in host) return ServerInfo("", "", url, null, signupsAllowed = true, isPhotovault = false)
+        // A saved server's other addresses (its home URL, or the last address that answered, such as a
+        // Tailscale one) answer as that server.
+        synchronized(lock) {
+            servers.values.firstOrNull { s -> s.publicUrl != url && (s.homeUrl == url || seen[s.publicUrl]?.second == url) }
+        }?.let { return it }
         val isLan = host.startsWith("10.") || host.startsWith("192.168.") || host.endsWith(".local")
         return ServerInfo(
             name = "Demo vault",
@@ -135,18 +144,35 @@ class FakeCore(
 
     override fun savedServers(): List<ServerInfo> = synchronized(lock) { servers.values.toList() }
 
+    override fun recentServers(): List<RecentServer> = synchronized(lock) {
+        servers.values
+            .map { RecentServer(it, seen[it.publicUrl]?.first ?: 0L, seen[it.publicUrl]?.second) }
+            .sortedWith(compareByDescending<RecentServer> { it.lastConnectedUs != 0L }.thenByDescending { it.lastConnectedUs })
+    }
+
     override suspend fun addServer(address: String): ServerInfo {
         val info = fetchServerInfo(address)
         synchronized(lock) {
             servers[info.publicUrl] = info
             active = info.publicUrl
+            markSeen(info.publicUrl, normalize(address))
         }
         return info
+    }
+
+    /** Remembers that [address] answered as the saved server [publicUrl] (core does this when an address answers). */
+    internal fun markSeen(publicUrl: String, address: String) {
+        synchronized(lock) {
+            if (publicUrl !in servers) return
+            lastSeenUs = maxOf(lastSeenUs + 1, System.currentTimeMillis() * 1000L)
+            seen[publicUrl] = lastSeenUs to address
+        }
     }
 
     override fun removeServer(publicUrl: String) {
         synchronized(lock) {
             servers.remove(publicUrl)
+            seen.remove(publicUrl)
             if (active == publicUrl) {
                 active = null
                 account = null
@@ -159,11 +185,17 @@ class FakeCore(
             if (publicUrl !in servers) throw CoreError.Storage("Unknown server $publicUrl")
             if (active != publicUrl) account = null
             active = publicUrl
+            // The demo server always answers: at the address it answered at last, else its public URL.
+            markSeen(publicUrl, seen[publicUrl]?.second ?: publicUrl)
         }
     }
 
     override fun activeBaseUrl(): String? = synchronized(lock) {
-        active?.let { a -> servers[a]?.homeUrl?.takeIf { it.startsWith("https://") || a in homeAllowed } ?: a }
+        // As core: the last address that answered, then the home URL (plain http only when allowed), then public.
+        active?.let { a ->
+            listOfNotNull(seen[a]?.second, servers[a]?.homeUrl)
+                .firstOrNull { it != a && (it.startsWith("https://") || a in homeAllowed) } ?: a
+        }
     }
 
     override suspend fun refreshNetwork(): String? = activeBaseUrl()

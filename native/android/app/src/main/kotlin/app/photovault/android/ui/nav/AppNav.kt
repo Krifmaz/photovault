@@ -79,7 +79,7 @@ fun AppNav(graph: AppGraph, start: Any) {
                 popExitTransition = { fadeOut() },
             ) {
                 composable<ConnectRoute> { entry ->
-                    val vm = viewModel { ConnectViewModel(graph.core, graph.discovery, BuildConfig.DEFAULT_SERVER_URL) }
+                    val vm = viewModel { ConnectViewModel(graph.core, graph.discovery, BuildConfig.DEFAULT_SERVER_URL, graph.tailscale) }
                     val handle = entry.savedStateHandle
                     val qr = remember(handle) { handle.getStateFlow<String?>(NavResults.QR_PAYLOAD, null) }
                     ConnectScreen(

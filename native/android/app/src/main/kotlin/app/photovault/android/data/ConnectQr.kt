@@ -46,6 +46,6 @@ object ConnectQr {
     private fun decode(s: String): String = runCatching { URLDecoder.decode(s, "UTF-8") }.getOrDefault(s)
 }
 
-/** What the user typed, as shown in messages: no scheme, no trailing slash ("10.0.1.7:8095"). */
+/** What the user typed, as shown in messages: no scheme, no trailing slash ("192.168.1.10:8080"). */
 fun displayAddress(address: String): String =
     address.trim().removePrefix("https://").removePrefix("http://").trimEnd('/')
