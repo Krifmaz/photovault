@@ -92,7 +92,16 @@ jobs:
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Free runner disk space
-              run: sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+              # The release build (R8, resource shrinking, Rust, Gradle caches) has
+              # run a hosted runner out of disk; drop toolchains this job never uses.
+              run: |
+                  df -h /
+                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost \
+                      /usr/share/swift /usr/local/share/powershell /usr/local/share/chromium \
+                      /usr/local/lib/node_modules /opt/hostedtoolcache/CodeQL /opt/microsoft /opt/google \
+                      /opt/az /usr/lib/jvm /usr/lib/google-cloud-sdk
+                  sudo docker image prune --all --force > /dev/null || true
+                  df -h /
 
             - name: Setup JDK 17
               uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
