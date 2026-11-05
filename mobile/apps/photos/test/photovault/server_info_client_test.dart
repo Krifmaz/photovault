@@ -24,7 +24,7 @@ Future<ServerConnectErrorKind> _kind(Future<Object?> f) async {
 }
 
 void main() {
-  const base = "http://10.0.1.7:8095";
+  const base = "http://192.168.1.10:8080";
 
   test("reads /photovault/info", () async {
     final client = _client((req) async {
@@ -74,7 +74,7 @@ void main() {
     } on ServerConnectException catch (e) {
       expect(e.kind, ServerConnectErrorKind.httpError);
       expect(e.statusCode, 502);
-      expect(e.address, "10.0.1.7:8095");
+      expect(e.address, "192.168.1.10:8080");
     }
   });
 

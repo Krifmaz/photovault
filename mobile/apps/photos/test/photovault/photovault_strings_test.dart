@@ -9,7 +9,7 @@ void main() {
     final lan = PhotovaultStrings.connectError(
       const ServerConnectException(
         ServerConnectErrorKind.unreachable,
-        "10.0.1.7:8095",
+        "192.168.1.10:8080",
       ),
     );
     expect(lan, contains("home Wi-Fi"));
