@@ -8,22 +8,22 @@ class ConnectQrTest {
     @Test
     fun parsesConnectUrl() {
         val p = ConnectQr.parse(
-            "photovault://connect?url=https%3A%2F%2Fphotos.example.com%2F&home=http%3A%2F%2F10.0.1.7%3A8095&name=Home%20vault",
+            "photovault://connect?url=https%3A%2F%2Fphotos.example.com%2F&home=http%3A%2F%2F192.168.1.10%3A8080&name=Home%20vault",
         )!!
         assertEquals("https://photos.example.com", p.url)
-        assertEquals("http://10.0.1.7:8095", p.home)
+        assertEquals("http://192.168.1.10:8080", p.home)
         assertEquals("Home vault", p.name)
     }
 
     @Test
     fun fallsBackToHomeWithoutUrl() {
-        assertEquals("http://10.0.1.7:8095", ConnectQr.address("photovault://connect?home=http%3A%2F%2F10.0.1.7%3A8095"))
+        assertEquals("http://192.168.1.10:8080", ConnectQr.address("photovault://connect?home=http%3A%2F%2F192.168.1.10%3A8080"))
     }
 
     @Test
     fun acceptsBareUrls() {
         assertEquals("https://photos.example.com", ConnectQr.address("  https://photos.example.com/ "))
-        assertEquals("http://10.0.1.7:8095", ConnectQr.address("http://10.0.1.7:8095"))
+        assertEquals("http://192.168.1.10:8080", ConnectQr.address("http://192.168.1.10:8080"))
     }
 
     @Test
@@ -37,6 +37,6 @@ class ConnectQrTest {
 
     @Test
     fun displayAddressDropsScheme() {
-        assertEquals("10.0.1.7:8095", displayAddress("http://10.0.1.7:8095/"))
+        assertEquals("192.168.1.10:8080", displayAddress("http://192.168.1.10:8080/"))
     }
 }

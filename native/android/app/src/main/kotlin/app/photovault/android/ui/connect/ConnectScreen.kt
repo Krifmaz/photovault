@@ -1,5 +1,6 @@
 package app.photovault.android.ui.connect
 
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.photovault.android.R
+import app.photovault.android.data.RecentServer
 import app.photovault.android.data.ServerInfo
 import app.photovault.android.data.displayAddress
 import app.photovault.android.ui.components.PanelRow
@@ -53,7 +55,7 @@ import app.photovault.android.ui.theme.Spacing
 import app.photovault.android.ui.theme.palette
 import kotlinx.coroutines.flow.Flow
 
-/** "Connect to your server": address, LAN servers, QR, saved servers. */
+/** "Connect to your server": address, LAN servers, servers reached over Tailscale, QR, recent servers. */
 @Composable
 fun ConnectScreen(
     vm: ConnectViewModel,
@@ -103,6 +105,7 @@ fun ConnectScreen(
             AddressForm(vm, onScanQr, Modifier.widthIn(max = 560.dp).padding(top = Spacing.xl))
         }
         lanSection(vm)
+        tailscaleSection(vm)
         savedSection(vm)
     }
 }
@@ -228,9 +231,53 @@ private fun LanList(vm: ConnectViewModel) {
     }
 }
 
+private fun androidx.compose.foundation.lazy.LazyListScope.tailscaleSection(vm: ConnectViewModel) {
+    item(key = "tailscale", contentType = "tailscale") {
+        TailscaleList(vm)
+    }
+}
+
+/** Shown while Tailscale is on: recent servers that answered directly (mDNS does not cross the VPN). */
+@Composable
+private fun TailscaleList(vm: ConnectViewModel) {
+    val scan by vm.tailscale.collectAsStateWithLifecycle()
+    val state by vm.state.collectAsStateWithLifecycle()
+    if (!scan.active) return
+    val p = MaterialTheme.palette
+    Column(Modifier.fillMaxWidth().widthIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            SectionLabel(stringResource(R.string.connect_tailscale), Modifier.weight(1f))
+            if (scan.searching) {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(top = Spacing.xl).size(14.dp),
+                    strokeWidth = 2.dp,
+                    color = p.faint,
+                )
+            }
+        }
+        val note = when {
+            scan.searching -> stringResource(R.string.connect_tailscale_searching)
+            scan.found.isNotEmpty() -> null
+            state.recent.isEmpty() -> stringResource(R.string.connect_tailscale_no_recent)
+            else -> stringResource(R.string.connect_tailscale_none)
+        }
+        if (note != null) Text(note, style = MaterialTheme.typography.bodySmall, color = p.muted)
+        for (reach in scan.found) {
+            val shown = displayAddress(reach.address)
+            PanelRow(
+                title = reach.info.name.ifBlank { displayAddress(reach.info.publicUrl) },
+                subtitle = if (reach.direct) stringResource(R.string.connect_tailscale_reached, shown)
+                else stringResource(R.string.connect_tailscale_reached_public, shown),
+                onClick = { vm.useTailscale(reach) },
+                icon = R.drawable.ic_lock,
+            )
+        }
+    }
+}
+
 /** Opt-in for a plain-http home address (see ConnectViewModel.setHomeAllowed). */
 @Composable
-private fun HomeAddressRow(address: String, allowed: Boolean, onChange: (Boolean) -> Unit) {
+private fun HomeAddressRow(title: String, warning: String, allowed: Boolean, onChange: (Boolean) -> Unit) {
     val p = MaterialTheme.palette
     Row(
         Modifier.fillMaxWidth().padding(horizontal = Spacing.md),
@@ -238,8 +285,8 @@ private fun HomeAddressRow(address: String, allowed: Boolean, onChange: (Boolean
         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
         Column(Modifier.weight(1f)) {
-            Text(stringResource(R.string.connect_home_title, address), color = p.text, style = MaterialTheme.typography.bodyMedium)
-            Text(stringResource(R.string.connect_home_warning), color = p.muted, style = MaterialTheme.typography.bodySmall)
+            Text(title, color = p.text, style = MaterialTheme.typography.bodyMedium)
+            Text(warning, color = p.muted, style = MaterialTheme.typography.bodySmall)
         }
         Switch(checked = allowed, onCheckedChange = onChange)
     }
@@ -254,16 +301,17 @@ private fun androidx.compose.foundation.lazy.LazyListScope.savedSection(vm: Conn
 @Composable
 private fun SavedList(vm: ConnectViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
-    if (state.saved.isEmpty()) return
+    if (state.recent.isEmpty()) return
     val p = MaterialTheme.palette
     Column(Modifier.fillMaxWidth().widthIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
-        SectionLabel(stringResource(R.string.connect_saved))
-        for (server in state.saved) {
-            val active = state.activeUrl != null && (state.activeUrl == server.publicUrl || state.activeUrl == server.homeUrl)
+        SectionLabel(stringResource(R.string.connect_recent))
+        for (recent in state.recent) {
+            val server = recent.info
+            val active = state.activeUrl != null &&
+                (state.activeUrl == server.publicUrl || state.activeUrl == server.homeUrl || state.activeUrl == recent.lastAddress)
             PanelRow(
                 title = server.name.ifBlank { displayAddress(server.publicUrl) },
-                subtitle = if (active) stringResource(R.string.connect_saved_active, displayAddress(server.publicUrl))
-                else displayAddress(server.publicUrl),
+                subtitle = recentSubtitle(recent, active),
                 onClick = { vm.selectSaved(server) },
                 icon = R.drawable.ic_server,
                 trailing = {
@@ -276,15 +324,47 @@ private fun SavedList(vm: ConnectViewModel) {
                     }
                 },
             )
-            val home = server.homeUrl
-            if (home != null && home.startsWith("http://", ignoreCase = true)) {
+            val allowed = server.publicUrl in state.homeAllowed
+            val home = server.homeUrl?.takeIf { it.startsWith("http://", ignoreCase = true) }
+            val direct = recent.lastAddress
+                ?.takeIf { it.startsWith("http://", ignoreCase = true) }
+                ?.takeIf { it.trimEnd('/') != server.publicUrl.trimEnd('/') && it.trimEnd('/') != server.homeUrl?.trimEnd('/') }
+            // One approval covers both plain-http addresses (contract v1.3); name the home one if there is one.
+            if (home != null) {
                 HomeAddressRow(
-                    address = displayAddress(home),
-                    allowed = server.publicUrl in state.homeAllowed,
+                    title = stringResource(R.string.connect_home_title, displayAddress(home)),
+                    warning = stringResource(R.string.connect_home_warning),
+                    allowed = allowed,
+                    onChange = { vm.setHomeAllowed(server, it) },
+                )
+            } else if (direct != null) {
+                HomeAddressRow(
+                    title = stringResource(R.string.connect_direct_title, displayAddress(direct)),
+                    warning = stringResource(R.string.connect_direct_warning),
+                    allowed = allowed,
                     onChange = { vm.setHomeAllowed(server, it) },
                 )
             }
         }
         Spacer(Modifier.height(Spacing.xl))
+    }
+}
+
+/** "photos.example.com · current", or "· last connected 2 days ago". */
+@Composable
+private fun recentSubtitle(recent: RecentServer, active: Boolean): String {
+    val address = displayAddress(recent.info.publicUrl)
+    return when {
+        active -> stringResource(R.string.connect_saved_active, address)
+        recent.lastConnectedUs > 0 -> stringResource(
+            R.string.connect_recent_last,
+            address,
+            DateUtils.getRelativeTimeSpanString(
+                recent.lastConnectedUs / 1_000L,
+                System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS,
+            ).toString(),
+        )
+        else -> address
     }
 }

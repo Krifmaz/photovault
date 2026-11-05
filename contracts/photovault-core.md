@@ -17,7 +17,7 @@ Rules:
   secretbox under a device key. **[contract v1.1]** Apps pass that key to `Core::with_device_key` and keep
   it wrapped by the platform keystore (Android Keystore AES-GCM); `Core::new` (legacy `device.key` file in
   the data dir) remains for tests and tools.
-* **[contract v1.1]** A plain-http `homeUrl` is only used (it carries sign-in and the session token) after
+* **[contract v1.1]** A plain-http `homeUrl` (and, v1.3, a plain-http last address) is only used (it carries sign-in and the session token) after
   the user allowed it per server (`set_home_url_allowed`); an `https://` home URL needs no approval.
   Authenticated requests always go to the signed-in account's own server, whatever server is selected.
 * **[contract]** Base URL selection follows `contracts/server-info.md` (home/public switching).
@@ -280,3 +280,30 @@ references in `playlist.rs`). Stream generation is not part of core (Ente's apps
   apps do the same). Apps may therefore call `video_stream` for every video and fall back to `download`.
 * Server endpoints used: `GET /files/data/fetch?fileID&type=vid_preview&preferNoContent=true`,
   `GET /files/data/preview?fileID&type=vid_preview`, `POST /files/data/status-diff`.
+
+## v1.3: recent servers
+
+Server discovery over VPNs (mDNS does not cross Tailscale). Additive: one record and one method; every
+saved server stays in `saved_servers()` as before.
+
+```rust
+#[derive(uniffi::Record)] pub struct RecentServer {
+  info: ServerInfo,
+  last_connected_us: i64,        // when an address of it last answered; 0 = not since it was saved by an older app
+  last_address: Option<String>,  // the base URL that answered then (public, home, or a typed one such as a Tailscale address)
+}
+#[uniffi::export] impl Core {
+  fn recent_servers(&self) -> Vec<RecentServer>;  // saved servers, most recently reached first; never-reached ones last, oldest first
+}
+```
+
+* Recorded when `add_server` finds the server (the address that answered) and when `refresh_network` finds an
+  address that answers as that server. Kept in the store's `server_seen` table (schema step 3), not in the saved
+  `ServerInfo` JSON, so servers saved by older versions load unchanged. `remove_server` forgets it; sign-out keeps it.
+* `refresh_network` (and `select_server`, which runs it) now tries, in order: the last address that answered
+  (when it is neither the home nor the public URL), then the home URL, each within 1.5 s and only if it answers
+  `/photovault/info` with the same `publicUrl`; otherwise the public URL, as before. A plain-http last address is
+  only tried after `set_home_url_allowed(public_url, true)`, like a plain-http home URL: it carries the sign-in and
+  the session token, and a carrier's CGNAT range overlaps Tailscale's 100.64.0.0/10. `https://` addresses
+  (e.g. a tailnet's `*.ts.net` name) need no approval.
+* When the public URL is chosen, it is probed (at most 3 s) only to record whether it answered.

@@ -43,6 +43,6 @@ class FakeCoreTest {
 
     @Test(expected = CoreError.Unreachable::class)
     fun unreachableHost() = runTest {
-        FakeCore(nowUs = now, latencyMs = 0).fetchServerInfo("unreachable.example:8095")
+        FakeCore(nowUs = now, latencyMs = 0).fetchServerInfo("unreachable.example:8080")
     }
 }

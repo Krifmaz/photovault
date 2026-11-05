@@ -21,7 +21,9 @@ import app.photovault.android.ui.timeline.TimelineLabels
 import app.photovault.android.widget.WidgetRefresh
 import coil3.ImageLoader
 import coil3.PlatformContext
+import app.photovault.android.data.AndroidTailscaleStatus
 import app.photovault.android.data.NetworkWatcher
+import app.photovault.android.data.TailscaleStatus
 import coil3.SingletonImageLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,8 @@ class AppGraph(private val context: Context) {
         Thread({ core }, "photovault-core-init").apply { priority = Thread.NORM_PRIORITY }.start()
     }
     val discovery: LanDiscovery by lazy { NsdLanDiscovery(context) }
+    /** Whether Tailscale is up (the connect screen then tries recent servers directly). */
+    val tailscale: TailscaleStatus by lazy { AndroidTailscaleStatus(context) }
     val timeline: TimelineStore by lazy { TimelineStore(core) }
     /** Create account (contract v1.2 signup), on the same core. */
     val signup: SignupRepository by lazy { SignupProvider.create(context, core) }

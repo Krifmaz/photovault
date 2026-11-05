@@ -11,6 +11,7 @@ import app.photovault.core.Account as CAccount
 import app.photovault.core.Collection as CCollection
 import app.photovault.core.FileKind as CFileKind
 import app.photovault.core.LoginStep as CLoginStep
+import app.photovault.core.RecentServer as CRecentServer
 import app.photovault.core.ServerInfo as CServerInfo
 import app.photovault.core.SyncProgress as CSyncProgress
 import app.photovault.core.TimelineItem as CTimelineItem
@@ -32,6 +33,8 @@ internal class RealCore(internal val core: Core) : CoreRepository, BackupCore {
     override fun parseConnectQr(payload: String): String? = coreParseConnectQr(payload)
 
     override fun savedServers(): List<ServerInfo> = core.savedServers().map { it.toApp() }
+
+    override fun recentServers(): List<RecentServer> = core.recentServers().map { it.toApp() }
 
     override suspend fun addServer(address: String): ServerInfo = guard(address) { core.addServer(address).toApp() }
 
@@ -129,6 +132,8 @@ internal class RealCore(internal val core: Core) : CoreRepository, BackupCore {
     }
 
     private fun CServerInfo.toApp() = ServerInfo(name, version, publicUrl, homeUrl, signupsAllowed, isPhotovault)
+
+    private fun CRecentServer.toApp() = RecentServer(info.toApp(), lastConnectedUs, lastAddress)
 
     private fun CAccount.toApp() = Account(userId, email, serverUrl)
 

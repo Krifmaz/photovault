@@ -16,12 +16,18 @@ interface CoreRepository {
 
     // servers (survive logout)
     fun savedServers(): List<ServerInfo>
+    /** [contract v1.3] Saved servers, most recently reached first, with the address that answered last. */
+    fun recentServers(): List<RecentServer> = savedServers().map { RecentServer(it) }
     suspend fun addServer(address: String): ServerInfo
     fun removeServer(publicUrl: String)
     fun selectServer(publicUrl: String)
     fun activeBaseUrl(): String?
+    /** Re-runs the address choice: last address that answered, home URL, public URL (contract v1.3). */
     suspend fun refreshNetwork(): String?
-    /** Whether requests (sign-in, the session token) may go to this server's plain-http home URL. */
+    /**
+     * Whether requests (sign-in, the session token) may go to this server's plain-http home URL, or its plain-http
+     * last address (contract v1.3).
+     */
     fun homeUrlAllowed(publicUrl: String): Boolean
     fun setHomeUrlAllowed(publicUrl: String, allowed: Boolean)
 
